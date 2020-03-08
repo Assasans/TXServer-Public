@@ -1,0 +1,60 @@
+﻿<Window x:Class="TXServer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TXServer"
+        mc:Ignorable="d"
+        Title="TX Server" WindowStartupLocation="CenterScreen" Height="256" Width="608" ResizeMode="CanMinimize" ScrollViewer.VerticalScrollBarVisibility="Disabled" Closing="Window_Closing" Closed="Window_Closed">
+    <Grid Margin="0,0,4,-19" UseLayoutRounding="False">
+        <GroupBox Header="Действия" Margin="10,10,0,0" Height="65" VerticalAlignment="Top" HorizontalAlignment="Left" Width="280">
+            <Grid Height="65" Margin="0,0,-12,-22" VerticalAlignment="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="87*"/>
+                    <ColumnDefinition Width="53*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Запуск сервера:" HorizontalAlignment="Left" Margin="10,7,0,0" VerticalAlignment="Top" Height="26" Width="95"/>
+                <Button x:Name="StartButton" Content="Запуск" Margin="10,10,21,0" VerticalAlignment="Top" Grid.Column="1" Height="20" Click="StartServer_Click"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="SettingsGroupBox" Header="Настройки" HorizontalAlignment="Left" Height="124" Margin="10,80,0,0" VerticalAlignment="Top" Width="280">
+            <Grid Margin="0,0,-12,-22">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="31*"/>
+                    <ColumnDefinition Width="39*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock HorizontalAlignment="Left" Margin="10,38,0,0" TextWrapping="Wrap" Text="Порт:" VerticalAlignment="Top" Height="16" Width="30"/>
+                <ComboBox x:Name="IPAddressComboBox" Grid.Column="1" Margin="10,10,21,0" VerticalAlignment="Top" SelectedIndex="0" Height="22"/>
+
+                <TextBlock HorizontalAlignment="Left" Margin="10,13,0,0" TextWrapping="Wrap" Text="IP-адрес:" VerticalAlignment="Top" Height="16" Width="49"/>
+                <TextBox x:Name="PortTextBox" Grid.Column="1" Height="23" Margin="10,37,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="5050"/>
+
+                <TextBlock HorizontalAlignment="Left" Margin="10,66,0,0" TextWrapping="Wrap" Text="Максимум игроков:" VerticalAlignment="Top" Height="22" Width="109"/>
+                <TextBox x:Name="MaxPlayersTextBox" Height="23" Margin="10,65,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Text="5"/>
+            </Grid>
+        </GroupBox>
+        <TextBlock HorizontalAlignment="Left" Height="0" Margin="10,10,0,0" Grid.Row="1" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="25" Grid.Column="1"/>
+        <GroupBox x:Name="DebugGroupBox" Header="Отладка" Margin="295,80,0,0" Height="95" VerticalAlignment="Top" HorizontalAlignment="Left" Width="293">
+            <Grid Height="65" Margin="0,0,-12,-22" VerticalAlignment="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="87*"/>
+                    <ColumnDefinition Width="53*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Отправлять содерж. файлов:" HorizontalAlignment="Left" Margin="10,7,0,0" VerticalAlignment="Top" Height="26"/>
+                <Button x:Name="DebugFileSelectButton" Content="Выбрать" Margin="10,10,21,0" VerticalAlignment="Top" Grid.Column="1" Height="20" Click="DebugFileSelectButton_Click"/>
+                <TextBlock x:Name="FileNameTextBlock" HorizontalAlignment="Left" Margin="19,38,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="253" Grid.ColumnSpan="2"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="StateGroupBox" Header="Состояние" Margin="295,10,0,0" Height="65" VerticalAlignment="Top" HorizontalAlignment="Left" Width="293" IsEnabled="False">
+            <Grid Height="65" Margin="0,0,-12,-22" VerticalAlignment="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="87*"/>
+                    <ColumnDefinition Width="53*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Показать состояние:" HorizontalAlignment="Left" Margin="10,7,0,0" VerticalAlignment="Top" Height="26" Width="124"/>
+                <Button x:Name="ShowStateButton" Content="Показать" Margin="10,10,21,0" VerticalAlignment="Top" Height="20" Click="ShowStateButton_Click" Grid.Column="1"/>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>
