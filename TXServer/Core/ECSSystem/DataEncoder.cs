@@ -28,62 +28,72 @@ namespace TXServer.Core
             this.map = map;
         }
 
-        private void Encode(object obj, bool encodeEntity = false)
+        private void EncodePrimitive(object obj)
+        {
+            writer.GetType()
+                  .GetMethod("Write", new Type[] { obj.GetType() })
+                  .Invoke(writer, new object[] { obj });
+        }
+
+        private void EncodeCollection(object obj)
+        {
+            ICollection collection = obj as ICollection;
+
+            writer.Write((byte)collection.Count);
+
+            foreach (object el in collection)
+            {
+                SelectEncode(el);
+            }
+        }
+
+        private void EncodeCommand(object obj)
+        {
+            writer.Write((byte)CommandCodeByType[obj.GetType()]);
+        }
+
+        private void EncodeEntity(object obj)
+        {
+            writer.Write(Player.Instance.Value.EntityIds[obj as Entity]);
+        }
+        
+        private void SelectEncode(object obj)
         {
             Type objType = obj.GetType();
 
             if (objType.IsPrimitive || objType == typeof(string) || objType == typeof(decimal))
             {
-                writer.GetType()
-                      .GetMethod("Write", new Type[] { objType })
-                      .Invoke(writer, new object[] { obj });
+                EncodePrimitive(obj);
                 return;
             }
 
-            else if (objType.IsArray)
+           else if (objType == typeof(Entity))
             {
-                object[] arr = obj as object[];
-
-                if (!typeof(Command).IsAssignableFrom(objType.GetElementType()))
-                    writer.Write((byte)arr.Length);
-
-                foreach (object el in arr)
-                {
-                    Encode(el);
-                }
-                return;
+                EncodeEntity(obj);
             }
+
             else if (typeof(ICollection).IsAssignableFrom(objType))
             {
-                ICollection collection = obj as ICollection;
-
-                writer.Write((byte)collection.Count);
-
-                foreach (object el in collection)
-                {
-                    Encode(el);
-                }
+                EncodeCollection(obj);
                 return;
             }
 
             else if (typeof(Command).IsAssignableFrom(objType))
             {
-                writer.Write((byte)CommandByType[objType]);
-                if (objType == typeof(EntityShareCommand))
-                    encodeEntity = true;
+                EncodeCommand(obj);
             }
-            else if (objType.GetCustomAttribute(typeof(SerialVersionUIDAttribute)) != null)
+
+            else if (Attribute.IsDefined(objType, typeof(SerialVersionUIDAttribute)))
             {
                 writer.Write(SerialVersionUIDTools.GetId(objType));
             }
 
-            else if (objType == typeof(Entity))
-            {
-                writer.Write(Player.Instance.Value.EntityIds[obj as Entity]);
-                if (!encodeEntity) return;
-            }
+            EncodeObject(obj);
+        }
 
-            foreach (PropertyInfo info in GetProtocolProperties(objType))
+        private void EncodeObject(object obj)
+        {
+            foreach (PropertyInfo info in GetProtocolProperties(obj.GetType()))
             {
                 object value = info.GetValue(obj);
 
@@ -93,7 +103,7 @@ namespace TXServer.Core
                     if (value == null) continue;
                 }
 
-                Encode(value, encodeEntity);
+                SelectEncode(value);
             }
         }
 
@@ -106,8 +116,7 @@ namespace TXServer.Core
 
             foreach (Command command in commands)
             {
-                command.BeforeWrap();
-                encoder.Encode(command);
+                encoder.SelectEncode(command);
             }
 
             map.Reset();

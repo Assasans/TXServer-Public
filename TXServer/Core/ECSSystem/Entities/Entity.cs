@@ -14,7 +14,6 @@ namespace TXServer.Core.ECSSystem
         public Entity(TemplateAccessor TemplateAccessor, List<Component> components)
         {
             this.TemplateAccessor = TemplateAccessor;
-            preComponents = components;
 
             foreach (Component component in components)
             {
@@ -35,8 +34,7 @@ namespace TXServer.Core.ECSSystem
             }
         }
 
-        [Protocol][OptionalMapped] public TemplateAccessor TemplateAccessor { get; set; }
-        [Protocol] public List<Component> preComponents { get; set; }
+        public TemplateAccessor TemplateAccessor { get; set; }
                 
         public ConcurrentDictionary<Type, Component> Components = new ConcurrentDictionary<Type, Component>();
 

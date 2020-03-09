@@ -28,6 +28,11 @@ namespace TXServer.Core.Commands
 
         public static void SendCommands(Socket socket, params Command[] commands)
         {
+            foreach (Command command in commands)
+            {
+                command.BeforeWrap();
+            }
+
             using (MemoryStream buffer = new MemoryStream())
             {
                 BinaryWriter writer = new BigEndianBinaryWriter(buffer);

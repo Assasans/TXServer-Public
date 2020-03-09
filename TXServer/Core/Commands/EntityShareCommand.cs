@@ -1,7 +1,8 @@
 ﻿using System.IO;
 using System;
 using TXServer.Core.ECSSystem;
-using TXServer.Bits;
+using System.Collections.Generic;
+using static TXServer.Core.ECSSystem.Components;
 
 namespace TXServer.Core.Commands
 {
@@ -21,8 +22,20 @@ namespace TXServer.Core.Commands
             // Добавить Entity в общий список.
             Player.Instance.Value.EntityList[newEntityId] = Entity;
             Player.Instance.Value.EntityIds[Entity] = newEntityId;
+
+            EntityId = newEntityId;
+            TemplateAccessor = Entity.TemplateAccessor;
+
+            foreach (Component component in Entity.Components.Values)
+            {
+                Components.Add(component);
+            }
         }
 
-        [Protocol] public Entity Entity { get; set; }
+        public Entity Entity { get; set; }
+
+        [Protocol] public UInt64 EntityId { get; set; }
+        [Protocol][OptionalMapped] public TemplateAccessor TemplateAccessor { get; set; }
+        [Protocol] public List<Component> Components { get; set; } = new List<Component>();
     }
 }

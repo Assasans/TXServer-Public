@@ -6,7 +6,7 @@ namespace TXServer.Core.Commands
 {
     public static partial class CommandTyping
     {
-        public enum CommandId
+        public enum CommandCode 
         {
             SendEvent = 1,
             EntityShare,
@@ -20,18 +20,18 @@ namespace TXServer.Core.Commands
 
 
         // Список типов команд.
-        public static readonly Dictionary<CommandId, Type> CommandType = new Dictionary<CommandId, Type>
+        public static readonly Dictionary<CommandCode, Type> CommandTypeByCode = new Dictionary<CommandCode, Type>
         {
-            { CommandId.SendEvent, typeof(SendEventCommand) },
-            { CommandId.EntityShare, typeof(EntityShareCommand) },
+            { CommandCode.SendEvent, typeof(SendEventCommand) },
+            { CommandCode.EntityShare, typeof(EntityShareCommand) },
             // { CommandId.EntityUnshare, typeof(EntityUnshareCommand) },
-            { CommandId.ComponentAdd, typeof(ComponentAddCommand) },
+            { CommandCode.ComponentAdd, typeof(ComponentAddCommand) },
             // { CommandId.ComponentRemove, typeof(ComponentRemoveCommand) },
-            { CommandId.ComponentChange, typeof(ComponentChangeCommand) },
-            { CommandId.InitTime, typeof(InitTimeCommand) },
+            { CommandCode.ComponentChange, typeof(ComponentChangeCommand) },
+            { CommandCode.InitTime, typeof(InitTimeCommand) },
             // { CommandId.Close, typeof(CloseCommand) },
         };
 
-        public static readonly Dictionary<Type, CommandId> CommandByType = CommandType.ToDictionary(x => x.Value, x => x.Key);
+        public static readonly Dictionary<Type, CommandCode> CommandCodeByType = CommandTypeByCode.ToDictionary(x => x.Value, x => x.Key);
     }
 }
