@@ -126,8 +126,9 @@
     <Compile Include="Core\Core.cs" />
     <Compile Include="Core\CommandTyping.cs" />
     <Compile Include="Core\CommandManager.cs" />
-    <Compile Include="Core\Player\Player.cs" />
-    <Compile Include="Core\Player\Handlers.cs" />
+    <Compile Include="Core\Player\PlayerConnection.cs" />
+    <Compile Include="Core\Player\PlayerData.cs" />
+    <Compile Include="Core\Player\PlayerHandlers.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -136,6 +137,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

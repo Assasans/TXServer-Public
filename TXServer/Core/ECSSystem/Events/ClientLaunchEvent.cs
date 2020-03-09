@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using TXServer.Bits;
 using TXServer.Core.Commands;
-using static TXServer.Core.ECSSystem.Components;
+using TXServer.Core.ECSSystem.Components;
 
 namespace TXServer.Core.ECSSystem.Events
 {
@@ -20,7 +20,7 @@ namespace TXServer.Core.ECSSystem.Events
         public override void Execute(Entity entity)
         {
             // WebId message
-            CommandManager.SendCommands(Player.Instance.Value.Socket,
+            CommandManager.SendCommands(PlayerData.Instance.Socket,
                 new ComponentAddCommand(entity, new WebIdComponent()),
                 new ComponentChangeCommand(entity, new WebIdComponent())
             );

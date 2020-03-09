@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using TXServer.Bits;
-using static TXServer.Core.ECSSystem.Components;
+using TXServer.Core.ECSSystem.Components;
 
 namespace TXServer.Core.ECSSystem
 {
@@ -45,7 +45,7 @@ namespace TXServer.Core.ECSSystem
         {
             List<Entity> entities = new List<Entity>();
 
-            foreach (Entity entity in Player.Instance.Value.EntityList.Values)
+            foreach (Entity entity in PlayerData.Instance.EntityList.Values)
             {
                 if (entity.Components.ContainsKey(componentType))
                 {
@@ -63,7 +63,7 @@ namespace TXServer.Core.ECSSystem
         {
             try
             {
-                return Player.Instance.Value.EntityList[id];
+                return PlayerData.Instance.EntityList[id];
             }
             catch (KeyNotFoundException)
             {

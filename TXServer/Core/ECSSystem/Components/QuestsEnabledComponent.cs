@@ -1,11 +1,8 @@
-﻿namespace TXServer.Core.ECSSystem
+﻿namespace TXServer.Core.ECSSystem.Components
 {
-    public static partial class Components
+    [SerialVersionUID(1479269007802)]
+    public sealed class QuestsEnabledComponent : Component
     {
-        [SerialVersionUID(1479269007802)]
-        public sealed class QuestsEnabledComponent : Component
-        {
-            public QuestsEnabledComponent() { }
-        }
+        public QuestsEnabledComponent() { }
     }
 }

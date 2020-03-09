@@ -12,8 +12,6 @@ namespace TXServer
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static string DebugFileFolder;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -66,6 +64,7 @@ namespace TXServer
             {
                 SettingsGroupBox.IsEnabled = true;
                 StateGroupBox.IsEnabled = false;
+                ServerStateText.Text = "";
 
                 Core.Core.StopServer();
 
@@ -74,22 +73,6 @@ namespace TXServer
 
             Activate();
             Cursor = Cursors.Arrow;
-        }
-
-        // Выбор файла для отправки.
-        private void DebugFileSelectButton_Click(object sender, RoutedEventArgs e)
-        {
-            using (var dlg = new CommonOpenFileDialog
-            {
-                IsFolderPicker = true
-            })
-            {
-                if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
-                {
-                    DebugFileFolder = dlg.FileName;
-                    FileNameTextBlock.Text = dlg.FileName;
-                }
-            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -110,8 +93,7 @@ namespace TXServer
         {
             if (!Core.Core.IsStarted) return;
 
-            Console.WriteLine("Состояние:" + Environment.NewLine +
-                "Игроков онлайн: " + Core.Core.PlayerCount);
+            ServerStateText.Text = "Игроков онлайн: " + Core.Core.PlayerCount;
         }
     }
 }

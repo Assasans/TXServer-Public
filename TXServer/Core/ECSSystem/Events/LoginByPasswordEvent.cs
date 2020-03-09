@@ -14,7 +14,7 @@ namespace TXServer.Core.ECSSystem.Events
 
 		public override void Execute(Entity entity)
 		{
-			CommandManager.SendCommands(Player.Instance.Value.Socket,
+			CommandManager.SendCommands(PlayerData.Instance.Socket,
 				new SendEventCommand(new LoginFailedEvent(), entity),
 				new SendEventCommand(new InvalidPasswordEvent(), entity));
 		}

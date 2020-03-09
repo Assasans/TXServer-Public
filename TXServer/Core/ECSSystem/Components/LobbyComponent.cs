@@ -1,11 +1,8 @@
-﻿namespace TXServer.Core.ECSSystem
+﻿namespace TXServer.Core.ECSSystem.Components
 {
-    public static partial class Components
+    [SerialVersionUID(7022690011228595024)]
+    public sealed class LobbyComponent : Component
     {
-        [SerialVersionUID(7022690011228595024)]
-        public sealed class LobbyComponent : Component
-        {
-            public LobbyComponent() { }
-        }
+        public LobbyComponent() { }
     }
 }

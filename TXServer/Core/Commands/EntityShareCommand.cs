@@ -2,7 +2,7 @@
 using System;
 using TXServer.Core.ECSSystem;
 using System.Collections.Generic;
-using static TXServer.Core.ECSSystem.Components;
+using TXServer.Core.ECSSystem.Components;
 
 namespace TXServer.Core.Commands
 {
@@ -17,11 +17,11 @@ namespace TXServer.Core.Commands
 
         public override void BeforeWrap()
         {
-            UInt64 newEntityId = Player.Instance.Value.GenerateId();
+            UInt64 newEntityId = PlayerData.Instance.GenerateId();
 
             // Добавить Entity в общий список.
-            Player.Instance.Value.EntityList[newEntityId] = Entity;
-            Player.Instance.Value.EntityIds[Entity] = newEntityId;
+            PlayerData.Instance.EntityList[newEntityId] = Entity;
+            PlayerData.Instance.EntityIds[Entity] = newEntityId;
 
             EntityId = newEntityId;
             TemplateAccessor = Entity.TemplateAccessor;
@@ -36,6 +36,6 @@ namespace TXServer.Core.Commands
 
         [Protocol] public UInt64 EntityId { get; set; }
         [Protocol][OptionalMapped] public TemplateAccessor TemplateAccessor { get; set; }
-        [Protocol] public List<Component> Components { get; set; } = new List<Component>();
+        [Protocol] public List<Component> Components { get; } = new List<Component>();
     }
 }

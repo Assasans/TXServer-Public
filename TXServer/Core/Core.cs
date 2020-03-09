@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using static TXServer.Core.Player;
 
 namespace TXServer.Core
 {
-    class Core
+    static class Core
     {
         class NativeMethods
         {
@@ -23,21 +20,16 @@ namespace TXServer.Core
             public static extern bool FreeConsole();
         }
 
-
         // Пул игроков.
-        private static List<Player> Pool = new List<Player>();
-
+        private static List<PlayerConnection> Pool = new List<PlayerConnection>();
 
         // Сокет, принимающий соединения.
         private static Socket acceptor;
         private static Thread acceptWorker;
 
-
         // Состояние сервера.
-        public static bool IsStarted { get; private set; } = false;
-
+        public static bool IsStarted { get; private set; }
         public static int PlayerCount = 0;
-
 
         // Запуск сервера.
         public static void InitServer(IPAddress ip, short port, int poolSize)
@@ -51,7 +43,7 @@ namespace TXServer.Core
 
             for (int i = 0; i < poolSize; i++)
             {
-                Pool.Add(new Player(i));
+                Pool.Add(new PlayerConnection(i));
             }
 
             acceptor = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
@@ -63,16 +55,12 @@ namespace TXServer.Core
             acceptWorker.Start();
         }
 
-
         // Остановка сервера.
         public static void StopServer()
         {
             IsStarted = false;
 
-            Pool.ForEach(delegate (Player player)
-            {
-                player.Destroy();
-            });
+            Pool.ForEach(player => player.Destroy());
 
             Pool.Clear();
             acceptor.Close();
@@ -86,14 +74,10 @@ namespace TXServer.Core
 #endif
         }
 
-
         // Добавление игрока в пул.
         private static void AddPlayer(Socket toAdd)
         {
-            Player selected = Pool.Find(delegate (Player player)
-            {
-                return player.State == PlayerState.Disconnected;
-            });
+            PlayerConnection selected = Pool.Find(connection => connection.data.Socket == null || !connection.data.Socket.Connected);
 
             if (selected != null)
             {
@@ -105,7 +89,6 @@ namespace TXServer.Core
                 Console.WriteLine("Server is full!");
             }
         }
-
 
         // Прием новых клиентов.
         public static void AcceptPlayers()
