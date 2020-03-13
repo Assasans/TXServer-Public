@@ -123,10 +123,10 @@
     <Compile Include="Core\Commands\InitTimeCommand.cs" />
     <Compile Include="Core\Commands\SendEventCommand.cs" />
     <Compile Include="Core\OptionalMap.cs" />
-    <Compile Include="Core\Core.cs" />
+    <Compile Include="Core\ServerLauncher.cs" />
     <Compile Include="Core\CommandTyping.cs" />
     <Compile Include="Core\CommandManager.cs" />
-    <Compile Include="Core\Player\PlayerConnection.cs" />
+    <Compile Include="Core\Player\Player.cs" />
     <Compile Include="Core\Player\PlayerData.cs" />
     <Compile Include="Core\Player\PlayerHandlers.cs" />
     <Page Include="MainWindow.xaml">

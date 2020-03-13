@@ -17,11 +17,11 @@ namespace TXServer.Core.Commands
 
         public override void BeforeWrap()
         {
-            UInt64 newEntityId = PlayerData.Instance.GenerateId();
+            UInt64 newEntityId = Player.Instance.GenerateId();
 
             // Добавить Entity в общий список.
-            PlayerData.Instance.EntityList[newEntityId] = Entity;
-            PlayerData.Instance.EntityIds[Entity] = newEntityId;
+            Player.Instance.EntityList[newEntityId] = Entity;
+            Player.Instance.EntityIds[Entity] = newEntityId;
 
             EntityId = newEntityId;
             TemplateAccessor = Entity.TemplateAccessor;

@@ -26,7 +26,7 @@ namespace TXServer.Core.ECSSystem.Events
 
 		public override void Execute(Entity entity)
 		{
-			CommandManager.SendCommands(PlayerData.Instance.Socket, new SendEventCommand(new EmailInvalidEvent(Email), entity));
+			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new EmailInvalidEvent(Email), entity));
 		}
 	}
 }

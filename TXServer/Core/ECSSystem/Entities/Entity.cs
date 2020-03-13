@@ -45,7 +45,7 @@ namespace TXServer.Core.ECSSystem
         {
             List<Entity> entities = new List<Entity>();
 
-            foreach (Entity entity in PlayerData.Instance.EntityList.Values)
+            foreach (Entity entity in Player.Instance.EntityList.Values)
             {
                 if (entity.Components.ContainsKey(componentType))
                 {
@@ -63,7 +63,7 @@ namespace TXServer.Core.ECSSystem
         {
             try
             {
-                return PlayerData.Instance.EntityList[id];
+                return Player.Instance.EntityList[id];
             }
             catch (KeyNotFoundException)
             {

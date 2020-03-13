@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net.Sockets;
 using System.Threading;
 using TXServer.Core.Commands;
 using TXServer.Core.ECSSystem;
@@ -10,81 +8,95 @@ using static TXServer.Core.ECSSystem.EntityTemplates;
 
 namespace TXServer.Core
 {
-    public static class PlayerHandlers
+    public partial class Player
     {
-        private static object playerConnection;
+        
 
-        // Обработка событий сервер-клиент.
-        public static void ServerSideEvents(object oPlayerData)
+        /// <summary>
+        /// Обработка событий сервер -> клиент.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов", Justification = "<Ожидание>")]
+        public static void ServerSideEvents(object oPlayer)
         {
-            PlayerData data = oPlayerData as PlayerData;
-            PlayerData.Instance = data;
+            Instance = oPlayer as Player;
 
-            while (true)
+            try
             {
-                try
+                if (Instance.Socket != null && Instance.Socket.Connected) {
+                    Entity ClientSession = new Entity(TemplateAccessor: new TemplateAccessor(new ClientSessionTemplate(), "notification/emailconfirmation"),
+                                                        components: new List<Component>
+                                                        {
+                                                            new ClientSessionComponent()
+                                                        });
+
+                    Entity Lobby = new Entity(TemplateAccessor: new TemplateAccessor(new LobbyTemplate(), "lobby"),
+                                                components: new List<Component>
+                                                {
+                                                    new LobbyComponent(),
+                                                    new QuestsEnabledComponent()
+                                                });
+
+                    // Server time message
+                    CommandManager.SendCommands(Instance.Socket, new InitTimeCommand());
+
+                    // Session init message
+                    CommandManager.SendCommands(Instance.Socket,
+                        new EntityShareCommand(ClientSession),
+                        new EntityShareCommand(Lobby),
+                        new ComponentAddCommand(ClientSession, new SessionSecurityPublicComponent())
+                    );
+                }
+
+                // Заглушка.
+                SpinWait.SpinUntil(delegate () { return Instance.Socket == null; });
+                throw new Exception();
+            }
+            catch (Exception e)
+            {
+                lock (Instance)
                 {
-                    if (data.Socket != null && data.Socket.Connected) {
-                        Entity ClientSession = new Entity(TemplateAccessor: new TemplateAccessor(new ClientSessionTemplate(), "notification/emailconfirmation"),
-                                                          components: new List<Component>
-                                                          {
-                                                              new ClientSessionComponent()
-                                                          });
-
-                        Entity Lobby = new Entity(TemplateAccessor: new TemplateAccessor(new LobbyTemplate(), "lobby"),
-                                                  components: new List<Component>
-                                                  {
-                                                      new LobbyComponent(),
-                                                      new QuestsEnabledComponent()
-                                                  });
-
-                        // Server time message
-                        CommandManager.SendCommands(data.Socket, new InitTimeCommand());
-
-                        // Session init message
-                        CommandManager.SendCommands(data.Socket,
-                            new EntityShareCommand(ClientSession),
-                            new EntityShareCommand(Lobby),
-                            new ComponentAddCommand(ClientSession, new SessionSecurityPublicComponent())
-                        );
+                    if (Instance.Socket == null) // Ошибка уже обработана в другом потоке - в этом случае Socket установлен в null.
+                    {
+                        Instance.IsBusy = false;
+                        Instance = null;
+                        return;
                     }
+                }
 
-                    Thread.Sleep(Timeout.Infinite);
-                }
-                catch (ThreadAbortException) { }
-                catch (ThreadInterruptedException) { }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                    data.Free();
-                }
+                Console.WriteLine(e.ToString());
+                Instance.Destroy();
             }
         }
 
-        /// <summary>
-        /// Обработка событий клиента.
-        /// </summary>
-        public static void ClientSideEvents(object oPlayerData)
-        {
-            PlayerData data = oPlayerData as PlayerData;
-            PlayerData.Instance = data;
 
-            while (true)
+        /// <summary>
+        /// Обработка событий клиент -> сервер.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов", Justification = "<Ожидание>")]
+        public static void ClientSideEvents(object oPlayer)
+        {
+            Instance = oPlayer as Player;
+
+            try
             {
-                try
+                while (true)
                 {
-                    if (data.Socket != null && data.Socket.Connected)
-                        CommandManager.ReceiveAndExecuteCommands(data.Socket);
-                    else
-                        Thread.Sleep(Timeout.Infinite);
+                    CommandManager.ReceiveAndExecuteCommands(Instance.Socket);
                 }
-                catch (ThreadAbortException) { }
-                catch (ThreadInterruptedException) { }
-                catch (Exception e)
+            }
+            catch (Exception e)
+            {
+                lock (Instance)
                 {
-                    Console.WriteLine(e.ToString());
-                    data.Free();
+                    if (Instance.Socket == null) // Ошибка уже обработана в другом потоке - в этом случае Socket установлен в null.
+                    {
+                        Instance.IsBusy = false;
+                        return;
+                    }
                 }
+
+                Console.WriteLine(e.ToString());
+                Instance.Destroy();
             }
         }
     }

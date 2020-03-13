@@ -20,7 +20,7 @@ namespace TXServer.Core.ECSSystem.Events
         public override void Execute(Entity entity)
         {
             // WebId message
-            CommandManager.SendCommands(PlayerData.Instance.Socket,
+            CommandManager.SendCommands(Player.Instance.Socket,
                 new ComponentAddCommand(entity, new WebIdComponent()),
                 new ComponentChangeCommand(entity, new WebIdComponent())
             );

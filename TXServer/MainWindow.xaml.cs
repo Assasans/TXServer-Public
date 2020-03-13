@@ -4,6 +4,7 @@ using System.Net.NetworkInformation;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using TXServer.Core;
 
 namespace TXServer
 {
@@ -52,11 +53,11 @@ namespace TXServer
         private void StartServer_Click(object sender, RoutedEventArgs e)
         {
             Cursor = Cursors.Wait;
-            if (!Core.Core.IsStarted) {
+            if (!ServerLauncher.IsStarted) {
                 SettingsGroupBox.IsEnabled = false;
                 StateGroupBox.IsEnabled = true;
 
-                Core.Core.InitServer(IPAddressComboBox.SelectedItem as IPAddress, short.Parse(PortTextBox.Text), int.Parse(MaxPlayersTextBox.Text));
+                ServerLauncher.InitServer(IPAddressComboBox.SelectedItem as IPAddress, short.Parse(PortTextBox.Text), int.Parse(MaxPlayersTextBox.Text));
 
                 StartButton.Content = "Остановить";
             }
@@ -66,7 +67,7 @@ namespace TXServer
                 StateGroupBox.IsEnabled = false;
                 ServerStateText.Text = "";
 
-                Core.Core.StopServer();
+                ServerLauncher.StopServer();
 
                 StartButton.Content = "Запуск";
             }
@@ -77,7 +78,7 @@ namespace TXServer
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (Core.Core.IsStarted)
+            if (Core.ServerLauncher.IsStarted)
             {
                 MessageBox.Show("Сначала остановите сервер.", "Ошибка");
                 e.Cancel = true;
@@ -91,9 +92,9 @@ namespace TXServer
 
         private void ShowStateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!Core.Core.IsStarted) return;
+            if (!ServerLauncher.IsStarted) return;
 
-            ServerStateText.Text = "Игроков онлайн: " + Core.Core.PlayerCount;
+            ServerStateText.Text = "Игроков онлайн: " + ServerLauncher.PlayerCount;
         }
     }
 }

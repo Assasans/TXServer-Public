@@ -7,17 +7,10 @@ using TXServer.Core.ECSSystem;
 
 namespace TXServer.Core
 {
-    public class PlayerData
+    public partial class Player
     {
-        public void Free()
-        {
-            Socket.Close();
-
-            Interlocked.Decrement(ref Core.PlayerCount);
-        }
-
-        private static ThreadLocal<PlayerData> _Instances = new ThreadLocal<PlayerData>();
-        public static PlayerData Instance
+        private static ThreadLocal<Player> _Instances = new ThreadLocal<Player>();
+        public static Player Instance
         {
             get
             {
@@ -29,14 +22,12 @@ namespace TXServer.Core
             }
         }
 
-        public Socket Socket { get; set; }
-
         // Генератор случайных значений.
-        private readonly Random Random = new Random(SafeRandom.Next());
+        private readonly Random Random;
         public ulong GenerateId() => ((ulong)Random.Next() << 32) + (ulong)Random.Next();
 
         // Entity list.
-        public readonly ConcurrentDictionary<ulong, Entity> EntityList = new ConcurrentDictionary<ulong, Entity>();
-        public readonly ConcurrentDictionary<Entity, ulong> EntityIds = new ConcurrentDictionary<Entity, ulong>();
+        public ConcurrentDictionary<ulong, Entity> EntityList { get; } = new ConcurrentDictionary<ulong, Entity>();
+        public ConcurrentDictionary<Entity, ulong> EntityIds { get; } = new ConcurrentDictionary<Entity, ulong>();
     }
 }

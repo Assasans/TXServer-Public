@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace TXServer.Core
 {
-    static class Core
+    public static class ServerLauncher
     {
         class NativeMethods
         {
@@ -21,7 +21,8 @@ namespace TXServer.Core
         }
 
         // Пул игроков.
-        private static List<PlayerConnection> Pool = new List<PlayerConnection>();
+        private static List<Player> Pool = new List<Player>();
+        private static int PoolSize;
 
         // Сокет, принимающий соединения.
         private static Socket acceptor;
@@ -32,23 +33,18 @@ namespace TXServer.Core
         public static int PlayerCount = 0;
 
         // Запуск сервера.
-        public static void InitServer(IPAddress ip, short port, int poolSize)
+        public static void InitServer(IPAddress ip, short port, int PoolSize)
         {
 #if !DEBUG
         NativeMethods.AllocConsole();
         Console.OutputEncoding = Encoding.GetEncoding(1251);
 #endif
-
+            ServerLauncher.PoolSize = PoolSize;
             IsStarted = true;
-
-            for (int i = 0; i < poolSize; i++)
-            {
-                Pool.Add(new PlayerConnection(i));
-            }
 
             acceptor = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
             acceptor.Bind(new IPEndPoint(ip, port));
-            acceptor.Listen(poolSize);
+            acceptor.Listen(PoolSize);
 
             acceptWorker = new Thread(AcceptPlayers);
             acceptWorker.Name = "Acceptor";
@@ -61,8 +57,8 @@ namespace TXServer.Core
             IsStarted = false;
 
             Pool.ForEach(player => player.Destroy());
-
             Pool.Clear();
+
             acceptor.Close();
 
             acceptWorker.Abort();
@@ -77,36 +73,50 @@ namespace TXServer.Core
         // Добавление игрока в пул.
         private static void AddPlayer(Socket toAdd)
         {
-            PlayerConnection selected = Pool.Find(connection => connection.data.Socket == null || !connection.data.Socket.Connected);
+            int freeIndex = Pool.FindIndex(player => player.Socket == null);
 
-            if (selected != null)
+            if (freeIndex != -1)
             {
-                selected.Prepare(toAdd);
+                // Ожидание завершения потоков клиента.
+                SpinWait wait = new SpinWait();
+                while (Pool[freeIndex].IsBusy)
+                    wait.SpinOnce();
+
+                Pool[freeIndex] = new Player(toAdd);
+            }
+            else if (PlayerCount < PoolSize)
+            {
+                Pool.Add(new Player(toAdd));
             }
             else
             {
                 toAdd.Close();
-                Console.WriteLine("Server is full!");
+                Console.WriteLine("Сервер переполнен!");
             }
         }
 
+
         // Прием новых клиентов.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов", Justification = "<Ожидание>")]
         public static void AcceptPlayers()
         {
             while (true)
             {
+                Socket socket = null;
+                bool accepted = false;
                 try
                 {
-                    Socket accepted = acceptor.Accept();
-                    if (!IsStarted)
-                    {
-                        accepted.Close();
-                        break;
-                    }
+                    socket = acceptor.Accept();
+                    accepted = true;
 
-                    AddPlayer(accepted);
+                    AddPlayer(socket);
                 }
-                catch { }
+                catch (SocketException) { }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                    if (!accepted) socket.Close();
+                }
             }
         }
     }
