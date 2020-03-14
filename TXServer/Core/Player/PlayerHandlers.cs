@@ -55,16 +55,18 @@ namespace TXServer.Core
             {
                 lock (Instance)
                 {
-                    if (Instance.Socket == null) // Ошибка уже обработана в другом потоке - в этом случае Socket установлен в null.
+                    if (Instance.Socket != null) // Ошибка уже обработана в другом потоке - в этом случае Socket установлен в null.
+                    {
+                        Console.WriteLine(e.ToString());
+                        Instance.Destroy();
+                    }
+                    else
                     {
                         Instance.IsBusy = false;
-                        Instance = null;
-                        return;
                     }
                 }
 
-                Console.WriteLine(e.ToString());
-                Instance.Destroy();
+                Instance = null;
             }
         }
 
@@ -88,15 +90,18 @@ namespace TXServer.Core
             {
                 lock (Instance)
                 {
-                    if (Instance.Socket == null) // Ошибка уже обработана в другом потоке - в этом случае Socket установлен в null.
+                    if (Instance.Socket != null) // Ошибка уже обработана в другом потоке - в этом случае Socket установлен в null.
+                    {
+                        Console.WriteLine(e.ToString());
+                        Instance.Destroy();
+                    }
+                    else
                     {
                         Instance.IsBusy = false;
-                        return;
                     }
                 }
 
-                Console.WriteLine(e.ToString());
-                Instance.Destroy();
+                Instance = null;
             }
         }
     }

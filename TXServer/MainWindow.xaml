@@ -35,15 +35,13 @@
             </Grid>
         </GroupBox>
         <TextBlock HorizontalAlignment="Left" Height="0" Margin="10,10,0,0" Grid.Row="1" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="25" Grid.Column="1"/>
-        <GroupBox x:Name="StateGroupBox" Header="Состояние" Margin="295,10,0,0" Height="194" VerticalAlignment="Top" HorizontalAlignment="Left" Width="293" IsEnabled="False">
+        <GroupBox x:Name="StateGroupBox" Header="Состояние" Margin="295,10,0,0" Height="194" VerticalAlignment="Top" HorizontalAlignment="Left" Width="293">
             <Grid Height="184" Margin="0,0,-12,-13" VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="87*"/>
                     <ColumnDefinition Width="53*"/>
                 </Grid.ColumnDefinitions>
-                <Label Content="Состояние сервера:" HorizontalAlignment="Left" Margin="10,7,0,0" VerticalAlignment="Top" Height="26" Width="132"/>
-                <Button x:Name="RefreshStateButton" Content="Обновить" Margin="10,10,21,0" VerticalAlignment="Top" Height="20" Click="ShowStateButton_Click" Grid.Column="1"/>
-                <TextBox x:Name="ServerStateText" HorizontalAlignment="Left" Height="125" Margin="14,38,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="258" Grid.ColumnSpan="2" Focusable="False" AllowDrop="False" IsTabStop="False" UndoLimit="0"/>
+                <TextBox x:Name="ServerStateText" Margin="10,10,0,0" TextWrapping="Wrap" Grid.ColumnSpan="2" Focusable="False" AllowDrop="False" IsTabStop="False" UndoLimit="0" Height="154" VerticalAlignment="Top" HorizontalAlignment="Left" Width="264"/>
             </Grid>
         </GroupBox>
     </Grid>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Threading;
+using System.Windows;
 
 namespace TXServer.Core
 {
@@ -15,6 +16,7 @@ namespace TXServer.Core
             Random = new System.Random(Socket.Handle.ToInt32());
 
             Interlocked.Increment(ref ServerLauncher.PlayerCount);
+            Application.Current.Dispatcher.Invoke(new Action(() => { (Application.Current.MainWindow as MainWindow).UpdateState(); }));
 
             UpWorker = new Thread(ServerSideEvents);
             UpWorker.Name = "ServerSide #" + Socket.Handle;
@@ -27,15 +29,17 @@ namespace TXServer.Core
 
         public void Destroy()
         {
-            lock (Instance)
+            lock (this)
             {
-                Socket.Close();
-                Socket = null;
+                if (Socket != null)
+                {
+                    Socket.Close();
+                    Socket = null;
+                }
             }
 
-            Instance = null;
-
             Interlocked.Decrement(ref ServerLauncher.PlayerCount);
+            Application.Current.Dispatcher.Invoke(new Action(() => { (Application.Current.MainWindow as MainWindow).UpdateState(); }));
         }
 
         public Socket Socket { get; private set; }

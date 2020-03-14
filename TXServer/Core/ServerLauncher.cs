@@ -111,11 +111,10 @@ namespace TXServer.Core
 
                     AddPlayer(socket);
                 }
-                catch (SocketException) { }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
-                    if (!accepted) socket.Close();
+                    if (socket != null && !accepted) socket.Close();
                 }
             }
         }

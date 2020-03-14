@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Windows;
 using System.Windows.Input;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using TXServer.Core;
 
 namespace TXServer
@@ -55,7 +54,6 @@ namespace TXServer
             Cursor = Cursors.Wait;
             if (!ServerLauncher.IsStarted) {
                 SettingsGroupBox.IsEnabled = false;
-                StateGroupBox.IsEnabled = true;
 
                 ServerLauncher.InitServer(IPAddressComboBox.SelectedItem as IPAddress, short.Parse(PortTextBox.Text), int.Parse(MaxPlayersTextBox.Text));
 
@@ -64,8 +62,6 @@ namespace TXServer
             else
             {
                 SettingsGroupBox.IsEnabled = true;
-                StateGroupBox.IsEnabled = false;
-                ServerStateText.Text = "";
 
                 ServerLauncher.StopServer();
 
@@ -80,20 +76,18 @@ namespace TXServer
         {
             if (Core.ServerLauncher.IsStarted)
             {
-                MessageBox.Show("Сначала остановите сервер.", "Ошибка");
+                MessageBox.Show("Сначала остановите сервер.", "", MessageBoxButton.OK, MessageBoxImage.Warning);
                 e.Cancel = true;
             }
         }
 
-        private void Window_Closed(object sender, System.EventArgs e)
+        private void Window_Closed(object sender, EventArgs e)
         {
             Environment.Exit(0);
         }
 
-        private void ShowStateButton_Click(object sender, RoutedEventArgs e)
+        public void UpdateState()
         {
-            if (!ServerLauncher.IsStarted) return;
-
             ServerStateText.Text = "Игроков онлайн: " + ServerLauncher.PlayerCount;
         }
     }
