@@ -21,7 +21,7 @@ namespace TXServer.Core.ECSSystem.Events
 				new SendEventCommand(new InvalidPasswordEvent(), entity));
 			*/
 
-			Entity testEntity = new Entity(new TemplateAccessor(new EntityTemplates.TestTemplate(), "fractionscompetition"), new List<Component>());
+			Entity testEntity = new Entity(new TemplateAccessor(new EntityTemplates.FractionsCompetitionTemplate(), "fractionscompetition"), new List<Component>());
 
 			CommandManager.SendCommands(Player.Instance.Socket,
 				new ComponentAddCommand(entity, new UserGroupComponent()),

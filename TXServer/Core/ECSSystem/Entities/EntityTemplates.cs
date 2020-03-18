@@ -1,16 +1,13 @@
-﻿namespace TXServer.Core.ECSSystem
+﻿namespace TXServer.Core.ECSSystem.EntityTemplates
 {
-    public static class EntityTemplates
-    {
-        public interface IEntityTemplate { }
+    public interface IEntityTemplate { }
 
-        [SerialVersionUID(1429771189777)]
-        public class ClientSessionTemplate : IEntityTemplate { }
+    [SerialVersionUID(1429771189777)]
+    public class ClientSessionTemplate : IEntityTemplate { }
 
-        [SerialVersionUID(1454928219469)]
-        public class LobbyTemplate : IEntityTemplate { }
+    [SerialVersionUID(1454928219469)]
+    public class LobbyTemplate : IEntityTemplate { }
 
-        [SerialVersionUID(1534913762047)]
-        public class TestTemplate : IEntityTemplate { } // Test!!!
-    }
+    [SerialVersionUID(1534913762047)]
+    public class FractionsCompetitionTemplate : IEntityTemplate { }
 }
