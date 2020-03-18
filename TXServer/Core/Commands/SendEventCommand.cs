@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TXServer.Bits;
 using TXServer.Core.ECSSystem;
 using TXServer.Core.ECSSystem.Events;
 
@@ -21,11 +20,11 @@ namespace TXServer.Core.Commands
             this.Entities = Entities.ToList();
         }
 
-        public override void BeforeWrap()
+        public override void OnSend()
         {
         }
 
-        public override void AfterUnwrap()
+        public override void OnReceive()
         {
             foreach (Entity entity in Entities)
             {

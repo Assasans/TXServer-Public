@@ -59,12 +59,6 @@
     <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.ServiceModel" />
@@ -86,7 +80,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Bits\BigEndianBinary.cs" />
+    <Compile Include="Core\ECSSystem\Components\FinishedFractionsCompetitionComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserGroupComponent.cs" />
+    <Compile Include="Core\ECSSystem\Entities\GlobalEntityIds.cs" />
+    <Compile Include="Library\BidirectionalDictionary.cs" />
+    <Compile Include="Library\BigEndianIO.cs" />
     <Compile Include="Core\ECSSystem\Events\CheckEmailEvent.cs" />
     <Compile Include="Core\ECSSystem\Events\EmailInvalidEvent.cs" />
     <Compile Include="Core\ECSSystem\Events\IntroduceUserByEmailEvent.cs" />
@@ -113,7 +111,6 @@
     <Compile Include="Core\ECSSystem\Components\SessionSecurityPublicComponent.cs" />
     <Compile Include="Core\ECSSystem\Entities\TemplateAccessor.cs" />
     <Compile Include="Core\ECSSystem\Entities\EntityTemplates.cs" />
-    <Compile Include="Bits\SafeRandom.cs" />
     <Compile Include="Core\ECSSystem\SerialVersionUIDAttribute.cs" />
     <Compile Include="Core\Commands\ComponentAddOrChangeCommand.cs" />
     <Compile Include="Core\Commands\EntityShareCommand.cs" />

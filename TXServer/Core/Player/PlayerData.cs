@@ -1,33 +1,19 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Net.Sockets;
-using System.Threading;
-using TXServer.Bits;
 using TXServer.Core.ECSSystem;
+using TXServer.Library;
 
 namespace TXServer.Core
 {
     public partial class Player
     {
-        private static ThreadLocal<Player> _Instances = new ThreadLocal<Player>();
-        public static Player Instance
-        {
-            get
-            {
-                return _Instances.Value;
-            }
-            set
-            {
-                _Instances.Value = value;
-            }
-        }
+        [ThreadStatic] private static Player _Instance;
+        public static Player Instance => _Instance;
 
         // Генератор случайных значений.
-        private readonly Random Random;
-        public ulong GenerateId() => ((ulong)Random.Next() << 32) + (ulong)Random.Next();
+        [ThreadStatic] private static Random Random;
+        public static Int64 GenerateId() => (Random.Next() << 32) + Random.Next();
 
         // Entity list.
-        public ConcurrentDictionary<ulong, Entity> EntityList { get; } = new ConcurrentDictionary<ulong, Entity>();
-        public ConcurrentDictionary<Entity, ulong> EntityIds { get; } = new ConcurrentDictionary<Entity, ulong>();
+        public BidirectionalDictionary<Int64, Entity> EntityList { get; } = new BidirectionalDictionary<Int64, Entity>();
     }
 }

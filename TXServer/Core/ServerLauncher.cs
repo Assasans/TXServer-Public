@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
+using TXServer.Core.Commands;
 
 namespace TXServer.Core
 {
@@ -18,6 +20,15 @@ namespace TXServer.Core
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             public static extern bool FreeConsole();
+
+            [DllImport("user32.dll")]
+            public static extern int DeleteMenu(IntPtr hMenu, int nPosition, int wFlags);
+
+            [DllImport("user32.dll")]
+            public static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+
+            [DllImport("kernel32.dll", ExactSpelling = true)]
+            public static extern IntPtr GetConsoleWindow();
         }
 
         // Пул игроков.
@@ -37,6 +48,7 @@ namespace TXServer.Core
         {
 #if !DEBUG
         NativeMethods.AllocConsole();
+        _ = NativeMethods.DeleteMenu(NativeMethods.GetSystemMenu(NativeMethods.GetConsoleWindow(), false), 0xF060, 0);
         Console.OutputEncoding = Encoding.GetEncoding(1251);
 #endif
             ServerLauncher.PoolSize = PoolSize;
@@ -71,26 +83,21 @@ namespace TXServer.Core
         }
 
         // Добавление игрока в пул.
-        private static void AddPlayer(Socket toAdd)
+        private static void AddPlayer(Socket socket)
         {
-            int freeIndex = Pool.FindIndex(player => player.Socket == null);
+            int freeIndex = Pool.FindIndex(player => !player.Active);
 
             if (freeIndex != -1)
             {
-                // Ожидание завершения потоков клиента.
-                SpinWait wait = new SpinWait();
-                while (Pool[freeIndex].IsBusy)
-                    wait.SpinOnce();
-
-                Pool[freeIndex] = new Player(toAdd);
+                Pool[freeIndex] = new Player(socket);
             }
             else if (PlayerCount < PoolSize)
             {
-                Pool.Add(new Player(toAdd));
+                Pool.Add(new Player(socket));
             }
             else
             {
-                toAdd.Close();
+                socket.Close();
                 Console.WriteLine("Сервер переполнен!");
             }
         }
@@ -113,8 +120,10 @@ namespace TXServer.Core
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.ToString());
-                    if (socket != null && !accepted) socket.Close();
+                    if (e.GetType() != typeof(ThreadAbortException)) // Игнорировать исключение остановки сервера.
+                        Console.WriteLine(e.ToString());
+
+                    if (accepted) socket.Close();
                 }
             }
         }

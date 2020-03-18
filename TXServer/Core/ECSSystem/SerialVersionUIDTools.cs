@@ -6,7 +6,7 @@ namespace TXServer.Core.ECSSystem
 {
     public static class SerialVersionUIDTools
     {
-        private static readonly Dictionary<UInt64, Type> TypeBySerialVersionUID = new Dictionary<UInt64, Type>();
+        private static readonly Dictionary<Int64, Type> TypeBySerialVersionUID = new Dictionary<Int64, Type>();
         private static bool SerialVersionUIDsLoaded = false;
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace TXServer.Core.ECSSystem
         /// <summary>
         /// Получает SerialVersionUID типа.
         /// </summary>
-        public static UInt64 GetId(Type type)
+        public static Int64 GetId(Type type)
         {
             SerialVersionUIDAttribute attribute = type.GetCustomAttribute(typeof(SerialVersionUIDAttribute)) as SerialVersionUIDAttribute;
 
@@ -52,7 +52,7 @@ namespace TXServer.Core.ECSSystem
         /// <summary>
         /// Получает тип по SerialVersionUID.
         /// </summary>
-        public static Type FindType(UInt64 id)
+        public static Type FindType(Int64 id)
         {
             LoadSerialVersionUIDs();
 

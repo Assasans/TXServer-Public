@@ -1,9 +1,8 @@
-﻿using TXServer.Bits;
-using TXServer.Core.Commands;
+﻿using TXServer.Core.Commands;
 
 namespace TXServer.Core.ECSSystem.Events
 {
-    [SerialVersionUID(635906273125139964L)]
+	[SerialVersionUID(635906273125139964L)]
 	public class CheckEmailEvent : ECSEvent
 	{
 		public CheckEmailEvent()

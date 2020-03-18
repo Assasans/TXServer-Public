@@ -3,9 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TXServer"
         mc:Ignorable="d"
-        Title="TX Server" WindowStartupLocation="CenterScreen" Height="256" Width="608" ResizeMode="CanMinimize" ScrollViewer.VerticalScrollBarVisibility="Disabled" Closing="Window_Closing" Closed="Window_Closed">
+        Title="TX Server" WindowStartupLocation="CenterScreen" Height="256" Width="608" ResizeMode="CanMinimize" ScrollViewer.VerticalScrollBarVisibility="Disabled" Closing="Window_Closing">
     <Grid Margin="0,0,4,-19" UseLayoutRounding="False">
         <GroupBox Header="Действия" Margin="10,10,0,0" Height="65" VerticalAlignment="Top" HorizontalAlignment="Left" Width="280">
             <Grid Height="65" Margin="0,0,-12,-22" VerticalAlignment="Top">
@@ -41,7 +40,7 @@
                     <ColumnDefinition Width="87*"/>
                     <ColumnDefinition Width="53*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="ServerStateText" Margin="10,10,0,0" TextWrapping="Wrap" Grid.ColumnSpan="2" Focusable="False" AllowDrop="False" IsTabStop="False" UndoLimit="0" Height="154" VerticalAlignment="Top" HorizontalAlignment="Left" Width="264"/>
+                <TextBox x:Name="ServerStateText" Margin="10,10,0,0" TextWrapping="Wrap" Grid.ColumnSpan="2" Focusable="False" AllowDrop="False" IsTabStop="False" UndoLimit="0" Height="154" VerticalAlignment="Top" HorizontalAlignment="Left" Width="264" UseLayoutRounding="False" IsReadOnly="True"/>
             </Grid>
         </GroupBox>
     </Grid>

@@ -10,15 +10,25 @@ namespace TXServer.Core
 {
     public partial class Player
     {
-        
+        private void InitThreadLocals()
+        {
+            _Instance = this;
+            Random = new Random(Thread.CurrentThread.ManagedThreadId);
+        }
+
+        private void HandleException(Exception e)
+        {
+            Console.WriteLine(e.ToString());
+            Destroy();
+        }
 
         /// <summary>
         /// Обработка событий сервер -> клиент.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов", Justification = "<Ожидание>")]
-        public static void ServerSideEvents(object oPlayer)
+        public void ServerSideEvents()
         {
-            Instance = oPlayer as Player;
+            InitThreadLocals();
 
             try
             {
@@ -48,25 +58,12 @@ namespace TXServer.Core
                 }
 
                 // Заглушка.
-                SpinWait.SpinUntil(delegate () { return Instance.Socket == null; });
+                SpinWait.SpinUntil(() => !Active);
                 throw new Exception();
             }
             catch (Exception e)
             {
-                lock (Instance)
-                {
-                    if (Instance.Socket != null) // Ошибка уже обработана в другом потоке - в этом случае Socket установлен в null.
-                    {
-                        Console.WriteLine(e.ToString());
-                        Instance.Destroy();
-                    }
-                    else
-                    {
-                        Instance.IsBusy = false;
-                    }
-                }
-
-                Instance = null;
+                HandleException(e);
             }
         }
 
@@ -75,9 +72,9 @@ namespace TXServer.Core
         /// Обработка событий клиент -> сервер.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов", Justification = "<Ожидание>")]
-        public static void ClientSideEvents(object oPlayer)
+        public void ClientSideEvents()
         {
-            Instance = oPlayer as Player;
+            InitThreadLocals();
 
             try
             {
@@ -88,20 +85,7 @@ namespace TXServer.Core
             }
             catch (Exception e)
             {
-                lock (Instance)
-                {
-                    if (Instance.Socket != null) // Ошибка уже обработана в другом потоке - в этом случае Socket установлен в null.
-                    {
-                        Console.WriteLine(e.ToString());
-                        Instance.Destroy();
-                    }
-                    else
-                    {
-                        Instance.IsBusy = false;
-                    }
-                }
-
-                Instance = null;
+                HandleException(e);
             }
         }
     }

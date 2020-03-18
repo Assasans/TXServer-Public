@@ -1,8 +1,6 @@
-﻿using TXServer.Bits;
-
-namespace TXServer.Core.ECSSystem.Events
+﻿namespace TXServer.Core.ECSSystem.Events
 {
-    [SerialVersionUID(1439531278716)]
+	[SerialVersionUID(1439531278716)]
 	public class PersonalPasscodeEvent : ECSEvent
 	{
 		public PersonalPasscodeEvent() { }

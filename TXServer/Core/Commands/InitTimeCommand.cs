@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using TXServer.Bits;
 
 namespace TXServer.Core.Commands
 {
@@ -8,7 +6,7 @@ namespace TXServer.Core.Commands
     {
         public InitTimeCommand() { }
 
-        public override void BeforeWrap()
+        public override void OnSend()
         {
         }
 

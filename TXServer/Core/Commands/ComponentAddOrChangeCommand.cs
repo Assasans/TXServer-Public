@@ -1,5 +1,4 @@
-﻿using TXServer.Bits;
-using TXServer.Core.ECSSystem;
+﻿using TXServer.Core.ECSSystem;
 using TXServer.Core.ECSSystem.Components;
 
 namespace TXServer.Core.Commands
@@ -14,12 +13,12 @@ namespace TXServer.Core.Commands
             this.Component = Component;
         }
 
-        public override void BeforeWrap()
+        public override void OnSend()
         {
             AddOrChangeComponent();
         }
 
-        public override void AfterUnwrap()
+        public override void OnReceive()
         {
             AddOrChangeComponent();
         }

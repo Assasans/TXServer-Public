@@ -24,12 +24,12 @@ namespace TXServer.Core.Commands
         {
             { CommandCode.SendEvent, typeof(SendEventCommand) },
             { CommandCode.EntityShare, typeof(EntityShareCommand) },
-            // { CommandId.EntityUnshare, typeof(EntityUnshareCommand) },
+            // { CommandCode.EntityUnshare, typeof(EntityUnshareCommand) },
             { CommandCode.ComponentAdd, typeof(ComponentAddCommand) },
-            // { CommandId.ComponentRemove, typeof(ComponentRemoveCommand) },
+            // { CommandCode.ComponentRemove, typeof(ComponentRemoveCommand) },
             { CommandCode.ComponentChange, typeof(ComponentChangeCommand) },
             { CommandCode.InitTime, typeof(InitTimeCommand) },
-            // { CommandId.Close, typeof(CloseCommand) },
+            // { CommandCode.Close, typeof(CloseCommand) },
         };
 
         public static readonly Dictionary<Type, CommandCode> CommandCodeByType = CommandTypeByCode.ToDictionary(x => x.Value, x => x.Key);

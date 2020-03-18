@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using TXServer.Bits;
 using TXServer.Core.ECSSystem.Components;
 
 namespace TXServer.Core.ECSSystem
@@ -36,7 +35,7 @@ namespace TXServer.Core.ECSSystem
 
         public TemplateAccessor TemplateAccessor { get; set; }
                 
-        public ConcurrentDictionary<Type, Component> Components = new ConcurrentDictionary<Type, Component>();
+        public ConcurrentDictionary<Type, Component> Components { get; } = new ConcurrentDictionary<Type, Component>();
 
         /// <summary>
         /// Поиск сущностей по компоненту.
@@ -59,7 +58,7 @@ namespace TXServer.Core.ECSSystem
         /// <summary>
         /// Поиск сущности по ID.
         /// </summary>
-        public static Entity FindById(UInt64 id)
+        public static Entity FindById(Int64 id)
         {
             try
             {

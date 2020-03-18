@@ -1,8 +1,6 @@
-﻿using TXServer.Bits;
-
-namespace TXServer.Core.ECSSystem.Events
+﻿namespace TXServer.Core.ECSSystem.Events
 {
-    [SerialVersionUID(1455866538339)]
+	[SerialVersionUID(1455866538339)]
 	public class EmailInvalidEvent : ECSEvent
 	{
 		public EmailInvalidEvent() { }

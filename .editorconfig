@@ -5,3 +5,12 @@ dotnet_diagnostic.CA2208.severity = none
 
 # CA2227: Свойства коллекций должны быть доступны только для чтения
 dotnet_diagnostic.CA2227.severity = none
+
+# IDE0049: Упрощение имен
+dotnet_style_predefined_type_for_member_access = true:none
+
+# IDE0049: Упрощение имен
+dotnet_style_predefined_type_for_locals_parameters_members = true:none
+
+# CA1040: Не используйте пустые интерфейсы
+dotnet_diagnostic.CA1040.severity = none

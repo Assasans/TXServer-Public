@@ -8,20 +8,17 @@ namespace TXServer.Core.Commands
 {
     public class EntityShareCommand : Command
     {
-        public EntityShareCommand() { }
-
         public EntityShareCommand(Entity Entity)
         {
             this.Entity = Entity;
         }
 
-        public override void BeforeWrap()
+        public override void OnSend()
         {
-            UInt64 newEntityId = Player.Instance.GenerateId();
+            Int64 newEntityId = Player.GenerateId();
 
             // Добавить Entity в общий список.
             Player.Instance.EntityList[newEntityId] = Entity;
-            Player.Instance.EntityIds[Entity] = newEntityId;
 
             EntityId = newEntityId;
             TemplateAccessor = Entity.TemplateAccessor;
@@ -34,7 +31,7 @@ namespace TXServer.Core.Commands
 
         public Entity Entity { get; set; }
 
-        [Protocol] public UInt64 EntityId { get; set; }
+        [Protocol] public Int64 EntityId { get; set; }
         [Protocol][OptionalMapped] public TemplateAccessor TemplateAccessor { get; set; }
         [Protocol] public List<Component> Components { get; } = new List<Component>();
     }

@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using TXServer.Bits;
 using static TXServer.Core.ECSSystem.EntityTemplates;
 
 namespace TXServer.Core.ECSSystem

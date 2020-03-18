@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
-using TXServer.Bits;
+using TXServer.Library;
 
 namespace TXServer.Core.Commands
 {
@@ -21,7 +21,7 @@ namespace TXServer.Core.Commands
                 DataUnpacker unpacker = new DataUnpacker(reader);
                 foreach (Command command in unpacker.UnpackData() as List<Command>)
                 {
-                    command.AfterUnwrap();
+                    command.OnReceive();
                 }
             }
         }
@@ -30,7 +30,7 @@ namespace TXServer.Core.Commands
         {
             foreach (Command command in commands)
             {
-                command.BeforeWrap();
+                command.OnSend();
             }
 
             using (MemoryStream buffer = new MemoryStream())

@@ -6,8 +6,6 @@ namespace TXServer.Core.Commands
 {
     public class ComponentAddCommand : ComponentAddOrChangeCommand
     {
-        public ComponentAddCommand() { }
-
         public ComponentAddCommand(Entity Target, Component Component) : base(Target, Component) { }
 
         protected override void AddOrChangeComponent()

@@ -1,5 +1,4 @@
-﻿using TXServer.Bits;
-using TXServer.Core.Commands;
+﻿using TXServer.Core.Commands;
 
 namespace TXServer.Core.ECSSystem.Events
 {

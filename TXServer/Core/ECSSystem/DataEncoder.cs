@@ -6,7 +6,7 @@ using TXServer.Core.ECSSystem;
 using TXServer.Core.Commands;
 using static TXServer.Core.Commands.CommandTyping;
 using static TXServer.Core.Commands.CommandManager;
-using TXServer.Bits;
+using TXServer.Library;
 
 namespace TXServer.Core
 {
@@ -54,7 +54,7 @@ namespace TXServer.Core
 
         private void EncodeEntity(object obj)
         {
-            writer.Write(Player.Instance.EntityIds[obj as Entity]);
+            writer.Write(Player.Instance.EntityList[obj as Entity]);
         }
         
         private void SelectEncode(object obj)
@@ -109,26 +109,29 @@ namespace TXServer.Core
 
         public void PackData(Command[] commands)
         {
-            BinaryWriter writtenCommands = new BigEndianBinaryWriter(new MemoryStream());
-
-            OptionalMap map = new OptionalMap();
-            DataPacker encoder = new DataPacker(writtenCommands, map);
-
-            foreach (Command command in commands)
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                encoder.SelectEncode(command);
+                BinaryWriter writtenCommands = new BigEndianBinaryWriter(memoryStream);
+
+                OptionalMap map = new OptionalMap();
+                DataPacker encoder = new DataPacker(writtenCommands, map);
+
+                foreach (Command command in commands)
+                {
+                    encoder.SelectEncode(command);
+                }
+
+                map.Reset();
+
+                writer.Write(Magic);
+                writer.Write(map.Length);
+                writer.Write((UInt32)writtenCommands.BaseStream.Length);
+
+                writer.Write(map.Data());
+
+                writtenCommands.BaseStream.Position = 0;
+                writtenCommands.BaseStream.CopyTo(writer.BaseStream);
             }
-
-            map.Reset();
-
-            writer.Write(Magic);
-            writer.Write(map.Length);
-            writer.Write((UInt32)writtenCommands.BaseStream.Length);
-
-            writer.Write(map.Data());
-
-            writtenCommands.BaseStream.Position = 0;
-            writtenCommands.BaseStream.CopyTo(writer.BaseStream);
         }
     }
 }

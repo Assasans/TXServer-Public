@@ -7,11 +7,11 @@ namespace TXServer.Core.ECSSystem
     {
         private SerialVersionUIDAttribute() { }
 
-        public SerialVersionUIDAttribute(UInt64 Id)
+        public SerialVersionUIDAttribute(Int64 Id)
         {
             this.Id = Id;
         }
 
-        public readonly UInt64 Id;
+        public readonly Int64 Id;
     }
 }

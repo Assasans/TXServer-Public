@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using TXServer.Bits;
 
 namespace TXServer.Core.ECSSystem.Components
 {

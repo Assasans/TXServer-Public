@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using TXServer.Bits;
 using TXServer.Core.Commands;
 using TXServer.Core.ECSSystem;
+using TXServer.Library;
 using static TXServer.Core.Commands.CommandManager;
 using static TXServer.Core.Commands.CommandTyping;
 
@@ -57,7 +57,7 @@ namespace TXServer.Core
 
         private object DecodeEntity()
         {
-            UInt64 EntityId = reader.ReadUInt64();
+            Int64 EntityId = reader.ReadInt64();
 
             return Entity.FindById(EntityId);
         }
@@ -97,7 +97,7 @@ namespace TXServer.Core
 
             if (objType.IsAbstract || objType.IsInterface)
             {
-                objType = SerialVersionUIDTools.FindType(reader.ReadUInt64());
+                objType = SerialVersionUIDTools.FindType(reader.ReadInt64());
             }
 
             return UnpackData(objType);

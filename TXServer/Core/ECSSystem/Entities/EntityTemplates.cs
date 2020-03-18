@@ -9,5 +9,8 @@
 
         [SerialVersionUID(1454928219469)]
         public class LobbyTemplate : IEntityTemplate { }
+
+        [SerialVersionUID(1534913762047)]
+        public class TestTemplate : IEntityTemplate { } // Test!!!
     }
-    }
+}

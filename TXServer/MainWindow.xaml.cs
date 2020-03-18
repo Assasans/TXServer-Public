@@ -16,10 +16,6 @@ namespace TXServer
         {
             InitializeComponent();
 
-#if DEBUG == false
-            DebugGroupBox.Visibility = Visibility.Hidden;
-#endif
-
             // Заполнение списка IP-адресов.
             foreach (NetworkInterface @interface in NetworkInterface.GetAllNetworkInterfaces())
             {
@@ -31,6 +27,8 @@ namespace TXServer
                     }
                 }
             }
+
+            UpdateStateText();
         }
 
         // Остановка сервера.
@@ -69,6 +67,7 @@ namespace TXServer
             }
 
             Activate();
+            UpdateStateText();
             Cursor = Cursors.Arrow;
         }
 
@@ -81,13 +80,14 @@ namespace TXServer
             }
         }
 
-        private void Window_Closed(object sender, EventArgs e)
+        public void UpdateStateText()
         {
-            Environment.Exit(0);
-        }
+            if (!ServerLauncher.IsStarted)
+            {
+                ServerStateText.Text = "Сервер остановлен.";
+                return;
+            }
 
-        public void UpdateState()
-        {
             ServerStateText.Text = "Игроков онлайн: " + ServerLauncher.PlayerCount;
         }
     }
