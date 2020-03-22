@@ -12,8 +12,10 @@ namespace TXServer.Core.Commands
 
         protected override void AddOrChangeComponent()
         {
-            if (!Target.Components.ContainsKey(Component.GetType())) throw new ArgumentException("Компонент " + Component.GetType().FullName + " не найден.");
-            Target.Components[Component.GetType()] = Component;
+            if (!Target.Components.Contains(Component)) throw new ArgumentException("Компонент " + Component.GetType().FullName + " не найден.");
+
+            Target.Components.Remove(Component);
+            Target.Components.Add(Component);
         }
     }
 }

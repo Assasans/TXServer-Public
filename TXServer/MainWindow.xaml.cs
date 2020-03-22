@@ -34,12 +34,6 @@ namespace TXServer
         // Остановка сервера.
         public static void OnServerStop(string error = null)
         {
-            (Application.Current.MainWindow as MainWindow).ServerStopped(error);
-        }
-
-        // Обработка остановки сервера.
-        public void ServerStopped(string error)
-        {
             if (error != null)
             {
                 MessageBox.Show(error, "Ошибка");
@@ -49,8 +43,14 @@ namespace TXServer
         // Кнопка запуска сервера.
         private void StartServer_Click(object sender, RoutedEventArgs e)
         {
+            ChangeServerState();
+        }
+
+        public void ChangeServerState()
+        {
             Cursor = Cursors.Wait;
-            if (!ServerLauncher.IsStarted) {
+            if (!ServerLauncher.IsStarted)
+            {
                 SettingsGroupBox.IsEnabled = false;
 
                 ServerLauncher.InitServer(IPAddressComboBox.SelectedItem as IPAddress, short.Parse(PortTextBox.Text), int.Parse(MaxPlayersTextBox.Text));
@@ -73,7 +73,7 @@ namespace TXServer
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (Core.ServerLauncher.IsStarted)
+            if (ServerLauncher.IsStarted)
             {
                 MessageBox.Show("Сначала остановите сервер.", "", MessageBoxButton.OK, MessageBoxImage.Warning);
                 e.Cancel = true;

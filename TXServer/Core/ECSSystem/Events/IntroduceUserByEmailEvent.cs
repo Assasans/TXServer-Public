@@ -5,11 +5,11 @@ namespace TXServer.Core.ECSSystem.Events
     [SerialVersionUID(1458846544326)]
 	public class IntroduceUserByEmailEvent : ECSEvent
 	{
-		public string Email = "";
-
 		public override void Execute(Entity entity)
 		{
 			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new PersonalPasscodeEvent(), entity));
 		}
+
+		[Protocol] public string Email { get; set; } = "";
 	}
 }

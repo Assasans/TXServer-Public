@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using TXServer.Core.Commands;
 
 namespace TXServer.Core
@@ -35,9 +39,11 @@ namespace TXServer.Core
         private static List<Player> Pool = new List<Player>();
         private static int PoolSize;
 
-        // Сокет, принимающий соединения.
-        private static Socket acceptor;
+        // Поток, принимающий соединения.
         private static Thread acceptWorker;
+
+        // Поток сервера состояния.
+        private static Thread StateServerWorker;
 
         // Состояние сервера.
         public static bool IsStarted { get; private set; }
@@ -54,13 +60,17 @@ namespace TXServer.Core
             ServerLauncher.PoolSize = PoolSize;
             IsStarted = true;
 
-            acceptor = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
-            acceptor.Bind(new IPEndPoint(ip, port));
-            acceptor.Listen(PoolSize);
-
-            acceptWorker = new Thread(AcceptPlayers);
-            acceptWorker.Name = "Acceptor";
+            acceptWorker = new Thread(() => AcceptPlayers(ip, port, PoolSize))
+            {
+                Name = "Acceptor"
+            };
             acceptWorker.Start();
+
+            StateServerWorker = new Thread(() => StateServer(ip))
+            {
+                Name = "StateServer"
+            };
+            StateServerWorker.Start();
         }
 
         // Остановка сервера.
@@ -68,12 +78,11 @@ namespace TXServer.Core
         {
             IsStarted = false;
 
+            acceptWorker.Abort();
+            StateServerWorker.Abort();
+
             Pool.ForEach(player => player.Destroy());
             Pool.Clear();
-
-            acceptor.Close();
-
-            acceptWorker.Abort();
 
             MainWindow.OnServerStop();
 
@@ -105,25 +114,75 @@ namespace TXServer.Core
 
         // Прием новых клиентов.
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов", Justification = "<Ожидание>")]
-        public static void AcceptPlayers()
+        public static void AcceptPlayers(IPAddress ip, short port, int PoolSize)
         {
-            while (true)
+            using (Socket acceptor = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP))
             {
-                Socket socket = null;
-                bool accepted = false;
-                try
-                {
-                    socket = acceptor.Accept();
-                    accepted = true;
+                acceptor.Bind(new IPEndPoint(ip, port));
+                acceptor.Listen(PoolSize);
 
-                    AddPlayer(socket);
+                while (true)
+                {
+                    Socket socket = null;
+                    bool accepted = false;
+                    try
+                    {
+                        IAsyncResult result = acceptor.BeginAccept(null, acceptor);
+                        socket = acceptor.EndAccept(result);
+                        accepted = true;
+
+                        AddPlayer(socket);
+                    }
+                    catch (Exception e)
+                    {
+                        // Игнорировать исключение остановки сервера.
+                        if (e.GetType() != typeof(ThreadAbortException))
+                            Console.WriteLine(e.ToString());
+
+                        if (accepted) socket.Close();
+                    }
                 }
-                catch (Exception e)
-                {
-                    if (e.GetType() != typeof(ThreadAbortException)) // Игнорировать исключение остановки сервера.
-                        Console.WriteLine(e.ToString());
+            }
+        }
 
-                    if (accepted) socket.Close();
+        public static void StateServer(IPAddress ip)
+        {
+            string rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/StateServer";
+
+            using (HttpListener listener = new HttpListener())
+            {
+                listener.Prefixes.Add("http://" + ip + ":8080/");
+
+                listener.Start();
+
+                while (true)
+                {
+                    IAsyncResult result = listener.BeginGetContext(null, listener);
+                    HttpListenerContext context = listener.EndGetContext(result);
+
+                    new Task(() =>
+                    {
+                        HttpListenerRequest request = context.Request;
+                        HttpListenerResponse response = context.Response;
+
+                        byte[] buffer;
+                        try
+                        {
+                            buffer = File.ReadAllBytes(rootPath + request.RawUrl.Split('?')[0]);
+                        }
+                        catch
+                        {
+                            buffer = Array.Empty<byte>();
+                            response.StatusCode = 400;
+                        }
+
+                        response.ContentLength64 = buffer.Length;
+
+                        Stream output = response.OutputStream;
+                        output.Write(buffer, 0, buffer.Length);
+
+                        output.Close();
+                    }).Start();
                 }
             }
         }

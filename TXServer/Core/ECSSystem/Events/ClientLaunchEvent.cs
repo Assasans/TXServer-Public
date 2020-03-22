@@ -7,15 +7,6 @@ namespace TXServer.Core.ECSSystem.Events
     [SerialVersionUID(1478774431678)]
     public class ClientLaunchEvent : ECSEvent
     {
-        public ClientLaunchEvent() { }
-
-        public ClientLaunchEvent(BinaryReader reader)
-        {
-            WebId = reader.ReadString();
-        }
-
-        [Protocol] public string WebId { get; set; }
-
         public override void Execute(Entity entity)
         {
             // WebId message
@@ -24,5 +15,7 @@ namespace TXServer.Core.ECSSystem.Events
                 new ComponentChangeCommand(entity, new WebIdComponent())
             );
         }
+
+        [Protocol] public string WebId { get; set; }
     }
 }

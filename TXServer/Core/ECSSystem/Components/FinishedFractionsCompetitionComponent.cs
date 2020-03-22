@@ -1,11 +1,10 @@
-﻿using System;
-using TXServer.Core.ECSSystem.Entities;
+﻿using static TXServer.Core.ECSSystem.Entity;
 
 namespace TXServer.Core.ECSSystem.Components
 {
     [SerialVersionUID(1545394828752)]
     public class FinishedFractionsCompetitionComponent : Component
     {
-        [Protocol] public Int64 Winner { get; } = GlobalEntityIds.FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS;
+        [Protocol] public Entity Winner { get; } = Globals.FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS;
     }
 }

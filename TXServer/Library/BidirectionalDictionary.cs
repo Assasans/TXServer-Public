@@ -9,8 +9,8 @@ namespace TXServer.Library
     /// <typeparam name="TValue">Тип значений в словаре.</typeparam>
     public class BidirectionalDictionary<TKey, TValue>
     {
-        private Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>();
-        private Dictionary<TValue, TKey> reverseDictionary = new Dictionary<TValue, TKey>();
+        private readonly Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>();
+        private readonly Dictionary<TValue, TKey> reverseDictionary = new Dictionary<TValue, TKey>();
 
         private object writeLock = new object();
 
@@ -32,6 +32,7 @@ namespace TXServer.Library
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1707:Идентификаторы не должны содержать символы подчеркивания", Justification = "<Ожидание>")]
         public TKey this[TValue _value]
         {
             get

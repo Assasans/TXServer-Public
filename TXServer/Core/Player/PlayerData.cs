@@ -11,9 +11,9 @@ namespace TXServer.Core
 
         // Генератор случайных значений.
         [ThreadStatic] private static Random Random;
-        public static Int64 GenerateId() => (Random.Next() << 32) + Random.Next();
+        public static Int64 GenerateId() => ((long)Random.Next() << 32) + Random.Next();
 
         // Entity list.
-        public BidirectionalDictionary<Int64, Entity> EntityList { get; } = new BidirectionalDictionary<Int64, Entity>();
+        public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
     }
 }

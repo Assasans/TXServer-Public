@@ -1,59 +1,27 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using TXServer.Core.ECSSystem.Components;
+using TXServer.Library;
 
 namespace TXServer.Core.ECSSystem
 {
-    public class Entity
+    public partial class Entity
     {
-        public Entity() { }
-
-        public Entity(TemplateAccessor TemplateAccessor, List<Component> components)
+        public Entity(TemplateAccessor TemplateAccessor, params Component[] components)
         {
+            EntityId = Player.GenerateId();
+
             this.TemplateAccessor = TemplateAccessor;
 
-            foreach (Component component in components)
-            {
-                Components.TryAdd(component.GetType(), component);
-            }
+            Components.UnionWith(components);
         }
-
-        public void Wrap(BinaryWriter writer)
-        {
-            TemplateAccessor.Wrap(writer);
-
-            writer.Write((byte)Components.Count);
-
-            foreach (Component component in Components.Values)
-            {
-                writer.Write(SerialVersionUIDTools.GetId(component.GetType()));
-                component.Wrap(writer);
-            }
-        }
-
-        public TemplateAccessor TemplateAccessor { get; set; }
-                
-        public ConcurrentDictionary<Type, Component> Components { get; } = new ConcurrentDictionary<Type, Component>();
 
         /// <summary>
-        /// Поиск сущностей по компоненту.
+        /// Создание сущности по id.
+        /// <para>Результирующая сущность пригодна только для поиска других сущностей.</para>
         /// </summary>
-        public static List<Entity> FindByComponent(Type componentType)
-        {
-            List<Entity> entities = new List<Entity>();
-
-            foreach (Entity entity in Player.Instance.EntityList.Values)
-            {
-                if (entity.Components.ContainsKey(componentType))
-                {
-                    entities.Add(entity);
-                }
-            }
-
-            return entities;
-        }
+        /// <param name="EntityId">ID сущности.</param>
+        public Entity(long EntityId) => this.EntityId = EntityId;
 
         /// <summary>
         /// Поиск сущности по ID.
@@ -62,12 +30,20 @@ namespace TXServer.Core.ECSSystem
         {
             try
             {
-                return Player.Instance.EntityList[id];
+                Entity found;
+                Player.Instance.EntityList.TryGetValue(new Entity(id), out found);
+                return found;
             }
             catch (KeyNotFoundException)
             {
                 throw new ArgumentException("Сущность с id " + id + "не найдена.");
             }
         }
+
+        public override int GetHashCode() => EntityId.GetHashCode();
+
+        public long EntityId { get; }
+        public TemplateAccessor TemplateAccessor { get; set; }
+        public HashSet<Component> Components { get; set; } = new HashSet<Component>(new HashCodeEqualityComparer<Component>());
     }
 }

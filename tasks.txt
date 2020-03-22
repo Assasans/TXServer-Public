@@ -1,0 +1,8 @@
+﻿1) + make battle message queue - concurrent hashset (concurrent dictionary with key -> hashcode) of command
+2) + make lobby message queue - blocking collection of command
+3) + remove unnecessary socket locks
+4) make server events' message loop
+5) - rewrite encoder & decoder (remove protocol attribute)
+6) + fix style
+7) + delete empty constructors where not needed
+8) continue...

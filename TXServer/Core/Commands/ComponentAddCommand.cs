@@ -10,9 +10,9 @@ namespace TXServer.Core.Commands
 
         protected override void AddOrChangeComponent()
         {
-            if (Target.Components.ContainsKey(Component.GetType()))
+            if (Target.Components.Contains(Component))
                 throw new ArgumentException("Компонент " + Component.GetType().FullName + " уже содержится в сущности.");
-            Target.Components.TryAdd(Component.GetType(), Component);
+            Target.Components.Add(Component);
         }
     }
 }

@@ -1,8 +1,0 @@
-host: 127.0.0.1
-acceptorPort: 5050
-configVersion: visual3-48546
-bundleDbVersion: visual3-48546
-resourcesUrl: http://127.0.0.1/resources
-configsUrl: http://127.0.0.1/config
-updateConfigUrl: http://127.0.0.1/update/{BuildTarget}
-stateFileUrl: http://127.0.0.1/state/_state.yml

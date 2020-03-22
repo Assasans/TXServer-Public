@@ -54,7 +54,7 @@ namespace TXServer.Core
 
         private void EncodeEntity(object obj)
         {
-            writer.Write(Player.Instance.EntityList[obj as Entity]);
+            writer.Write((obj as Entity).EntityId);
         }
         
         private void SelectEncode(object obj)

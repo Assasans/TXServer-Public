@@ -1,25 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading;
 using TXServer.Core.Commands;
 using TXServer.Core.ECSSystem;
 using TXServer.Core.ECSSystem.Components;
-using static TXServer.Core.ECSSystem.EntityTemplates;
+using TXServer.Core.ECSSystem.EntityTemplates;
+using TXServer.Library;
 
 namespace TXServer.Core
 {
     public partial class Player
     {
+        public bool InBattle { get; set; }
+
+        public BlockingCollection<Command> LobbyCommandQueue { get; }
+        public ConcurrentHashSet<Command> BattleCommandQueue { get; }
+
         private void InitThreadLocals()
         {
             _Instance = this;
             Random = new Random(Thread.CurrentThread.ManagedThreadId);
-        }
-
-        private void HandleException(Exception e)
-        {
-            Console.WriteLine(e.ToString());
-            Destroy();
         }
 
         /// <summary>
@@ -34,17 +34,11 @@ namespace TXServer.Core
             {
                 if (Instance.Socket != null && Instance.Socket.Connected) {
                     Entity ClientSession = new Entity(TemplateAccessor: new TemplateAccessor(new ClientSessionTemplate(), "notification/emailconfirmation"),
-                                                        components: new List<Component>
-                                                        {
-                                                            new ClientSessionComponent()
-                                                        });
+                                                        new ClientSessionComponent());
 
                     Entity Lobby = new Entity(TemplateAccessor: new TemplateAccessor(new LobbyTemplate(), "lobby"),
-                                                components: new List<Component>
-                                                {
-                                                    new LobbyComponent(),
-                                                    new QuestsEnabledComponent()
-                                                });
+                                                new LobbyComponent(),
+                                                new QuestsEnabledComponent());
 
                     // Server time message
                     CommandManager.SendCommands(Instance.Socket, new InitTimeCommand());
@@ -57,13 +51,13 @@ namespace TXServer.Core
                     );
                 }
 
-                // Заглушка.
                 SpinWait.SpinUntil(() => !Active);
                 throw new Exception();
             }
             catch (Exception e)
             {
-                HandleException(e);
+                Console.WriteLine(e.ToString());
+                Destroy();
             }
         }
 
@@ -85,7 +79,8 @@ namespace TXServer.Core
             }
             catch (Exception e)
             {
-                HandleException(e);
+                Console.WriteLine(e.ToString());
+                Destroy();
             }
         }
     }

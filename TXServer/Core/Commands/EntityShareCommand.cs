@@ -15,15 +15,13 @@ namespace TXServer.Core.Commands
 
         public override void OnSend()
         {
-            Int64 newEntityId = Player.GenerateId();
-
             // Добавить Entity в общий список.
-            Player.Instance.EntityList[newEntityId] = Entity;
+            Player.Instance.EntityList.Add(Entity);
 
-            EntityId = newEntityId;
+            EntityId = Entity.EntityId;
             TemplateAccessor = Entity.TemplateAccessor;
 
-            foreach (Component component in Entity.Components.Values)
+            foreach (Component component in Entity.Components)
             {
                 Components.Add(component);
             }

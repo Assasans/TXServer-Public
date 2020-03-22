@@ -14,3 +14,6 @@ dotnet_style_predefined_type_for_locals_parameters_members = true:none
 
 # CA1040: Не используйте пустые интерфейсы
 dotnet_diagnostic.CA1040.severity = none
+
+# CA1710: Идентификаторы должны иметь правильные суффиксы
+dotnet_diagnostic.CA1710.severity = none

@@ -42,7 +42,6 @@ namespace TXServer.Core.Commands
 
                 writer.BaseStream.Position = 0;
 
-                lock (socket)
                 using (NetworkStream stream = new NetworkStream(socket))
                     writer.BaseStream.CopyTo(stream);
             }
