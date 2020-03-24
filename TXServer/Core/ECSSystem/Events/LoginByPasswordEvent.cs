@@ -1,6 +1,6 @@
-﻿using TXServer.Core.Commands;
+﻿using System.Collections.Generic;
+using TXServer.Core.Commands;
 using TXServer.Core.ECSSystem.Components;
-using TXServer.Core.ECSSystem.EntityTemplates;
 using static TXServer.Core.ECSSystem.Entity;
 
 namespace TXServer.Core.ECSSystem.Events
@@ -20,8 +20,12 @@ namespace TXServer.Core.ECSSystem.Events
 				new ComponentAddCommand(entity, new UserGroupComponent()),
 				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION),
 				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_FRONTIER),
-				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS));
-				//new SendEventCommand());
+				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS),
+				new SendEventCommand(new UpdateClientFractionScoresEvent(1000, new Dictionary<long, long>()
+				{
+					{ GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_FRONTIER.EntityId, 1001},
+					{ GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS.EntityId, 1002}
+				}), entity));
 		}
 
 		[Protocol] public string HardwareFingerprint { get; set; } = "";

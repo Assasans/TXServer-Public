@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -58,11 +59,12 @@ namespace TXServer.Core.Commands
 
             return from property in type.GetProperties()
                    where Attribute.IsDefined(property, typeof(ProtocolAttribute))
+                         || type == typeof(DictionaryEntry)
                    orderby ((ProtocolAttribute)property
-                             .GetCustomAttribute(typeof(ProtocolAttribute)))
+                             .GetCustomAttribute(typeof(ProtocolAttribute)))?
                              .Priority,
                            ((ProtocolAttribute)property
-                             .GetCustomAttribute(typeof(ProtocolAttribute)))
+                             .GetCustomAttribute(typeof(ProtocolAttribute)))?
                              .Position
                    select property;
         }

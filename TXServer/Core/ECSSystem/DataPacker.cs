@@ -7,6 +7,7 @@ using TXServer.Core.Commands;
 using static TXServer.Core.Commands.CommandTyping;
 using static TXServer.Core.Commands.CommandManager;
 using TXServer.Library;
+using System.Collections.Generic;
 
 namespace TXServer.Core
 {
@@ -67,9 +68,23 @@ namespace TXServer.Core
                 return;
             }
 
-           else if (objType == typeof(Entity))
+            else if (objType == typeof(Entity))
             {
                 EncodeEntity(obj);
+            }
+
+            else if (typeof(IDictionary).IsAssignableFrom(objType))
+            {
+                IDictionary dictionary = obj as IDictionary;
+
+                writer.Write((byte)dictionary.Count);
+
+                foreach (object pair in dictionary)
+                {
+                    EncodeObject(pair);
+                }
+
+                return;
             }
 
             else if (typeof(ICollection).IsAssignableFrom(objType))

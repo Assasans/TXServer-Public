@@ -86,6 +86,7 @@
     <Compile Include="Core\ECSSystem\Components\FractionGroupComponent.cs" />
     <Compile Include="Core\ECSSystem\Components\UserGroupComponent.cs" />
     <Compile Include="Core\ECSSystem\Entities\Globals.cs" />
+    <Compile Include="Core\ECSSystem\Events\UpdateClientFractionScoresEvent.cs" />
     <Compile Include="Core\ProtocolAttribute.cs" />
     <Compile Include="Library\BidirectionalDictionary.cs" />
     <Compile Include="Library\BigEndianIO.cs" />
