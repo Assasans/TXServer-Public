@@ -6,11 +6,12 @@ namespace TXServer.Core
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public sealed class ProtocolAttribute : Attribute
     {
-        public ProtocolAttribute([CallerLineNumber]int order = 0)
+        public ProtocolAttribute([CallerLineNumber]int Position = 0)
         {
-            ProtocolPosition = order;
+            this.Position = Position;
         }
 
-        public int ProtocolPosition { get; }
+        public int Position { get; }
+        public int Priority { get; set; }
     }
 }

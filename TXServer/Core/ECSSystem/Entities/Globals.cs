@@ -1,11 +1,14 @@
-﻿namespace TXServer.Core.ECSSystem
+﻿using TXServer.Core.ECSSystem.Components;
+using TXServer.Core.ECSSystem.EntityTemplates;
+
+namespace TXServer.Core.ECSSystem
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Типы статических заполнителей должны быть Static или NotInheritable", Justification = "<Ожидание>")]
     public partial class Entity
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1707:Идентификаторы не должны содержать символы подчеркивания", Justification = "<Ожидание>")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Вложенные типы не должны быть видимыми", Justification = "<Ожидание>")]
-        public static class Globals
+        public static class GlobalEntities
         {
             public static readonly Entity BATTLESELECT_MATCHMAKING_MODE_COSMICBATTLE = new Entity(-176533989);
             public static readonly Entity BATTLESELECT_MATCHMAKING_MODE_DEATHMATCH = new Entity(596799940);
@@ -24,9 +27,9 @@
             public static readonly Entity CHAT_GENERAL_RU = new Entity(-968268831);
             public static readonly Entity CHAT_GENERAL_TR = new Entity(-968268772);
             public static readonly Entity DAILYBONUS = new Entity(1529751974);
-            public static readonly Entity FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS = new Entity(-1650120701);
-            public static readonly Entity FRACTIONSCOMPETITION_FRACTIONS_FRONTIER = new Entity(-372139284);
-            public static readonly Entity FRACTIONSCOMPETITION = new Entity(1529751975);
+            public static readonly Entity FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS = new Entity(-1650120701, new TemplateAccessor(new FractionTemplate(), "fractionscompetition/fractions/antaeus"), new FractionGroupComponent(-1650120701), new FractionComponent("antaeus"));
+            public static readonly Entity FRACTIONSCOMPETITION_FRACTIONS_FRONTIER = new Entity(-372139284, new TemplateAccessor(new FractionTemplate(), "fractionscompetition/fractions/frontier"), new FractionGroupComponent(-372139284), new FractionComponent("frontier"));
+            public static readonly Entity FRACTIONSCOMPETITION = new Entity(1529751975, new TemplateAccessor(new FractionsCompetitionTemplate(), "fractionscompetition"), new FinishedFractionsCompetitionComponent());
             public static readonly Entity GARAGE_AVATAR_ALGHERIA_FLAG = new Entity(-910231604);
             public static readonly Entity GARAGE_AVATAR_ALPHA = new Entity(934969104);
             public static readonly Entity GARAGE_AVATAR_ANTHEUSFIGHTER = new Entity(6200);

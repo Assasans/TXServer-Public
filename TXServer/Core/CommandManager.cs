@@ -12,7 +12,9 @@ namespace TXServer.Core.Commands
     {
         public static readonly byte[] Magic = { 0xff, 0x00 };
 
-        // Прием данных от клиента.
+        /// <summary>
+        /// Прием данных от клиента.
+        /// </summary>
         public static void ReceiveAndExecuteCommands(Socket socket)
         {
             using (NetworkStream stream = new NetworkStream(socket))
@@ -26,6 +28,9 @@ namespace TXServer.Core.Commands
             }
         }
 
+        /// <summary>
+        /// Передача данных клиенту.
+        /// </summary>
         public static void SendCommands(Socket socket, params Command[] commands)
         {
             foreach (Command command in commands)
@@ -49,12 +54,49 @@ namespace TXServer.Core.Commands
 
         public static IOrderedEnumerable<PropertyInfo> GetProtocolProperties(Type type)
         {
+            SetAllProtocolPriorities();
+
             return from property in type.GetProperties()
                    where Attribute.IsDefined(property, typeof(ProtocolAttribute))
                    orderby ((ProtocolAttribute)property
-                             .GetCustomAttributes(typeof(ProtocolAttribute), false)
-                             .Single()).ProtocolPosition
+                             .GetCustomAttribute(typeof(ProtocolAttribute)))
+                             .Priority,
+                           ((ProtocolAttribute)property
+                             .GetCustomAttribute(typeof(ProtocolAttribute)))
+                             .Position
                    select property;
         }
+
+        private static void SetAllProtocolPriorities()
+        {
+            if (SetPrioritiesPassed) return;
+            lock (SetPrioritiesLock)
+            {
+                if (SetPrioritiesPassed) return;
+
+                Assembly current = Assembly.GetExecutingAssembly();
+                foreach (Type type in current.GetTypes())
+                {
+                    int depth = 0;
+                    for (Type baseType = type.BaseType; baseType != null; baseType = baseType.BaseType)
+                    {
+                        depth++;
+                    }
+
+                    foreach (PropertyInfo property in type.GetProperties())
+                    {
+                        ProtocolAttribute attribute = property.GetCustomAttribute(typeof(ProtocolAttribute)) as ProtocolAttribute;
+
+                        if (attribute != null)
+                            attribute.Priority = depth;
+                    }
+                }
+
+                SetPrioritiesPassed = true;
+            }
+        }
+
+        private static object SetPrioritiesLock = new object();
+        private volatile static bool SetPrioritiesPassed;
     }
 }

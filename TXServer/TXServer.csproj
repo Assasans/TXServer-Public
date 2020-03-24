@@ -82,6 +82,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Core\ECSSystem\Components\FinishedFractionsCompetitionComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\FractionComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\FractionGroupComponent.cs" />
     <Compile Include="Core\ECSSystem\Components\UserGroupComponent.cs" />
     <Compile Include="Core\ECSSystem\Entities\Globals.cs" />
     <Compile Include="Core\ProtocolAttribute.cs" />
@@ -95,8 +97,8 @@
     <Compile Include="Core\ECSSystem\Events\LoginByPasswordEvent.cs" />
     <Compile Include="Core\ECSSystem\Events\LoginFailedEvent.cs" />
     <Compile Include="Core\ECSSystem\Events\PersonalPasscodeEvent.cs" />
-    <Compile Include="Core\ECSSystem\DataDecoder.cs" />
-    <Compile Include="Core\ECSSystem\DataEncoder.cs" />
+    <Compile Include="Core\ECSSystem\DataUnpacker.cs" />
+    <Compile Include="Core\ECSSystem\DataPacker.cs" />
     <Compile Include="Core\ECSSystem\Components\WebIdComponent.cs" />
     <Compile Include="Core\OptionalMappedAttribute.cs" />
     <Compile Include="Core\ECSSystem\Events\ClientLaunchEvent.cs" />

@@ -7,24 +7,40 @@ namespace TXServer.Core.ECSSystem
 {
     public partial class Entity
     {
+        /// <summary>
+        /// Создание сущности с случайным id.
+        /// </summary>
         public Entity(TemplateAccessor TemplateAccessor, params Component[] components)
         {
             EntityId = Player.GenerateId();
 
+            PopulateEntity(TemplateAccessor, components);
+        }
+
+        /// <summary>
+        /// Создание сущности с заданным id.
+        /// </summary>
+        public Entity(long EntityId, TemplateAccessor TemplateAccessor, params Component[] components)
+        {
+            this.EntityId = EntityId;
+
+            PopulateEntity(TemplateAccessor, components);
+        }
+
+        /// <summary>
+        /// Создание сущности для поиска по id.
+        /// </summary>
+        public Entity(long EntityId) => this.EntityId = EntityId;
+
+        private void PopulateEntity(TemplateAccessor TemplateAccessor, Component[] components)
+        {
             this.TemplateAccessor = TemplateAccessor;
 
             Components.UnionWith(components);
         }
 
         /// <summary>
-        /// Создание сущности по id.
-        /// <para>Результирующая сущность пригодна только для поиска других сущностей.</para>
-        /// </summary>
-        /// <param name="EntityId">ID сущности.</param>
-        public Entity(long EntityId) => this.EntityId = EntityId;
-
-        /// <summary>
-        /// Поиск сущности по ID.
+        /// Поиск сущности по id.
         /// </summary>
         public static Entity FindById(Int64 id)
         {

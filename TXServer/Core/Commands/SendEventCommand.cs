@@ -8,8 +8,6 @@ namespace TXServer.Core.Commands
 {
     public class SendEventCommand : Command
     {
-        public SendEventCommand() { }
-
         public SendEventCommand(ECSEvent Event, params Entity[] Entities)
         {
             if (Entities == null)

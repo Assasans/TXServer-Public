@@ -1,5 +1,7 @@
 ﻿using TXServer.Core.Commands;
 using TXServer.Core.ECSSystem.Components;
+using TXServer.Core.ECSSystem.EntityTemplates;
+using static TXServer.Core.ECSSystem.Entity;
 
 namespace TXServer.Core.ECSSystem.Events
 {
@@ -14,11 +16,12 @@ namespace TXServer.Core.ECSSystem.Events
 				new SendEventCommand(new InvalidPasswordEvent(), entity));
 			*/
 
-			Entity testEntity = new Entity(new TemplateAccessor(new EntityTemplates.FractionsCompetitionTemplate(), "fractionscompetition"), new FinishedFractionsCompetitionComponent());
-
 			CommandManager.SendCommands(Player.Instance.Socket,
 				new ComponentAddCommand(entity, new UserGroupComponent()),
-				new EntityShareCommand(testEntity));
+				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION),
+				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_FRONTIER),
+				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS));
+				//new SendEventCommand());
 		}
 
 		[Protocol] public string HardwareFingerprint { get; set; } = "";
