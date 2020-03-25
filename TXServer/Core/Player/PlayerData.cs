@@ -15,5 +15,8 @@ namespace TXServer.Core
 
         // Entity list.
         public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
+
+        public string Uid { get; set; } = "user";
+        public string Email { get; set; } = "none";
     }
 }

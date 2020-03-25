@@ -7,9 +7,10 @@ namespace TXServer.Core.ECSSystem.Events
 	{
 		public override void Execute(Entity entity)
 		{
+			Player.Instance.Email = Email;
 			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new PersonalPasscodeEvent(), entity));
 		}
 
-		public string Email { get; set; } = "";
+		public string Email { get; set; }
 	}
 }

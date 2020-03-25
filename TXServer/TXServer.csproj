@@ -81,11 +81,38 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\ECSSystem\Components\BattleLeaveCounterComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\BlackListComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\ConfirmedUserEmailComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\FavoriteEquipmentStatisticsComponent.cs" />
     <Compile Include="Core\ECSSystem\Components\FinishedFractionsCompetitionComponent.cs" />
     <Compile Include="Core\ECSSystem\Components\FractionComponent.cs" />
     <Compile Include="Core\ECSSystem\Components\FractionGroupComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\GameplayChestScoreComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\KillsEquipmentStatisticsComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\LeagueGroupComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\PersonalChatOwnerComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\QuestReadyComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\RegistrationDateComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\TutorialCompleteIdsComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserAvatarComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserCountryComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserDailyBonusCycleComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserDailyBonusReceivedRewardsComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserDailyBonusZoneComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserExperienceComponent.cs" />
     <Compile Include="Core\ECSSystem\Components\UserGroupComponent.cs" />
-    <Compile Include="Core\ECSSystem\Entities\Globals.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserMoneyComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserPublisherComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserRankComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserReputationComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserStatisticsComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserSubscribeComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserUidComponent.cs" />
+    <Compile Include="Core\ECSSystem\Components\UserXCrystalsComponent.cs" />
+    <Compile Include="Core\ECSSystem\Entities\GlobalEntities.cs" />
+    <Compile Include="Core\ECSSystem\Events\FractionUserScoreComponent.cs" />
     <Compile Include="Core\ECSSystem\Events\UpdateClientFractionScoresEvent.cs" />
     <Compile Include="Core\ProtocolFixedAttribute.cs" />
     <Compile Include="Core\ProtocolIgnoreAttribute.cs" />

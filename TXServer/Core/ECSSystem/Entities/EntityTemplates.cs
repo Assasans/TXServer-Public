@@ -11,6 +11,12 @@
     [SerialVersionUID(1534913762047)]
     public class FractionsCompetitionTemplate : IEntityTemplate { }
 
-    [SerialVersionUID(1544501900637L)]
+    [SerialVersionUID(1544501900637)]
     public class FractionTemplate : IEntityTemplate { }
+
+    [SerialVersionUID(1433752208915)]
+    public class UserTemplate : IEntityTemplate { }
+
+    [SerialVersionUID(-5630755063511713066)]
+    public class xxTemplate : IEntityTemplate { }
 }
