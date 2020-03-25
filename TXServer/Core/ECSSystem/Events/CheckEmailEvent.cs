@@ -15,7 +15,7 @@ namespace TXServer.Core.ECSSystem.Events
 			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new EmailInvalidEvent(Email), entity));
 		}
 
-		[Protocol] public string Email { get; set; } = "";
-		[Protocol] public bool IncludeUnconfirmed { get; set; }
+		public string Email { get; set; } = "";
+		public bool IncludeUnconfirmed { get; set; }
 	}
 }

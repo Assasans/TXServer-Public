@@ -8,7 +8,7 @@
             this.Key = Key;
         }
 
-        [Protocol] public static ulong ComponentSerialUID { get; } = 1544510801819;
-        [Protocol] public long Key { get; set; }
+        public static ulong ComponentSerialUID { get; } = 1544510801819;
+        public long Key { get; set; }
     }
 }

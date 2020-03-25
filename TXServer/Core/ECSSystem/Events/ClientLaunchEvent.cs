@@ -16,6 +16,6 @@ namespace TXServer.Core.ECSSystem.Events
             );
         }
 
-        [Protocol] public string WebId { get; set; }
+        public string WebId { get; set; }
     }
 }

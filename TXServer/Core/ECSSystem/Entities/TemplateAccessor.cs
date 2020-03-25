@@ -12,7 +12,7 @@ namespace TXServer.Core.ECSSystem
             this.ConfigPath = ConfigPath;
         }
 
-        [Protocol] public IEntityTemplate Template { get; set; }
-        [Protocol] public string ConfigPath { get; set; }
+        [ProtocolFixed] public IEntityTemplate Template { get; set; }
+        [ProtocolFixed] public string ConfigPath { get; set; }
     }
 }

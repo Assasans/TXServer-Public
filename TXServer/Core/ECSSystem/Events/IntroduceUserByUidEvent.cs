@@ -10,6 +10,6 @@ namespace TXServer.Core.ECSSystem.Events
 			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new PersonalPasscodeEvent(), entity));
 		}
 
-		[Protocol] public string Uid { get; set; } = "";
+		public string Uid { get; set; } = "";
 	}
 }

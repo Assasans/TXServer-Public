@@ -28,8 +28,8 @@ namespace TXServer.Core.ECSSystem.Events
 				}), entity));
 		}
 
-		[Protocol] public string HardwareFingerprint { get; set; } = "";
-		[Protocol] public string PasswordEncipher { get; set; } = "";
-		[Protocol] public bool RememberMe { get; set; }
+		public string HardwareFingerprint { get; set; } = "";
+		public string PasswordEncipher { get; set; } = "";
+		public bool RememberMe { get; set; }
 	}
 }

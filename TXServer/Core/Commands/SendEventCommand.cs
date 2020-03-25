@@ -30,7 +30,7 @@ namespace TXServer.Core.Commands
             }
         }
 
-        [Protocol] public ECSEvent Event { get; set; }
-        [Protocol] public List<Entity> Entities { get; set; } = new List<Entity>();
+        [ProtocolFixed] public ECSEvent Event { get; set; }
+        [ProtocolFixed] public List<Entity> Entities { get; set; }
     }
 }

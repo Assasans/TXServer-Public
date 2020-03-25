@@ -25,7 +25,7 @@ namespace TXServer.Core.Commands
 
         protected abstract void AddOrChangeComponent();
 
-        [Protocol] public Entity Target { get; set; }
-        [Protocol] public Component Component { get; set; }
+        [ProtocolFixed] public Entity Target { get; set; }
+        [ProtocolFixed] public Component Component { get; set; }
     }
 }

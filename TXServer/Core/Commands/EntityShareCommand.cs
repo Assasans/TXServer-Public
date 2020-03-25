@@ -1,7 +1,6 @@
-﻿using System.IO;
-using System;
-using TXServer.Core.ECSSystem;
+﻿using System;
 using System.Collections.Generic;
+using TXServer.Core.ECSSystem;
 using TXServer.Core.ECSSystem.Components;
 
 namespace TXServer.Core.Commands
@@ -27,10 +26,10 @@ namespace TXServer.Core.Commands
             }
         }
 
-        public Entity Entity { get; set; }
+        [ProtocolIgnore] public Entity Entity { get; set; }
 
-        [Protocol] public Int64 EntityId { get; set; }
-        [Protocol][OptionalMapped] public TemplateAccessor TemplateAccessor { get; set; }
-        [Protocol] public List<Component> Components { get; } = new List<Component>();
+        [ProtocolFixed] public Int64 EntityId { get; set; }
+        [ProtocolFixed][OptionalMapped] public TemplateAccessor TemplateAccessor { get; set; }
+        [ProtocolFixed] public List<Component> Components { get; } = new List<Component>();
     }
 }

@@ -7,6 +7,6 @@ namespace TXServer.Core.ECSSystem.Events
     {
         public override void Execute(Entity entity) { }
 
-        [Protocol] public string Screen { get; set; }
+        public string Screen { get; set; }
     }
 }

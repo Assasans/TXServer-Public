@@ -10,6 +10,8 @@ namespace TXServer.Core.Commands
         {
         }
 
-        [Protocol] public Int64 ServerTime { get; set; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        public override void OnReceive() => throw new NotSupportedException();
+
+        [ProtocolFixed] public Int64 ServerTime { get; set; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
     }
 }

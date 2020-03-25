@@ -3,9 +3,9 @@
     [SerialVersionUID(1479820450460)]
     public sealed class WebIdComponent : Component
     {
-        [Protocol] public string WebId { get; set; } = "";
-        [Protocol] public string Utm { get; set; } = "";
-        [Protocol] public string GoogleAnalyticsId { get; set; } = "";
-        [Protocol] public string WebIdUid { get; set; } = "";
+        public string WebId { get; set; } = "";
+        public string Utm { get; set; } = "";
+        public string GoogleAnalyticsId { get; set; } = "";
+        public string WebIdUid { get; set; } = "";
     }
 }

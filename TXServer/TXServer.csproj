@@ -87,7 +87,8 @@
     <Compile Include="Core\ECSSystem\Components\UserGroupComponent.cs" />
     <Compile Include="Core\ECSSystem\Entities\Globals.cs" />
     <Compile Include="Core\ECSSystem\Events\UpdateClientFractionScoresEvent.cs" />
-    <Compile Include="Core\ProtocolAttribute.cs" />
+    <Compile Include="Core\ProtocolFixedAttribute.cs" />
+    <Compile Include="Core\ProtocolIgnoreAttribute.cs" />
     <Compile Include="Library\BidirectionalDictionary.cs" />
     <Compile Include="Library\BigEndianIO.cs" />
     <Compile Include="Core\ECSSystem\Events\CheckEmailEvent.cs" />

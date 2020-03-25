@@ -11,8 +11,8 @@ namespace TXServer.Core.ECSSystem.Events
 			this.Scores = Scores;
 		}
 
-		[Protocol] public Dictionary<long, long> Scores { get; set; }
+		public Dictionary<long, long> Scores { get; set; }
 
-		[Protocol] public long TotalCryFund { get; set; }
+		public long TotalCryFund { get; set; }
 	}
 }

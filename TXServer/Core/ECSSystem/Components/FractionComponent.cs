@@ -8,6 +8,6 @@
             this.FractionName = FractionName;
         }
 
-        [Protocol] public string FractionName { get; set; }
+        public string FractionName { get; set; }
     }
 }

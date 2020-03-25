@@ -71,6 +71,7 @@ namespace TXServer.Core
             else if (objType == typeof(Entity))
             {
                 EncodeEntity(obj);
+                return;
             }
 
             else if (typeof(IDictionary).IsAssignableFrom(objType))
