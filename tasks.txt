@@ -1,8 +1,45 @@
-﻿1) + make battle message queue - concurrent hashset (concurrent dictionary with key -> hashcode) of command
-2) + make lobby message queue - blocking collection of command
-3) + remove unnecessary socket locks
-4) make server events' message loop
-5) - rewrite encoder & decoder (remove protocol attribute)
-6) + fix style
-7) + delete empty constructors where not needed
-8) continue...
+﻿4) make server events' message loop
+8) replace lock (this) with interlocked in player/player
+9) remove core/interfaces, move command.cs to core/commands
+10) add notsupported to entityshare
+11) shorten null check on sendevent
+12) separate core/ecssystem parts into core/protocol
+13) move core/ecssystem to root
+14) split entitytemplates to separate files
+15) remove structlayout in templateaccessor
+16) move fractionuserscorecomponent from events to components
+17) fix indent
+18) check existing code
+19) add type to dictionary encoder
+20) rewrite attribute checking in encodeobject
+21) make optionalmap writable in datapacker
+22) rewrite packdata in datapacker
+23) remove unnecessary else if in all select*code
+24) remove core/ecssystem/protocolattribute
+25) remove unnecessary private constructors
+26) rewrite serialversionuidtools
+27) explain catching common exceptions in playerhandlers
+28) remove unnecessary socket check in serversideevents
+29) explain externally used methods and fields in commandmanager
+30) rename *packer to *coder
+31) replace command*by* with bidirectionaldictionary
+32) merge commandtyping with commandmanager
+33) make optionalmap add exact
+34) disallow optionalmap write anywhere but end
+35) rename data to getbytes in optionalmap
+36) merge optionalmap load with constructor
+37) explain protocolfixedattribute
+38) fix if debug indent in serverlauncher
+39) explain begin-end in serverlauncher
+40) move methods to top in serverlauncher
+42) simplify *equipmentstatisticscomponent
+43) replace key with entity in *groupcomponent
+44) make *groupcomponent inheritance tree
+45) comment tutorialcompleteidscomponent
+46) fix bracket set in bidirectionaldictionary
+47) make bigendianbinary* complete
+48) remove bigendianbinarywriter method body repeat
+49) add any address to interfaces in mainwindow
+50) remove onserverstop in mainwindow
+51) make http server work with external addresses
+52) ...

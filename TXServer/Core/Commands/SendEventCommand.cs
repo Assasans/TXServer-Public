@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TXServer.Core.ECSSystem;
-using TXServer.Core.ECSSystem.Events;
+using TXServer.Core.Protocol;
+using TXServer.ECSSystem;
+using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Events;
 
 namespace TXServer.Core.Commands
 {
@@ -10,10 +12,8 @@ namespace TXServer.Core.Commands
     {
         public SendEventCommand(ECSEvent Event, params Entity[] Entities)
         {
-            if (Entities == null)
-            {
-                throw new ArgumentNullException("Не указаны сущности.");
-            }
+            _ = Entities ?? throw new ArgumentNullException(nameof(Entities));
+
             this.Event = Event;
             this.Entities = Entities.ToList();
         }

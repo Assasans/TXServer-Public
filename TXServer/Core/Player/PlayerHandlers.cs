@@ -2,9 +2,10 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using TXServer.Core.Commands;
-using TXServer.Core.ECSSystem;
-using TXServer.Core.ECSSystem.Components;
-using TXServer.Core.ECSSystem.EntityTemplates;
+using TXServer.ECSSystem;
+using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.EntityTemplates;
 using TXServer.Library;
 
 namespace TXServer.Core

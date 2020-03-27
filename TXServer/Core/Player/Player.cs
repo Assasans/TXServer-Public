@@ -27,11 +27,7 @@ namespace TXServer.Core
 
         public void Destroy()
         {
-            lock (this)
-            {
-                if (!Active) return;
-                Active = false;
-            }
+            if (Interlocked.Exchange(ref _Active, 0) == 0) return;
 
             Socket.Disconnect(false);
 
@@ -41,7 +37,8 @@ namespace TXServer.Core
 
         public Socket Socket { get; private set; }
 
-        public bool Active { get; private set; } = true;
+        public bool Active => Convert.ToBoolean(_Active);
+        private int _Active = 1;
 
         private readonly Thread UpWorker;
         private readonly Thread DownWorker;

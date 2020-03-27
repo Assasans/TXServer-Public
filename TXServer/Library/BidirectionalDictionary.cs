@@ -5,8 +5,8 @@ namespace TXServer.Library
     /// <summary>
     /// Двунаправленный словарь с поддержкой поиска по значению.
     /// </summary>
-    /// <typeparam name="TKey">Тип ключей в словаре.</typeparam>
-    /// <typeparam name="TValue">Тип значений в словаре.</typeparam>
+    /// <typeparam name="TKey">Тип ключей в словаре.<typeparam>
+    /// <typeparam name="TValue">Тип значений в словаре.<typeparam>
     public class BidirectionalDictionary<TKey, TValue>
     {
         private readonly Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>();

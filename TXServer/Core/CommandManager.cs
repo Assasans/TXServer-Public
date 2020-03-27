@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
+using TXServer.Core.Protocol;
 using TXServer.Library;
 
 namespace TXServer.Core.Commands

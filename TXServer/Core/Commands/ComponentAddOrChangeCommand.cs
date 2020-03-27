@@ -1,5 +1,5 @@
-﻿using TXServer.Core.ECSSystem;
-using TXServer.Core.ECSSystem.Components;
+﻿using TXServer.Core.Protocol;
+using TXServer.ECSSystem.Base;
 
 namespace TXServer.Core.Commands
 {

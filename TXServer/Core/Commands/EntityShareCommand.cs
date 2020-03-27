@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using TXServer.Core.ECSSystem;
-using TXServer.Core.ECSSystem.Components;
+using TXServer.Core.Protocol;
+using TXServer.ECSSystem;
+using TXServer.ECSSystem.Base;
 
 namespace TXServer.Core.Commands
 {
@@ -24,6 +25,11 @@ namespace TXServer.Core.Commands
             {
                 Components.Add(component);
             }
+        }
+
+        public override void OnReceive()
+        {
+            throw new NotSupportedException();
         }
 
         [ProtocolIgnore] public Entity Entity { get; set; }
