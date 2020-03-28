@@ -13,19 +13,19 @@ using static TXServer.Core.Commands.CommandTyping;
 
 namespace TXServer.Core.Protocol
 {
-    class DataUnpacker
+    class DataDecoder
     {
         private readonly BinaryReader reader;
         private readonly OptionalMap map;
 
-        private DataUnpacker() { }
+        private DataDecoder() { }
 
-        public DataUnpacker(BinaryReader reader)
+        public DataDecoder(BinaryReader reader)
         {
             this.reader = reader;
         }
 
-        private DataUnpacker(BinaryReader reader, OptionalMap map)
+        private DataDecoder(BinaryReader reader, OptionalMap map)
         {
             this.reader = reader;
             this.map = map;
@@ -85,7 +85,8 @@ namespace TXServer.Core.Protocol
             {
                 throw new NotImplementedException();
             }
-            else if (typeof(ICollection).IsAssignableFrom(objType))
+            
+            if (typeof(ICollection).IsAssignableFrom(objType))
             {
                 return DecodeCollection(objType);
             }
@@ -118,7 +119,7 @@ namespace TXServer.Core.Protocol
             return obj;
         }
 
-        public object UnpackData(Type objType = null)
+        private object UnpackData(Type objType = null)
         {
             Int32 mapLength, length;
 
@@ -136,7 +137,7 @@ namespace TXServer.Core.Protocol
             using (MemoryStream stream = new MemoryStream(reader.ReadBytes(length)))
             {
                 BinaryReader buffer = new BigEndianBinaryReader(stream);
-                DataUnpacker unpacker = new DataUnpacker(buffer, map);
+                DataDecoder unpacker = new DataDecoder(buffer, map);
 
                 if (objType == null)
                 {
@@ -156,5 +157,7 @@ namespace TXServer.Core.Protocol
                 }
             }
         }
+
+        public List<Command> DecodeCommands() => UnpackData() as List<Command>;
     }
 }

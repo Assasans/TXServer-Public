@@ -33,24 +33,22 @@ namespace TXServer.Core
 
             try
             {
-                if (Instance.Socket != null && Instance.Socket.Connected) {
-                    Entity ClientSession = new Entity(TemplateAccessor: new TemplateAccessor(new ClientSessionTemplate(), "notification/emailconfirmation"),
-                                                        new ClientSessionComponent());
+                Entity ClientSession = new Entity(TemplateAccessor: new TemplateAccessor(new ClientSessionTemplate(), "notification/emailconfirmation"),
+                                                    new ClientSessionComponent());
 
-                    Entity Lobby = new Entity(TemplateAccessor: new TemplateAccessor(new LobbyTemplate(), "lobby"),
-                                                new LobbyComponent(),
-                                                new QuestsEnabledComponent());
+                Entity Lobby = new Entity(TemplateAccessor: new TemplateAccessor(new LobbyTemplate(), "lobby"),
+                                            new LobbyComponent(),
+                                            new QuestsEnabledComponent());
 
-                    // Server time message
-                    CommandManager.SendCommands(Instance.Socket, new InitTimeCommand());
+                // Server time message
+                CommandManager.SendCommands(Instance.Socket, new InitTimeCommand());
 
-                    // Session init message
-                    CommandManager.SendCommands(Instance.Socket,
-                        new EntityShareCommand(ClientSession),
-                        new EntityShareCommand(Lobby),
-                        new ComponentAddCommand(ClientSession, new SessionSecurityPublicComponent())
-                    );
-                }
+                // Session init message
+                CommandManager.SendCommands(Instance.Socket,
+                    new EntityShareCommand(ClientSession),
+                    new EntityShareCommand(Lobby),
+                    new ComponentAddCommand(ClientSession, new SessionSecurityPublicComponent())
+                );
 
                 SpinWait.SpinUntil(() => !Active);
                 throw new Exception();

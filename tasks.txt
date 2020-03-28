@@ -1,15 +1,4 @@
 ﻿4) make server events' message loop
-8) replace lock (this) with interlocked in player/player
-9) remove core/interfaces, move command.cs to core/commands
-10) add notsupported to entityshare
-11) shorten null check on sendevent
-12) separate core/ecssystem parts into core/protocol
-13) move core/ecssystem to root
-14) split entitytemplates to separate files
-15) remove structlayout in templateaccessor
-16) move fractionuserscorecomponent from events to components
-17) fix indent
-18) check existing code
 19) add type to dictionary encoder
 20) rewrite attribute checking in encodeobject
 21) make optionalmap writable in datapacker
@@ -42,4 +31,6 @@
 49) add any address to interfaces in mainwindow
 50) remove onserverstop in mainwindow
 51) make http server work with external addresses
-52) ...
+52) simplify addorchangecomponent in component*command
+53) add note to globalentities
+54) ...

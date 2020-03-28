@@ -3,7 +3,6 @@ using System.Collections;
 using System.IO;
 using System.Reflection;
 using TXServer.Core.Commands;
-using TXServer.ECSSystem;
 using TXServer.ECSSystem.Base;
 using TXServer.Library;
 using static TXServer.Core.Commands.CommandManager;
@@ -11,19 +10,19 @@ using static TXServer.Core.Commands.CommandTyping;
 
 namespace TXServer.Core.Protocol
 {
-    class DataPacker
+    class DataEncoder
     {
         private readonly BinaryWriter writer;
         private readonly OptionalMap map;
 
-        private DataPacker() { }
+        private DataEncoder() { }
 
-        public DataPacker(BinaryWriter writer)
+        public DataEncoder(BinaryWriter writer)
         {
             this.writer = writer;
         }
 
-        private DataPacker(BinaryWriter writer, OptionalMap map)
+        private DataEncoder(BinaryWriter writer, OptionalMap map)
         {
             this.writer = writer;
             this.map = map;
@@ -36,10 +35,8 @@ namespace TXServer.Core.Protocol
                   .Invoke(writer, new object[] { obj });
         }
 
-        private void EncodeCollection(object obj)
+        private void EncodeCollection(ICollection collection)
         {
-            ICollection collection = obj as ICollection;
-
             writer.Write((byte)collection.Count);
 
             foreach (object el in collection)
@@ -48,14 +45,24 @@ namespace TXServer.Core.Protocol
             }
         }
 
-        private void EncodeCommand(object obj)
+        private void EncodeCommand(Command command)
         {
-            writer.Write((byte)CommandCodeByType[obj.GetType()]);
+            writer.Write((byte)CommandCodeByType[command.GetType()]);
         }
 
-        private void EncodeEntity(object obj)
+        private void EncodeEntity(Entity entity)
         {
-            writer.Write((obj as Entity).EntityId);
+            writer.Write(entity.EntityId);
+        }
+
+        private void EncodeDictionary(IDictionary dictionary)
+        {
+            writer.Write((byte)dictionary.Count);
+
+            foreach (DictionaryEntry pair in dictionary)
+            {
+                EncodeObject(pair);
+            }
         }
         
         private void SelectEncode(object obj)
@@ -68,38 +75,23 @@ namespace TXServer.Core.Protocol
                 return;
             }
 
-            else if (objType == typeof(Entity))
+            switch (obj)
             {
-                EncodeEntity(obj);
-                return;
+                case Entity entity:
+                    EncodeEntity(entity);
+                    return;
+                case IDictionary dictionary:
+                    EncodeDictionary(dictionary);
+                    return;
+                case ICollection collection:
+                    EncodeCollection(collection);
+                    return;
+                case Command command:
+                    EncodeCommand(command);
+                    break;
             }
 
-            else if (typeof(IDictionary).IsAssignableFrom(objType))
-            {
-                IDictionary dictionary = obj as IDictionary;
-
-                writer.Write((byte)dictionary.Count);
-
-                foreach (object pair in dictionary)
-                {
-                    EncodeObject(pair);
-                }
-
-                return;
-            }
-
-            else if (typeof(ICollection).IsAssignableFrom(objType))
-            {
-                EncodeCollection(obj);
-                return;
-            }
-
-            else if (typeof(Command).IsAssignableFrom(objType))
-            {
-                EncodeCommand(obj);
-            }
-
-            else if (Attribute.IsDefined(objType, typeof(SerialVersionUIDAttribute)))
+            if (Attribute.IsDefined(objType, typeof(SerialVersionUIDAttribute)))
             {
                 writer.Write(SerialVersionUIDTools.GetId(objType));
             }
@@ -113,7 +105,7 @@ namespace TXServer.Core.Protocol
             {
                 object value = info.GetValue(obj);
 
-                if (info.GetCustomAttribute(typeof(OptionalMappedAttribute)) != null)
+                if (Attribute.IsDefined(info, typeof(OptionalMappedAttribute)))
                 {
                     map.Add(value == null);
                     if (value == null) continue;
@@ -123,14 +115,14 @@ namespace TXServer.Core.Protocol
             }
         }
 
-        public void PackData(Command[] commands)
+        public void EncodeCommands(Command[] commands)
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 BinaryWriter writtenCommands = new BigEndianBinaryWriter(memoryStream);
 
                 OptionalMap map = new OptionalMap();
-                DataPacker encoder = new DataPacker(writtenCommands, map);
+                DataEncoder encoder = new DataEncoder(writtenCommands, map);
 
                 foreach (Command command in commands)
                 {

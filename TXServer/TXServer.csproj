@@ -136,8 +136,8 @@
     <Compile Include="ECSSystem\Events\LoginByPasswordEvent.cs" />
     <Compile Include="ECSSystem\Events\LoginFailedEvent.cs" />
     <Compile Include="ECSSystem\Events\PersonalPasscodeEvent.cs" />
-    <Compile Include="Core\Protocol\DataUnpacker.cs" />
-    <Compile Include="Core\Protocol\DataPacker.cs" />
+    <Compile Include="Core\Protocol\DataDecoder.cs" />
+    <Compile Include="Core\Protocol\DataEncoder.cs" />
     <Compile Include="ECSSystem\Components\WebIdComponent.cs" />
     <Compile Include="Core\Protocol\OptionalMappedAttribute.cs" />
     <Compile Include="ECSSystem\Events\ClientLaunchEvent.cs" />

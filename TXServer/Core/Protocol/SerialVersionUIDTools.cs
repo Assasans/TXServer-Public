@@ -7,7 +7,7 @@ namespace TXServer.Core.Protocol
     public static class SerialVersionUIDTools
     {
         private static readonly Dictionary<Int64, Type> TypeBySerialVersionUID = new Dictionary<Int64, Type>();
-        private static bool SerialVersionUIDsLoaded = false;
+        private volatile static bool SerialVersionUIDsLoaded = false;
 
         /// <summary>
         /// Заполняет словарь с SerialVersionUID типов, если не заполнены.
@@ -41,7 +41,7 @@ namespace TXServer.Core.Protocol
         /// </summary>
         public static Int64 GetId(Type type)
         {
-            SerialVersionUIDAttribute attribute = type.GetCustomAttribute(typeof(SerialVersionUIDAttribute)) as SerialVersionUIDAttribute;
+            SerialVersionUIDAttribute attribute = type.GetCustomAttribute<SerialVersionUIDAttribute>();
 
             if (attribute != null)
                 return attribute.Id;

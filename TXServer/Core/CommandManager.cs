@@ -12,6 +12,9 @@ namespace TXServer.Core.Commands
 {
     public static partial class CommandManager
     {
+        /// <summary>
+        /// Последовательность, указывающая начало пакета.
+        /// </summary>
         public static readonly byte[] Magic = { 0xff, 0x00 };
 
         /// <summary>
@@ -22,8 +25,8 @@ namespace TXServer.Core.Commands
             using (NetworkStream stream = new NetworkStream(socket))
             using (BinaryReader reader = new BigEndianBinaryReader(stream))
             {
-                DataUnpacker unpacker = new DataUnpacker(reader);
-                foreach (Command command in unpacker.UnpackData() as List<Command>)
+                DataDecoder decoder = new DataDecoder(reader);
+                foreach (Command command in decoder.DecodeCommands())
                 {
                     command.OnReceive();
                 }
@@ -43,9 +46,9 @@ namespace TXServer.Core.Commands
             using (MemoryStream buffer = new MemoryStream())
             {
                 BinaryWriter writer = new BigEndianBinaryWriter(buffer);
-                DataPacker packer = new DataPacker(writer);
+                DataEncoder encoder = new DataEncoder(writer);
 
-                packer.PackData(commands);
+                encoder.EncodeCommands(commands);
 
                 writer.BaseStream.Position = 0;
 
@@ -54,6 +57,9 @@ namespace TXServer.Core.Commands
             }
         }
 
+        /// <summary>
+        /// Получает список свойств, не игнорируемых явно, в явно заданном или алфавитном порядке.
+        /// </summary>
         public static IOrderedEnumerable<PropertyInfo> GetProtocolProperties(Type type)
         {
             return from property in type.GetProperties()
