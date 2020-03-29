@@ -3,6 +3,7 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.Core.Commands
 {
+    [CommandCode(6)]
     public class ComponentChangeCommand : ComponentAddOrChangeCommand
     {
         public ComponentChangeCommand() { }
@@ -11,9 +12,8 @@ namespace TXServer.Core.Commands
 
         protected override void AddOrChangeComponent()
         {
-            if (!Target.Components.Contains(Component)) throw new ArgumentException("Компонент " + Component.GetType().FullName + " не найден.");
+            if (!Target.Components.Remove(Component)) throw new ArgumentException("Компонент " + Component.GetType().FullName + " не найден.");
 
-            Target.Components.Remove(Component);
             Target.Components.Add(Component);
         }
     }

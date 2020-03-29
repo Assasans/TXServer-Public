@@ -28,21 +28,25 @@ namespace TXServer
                 }
             }
 
+            IPAddressComboBox.Items.Add(IPAddress.Any);
+
             UpdateStateText();
         }
 
-        // Остановка сервера.
-        public static void OnServerStop(string error = null)
+        public static void HandleCriticalError()
         {
-            if (error != null)
-            {
-                MessageBox.Show(error, "Ошибка");
-            }
+            if (errorState) return;
+            errorState = true;
+
+            MessageBox.Show("Произошла критическая ошибка. Для дополнительной информации см. консоль.", "Критическая ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            (Application.Current.MainWindow as MainWindow).ChangeServerState();
         }
+
 
         // Кнопка запуска сервера.
         private void StartServer_Click(object sender, RoutedEventArgs e)
         {
+            errorState = false;
             ChangeServerState();
         }
 
@@ -79,7 +83,7 @@ namespace TXServer
                 e.Cancel = true;
             }
         }
-
+        
         public void UpdateStateText()
         {
             if (!ServerLauncher.IsStarted)
@@ -90,5 +94,7 @@ namespace TXServer
 
             ServerStateText.Text = "Игроков онлайн: " + ServerLauncher.PlayerCount;
         }
+
+        private static volatile bool errorState;
     }
 }

@@ -12,7 +12,8 @@ namespace TXServer.Core.Protocol
 
         public OptionalMap(byte[] data, Int32 Length)
         {
-            Load(data, Length);
+            this.data = data.ToList();
+            this.Length = Length;
         }
 
         private List<byte> data = new List<byte>();
@@ -41,15 +42,9 @@ namespace TXServer.Core.Protocol
 
         public void Reset() => Position = 0;
 
-        public byte[] Data()
+        public byte[] GetBytes()
         {
             return data.ToArray();
-        }
-
-        public void Load(byte[] data, Int32 Length)
-        {
-            this.data = data.ToList();
-            this.Length = Length;
         }
     }
 }

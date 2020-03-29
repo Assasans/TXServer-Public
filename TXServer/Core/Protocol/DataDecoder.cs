@@ -9,7 +9,6 @@ using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
 using TXServer.Library;
 using static TXServer.Core.Commands.CommandManager;
-using static TXServer.Core.Commands.CommandTyping;
 
 namespace TXServer.Core.Protocol
 {
@@ -64,7 +63,7 @@ namespace TXServer.Core.Protocol
 
         private object DecodeCommand()
         {
-            Type objType = CommandTypeByCode[(CommandCode)reader.ReadByte()];
+            Type objType = FindCommandType(reader.ReadByte());
 
             return DecodeObject(objType);
         }

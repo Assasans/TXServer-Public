@@ -7,6 +7,7 @@ namespace TXServer.ECSSystem.Components
     [SerialVersionUID(1505286737090)]
     public class TutorialCompleteIdsComponent : Component
     {
+        // Обучение полностью пройдено.
         public List<ulong> CompletedIds { get; set; } = new List<ulong>
         {
             0x00000000190828D4,

@@ -81,6 +81,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\CommandManager\CommandCodeAttribute.cs" />
     <Compile Include="ECSSystem\Components\BattleLeaveCounterComponent.cs" />
     <Compile Include="ECSSystem\Components\BlackListComponent.cs" />
     <Compile Include="ECSSystem\Components\ConfirmedUserEmailComponent.cs" />
@@ -163,8 +164,8 @@
     <Compile Include="Core\Commands\SendEventCommand.cs" />
     <Compile Include="Core\Protocol\OptionalMap.cs" />
     <Compile Include="Core\ServerLauncher.cs" />
-    <Compile Include="Core\CommandTyping.cs" />
-    <Compile Include="Core\CommandManager.cs" />
+    <Compile Include="Core\CommandManager\CommandTyping.cs" />
+    <Compile Include="Core\CommandManager\CommandManager.cs" />
     <Compile Include="Core\Player\Player.cs" />
     <Compile Include="Core\Player\PlayerData.cs" />
     <Compile Include="Core\Player\PlayerHandlers.cs" />

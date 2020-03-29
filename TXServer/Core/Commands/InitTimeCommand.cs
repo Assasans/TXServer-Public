@@ -3,6 +3,7 @@ using TXServer.Core.Protocol;
 
 namespace TXServer.Core.Commands
 {
+    [CommandCode(7)]
     public class InitTimeCommand : Command
     {
         public InitTimeCommand() { }

@@ -17,3 +17,9 @@ dotnet_diagnostic.CA1040.severity = none
 
 # CA1710: Идентификаторы должны иметь правильные суффиксы
 dotnet_diagnostic.CA1710.severity = none
+
+# CA1062: Проверить аргументы или открытые методы
+dotnet_diagnostic.CA1062.severity = none
+
+# IDE0055: Исправить форматирование
+dotnet_diagnostic.IDE0055.severity = none

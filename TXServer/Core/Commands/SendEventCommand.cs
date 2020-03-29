@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.Protocol;
-using TXServer.ECSSystem;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Events;
 
 namespace TXServer.Core.Commands
 {
+    [CommandCode(1)]
     public class SendEventCommand : Command
     {
         public SendEventCommand(ECSEvent Event, params Entity[] Entities)

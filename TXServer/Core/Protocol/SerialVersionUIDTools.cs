@@ -24,7 +24,7 @@ namespace TXServer.Core.Protocol
 
                 foreach (Type type in currentAssembly.GetTypes())
                 {
-                    SerialVersionUIDAttribute attribute = type.GetCustomAttribute(typeof(SerialVersionUIDAttribute)) as SerialVersionUIDAttribute;
+                    SerialVersionUIDAttribute attribute = type.GetCustomAttribute<SerialVersionUIDAttribute>();
 
                     if (attribute != null)
                     {
@@ -41,6 +41,7 @@ namespace TXServer.Core.Protocol
         /// </summary>
         public static Int64 GetId(Type type)
         {
+            _ = type ?? throw new ArgumentNullException(nameof(type));
             SerialVersionUIDAttribute attribute = type.GetCustomAttribute<SerialVersionUIDAttribute>();
 
             if (attribute != null)

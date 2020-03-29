@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using TXServer.Core.Protocol;
-using TXServer.ECSSystem;
 using TXServer.ECSSystem.Base;
 
 namespace TXServer.Core.Commands
 {
+    [CommandCode(2)]
     public class EntityShareCommand : Command
     {
         public EntityShareCommand(Entity Entity)

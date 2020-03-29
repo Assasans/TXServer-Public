@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using TXServer.Core.Commands;
 
 namespace TXServer.Core
 {
@@ -35,28 +34,15 @@ namespace TXServer.Core
             public static extern IntPtr GetConsoleWindow();
         }
 
-        // Пул игроков.
-        private static List<Player> Pool = new List<Player>();
-        private static int PoolSize;
-
-        // Поток, принимающий соединения.
-        private static Thread acceptWorker;
-
-        // Поток сервера состояния.
-        private static Thread StateServerWorker;
-
-        // Состояние сервера.
-        public static bool IsStarted { get; private set; }
-        public static int PlayerCount = 0;
-
         // Запуск сервера.
         public static void InitServer(IPAddress ip, short port, int PoolSize)
         {
 #if !DEBUG
-        NativeMethods.AllocConsole();
-        _ = NativeMethods.DeleteMenu(NativeMethods.GetSystemMenu(NativeMethods.GetConsoleWindow(), false), 0xF060, 0);
-        Console.OutputEncoding = Encoding.GetEncoding(1251);
+            NativeMethods.AllocConsole();
+            _ = NativeMethods.DeleteMenu(NativeMethods.GetSystemMenu(NativeMethods.GetConsoleWindow(), false), 0xF060, 0);
+            Console.OutputEncoding = Encoding.GetEncoding(1251);
 #endif
+
             ServerLauncher.PoolSize = PoolSize;
             IsStarted = true;
 
@@ -84,10 +70,8 @@ namespace TXServer.Core
             Pool.ForEach(player => player.Destroy());
             Pool.Clear();
 
-            MainWindow.OnServerStop();
-
 #if !DEBUG
-        NativeMethods.FreeConsole();
+            NativeMethods.FreeConsole();
 #endif
         }
 
@@ -118,8 +102,17 @@ namespace TXServer.Core
         {
             using (Socket acceptor = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP))
             {
-                acceptor.Bind(new IPEndPoint(ip, port));
-                acceptor.Listen(PoolSize);
+                try
+                {
+                    acceptor.Bind(new IPEndPoint(ip, port));
+                    acceptor.Listen(PoolSize);
+                }
+                catch (SocketException e)
+                {
+                    Console.WriteLine(e);
+                    Application.Current.Dispatcher.Invoke(new Action(MainWindow.HandleCriticalError));
+                    return;
+                }
 
                 while (true)
                 {
@@ -127,6 +120,7 @@ namespace TXServer.Core
                     bool accepted = false;
                     try
                     {
+                        // Асинхронные методы позволяют остановить поток, когда требуется.
                         IAsyncResult result = acceptor.BeginAccept(null, acceptor);
                         socket = acceptor.EndAccept(result);
                         accepted = true;
@@ -151,12 +145,22 @@ namespace TXServer.Core
 
             using (HttpListener listener = new HttpListener())
             {
-                listener.Prefixes.Add("http://" + ip + ":8080/");
+                listener.Prefixes.Add("http://" + (ip == IPAddress.Any ? "+" : ip.ToString()) + ":8080/");
 
-                listener.Start();
+                try
+                {
+                    listener.Start();
+                }
+                catch (HttpListenerException e)
+                {
+                    Console.WriteLine(e);
+                    Application.Current.Dispatcher.Invoke(new Action(MainWindow.HandleCriticalError));
+                    return;
+                }
 
                 while (true)
                 {
+                    // Асинхронные методы позволяют остановить поток, когда требуется.
                     IAsyncResult result = listener.BeginGetContext(null, listener);
                     HttpListenerContext context = listener.EndGetContext(result);
 
@@ -186,5 +190,21 @@ namespace TXServer.Core
                 }
             }
         }
+
+        // Пул игроков.
+        private static List<Player> Pool = new List<Player>();
+        private static int PoolSize;
+
+        // Поток, принимающий соединения.
+        private static Thread acceptWorker;
+
+        // Поток сервера состояния.
+        private static Thread StateServerWorker;
+
+        // Состояние сервера.
+        public static bool IsStarted { get; private set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Поля, не являющиеся константами, не должны быть видимыми", Justification = "<Ожидание>")]
+        public static int PlayerCount = 0;
     }
 }

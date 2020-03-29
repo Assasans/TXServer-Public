@@ -24,10 +24,10 @@ namespace TXServer.Library
             {
                 lock (writeLock)
                 {
-                    dictionary[key] = value;
-
-                    reverseDictionary.Remove(value);
+                    reverseDictionary.Remove(dictionary[key]);
                     reverseDictionary[value] = key;
+
+                    dictionary[key] = value;
                 }
             }
         }
@@ -43,10 +43,10 @@ namespace TXServer.Library
             {
                 lock (writeLock)
                 {
-                    reverseDictionary[_value] = value;
-
-                    dictionary.Remove(value);
+                    dictionary.Remove(reverseDictionary[_value]);
                     dictionary[value] = _value;
+
+                    reverseDictionary[_value] = value;
                 }
             }
         }

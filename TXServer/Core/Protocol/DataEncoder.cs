@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
 using TXServer.Library;
 using static TXServer.Core.Commands.CommandManager;
-using static TXServer.Core.Commands.CommandTyping;
 
 namespace TXServer.Core.Protocol
 {
@@ -47,22 +47,14 @@ namespace TXServer.Core.Protocol
 
         private void EncodeCommand(Command command)
         {
-            writer.Write((byte)CommandCodeByType[command.GetType()]);
+            Type type = command.GetType();
+
+            writer.Write(GetCommandCode(type));
         }
 
         private void EncodeEntity(Entity entity)
         {
             writer.Write(entity.EntityId);
-        }
-
-        private void EncodeDictionary(IDictionary dictionary)
-        {
-            writer.Write((byte)dictionary.Count);
-
-            foreach (DictionaryEntry pair in dictionary)
-            {
-                EncodeObject(pair);
-            }
         }
         
         private void SelectEncode(object obj)
@@ -79,9 +71,6 @@ namespace TXServer.Core.Protocol
             {
                 case Entity entity:
                     EncodeEntity(entity);
-                    return;
-                case IDictionary dictionary:
-                    EncodeDictionary(dictionary);
                     return;
                 case ICollection collection:
                     EncodeCollection(collection);
@@ -135,7 +124,7 @@ namespace TXServer.Core.Protocol
                 writer.Write(map.Length);
                 writer.Write((UInt32)writtenCommands.BaseStream.Length);
 
-                writer.Write(map.Data());
+                writer.Write(map.GetBytes());
 
                 writtenCommands.BaseStream.Position = 0;
                 writtenCommands.BaseStream.CopyTo(writer.BaseStream);
