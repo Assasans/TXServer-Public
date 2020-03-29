@@ -10,6 +10,62 @@ namespace TXServer.ECSSystem.Base
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1034:Вложенные типы не должны быть видимыми", Justification = "<Ожидание>")]
         public static class GlobalEntities
         {
+            public static readonly Entity BATTLE_MAP_SILENCE = new Entity(-321842153, new TemplateAccessor(new MapTemplate(), "battle/map/silence"),
+					new MapEnabledInCustomGameComponent(),
+					new MapComponent(),
+					new MapGroupComponent(-321842153));
+            public static readonly Entity BATTLE_MAP_NIGHTIRAN = new Entity(343745828, new TemplateAccessor(new MapTemplate(), "battle/map/nightiran"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(343745828));
+            public static readonly Entity BATTLE_MAP_ACIDLAKE = new Entity(485053206, new TemplateAccessor(new MapTemplate(), "battle/map/silence"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(485053206));
+            public static readonly Entity BATTLE_MAP_ACIDLAKEHALLOWEEN = new Entity(-820833801, new TemplateAccessor(new MapTemplate(), "battle/map/acidlakehalloween"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(-820833801));
+            public static readonly Entity BATTLE_MAP_TESTBOX = new Entity(458045295, new TemplateAccessor(new MapTemplate(), "battle/map/textbox"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(458045295));
+            public static readonly Entity BATTLE_MAP_SANDBOX = new Entity(-549069251, new TemplateAccessor(new MapTemplate(), "battle/map/sandbox"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(-549069251));
+            public static readonly Entity BATTLE_MAP_IRAN = new Entity(-51480736, new TemplateAccessor(new MapTemplate(), "battle/map/iran"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(-51480736));
+            public static readonly Entity BATTLE_MAP_WESTPRIME = new Entity(980475942, new TemplateAccessor(new MapTemplate(), "battle/map/westprime"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(980475942));
+            public static readonly Entity BATTLE_MAP_BOOMBOX = new Entity(1945237110, new TemplateAccessor(new MapTemplate(), "battle/map/boombox"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(1945237110));
+            public static readonly Entity BATTLE_MAP_SILENCEMOON = new Entity(933129112, new TemplateAccessor(new MapTemplate(), "battle/map/silencemoon"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(933129112));
+            public static readonly Entity BATTLE_MAP_RIO = new Entity(-1664220274, new TemplateAccessor(new MapTemplate(), "battle/map/rio"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(-1664220274));
+            public static readonly Entity BATTLE_MAP_MASSACREMARSBG = new Entity(989096365, new TemplateAccessor(new MapTemplate(), "battle/map/massacremarsBG"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(989096365));
+            public static readonly Entity BATTLE_MAP_MASSACRE = new Entity(-1551247853, new TemplateAccessor(new MapTemplate(), "battle/map/massacre"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(-1551247853));
+            public static readonly Entity BATTLE_MAP_KUNGUR = new Entity(2127033418, new TemplateAccessor(new MapTemplate(), "battle/map/kungur"),
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(2127033418));
             public static readonly Entity BATTLESELECT_MATCHMAKING_MODE_COSMICBATTLE = new Entity(-176533989);
             public static readonly Entity BATTLESELECT_MATCHMAKING_MODE_DEATHMATCH = new Entity(596799940);
             public static readonly Entity BATTLESELECT_MATCHMAKING_MODE_FIRST = new Entity(212624605);

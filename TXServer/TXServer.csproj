@@ -88,14 +88,14 @@
     <Compile Include="ECSSystem\Components\FavoriteEquipmentStatisticsComponent.cs" />
     <Compile Include="ECSSystem\Components\FinishedFractionsCompetitionComponent.cs" />
     <Compile Include="ECSSystem\Components\FractionComponent.cs" />
-    <Compile Include="ECSSystem\Components\Group\FractionGroupComponent.cs" />
+    <Compile Include="ECSSystem\Components\Groups\FractionGroupComponent.cs" />
     <Compile Include="ECSSystem\Components\GameplayChestScoreComponent.cs" />
-    <Compile Include="ECSSystem\Components\Group\GroupComponent.cs" />
+    <Compile Include="ECSSystem\Components\Groups\GroupComponent.cs" />
     <Compile Include="ECSSystem\Components\KillsEquipmentStatisticsComponent.cs" />
-    <Compile Include="ECSSystem\Components\Group\LeagueGroupComponent.cs" />
+    <Compile Include="ECSSystem\Components\Groups\LeagueGroupComponent.cs" />
     <Compile Include="ECSSystem\Components\MapComponent.cs" />
     <Compile Include="ECSSystem\Components\MapEnabledInCustomGameComponent.cs" />
-    <Compile Include="ECSSystem\Components\Group\MapGroupComponent.cs" />
+    <Compile Include="ECSSystem\Components\Groups\MapGroupComponent.cs" />
     <Compile Include="ECSSystem\Components\PersonalChatOwnerComponent.cs" />
     <Compile Include="ECSSystem\Components\QuestReadyComponent.cs" />
     <Compile Include="ECSSystem\Components\RegistrationDateComponent.cs" />
@@ -107,7 +107,7 @@
     <Compile Include="ECSSystem\Components\UserDailyBonusReceivedRewardsComponent.cs" />
     <Compile Include="ECSSystem\Components\UserDailyBonusZoneComponent.cs" />
     <Compile Include="ECSSystem\Components\UserExperienceComponent.cs" />
-    <Compile Include="ECSSystem\Components\Group\UserGroupComponent.cs" />
+    <Compile Include="ECSSystem\Components\Groups\UserGroupComponent.cs" />
     <Compile Include="ECSSystem\Components\UserMoneyComponent.cs" />
     <Compile Include="ECSSystem\Components\UserPublisherComponent.cs" />
     <Compile Include="ECSSystem\Components\UserRankComponent.cs" />

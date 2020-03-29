@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Commands;
 using TXServer.Core.ECSSystem.Events;
@@ -52,12 +53,7 @@ namespace TXServer.ECSSystem.Events
 				new BattleLeaveCounterComponent(),
 				new UserReputationComponent(0.0));
 
-			/*
-			Entity[] maps = new Entity[]{
-				new Entity(new TemplateAccessor(new MapTemplate(), "battle/map/silence"),
-					new MapEnabledInCustomGameComponent())
-			};
-			*/
+			var members = typeof(GlobalEntities).GetFields().Where(x => x.Name.Contains("BATTLE_MAP"));
 
 			CommandManager.SendCommands(Player.Instance.Socket,
 				new ComponentAddCommand(entity, new UserGroupComponent(entity)),
@@ -66,6 +62,11 @@ namespace TXServer.ECSSystem.Events
 				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS),
 				new SendEventCommand(new UpdateClientFractionScoresEvent(), GlobalEntities.FRACTIONSCOMPETITION),
 				new EntityShareCommand(user));
+
+			foreach (var member in members)
+			{
+				CommandManager.SendCommands(Player.Instance.Socket, new EntityShareCommand(member.GetValue(null) as Entity));
+			}
 		}
 
 		public string HardwareFingerprint { get; set; }

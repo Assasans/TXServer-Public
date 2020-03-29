@@ -9,5 +9,9 @@ namespace TXServer.ECSSystem.Components
         public MapGroupComponent(Entity Key) : base(Key)
         {
         }
+
+        public MapGroupComponent(long Key) : base(Key)
+        {
+        }
     }
 }
