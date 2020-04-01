@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TXServer.Core;
 using TXServer.Core.Commands;
 using TXServer.Core.ECSSystem.Events;
@@ -53,20 +55,25 @@ namespace TXServer.ECSSystem.Events
 				new BattleLeaveCounterComponent(),
 				new UserReputationComponent(0.0));
 
-			var members = typeof(GlobalEntities).GetFields().Where(x => x.Name.Contains("BATTLE_MAP"));
-
-			CommandManager.SendCommands(Player.Instance.Socket,
+			List<Command> collectedCommands = new List<Command>()
+			{
 				new ComponentAddCommand(entity, new UserGroupComponent(entity)),
 				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION),
 				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_FRONTIER),
 				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS),
 				new SendEventCommand(new UpdateClientFractionScoresEvent(), GlobalEntities.FRACTIONSCOMPETITION),
-				new EntityShareCommand(user));
+				new EntityShareCommand(user)
+			};
 
-			foreach (var member in members)
-			{
-				CommandManager.SendCommands(Player.Instance.Socket, new EntityShareCommand(member.GetValue(null) as Entity));
-			}
+			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
+									   where global.Name.Contains("BATTLE_MAP")
+									   select new EntityShareCommand(global.GetValue(null) as Entity));
+
+			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
+									   where global.Name.Contains("BATTLE_REWARDS")
+									   select new EntityShareCommand(global.GetValue(null) as Entity));
+
+			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands.ToArray());
 		}
 
 		public string HardwareFingerprint { get; set; }

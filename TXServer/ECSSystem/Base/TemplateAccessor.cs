@@ -11,6 +11,6 @@ namespace TXServer.ECSSystem.Base
         }
 
         [ProtocolFixed] public IEntityTemplate Template { get; set; }
-        [ProtocolFixed] public string ConfigPath { get; set; }
+        [ProtocolFixed][OptionalMapped] public string ConfigPath { get; set; }
     }
 }

@@ -26,7 +26,7 @@ namespace TXServer.ECSSystem.Base
                     new MapEnabledInCustomGameComponent(),
                     new MapComponent(),
                     new MapGroupComponent(-820833801));
-            public static readonly Entity BATTLE_MAP_TESTBOX = new Entity(458045295, new TemplateAccessor(new MapTemplate(), "battle/map/textbox"),
+            public static readonly Entity BATTLE_MAP_TESTBOX = new Entity(458045295, new TemplateAccessor(new MapTemplate(), "battle/map/testbox"),
                     new MapEnabledInCustomGameComponent(),
                     new MapComponent(),
                     new MapGroupComponent(458045295));
@@ -74,8 +74,11 @@ namespace TXServer.ECSSystem.Base
             public static readonly Entity BATTLESELECT_MATCHMAKING_MODE_SECOND = new Entity(-2044199258);
             public static readonly Entity BATTLESELECT_MATCHMAKING_MODE_SOON = new Entity(305493269);
             public static readonly Entity BATTLESELECT_MATCHMAKING_MODE_TRAININGBATTLE = new Entity(-1512720201);
-            public static readonly Entity BATTLE_REWARDS_MODULE_CONTAINER = new Entity(1069395872);
-            public static readonly Entity BATTLE_REWARDS_NEW_LEAGUE = new Entity(-1658996640);
+            public static readonly Entity BATTLE_REWARDS_LVLUP_UNLOCK = new Entity(1672895928, new TemplateAccessor(new LevelUpUnlockBattleRewardTemplate(), "battle_rewards/lvlup_unlock"), new BattleRewardGroupComponent(1672895928));
+            public static readonly Entity BATTLE_REWARDS_MODULE_CONTAINER = new Entity(1069395872, new TemplateAccessor(new ModuleContainerBattleRewardTemplate(), "battle_rewards/module_container"), new BattleRewardGroupComponent(1069395872));
+            public static readonly Entity BATTLE_REWARDS_NEW_LEAGUE = new Entity(-1658996640, new TemplateAccessor(new LeagueFirstEntranceRewardTemplate(), "battle_rewards/new_league"), new BattleRewardGroupComponent(-1658996640));
+            public static readonly Entity BATTLE_REWARDS_TUTORIAL = new Entity(646862480, new TemplateAccessor(new TutorialBattleRewardTemplate(), "battle_rewards/tutorial"), new BattleRewardGroupComponent(646862480));
+            public static readonly Entity BATTLE_REWARDS_XCRYSTAL_BONUS = new Entity(473122320, new TemplateAccessor(new XCrystalBattleRewardTemplate(), "battle_rewards/xcrystal_bonus"), new BattleRewardGroupComponent(473122320));
             public static readonly Entity BONUS_ENERGY_DAILY = new Entity(5542347150);
             public static readonly Entity BONUS_MONEY_DAILY = new Entity(3512370161);
             public static readonly Entity BONUS_QUESTEXCHANGE_DAILY = new Entity(2541397359);

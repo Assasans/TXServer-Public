@@ -88,6 +88,7 @@
     <Compile Include="ECSSystem\Components\FavoriteEquipmentStatisticsComponent.cs" />
     <Compile Include="ECSSystem\Components\FinishedFractionsCompetitionComponent.cs" />
     <Compile Include="ECSSystem\Components\FractionComponent.cs" />
+    <Compile Include="ECSSystem\Components\Groups\BattleRewardGroupComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\FractionGroupComponent.cs" />
     <Compile Include="ECSSystem\Components\GameplayChestScoreComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\GroupComponent.cs" />
@@ -119,9 +120,14 @@
     <Compile Include="ECSSystem\EntityTemplates\ClientSessionTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\FractionsCompetitionTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\FractionTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\LeagueFirstEntranceRewardTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\LevelUpUnlockBattleRewardTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\LobbyTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\MapTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\ModuleContainerBattleRewardTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\TutorialBattleRewardTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\UserTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\XCrystalBattleRewardTemplate.cs" />
     <Compile Include="ECSSystem\GlobalEntities.cs" />
     <Compile Include="ECSSystem\Components\FractionUserScoreComponent.cs" />
     <Compile Include="ECSSystem\Events\UpdateClientFractionScoresEvent.cs" />
