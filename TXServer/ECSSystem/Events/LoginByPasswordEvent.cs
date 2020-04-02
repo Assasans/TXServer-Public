@@ -57,7 +57,7 @@ namespace TXServer.ECSSystem.Events
 
 			List<Command> collectedCommands = new List<Command>()
 			{
-				new ComponentAddCommand(entity, new UserGroupComponent(entity)),
+				new ComponentAddCommand(entity, new UserGroupComponent(entity /* replace with random group id 1 */)),
 				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION),
 				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_FRONTIER),
 				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS),
@@ -71,6 +71,12 @@ namespace TXServer.ECSSystem.Events
 
 			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
 									   where global.Name.Contains("BATTLE_REWARDS")
+									   select new EntityShareCommand(global.GetValue(null) as Entity));
+
+			collectedCommands.Add(new SendEventCommand(new PaymentSectionLoadedEvent(), entity /* replace with random group id 1 */));
+
+			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
+									   where global.Name.Contains("PAYMENT_GOODS_GOLDBONUS")
 									   select new EntityShareCommand(global.GetValue(null) as Entity));
 
 			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands.ToArray());

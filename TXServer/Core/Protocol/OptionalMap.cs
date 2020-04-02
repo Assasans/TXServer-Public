@@ -16,9 +16,9 @@ namespace TXServer.Core.Protocol
             this.Length = Length;
         }
 
-        private List<byte> data = new List<byte>(); //{ 0, 0, 0 };
+        private List<byte> data = new List<byte>();
 
-        public Int32 Length { get; private set; } //= 3;
+        public Int32 Length { get; private set; }
         public Int32 Position { get; private set; }
 
         public void Add(bool isNull)

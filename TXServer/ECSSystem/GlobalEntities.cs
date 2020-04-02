@@ -1,4 +1,5 @@
-﻿using TXServer.ECSSystem.Components;
+﻿using System.Collections.Generic;
+using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.ECSSystem.Base
@@ -11,9 +12,9 @@ namespace TXServer.ECSSystem.Base
         public static class GlobalEntities
         {
             public static readonly Entity BATTLE_MAP_SILENCE = new Entity(-321842153, new TemplateAccessor(new MapTemplate(), "battle/map/silence"),
-					new MapEnabledInCustomGameComponent(),
-					new MapComponent(),
-					new MapGroupComponent(-321842153));
+                    new MapEnabledInCustomGameComponent(),
+                    new MapComponent(),
+                    new MapGroupComponent(-321842153));
             public static readonly Entity BATTLE_MAP_NIGHTIRAN = new Entity(343745828, new TemplateAccessor(new MapTemplate(), "battle/map/nightiran"),
                     new MapEnabledInCustomGameComponent(),
                     new MapComponent(),
@@ -829,10 +830,38 @@ namespace TXServer.ECSSystem.Base
             public static readonly Entity LEAGUES_LEAGUES_4_GOLD = new Entity(414840278);
             public static readonly Entity LEAGUES_LEAGUES_5_MASTER = new Entity(1131431735);
             public static readonly Entity LOBBY_ENTRANCE_AUTHENTICATION = new Entity(-2094363978);
-            public static readonly Entity PAYMENT_GOODS_GOLDBONUS_1000BOXES = new Entity(-1799018136);
-            public static readonly Entity PAYMENT_GOODS_GOLDBONUS_800BOXES = new Entity(1242971667);
-            public static readonly Entity PAYMENT_GOODS_GOLDBONUS_80BOXES = new Entity(-467522065);
-            public static readonly Entity PAYMENT_GOODS_GOLDBONUS_8BOXES = new Entity(724226707);
+            public static readonly Entity PAYMENT_GOODS_GOLDBONUS_1000BOXES = new Entity(-1799018136, new TemplateAccessor(new GoldBonusOfferTemplate(), "payment/goods/goldbonus/80boxes"),
+                new SpecialOfferDurationComponent(),
+                new SpecialOfferGroupComponent(-1799018136),
+                new PackIdComponent(-1799018136),
+                new ItemsPackFromConfigComponent(),
+                new CrystalsPackComponent(),
+                new CountableItemsPackComponent(new Dictionary<Entity, int>() { { GARAGE_GOLDBONUS, 0 } }),
+                new XCrystalsPackComponent());
+            public static readonly Entity PAYMENT_GOODS_GOLDBONUS_800BOXES = new Entity(1242971667, new TemplateAccessor(new GoldBonusOfferTemplate(), "payment/goods/goldbonus/80boxes"),
+                new SpecialOfferDurationComponent(),
+                new SpecialOfferGroupComponent(1242971667),
+                new PackIdComponent(1242971667),
+                new ItemsPackFromConfigComponent(),
+                new CrystalsPackComponent(),
+                new CountableItemsPackComponent(new Dictionary<Entity, int>() { { GARAGE_GOLDBONUS, 0 } }),
+                new XCrystalsPackComponent());
+            public static readonly Entity PAYMENT_GOODS_GOLDBONUS_80BOXES = new Entity(-467522065, new TemplateAccessor(new GoldBonusOfferTemplate(), "payment/goods/goldbonus/80boxes"),
+                new SpecialOfferDurationComponent(),
+                new SpecialOfferGroupComponent(-467522065),
+                new PackIdComponent(-467522065),
+                new ItemsPackFromConfigComponent(),
+                new CrystalsPackComponent(),
+                new CountableItemsPackComponent(new Dictionary<Entity, int>() { { GARAGE_GOLDBONUS, 0 } }),
+                new XCrystalsPackComponent());
+            public static readonly Entity PAYMENT_GOODS_GOLDBONUS_8BOXES = new Entity(724226707, new TemplateAccessor(new GoldBonusOfferTemplate(), "payment/goods/goldbonus/80boxes"),
+                new SpecialOfferDurationComponent(),
+                new SpecialOfferGroupComponent(724226707),
+                new PackIdComponent(724226707),
+                new ItemsPackFromConfigComponent(),
+                new CrystalsPackComponent(),
+                new CountableItemsPackComponent(new Dictionary<Entity, int>() { { GARAGE_GOLDBONUS, 0 } }),
+                new XCrystalsPackComponent());
             public static readonly Entity PAYMENT_GOODS_PREMIUM_30DAYX = new Entity(1957963539);
             public static readonly Entity PAYMENT_GOODS_PREMIUM_3DAY = new Entity(-763254490);
             public static readonly Entity PAYMENT_GOODS_PREMIUM_7DAY = new Entity(-1186619009);

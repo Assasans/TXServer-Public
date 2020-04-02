@@ -1,3 +1,4 @@
 ﻿4) make server events' message loop
-57) replace sendcommands plain array with list in loginbypasswordevent
-58) ...
+58) <in loginbypasswordevent>
+60) write tests
+61) ...
