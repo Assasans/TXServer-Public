@@ -67,7 +67,7 @@ namespace TXServer.Core
             acceptWorker.Abort();
             StateServerWorker.Abort();
 
-            Pool.ForEach(player => player.Destroy());
+            Pool.ForEach(player => player.Dispose());
             Pool.Clear();
 
 #if !DEBUG

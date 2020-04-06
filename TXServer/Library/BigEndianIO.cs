@@ -48,6 +48,13 @@ namespace TXServer.Library
             Array.Reverse(data);
             return BitConverter.ToUInt64(data, 0);
         }
+
+        public float ReadFloat()
+        {
+            var data = base.ReadBytes(4);
+            Array.Reverse(data);
+            return BitConverter.ToSingle(data, 0);
+        }
     }
 
     class BigEndianBinaryWriter : BinaryWriter
@@ -90,6 +97,13 @@ namespace TXServer.Library
         }
 
         public override void Write(ulong i)
+        {
+            byte[] data = BitConverter.GetBytes(i);
+            Array.Reverse(data);
+            base.Write(data);
+        }
+
+        public override void Write(float i)
         {
             byte[] data = BitConverter.GetBytes(i);
             Array.Reverse(data);

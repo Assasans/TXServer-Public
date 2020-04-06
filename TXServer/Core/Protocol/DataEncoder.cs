@@ -56,6 +56,16 @@ namespace TXServer.Core.Protocol
         {
             writer.Write(entity.EntityId);
         }
+
+        private void EncodeHashSet<T>(HashSet<T> set)
+        {
+            writer.Write((byte)set.Count);
+
+            foreach (object el in set)
+            {
+                SelectEncode(el);
+            }
+        }
         
         private void SelectEncode(object obj)
         {
@@ -78,6 +88,14 @@ namespace TXServer.Core.Protocol
                 case Command command:
                     EncodeCommand(command);
                     break;
+            }
+
+            if (objType.IsGenericType && objType.GetGenericTypeDefinition() == typeof(HashSet<>))
+            {
+                typeof(DataEncoder).GetMethod("EncodeHashSet", BindingFlags.NonPublic | BindingFlags.Instance)
+                                   .MakeGenericMethod(objType.GetGenericArguments()[0])
+                                   .Invoke(this, new object[] { obj });
+                return;
             }
 
             if (Attribute.IsDefined(objType, typeof(SerialVersionUIDAttribute)))

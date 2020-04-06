@@ -56,7 +56,7 @@ namespace TXServer.Core
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
-                Destroy();
+                Dispose();
             }
         }
 
@@ -79,7 +79,7 @@ namespace TXServer.Core
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
-                Destroy();
+                Dispose();
             }
         }
     }

@@ -91,12 +91,15 @@
     <Compile Include="ECSSystem\Components\Groups\BattleRewardGroupComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\CountableItemsPackComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\CrystalsPackComponent.cs" />
+    <Compile Include="ECSSystem\Components\Groups\DiscountComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\FractionGroupComponent.cs" />
     <Compile Include="ECSSystem\Components\GameplayChestScoreComponent.cs" />
+    <Compile Include="ECSSystem\Components\Groups\FriendsLoadedEvent.cs" />
     <Compile Include="ECSSystem\Components\Groups\GroupComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\ItemsPackFromConfigComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\PackIdComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\SpecialOfferGroupComponent.cs" />
+    <Compile Include="ECSSystem\Components\Groups\UserOnlineComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\XCrystalsPackComponent.cs" />
     <Compile Include="ECSSystem\Components\KillsEquipmentStatisticsComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\LeagueGroupComponent.cs" />
@@ -125,6 +128,7 @@
     <Compile Include="ECSSystem\Components\UserUidComponent.cs" />
     <Compile Include="ECSSystem\Components\UserXCrystalsComponent.cs" />
     <Compile Include="ECSSystem\EntityTemplates\ClientSessionTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\EnergyDailyBonusTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\FractionsCompetitionTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\FractionTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\GoldBonusOfferTemplate.cs" />
@@ -133,6 +137,7 @@
     <Compile Include="ECSSystem\EntityTemplates\LobbyTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\MapTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\ModuleContainerBattleRewardTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\PersonalSpecialOfferPropertiesTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\TutorialBattleRewardTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\UserTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\XCrystalBattleRewardTemplate.cs" />

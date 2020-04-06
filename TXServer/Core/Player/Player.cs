@@ -6,7 +6,7 @@ using System.Windows;
 namespace TXServer.Core
 {
     // Соединение с игроком.
-    public partial class Player
+    public sealed partial class Player : IDisposable
     {
         public Player(Socket Socket)
         {
@@ -25,7 +25,7 @@ namespace TXServer.Core
             DownWorker.Start();
         }
 
-        public void Destroy()
+        public void Dispose()
         {
             if (Interlocked.Exchange(ref _Active, 0) == 0) return;
 
