@@ -57,6 +57,12 @@ namespace TXServer.Core.Protocol
             writer.Write(entity.EntityId);
         }
 
+        private void EncodeEnum(Enum @enum)
+        {
+            writer.Write(Convert.ToByte(@enum));
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Удалите неиспользуемые закрытые члены", Justification = "<Ожидание>")]
         private void EncodeHashSet<T>(HashSet<T> set)
         {
             writer.Write((byte)set.Count);
@@ -88,6 +94,9 @@ namespace TXServer.Core.Protocol
                 case Command command:
                     EncodeCommand(command);
                     break;
+                case Enum @enum:
+                    EncodeEnum(@enum);
+                    return;
             }
 
             if (objType.IsGenericType && objType.GetGenericTypeDefinition() == typeof(HashSet<>))

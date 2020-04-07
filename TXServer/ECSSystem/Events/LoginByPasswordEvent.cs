@@ -86,6 +86,22 @@ namespace TXServer.ECSSystem.Events
 			});
 
 			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands.ToArray());
+
+			collectedCommands.Clear();
+
+			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
+									   where global.Name.Contains("GARAGE_CONTAINER")
+									   select new EntityShareCommand(global.GetValue(null) as Entity));
+
+			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
+									   where global.Name.Contains("GARAGE_PAINT")
+									   select new EntityShareCommand(global.GetValue(null) as Entity));
+
+			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
+									   where global.Name.Contains("GARAGE_MODULE")
+									   select new EntityShareCommand(global.GetValue(null) as Entity));
+
+			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands.ToArray());
 		}
 
 		public string HardwareFingerprint { get; set; }

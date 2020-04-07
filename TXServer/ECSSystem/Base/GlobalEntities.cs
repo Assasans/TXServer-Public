@@ -4,6 +4,7 @@ using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.ECSSystem.Base
 {
+
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Типы статических заполнителей должны быть Static или NotInheritable", Justification = "<Ожидание>")]
     public partial class Entity
     {
@@ -180,58 +181,152 @@ namespace TXServer.ECSSystem.Base
             public static readonly Entity GARAGE_AVATAR_VLADIMIR_REPIN = new Entity(-480997961);
             public static readonly Entity GARAGE_AVATAR_WASP = new Entity(6230);
             public static readonly Entity GARAGE_AVATAR_YAMAMOTO_TSUNETOMO = new Entity(605003762);
-            public static readonly Entity GARAGE_CONTAINER_12APRIL2017 = new Entity(759177625);
-            public static readonly Entity GARAGE_CONTAINER_12APRIL2018 = new Entity(100024310);
-            public static readonly Entity GARAGE_CONTAINER_12APRIL2019 = new Entity(763642357);
-            public static readonly Entity GARAGE_CONTAINER_2018 = new Entity(158184859);
-            public static readonly Entity GARAGE_CONTAINER_23FEBRUARY2017 = new Entity(782261271);
-            public static readonly Entity GARAGE_CONTAINER_23FEBRUARY2018 = new Entity(782261272);
-            public static readonly Entity GARAGE_CONTAINER_23FEBRUARY2019 = new Entity(647046527);
-            public static readonly Entity GARAGE_CONTAINER_8MARCH2017 = new Entity(-382197697);
-            public static readonly Entity GARAGE_CONTAINER_8MARCH2019 = new Entity(-2044621657);
-            public static readonly Entity GARAGE_CONTAINER_AVATARS = new Entity(160097023);
-            public static readonly Entity GARAGE_CONTAINER_BIRTHDAY2017PAINTS = new Entity(1616681926);
-            public static readonly Entity GARAGE_CONTAINER_BIRTHDAY2017SKINS = new Entity(-1191706491);
-            public static readonly Entity GARAGE_CONTAINER_CAMOUFLAGE = new Entity(255419373);
-            public static readonly Entity GARAGE_CONTAINER_CARDSBRONZE = new Entity(-370755132);
-            public static readonly Entity GARAGE_CONTAINER_CARDSGOLD = new Entity(-1147355315);
-            public static readonly Entity GARAGE_CONTAINER_CARDSGOLDDONUT = new Entity(-1667426315);
-            public static readonly Entity GARAGE_CONTAINER_CARDSMASTER = new Entity(1357210127);
-            public static readonly Entity GARAGE_CONTAINER_CARDSSCOUT = new Entity(1357210027);
-            public static readonly Entity GARAGE_CONTAINER_CARDSSILVER = new Entity(1536166586);
-            public static readonly Entity GARAGE_CONTAINER_CARDSSILVERDONUT = new Entity(-1308563288);
-            public static readonly Entity GARAGE_CONTAINER_CARDSSPYDONUT = new Entity(1060751187);
-            public static readonly Entity GARAGE_CONTAINER_COVER = new Entity(655960513);
-            public static readonly Entity GARAGE_CONTAINER_CRYSTALLIGHT = new Entity(208629334);
-            public static readonly Entity GARAGE_CONTAINER_EVERYTHING = new Entity(1933847273);
-            public static readonly Entity GARAGE_CONTAINER_FRONTIERZERO = new Entity(1185680389);
-            public static readonly Entity GARAGE_CONTAINER_GOLD = new Entity(-678260688);
-            public static readonly Entity GARAGE_CONTAINER_HALLOWEEN2018 = new Entity(-208273732);
-            public static readonly Entity GARAGE_CONTAINER_MARS = new Entity(159038379);
-            public static readonly Entity GARAGE_CONTAINER_MAY2017 = new Entity(-1096656045);
-            public static readonly Entity GARAGE_CONTAINER_MAY2018_1 = new Entity(-1619467770);
-            public static readonly Entity GARAGE_CONTAINER_MAY2018_2 = new Entity(-1619467769);
-            public static readonly Entity GARAGE_CONTAINER_MAY2018_3 = new Entity(-1619467768);
-            public static readonly Entity GARAGE_CONTAINER_PREY = new Entity(160097004);
-            public static readonly Entity GARAGE_CONTAINER_RUBBER = new Entity(1346673024);
-            public static readonly Entity GARAGE_CONTAINER_SHADOWASSASSIN = new Entity(145730912);
-            public static readonly Entity GARAGE_CONTAINER_SMOKE = new Entity(670670713);
-            public static readonly Entity GARAGE_CONTAINER_STEAM = new Entity(-1462392318);
-            public static readonly Entity GARAGE_CONTAINER_STEEL = new Entity(459979771);
-            public static readonly Entity GARAGE_CONTAINER_SUPERENERGY = new Entity(-1301708723);
-            public static readonly Entity GARAGE_CONTAINER_SUPPORTANTAEUS = new Entity(-1191706490);
-            public static readonly Entity GARAGE_CONTAINER_SUPPORTANTAEUS1 = new Entity(2132723585);
-            public static readonly Entity GARAGE_CONTAINER_SUPPORTFRONTIER = new Entity(1616681925);
-            public static readonly Entity GARAGE_CONTAINER_SUPPORTFRONTIER1 = new Entity(-132997493);
-            public static readonly Entity GARAGE_CONTAINER_TITANXT = new Entity(1046779026);
-            public static readonly Entity GARAGE_CONTAINER_TUTORIALBRONZE1 = new Entity(-1415877053);
-            public static readonly Entity GARAGE_CONTAINER_TUTORIALBRONZE2 = new Entity(-1415877052);
-            public static readonly Entity GARAGE_CONTAINER_TWINSXT = new Entity(1437820497);
-            public static readonly Entity GARAGE_CONTAINER_VALHALLA = new Entity(185937013);
-            public static readonly Entity GARAGE_CONTAINER_VIKINGT2 = new Entity(1325772382);
-            public static readonly Entity GARAGE_CONTAINER_XMAS = new Entity(285430311);
-            public static readonly Entity GARAGE_CONTAINER_XT = new Entity(742065458);
-            public static readonly Entity GARAGE_CONTAINER_XT_ZEUS = new Entity(598090230);
+            public static readonly Entity GARAGE_CONTAINER_12APRIL2017 = new Entity(759177625, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/12april2017"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(759177625));
+            public static readonly Entity GARAGE_CONTAINER_12APRIL2018 = new Entity(100024310, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/12april2018"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(100024310));
+            public static readonly Entity GARAGE_CONTAINER_12APRIL2019 = new Entity(763642357, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/12april2019"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(763642357));
+            public static readonly Entity GARAGE_CONTAINER_2018 = new Entity(158184859, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/2018"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(158184859));
+            public static readonly Entity GARAGE_CONTAINER_23FEBRUARY2017 = new Entity(782261271, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/23february2017"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(782261271));
+            public static readonly Entity GARAGE_CONTAINER_23FEBRUARY2018 = new Entity(782261272, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/23february2018"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(782261272));
+            public static readonly Entity GARAGE_CONTAINER_23FEBRUARY2019 = new Entity(647046527, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/23february2019"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(647046527));
+            public static readonly Entity GARAGE_CONTAINER_8MARCH2017 = new Entity(-382197697, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/8march2017"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-382197697));
+            public static readonly Entity GARAGE_CONTAINER_8MARCH2019 = new Entity(-2044621657, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/8march2019"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-2044621657));
+            public static readonly Entity GARAGE_CONTAINER_AVATARS = new Entity(160097023, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/avatars"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(160097023));
+            public static readonly Entity GARAGE_CONTAINER_BIRTHDAY2017PAINTS = new Entity(1616681926, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/birthday2017paints"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(1616681926));
+            public static readonly Entity GARAGE_CONTAINER_BIRTHDAY2017SKINS = new Entity(-1191706491, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/birthday2017skins"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-1191706491));
+            public static readonly Entity GARAGE_CONTAINER_CAMOUFLAGE = new Entity(255419373, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/camouflage"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(255419373));
+            public static readonly Entity GARAGE_CONTAINER_CARDSBRONZE = new Entity(-370755132, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardsbronze"),
+                new MarketItemGroupComponent(-370755132));
+            public static readonly Entity GARAGE_CONTAINER_CARDSGOLD = new Entity(-1147355315, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardsgold"),
+                new MarketItemGroupComponent(-1147355315));
+            public static readonly Entity GARAGE_CONTAINER_CARDSGOLDDONUT = new Entity(-1667426315, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardsgolddonut"),
+                new MarketItemGroupComponent(-1667426315));
+            public static readonly Entity GARAGE_CONTAINER_CARDSMASTER = new Entity(1357210127, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardsmaster"),
+                new MarketItemGroupComponent(1357210127));
+            public static readonly Entity GARAGE_CONTAINER_CARDSSCOUT = new Entity(1357210027, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardsscout"),
+                new MarketItemGroupComponent(1357210027));
+            public static readonly Entity GARAGE_CONTAINER_CARDSSILVER = new Entity(1536166586, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardssilver"),
+                new MarketItemGroupComponent(1536166586));
+            public static readonly Entity GARAGE_CONTAINER_CARDSSILVERDONUT = new Entity(-1308563288, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardssilverdonut"),
+                new MarketItemGroupComponent(-1308563288));
+            public static readonly Entity GARAGE_CONTAINER_CARDSSPYDONUT = new Entity(1060751187, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardsspydonut"),
+                new MarketItemGroupComponent(1060751187));
+            public static readonly Entity GARAGE_CONTAINER_COVER = new Entity(655960513, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/cover"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(655960513));
+            public static readonly Entity GARAGE_CONTAINER_CRYSTALLIGHT = new Entity(208629334, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/crystallight"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(208629334));
+            public static readonly Entity GARAGE_CONTAINER_EVERYTHING = new Entity(1933847273, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/everything"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(1933847273));
+            public static readonly Entity GARAGE_CONTAINER_FRONTIERZERO = new Entity(1185680389, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/frontierzero"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(1185680389));
+            public static readonly Entity GARAGE_CONTAINER_GOLD = new Entity(-678260688, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/gold"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-678260688));
+            public static readonly Entity GARAGE_CONTAINER_HALLOWEEN2018 = new Entity(-208273732, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/halloween2018"), 
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-208273732));
+            public static readonly Entity GARAGE_CONTAINER_MARS = new Entity(159038379, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/Mars"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(159038379));
+            public static readonly Entity GARAGE_CONTAINER_MAY2017 = new Entity(-1096656045, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/may2017"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-1096656045));
+            public static readonly Entity GARAGE_CONTAINER_MAY2018_1 = new Entity(-1619467770, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/may2018_1"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-1619467770));
+            public static readonly Entity GARAGE_CONTAINER_MAY2018_2 = new Entity(-1619467769, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/may2018_2"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-1619467769));
+            public static readonly Entity GARAGE_CONTAINER_MAY2018_3 = new Entity(-1619467768, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/may2018_3"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-1619467768));
+            public static readonly Entity GARAGE_CONTAINER_PREY = new Entity(160097004, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/prey"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(160097004));
+            public static readonly Entity GARAGE_CONTAINER_RUBBER = new Entity(1346673024, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/rubber"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(1346673024));
+            public static readonly Entity GARAGE_CONTAINER_SHADOWASSASSIN = new Entity(145730912, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/shadowassassin"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(145730912));
+            public static readonly Entity GARAGE_CONTAINER_SMOKE = new Entity(670670713, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/smoke"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(670670713));
+            public static readonly Entity GARAGE_CONTAINER_STEAM = new Entity(-1462392318, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/steam"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-1462392318));
+            public static readonly Entity GARAGE_CONTAINER_STEEL = new Entity(459979771, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/steel"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(459979771));
+            public static readonly Entity GARAGE_CONTAINER_SUPERENERGY = new Entity(-1301708723, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/superenergy"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-1301708723));
+            public static readonly Entity GARAGE_CONTAINER_SUPPORTANTAEUS = new Entity(-1191706490, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/supportantaeus"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-1191706490));
+            public static readonly Entity GARAGE_CONTAINER_SUPPORTANTAEUS1 = new Entity(2132723585, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/supportantaeus1"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(2132723585));
+            public static readonly Entity GARAGE_CONTAINER_SUPPORTFRONTIER = new Entity(1616681925, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/supportfrontier"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(1616681925));
+            public static readonly Entity GARAGE_CONTAINER_SUPPORTFRONTIER1 = new Entity(-132997493, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/supportfrontier1"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(-132997493));
+            public static readonly Entity GARAGE_CONTAINER_TITANXT = new Entity(1046779026, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/titanXT"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(1046779026));
+            public static readonly Entity GARAGE_CONTAINER_TUTORIALBRONZE1 = new Entity(-1415877053, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/tutorialbronze1"),
+                new MarketItemGroupComponent(-1415877053));
+            public static readonly Entity GARAGE_CONTAINER_TUTORIALBRONZE2 = new Entity(-1415877052, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/tutorialbronze2"),
+                new MarketItemGroupComponent(-1415877052));
+            public static readonly Entity GARAGE_CONTAINER_TWINSXT = new Entity(1437820497, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/twinsXT"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(1437820497));
+            public static readonly Entity GARAGE_CONTAINER_VALHALLA = new Entity(185937013, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/valhalla"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(185937013));
+            public static readonly Entity GARAGE_CONTAINER_VIKINGT2 = new Entity(1325772382, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/vikingT2"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(1325772382));
+            public static readonly Entity GARAGE_CONTAINER_XMAS = new Entity(285430311, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/xmas"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(285430311));
+            public static readonly Entity GARAGE_CONTAINER_XT = new Entity(742065458, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/xt"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(742065458));
+            public static readonly Entity GARAGE_CONTAINER_XT_ZEUS = new Entity(598090230, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/xt_zeus"),
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(598090230));
             public static readonly Entity GARAGE_COVER_ANTAEUS1 = new Entity(-891349912);
             public static readonly Entity GARAGE_COVER_ANTAEUS2018 = new Entity(1577640270);
             public static readonly Entity GARAGE_COVER_BLUE = new Entity(-172609771);
@@ -455,151 +550,447 @@ namespace TXServer.ECSSystem.Base
             public static readonly Entity GARAGE_MODULE_CARD_SPIDERMINE = new Entity(709690204);
             public static readonly Entity GARAGE_MODULE_CARD_TEMPBLOCK = new Entity(-23536107);
             public static readonly Entity GARAGE_MODULE_CARD_TURBOSPEED = new Entity(1378523021);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_1_ABSORBINGARMOR = new Entity(492941809);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_1_REPAIRKIT = new Entity(-862259125);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_1_TURBOSPEED = new Entity(-365494384);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_2_FORCEFIELD = new Entity(-1597839790);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_2_INVISIBILITY = new Entity(137179508);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_2_JUMPIMPACT = new Entity(1327463523);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_3_FIRERING = new Entity(1896579342);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_3_ICETRAP = new Entity(-1177680131);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_3_INVULNERABILITY = new Entity(1924597477);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_PASSIVE_1_BACKHITDEFENCE = new Entity(-1962420821);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_PASSIVE_1_TEMPBLOCK = new Entity(596921121);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_PASSIVE_2_ACCELERATEDGEARS = new Entity(1365914179);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_TRIGGER_2_SAPPER = new Entity(-105040547);
-            public static readonly Entity GARAGE_MODULE_MODULE_TANK_TRIGGER_3_EMERGENCYPROTECTION = new Entity(-357196071);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_1_EMP = new Entity(-1493372159);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_1_MINE = new Entity(1133911248);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_1_SONAR = new Entity(-1318192334);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_2_EXTERNALIMPACT = new Entity(-1334156852);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_2_INCREASEDDAMAGE = new Entity(676407818);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_2_SPIDERMINE = new Entity(1458405023);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_3_DRONE = new Entity(1392039140);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_3_ENERGYINJECTION = new Entity(1128679079);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_3_EXPLOSIVEMASS = new Entity(393550399);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_PASSIVE_1_BACKHITINCREASE = new Entity(-2075784110);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_PASSIVE_1_ENGINEER = new Entity(-1027949361);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_PASSIVE_2_ADRENALINE = new Entity(1367280061);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_TRIGGER_1_RAGE = new Entity(1215656773);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_TRIGGER_2_KAMIKADZE = new Entity(-1603423529);
-            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_TRIGGER_3_LIFESTEAL = new Entity(-246333323);
-            public static readonly Entity GARAGE_MODULE_PREBUILDMODULE_COMMON_ACTIVE_1_GOLD = new Entity(-150814762);
-            public static readonly Entity GARAGE_PAINT_23FEB2019 = new Entity(300183087);
-            public static readonly Entity GARAGE_PAINT_8MARCH19_1 = new Entity(685548944);
-            public static readonly Entity GARAGE_PAINT_8MARCH19_2 = new Entity(685548945);
-            public static readonly Entity GARAGE_PAINT_8MARCH19_3 = new Entity(685548946);
-            public static readonly Entity GARAGE_PAINT_ANAVATAN = new Entity(231787227);
-            public static readonly Entity GARAGE_PAINT_ANTAEUS1 = new Entity(1104561449);
-            public static readonly Entity GARAGE_PAINT_ANTAEUS2018 = new Entity(1104561450);
-            public static readonly Entity GARAGE_PAINT_ANTARCTIDA = new Entity(683803510);
-            public static readonly Entity GARAGE_PAINT_ARROWSOFLOVE = new Entity(-400341658);
-            public static readonly Entity GARAGE_PAINT_AUTUMNLEAVES = new Entity(-662236117);
-            public static readonly Entity GARAGE_PAINT_BANANAS = new Entity(-574655849);
-            public static readonly Entity GARAGE_PAINT_BEGINNING = new Entity(-1500327034);
-            public static readonly Entity GARAGE_PAINT_BIRTHDAY2017 = new Entity(776075330);
-            public static readonly Entity GARAGE_PAINT_BLACKROGER = new Entity(2008328619);
-            public static readonly Entity GARAGE_PAINT_BLUE = new Entity(137747283);
-            public static readonly Entity GARAGE_PAINT_BLUEMAGMA = new Entity(436923060);
-            public static readonly Entity GARAGE_PAINT_CANYON = new Entity(214261055);
-            public static readonly Entity GARAGE_PAINT_CARBON = new Entity(214261056);
-            public static readonly Entity GARAGE_PAINT_CEDER = new Entity(-24102762);
-            public static readonly Entity GARAGE_PAINT_CHAMPION = new Entity(1798212322);
-            public static readonly Entity GARAGE_PAINT_COAL = new Entity(920905258);
-            public static readonly Entity GARAGE_PAINT_CORROSION = new Entity(1569952799);
-            public static readonly Entity GARAGE_PAINT_DESERT = new Entity(-718109490);
-            public static readonly Entity GARAGE_PAINT_DIGITAL = new Entity(-683002753);
-            public static readonly Entity GARAGE_PAINT_DIRT = new Entity(137803904);
-            public static readonly Entity GARAGE_PAINT_DRAGON = new Entity(-706638132);
-            public static readonly Entity GARAGE_PAINT_EASTERNSTAR = new Entity(1717585789);
-            public static readonly Entity GARAGE_PAINT_EPICGOLD = new Entity(-892221448);
-            public static readonly Entity GARAGE_PAINT_FLAME = new Entity(-1514026752);
-            public static readonly Entity GARAGE_PAINT_FLORA = new Entity(-21112705);
-            public static readonly Entity GARAGE_PAINT_FOOTBALL = new Entity(761115110);
-            public static readonly Entity GARAGE_PAINT_FORESTER = new Entity(833674243);
-            public static readonly Entity GARAGE_PAINT_FREEDOM = new Entity(1347685821);
-            public static readonly Entity GARAGE_PAINT_FRONTIER1 = new Entity(-1396691349);
-            public static readonly Entity GARAGE_PAINT_FRONTIER2018 = new Entity(-1396691350);
-            public static readonly Entity GARAGE_PAINT_GALAXY = new Entity(-636128311);
-            public static readonly Entity GARAGE_PAINT_GLACIER = new Entity(526265313);
-            public static readonly Entity GARAGE_PAINT_GLINA = new Entity(-20195074);
-            public static readonly Entity GARAGE_PAINT_GOLD = new Entity(921024755);
-            public static readonly Entity GARAGE_PAINT_GREEN = new Entity(-20020438);
-            public static readonly Entity GARAGE_PAINT_GREENSKULLS = new Entity(97943767);
-            public static readonly Entity GARAGE_PAINT_HALLOWEEN = new Entity(721518013);
-            public static readonly Entity GARAGE_PAINT_HALLOWEEN2017 = new Entity(1218811098);
-            public static readonly Entity GARAGE_PAINT_HERO = new Entity(137919219);
-            public static readonly Entity GARAGE_PAINT_HONEYCOMB = new Entity(1023813172);
-            public static readonly Entity GARAGE_PAINT_HVOYA = new Entity(-18967536);
-            public static readonly Entity GARAGE_PAINT_HYDRA = new Entity(-887676103);
-            public static readonly Entity GARAGE_PAINT_INFERNO = new Entity(-398350090);
-            public static readonly Entity GARAGE_PAINT_LEAGUE_BRONZE = new Entity(1185540727);
-            public static readonly Entity GARAGE_PAINT_LEAGUE_GOLD = new Entity(-1245546371);
-            public static readonly Entity GARAGE_PAINT_LEAGUE_MASTER = new Entity(-317558887);
-            public static readonly Entity GARAGE_PAINT_LEAGUE_SILVER = new Entity(1663842282);
-            public static readonly Entity GARAGE_PAINT_MARINE = new Entity(-464167301);
-            public static readonly Entity GARAGE_PAINT_MARY = new Entity(138064340);
-            public static readonly Entity GARAGE_PAINT_MATTEBLACK = new Entity(-646190818);
-            public static readonly Entity GARAGE_PAINT_MATTEBLUE = new Entity(-436467641);
-            public static readonly Entity GARAGE_PAINT_MATTEGRAY = new Entity(-431689890);
-            public static readonly Entity GARAGE_PAINT_MATTEGREEN = new Entity(-497382758);
-            public static readonly Entity GARAGE_PAINT_MATTENAVI = new Entity(-425712005);
-            public static readonly Entity GARAGE_PAINT_MATTEORANGE = new Entity(267667571);
-            public static readonly Entity GARAGE_PAINT_MATTERED = new Entity(-1260536244);
-            public static readonly Entity GARAGE_PAINT_MATTEROSE = new Entity(-421603854);
-            public static readonly Entity GARAGE_PAINT_MATTEVIOLET = new Entity(1940431938);
-            public static readonly Entity GARAGE_PAINT_MATTEWHITE = new Entity(-48418252);
-            public static readonly Entity GARAGE_PAINT_MATTEYELLOW = new Entity(190698221);
-            public static readonly Entity GARAGE_PAINT_MAY2018_1 = new Entity(2070833571);
-            public static readonly Entity GARAGE_PAINT_MAY2018_2 = new Entity(2070833572);
-            public static readonly Entity GARAGE_PAINT_METEL = new Entity(-14852182);
-            public static readonly Entity GARAGE_PAINT_MILITARY = new Entity(-1660396512);
-            public static readonly Entity GARAGE_PAINT_MOSAIC = new Entity(-451216061);
-            public static readonly Entity GARAGE_PAINT_MOSCOW = new Entity(-1878474135);
-            public static readonly Entity GARAGE_PAINT_NEFRIT = new Entity(532533505);
-            public static readonly Entity GARAGE_PAINT_NEWYEARGLOW = new Entity(-1760088841);
-            public static readonly Entity GARAGE_PAINT_NEWYEARICE = new Entity(-888059423);
-            public static readonly Entity GARAGE_PAINT_NOISE = new Entity(-1506541337);
-            public static readonly Entity GARAGE_PAINT_NORTH = new Entity(-1506532654);
-            public static readonly Entity GARAGE_PAINT_ORANGE = new Entity(-391711001);
-            public static readonly Entity GARAGE_PAINT_ORION = new Entity(-12628116);
-            public static readonly Entity GARAGE_PAINT_PARTIZAN = new Entity(1555319306);
-            public static readonly Entity GARAGE_PAINT_PATINA = new Entity(-1079898253);
-            public static readonly Entity GARAGE_PAINT_PINK = new Entity(921287177);
-            public static readonly Entity GARAGE_PAINT_POLAR = new Entity(-1504691957);
-            public static readonly Entity GARAGE_PAINT_PRIBOY = new Entity(-362854786);
-            public static readonly Entity GARAGE_PAINT_PRODIGY = new Entity(1641998027);
-            public static readonly Entity GARAGE_PAINT_RADIATION = new Entity(1223441167);
-            public static readonly Entity GARAGE_PAINT_RED = new Entity(558647928);
-            public static readonly Entity GARAGE_PAINT_REDAMBER = new Entity(1784687185);
-            public static readonly Entity GARAGE_PAINT_RIVETS = new Entity(925876519);
-            public static readonly Entity GARAGE_PAINT_ROCKS = new Entity(-9952811);
-            public static readonly Entity GARAGE_PAINT_RUST = new Entity(276536681);
-            public static readonly Entity GARAGE_PAINT_SANDSTONE = new Entity(138818312);
-            public static readonly Entity GARAGE_PAINT_SAVANNA = new Entity(-470773521);
-            public static readonly Entity GARAGE_PAINT_SMOKE = new Entity(-9077354);
-            public static readonly Entity GARAGE_PAINT_SPECTRE = new Entity(-56970637);
-            public static readonly Entity GARAGE_PAINT_SPIDERWEB = new Entity(355636982);
-            public static readonly Entity GARAGE_PAINT_SPORT = new Entity(-1207082244);
-            public static readonly Entity GARAGE_PAINT_STARRYSKY = new Entity(-1732490966);
-            public static readonly Entity GARAGE_PAINT_STEAMULATORF = new Entity(1880146981);
-            public static readonly Entity GARAGE_PAINT_STEAMULATORSF = new Entity(-1844971488);
-            public static readonly Entity GARAGE_PAINT_STEEL = new Entity(-1501779048);
-            public static readonly Entity GARAGE_PAINT_STONE = new Entity(-1756632159);
-            public static readonly Entity GARAGE_PAINT_STORM = new Entity(-8868592);
-            public static readonly Entity GARAGE_PAINT_STVALENTINE2017 = new Entity(986557478);
-            public static readonly Entity GARAGE_PAINT_SUMMER = new Entity(-274067352);
-            public static readonly Entity GARAGE_PAINT_SWAMP = new Entity(-8792825);
-            public static readonly Entity GARAGE_PAINT_TAIGA = new Entity(-8517219);
-            public static readonly Entity GARAGE_PAINT_TAR = new Entity(-1209537658);
-            public static readonly Entity GARAGE_PAINT_TINA = new Entity(138280417);
-            public static readonly Entity GARAGE_PAINT_TRIANGLECAMO = new Entity(-1902859834);
-            public static readonly Entity GARAGE_PAINT_TROLLFACE = new Entity(1546602523);
-            public static readonly Entity GARAGE_PAINT_TUNDRA = new Entity(-245416673);
-            public static readonly Entity GARAGE_PAINT_UNIVERSE = new Entity(942805628);
-            public static readonly Entity GARAGE_PAINT_URBAN = new Entity(-7094151);
-            public static readonly Entity GARAGE_PAINT_VOSTOK1 = new Entity(-2023428617);
-            public static readonly Entity GARAGE_PAINT_WALKER = new Entity(-50932577);
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_1_ABSORBINGARMOR = new Entity(492941809, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/1/absorbingarmor"),
+                new ParentGroupComponent(492941809),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(492941809),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_1_REPAIRKIT = new Entity(-862259125, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/1/repairkit"),
+                new ParentGroupComponent(-862259125),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(-862259125),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_1_TURBOSPEED = new Entity(-365494384, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/1/turbospeed"),
+                new ParentGroupComponent(-365494384),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(-365494384),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_2_FORCEFIELD = new Entity(-1597839790, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/2/forcefield"),
+                new ParentGroupComponent(-1597839790),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(-1597839790),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_2_INVISIBILITY = new Entity(137179508, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/2/invisibility"),
+                new ParentGroupComponent(137179508),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(137179508),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_2_JUMPIMPACT = new Entity(1327463523, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/2/jumpimpact"),
+                new ParentGroupComponent(1327463523),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(1327463523),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_3_FIRERING = new Entity(1896579342, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/3/firering"),
+                new ParentGroupComponent(1896579342),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(1896579342),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_3_ICETRAP = new Entity(-1177680131, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/3/icetrap"),
+                new ParentGroupComponent(-1177680131),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(-1177680131),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_ACTIVE_3_INVULNERABILITY = new Entity(1924597477, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/3/invulnerability"),
+                new ParentGroupComponent(1924597477),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(1924597477),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_PASSIVE_1_BACKHITDEFENCE = new Entity(-1962420821, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/passive/1/backhitdefence"),
+                new ParentGroupComponent(-1962420821),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(-1962420821),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_PASSIVE_1_TEMPBLOCK = new Entity(596921121, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/passive/1/tempblock"),
+                new ParentGroupComponent(596921121),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(596921121),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_PASSIVE_2_ACCELERATEDGEARS = new Entity(1365914179, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/passive/2/acceleratedgears"),
+                new ParentGroupComponent(1365914179),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(1365914179),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_TRIGGER_2_SAPPER = new Entity(-105040547, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/trigger/2/sapper"),
+                new ParentGroupComponent(-105040547),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(-105040547),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_TANK_TRIGGER_3_EMERGENCYPROTECTION = new Entity(-357196071, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/trigger/3/emergencyprotection"),
+                new ParentGroupComponent(-357196071),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new MarketItemGroupComponent(-357196071),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_1_EMP = new Entity(-1493372159, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/1/emp"),
+                new ParentGroupComponent(-1493372159),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(-1493372159),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_1_MINE = new Entity(1133911248, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/1/mine"),
+                new ParentGroupComponent(1133911248),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(1133911248),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_1_SONAR = new Entity(-1318192334, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/1/sonar"),
+                new ParentGroupComponent(-1318192334),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(-1318192334),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_2_EXTERNALIMPACT = new Entity(-1334156852, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/2/externalimpact"),
+                new ParentGroupComponent(-1334156852),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(-1334156852),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_2_INCREASEDDAMAGE = new Entity(676407818, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/2/increaseddamage"),
+                new ParentGroupComponent(676407818),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(676407818),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_2_SPIDERMINE = new Entity(1458405023, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/2/spidermine"),
+                new ParentGroupComponent(1458405023),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(1458405023),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_3_DRONE = new Entity(1392039140, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/3/drone"),
+                new ParentGroupComponent(1392039140),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(1392039140),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_3_ENERGYINJECTION = new Entity(1128679079, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/3/energyinjection"),
+                new ParentGroupComponent(1128679079),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(1128679079),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_ACTIVE_3_EXPLOSIVEMASS = new Entity(393550399, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/3/explosivemass"),
+                new ParentGroupComponent(393550399),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(393550399),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_PASSIVE_1_BACKHITINCREASE = new Entity(-2075784110, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/passive/1/backhitincrease"),
+                new ParentGroupComponent(-2075784110),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(-2075784110),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_PASSIVE_1_ENGINEER = new Entity(-1027949361, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/passive/1/engineer"),
+                new ParentGroupComponent(-1027949361),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(-1027949361),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_PASSIVE_2_ADRENALINE = new Entity(1367280061, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/passive/2/adrenaline"),
+                new ParentGroupComponent(1367280061),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(1367280061),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_TRIGGER_1_RAGE = new Entity(1215656773, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/trigger/1/rage"),
+                new ParentGroupComponent(1215656773),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(1215656773),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_TRIGGER_2_KAMIKADZE = new Entity(-1603423529, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/trigger/2/kamikadze"),
+                new ParentGroupComponent(-1603423529),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(-1603423529),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_MODULE_WEAPON_TRIGGER_3_LIFESTEAL = new Entity(-246333323, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/trigger/3/lifesteal"),
+                new ParentGroupComponent(-246333323),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new MarketItemGroupComponent(-246333323),
+                new ModuleTierComponent(1),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_MODULE_PREBUILDMODULE_COMMON_ACTIVE_1_GOLD = new Entity(-150814762, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/prebuildmodule/common/active/1/gold"),
+                new ParentGroupComponent(-150814762),
+                new ModuleTankPartComponent(TankPartModuleType.COMMON),
+                new MarketItemGroupComponent(-150814762),
+                new ModuleTierComponent(1),
+                new ImmutableModuleItemComponent(),
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleCardsCompositionComponent());
+            public static readonly Entity GARAGE_PAINT_23FEB2019 = new Entity(300183087, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/23feb2019"),
+                new MarketItemGroupComponent(300183087));
+            public static readonly Entity GARAGE_PAINT_8MARCH19_1 = new Entity(685548944, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/8march19-1"),
+                new MarketItemGroupComponent(685548944));
+            public static readonly Entity GARAGE_PAINT_8MARCH19_2 = new Entity(685548945, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/8march19-2"),
+                new MarketItemGroupComponent(685548945));
+            public static readonly Entity GARAGE_PAINT_8MARCH19_3 = new Entity(685548946, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/8march19-3"),
+                new MarketItemGroupComponent(685548946));
+            public static readonly Entity GARAGE_PAINT_ANAVATAN = new Entity(231787227, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/anaVatan"),
+                new MarketItemGroupComponent(231787227));
+            public static readonly Entity GARAGE_PAINT_ANTAEUS1 = new Entity(1104561449, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/antaeus1"),
+                new MarketItemGroupComponent(1104561449));
+            public static readonly Entity GARAGE_PAINT_ANTAEUS2018 = new Entity(1104561450, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/antaeus2018"),
+                new MarketItemGroupComponent(1104561450));
+            public static readonly Entity GARAGE_PAINT_ANTARCTIDA = new Entity(683803510, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/antarctida"),
+                new MarketItemGroupComponent(683803510));
+            public static readonly Entity GARAGE_PAINT_ARROWSOFLOVE = new Entity(-400341658, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/arrowsoflove"),
+                new MarketItemGroupComponent(-400341658));
+            public static readonly Entity GARAGE_PAINT_AUTUMNLEAVES = new Entity(-662236117, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/autumnleaves"),
+                new MarketItemGroupComponent(-662236117));
+            public static readonly Entity GARAGE_PAINT_BANANAS = new Entity(-574655849, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/bananas"),
+                new MarketItemGroupComponent(-574655849));
+            public static readonly Entity GARAGE_PAINT_BEGINNING = new Entity(-1500327034, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/beginning"),
+                new MarketItemGroupComponent(-1500327034));
+            public static readonly Entity GARAGE_PAINT_BIRTHDAY2017 = new Entity(776075330, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/birthday2017"),
+                new MarketItemGroupComponent(776075330));
+            public static readonly Entity GARAGE_PAINT_BLACKROGER = new Entity(2008328619, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/blackroger"),
+                new MarketItemGroupComponent(2008328619));
+            public static readonly Entity GARAGE_PAINT_BLUE = new Entity(137747283, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/blue"),
+                new MarketItemGroupComponent(137747283));
+            public static readonly Entity GARAGE_PAINT_BLUEMAGMA = new Entity(436923060, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/bluemagma"),
+                new MarketItemGroupComponent(436923060));
+            public static readonly Entity GARAGE_PAINT_CANYON = new Entity(214261055, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/canyon"),
+                new MarketItemGroupComponent(214261055));
+            public static readonly Entity GARAGE_PAINT_CARBON = new Entity(214261056, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/carbon"),
+                new MarketItemGroupComponent(214261056));
+            public static readonly Entity GARAGE_PAINT_CEDER = new Entity(-24102762, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/ceder"),
+                new MarketItemGroupComponent(-24102762));
+            public static readonly Entity GARAGE_PAINT_CHAMPION = new Entity(1798212322, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/champion"),
+                new MarketItemGroupComponent(1798212322));
+            public static readonly Entity GARAGE_PAINT_COAL = new Entity(920905258, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/coal"),
+                new MarketItemGroupComponent(920905258));
+            public static readonly Entity GARAGE_PAINT_CORROSION = new Entity(1569952799, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/corrosion"),
+                new MarketItemGroupComponent(1569952799));
+            public static readonly Entity GARAGE_PAINT_DESERT = new Entity(-718109490, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/desert"),
+                new MarketItemGroupComponent(-718109490));
+            public static readonly Entity GARAGE_PAINT_DIGITAL = new Entity(-683002753, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/digital"),
+                new MarketItemGroupComponent(-683002753));
+            public static readonly Entity GARAGE_PAINT_DIRT = new Entity(137803904, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/dirt"),
+                new MarketItemGroupComponent(137803904));
+            public static readonly Entity GARAGE_PAINT_DRAGON = new Entity(-706638132, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/dragon"),
+                new MarketItemGroupComponent(-706638132));
+            public static readonly Entity GARAGE_PAINT_EASTERNSTAR = new Entity(1717585789, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/easternstar"),
+                new MarketItemGroupComponent(1717585789));
+            public static readonly Entity GARAGE_PAINT_EPICGOLD = new Entity(-892221448, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/epicgold"),
+                new MarketItemGroupComponent(-892221448));
+            public static readonly Entity GARAGE_PAINT_FLAME = new Entity(-1514026752, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/flame"),
+                new MarketItemGroupComponent(-1514026752));
+            public static readonly Entity GARAGE_PAINT_FLORA = new Entity(-21112705, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/flora"),
+                new MarketItemGroupComponent(-21112705));
+            public static readonly Entity GARAGE_PAINT_FOOTBALL = new Entity(761115110, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/football"),
+                new MarketItemGroupComponent(761115110));
+            public static readonly Entity GARAGE_PAINT_FORESTER = new Entity(833674243, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/forester"),
+                new MarketItemGroupComponent(833674243));
+            public static readonly Entity GARAGE_PAINT_FREEDOM = new Entity(1347685821, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/freedom"),
+                new MarketItemGroupComponent(1347685821));
+            public static readonly Entity GARAGE_PAINT_FRONTIER1 = new Entity(-1396691349, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/frontier1"),
+                new MarketItemGroupComponent(-1396691349));
+            public static readonly Entity GARAGE_PAINT_FRONTIER2018 = new Entity(-1396691350, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/frontier2018"),
+                new MarketItemGroupComponent(-1396691350));
+            public static readonly Entity GARAGE_PAINT_GALAXY = new Entity(-636128311, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/galaxy"),
+                new MarketItemGroupComponent(-636128311));
+            public static readonly Entity GARAGE_PAINT_GLACIER = new Entity(526265313, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/glacier"),
+                new MarketItemGroupComponent(526265313));
+            public static readonly Entity GARAGE_PAINT_GLINA = new Entity(-20195074, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/glina"),
+                new MarketItemGroupComponent(-20195074));
+            public static readonly Entity GARAGE_PAINT_GOLD = new Entity(921024755, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/gold"),
+                new MarketItemGroupComponent(921024755));
+            public static readonly Entity GARAGE_PAINT_GREEN = new Entity(-20020438, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/green"),
+                new MarketItemGroupComponent(-20020438));
+            public static readonly Entity GARAGE_PAINT_GREENSKULLS = new Entity(97943767, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/greenskulls"),
+                new MarketItemGroupComponent(97943767));
+            public static readonly Entity GARAGE_PAINT_HALLOWEEN = new Entity(721518013, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/halloween"),
+                new MarketItemGroupComponent(721518013));
+            public static readonly Entity GARAGE_PAINT_HALLOWEEN2017 = new Entity(1218811098, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/halloween2017"),
+                new MarketItemGroupComponent(1218811098));
+            public static readonly Entity GARAGE_PAINT_HERO = new Entity(137919219, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/hero"),
+                new MarketItemGroupComponent(137919219));
+            public static readonly Entity GARAGE_PAINT_HONEYCOMB = new Entity(1023813172, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/honeycomb"),
+                new MarketItemGroupComponent(1023813172));
+            public static readonly Entity GARAGE_PAINT_HVOYA = new Entity(-18967536, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/hvoya"),
+                new MarketItemGroupComponent(-18967536));
+            public static readonly Entity GARAGE_PAINT_HYDRA = new Entity(-887676103, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/hydra"),
+                new MarketItemGroupComponent(-887676103));
+            public static readonly Entity GARAGE_PAINT_INFERNO = new Entity(-398350090, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/inferno"),
+                new MarketItemGroupComponent(-398350090));
+            public static readonly Entity GARAGE_PAINT_LEAGUE_BRONZE = new Entity(1185540727, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/league_bronze"),
+                new MarketItemGroupComponent(1185540727));
+            public static readonly Entity GARAGE_PAINT_LEAGUE_GOLD = new Entity(-1245546371, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/league_gold"),
+                new MarketItemGroupComponent(-1245546371));
+            public static readonly Entity GARAGE_PAINT_LEAGUE_MASTER = new Entity(-317558887, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/league_master"),
+                new MarketItemGroupComponent(-317558887));
+            public static readonly Entity GARAGE_PAINT_LEAGUE_SILVER = new Entity(1663842282, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/league_silver"),
+                new MarketItemGroupComponent(1663842282));
+            public static readonly Entity GARAGE_PAINT_MARINE = new Entity(-464167301, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/marine"),
+                new MarketItemGroupComponent(-464167301));
+            public static readonly Entity GARAGE_PAINT_MARY = new Entity(138064340, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/mary"),
+                new MarketItemGroupComponent(138064340));
+            public static readonly Entity GARAGE_PAINT_MATTEBLACK = new Entity(-646190818, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/matteblack"),
+                new MarketItemGroupComponent(-646190818));
+            public static readonly Entity GARAGE_PAINT_MATTEBLUE = new Entity(-436467641, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/matteblue"),
+                new MarketItemGroupComponent(-436467641));
+            public static readonly Entity GARAGE_PAINT_MATTEGRAY = new Entity(-431689890, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/mattegray"),
+                new MarketItemGroupComponent(-431689890));
+            public static readonly Entity GARAGE_PAINT_MATTEGREEN = new Entity(-497382758, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/mattegreen"),
+                new MarketItemGroupComponent(-497382758));
+            public static readonly Entity GARAGE_PAINT_MATTENAVI = new Entity(-425712005, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/mattenavi"),
+                new MarketItemGroupComponent(-425712005));
+            public static readonly Entity GARAGE_PAINT_MATTEORANGE = new Entity(267667571, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/matteorange"),
+                new MarketItemGroupComponent(267667571));
+            public static readonly Entity GARAGE_PAINT_MATTERED = new Entity(-1260536244, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/mattered"),
+                new MarketItemGroupComponent(-1260536244));
+            public static readonly Entity GARAGE_PAINT_MATTEROSE = new Entity(-421603854, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/matterose"),
+                new MarketItemGroupComponent(-421603854));
+            public static readonly Entity GARAGE_PAINT_MATTEVIOLET = new Entity(1940431938, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/matteviolet"),
+                new MarketItemGroupComponent(1940431938));
+            public static readonly Entity GARAGE_PAINT_MATTEWHITE = new Entity(-48418252, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/mattewhite"),
+                new MarketItemGroupComponent(-48418252));
+            public static readonly Entity GARAGE_PAINT_MATTEYELLOW = new Entity(190698221, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/matteyellow"),
+                new MarketItemGroupComponent(190698221));
+            public static readonly Entity GARAGE_PAINT_MAY2018_1 = new Entity(2070833571, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/may2018_1"),
+                new MarketItemGroupComponent(2070833571));
+            public static readonly Entity GARAGE_PAINT_MAY2018_2 = new Entity(2070833572, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/may2018_2"),
+                new MarketItemGroupComponent(2070833572));
+            public static readonly Entity GARAGE_PAINT_METEL = new Entity(-14852182, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/metel"),
+                new MarketItemGroupComponent(-14852182));
+            public static readonly Entity GARAGE_PAINT_MILITARY = new Entity(-1660396512, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/military"),
+                new MarketItemGroupComponent(-1660396512));
+            public static readonly Entity GARAGE_PAINT_MOSAIC = new Entity(-451216061, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/mosaic"),
+                new MarketItemGroupComponent(-451216061));
+            public static readonly Entity GARAGE_PAINT_MOSCOW = new Entity(-1878474135, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/moscow"),
+                new MarketItemGroupComponent(-1878474135));
+            public static readonly Entity GARAGE_PAINT_NEFRIT = new Entity(532533505, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/nefrit"),
+                new MarketItemGroupComponent(532533505));
+            public static readonly Entity GARAGE_PAINT_NEWYEARGLOW = new Entity(-1760088841, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/newyearglow"),
+                new MarketItemGroupComponent(-1760088841));
+            public static readonly Entity GARAGE_PAINT_NEWYEARICE = new Entity(-888059423, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/newyearice"),
+                new MarketItemGroupComponent(-888059423));
+            public static readonly Entity GARAGE_PAINT_NOISE = new Entity(-1506541337, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/noise"),
+                new MarketItemGroupComponent(-1506541337));
+            public static readonly Entity GARAGE_PAINT_NORTH = new Entity(-1506532654, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/north"),
+                new MarketItemGroupComponent(-1506532654));
+            public static readonly Entity GARAGE_PAINT_ORANGE = new Entity(-391711001, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/orange"),
+                new MarketItemGroupComponent(-391711001));
+            public static readonly Entity GARAGE_PAINT_ORION = new Entity(-12628116, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/orion"),
+                new MarketItemGroupComponent(-12628116));
+            public static readonly Entity GARAGE_PAINT_PARTIZAN = new Entity(1555319306, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/partizan"),
+                new MarketItemGroupComponent(1555319306));
+            public static readonly Entity GARAGE_PAINT_PATINA = new Entity(-1079898253, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/patina"),
+                new MarketItemGroupComponent(-1079898253));
+            public static readonly Entity GARAGE_PAINT_PINK = new Entity(921287177, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/pink"),
+                new MarketItemGroupComponent(921287177));
+            public static readonly Entity GARAGE_PAINT_POLAR = new Entity(-1504691957, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/polar"),
+                new MarketItemGroupComponent(-1504691957));
+            public static readonly Entity GARAGE_PAINT_PRIBOY = new Entity(-362854786, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/priboy"),
+                new MarketItemGroupComponent(-362854786));
+            public static readonly Entity GARAGE_PAINT_PRODIGY = new Entity(1641998027, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/prodigy"),
+                new MarketItemGroupComponent(1641998027));
+            public static readonly Entity GARAGE_PAINT_RADIATION = new Entity(1223441167, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/radiation"),
+                new MarketItemGroupComponent(1223441167));
+            public static readonly Entity GARAGE_PAINT_RED = new Entity(558647928, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/red"),
+                new MarketItemGroupComponent(558647928));
+            public static readonly Entity GARAGE_PAINT_REDAMBER = new Entity(1784687185, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/redamber"),
+                new MarketItemGroupComponent(1784687185));
+            public static readonly Entity GARAGE_PAINT_RIVETS = new Entity(925876519, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/rivets"),
+                new MarketItemGroupComponent(925876519));
+            public static readonly Entity GARAGE_PAINT_ROCKS = new Entity(-9952811, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/rocks"),
+                new MarketItemGroupComponent(-9952811));
+            public static readonly Entity GARAGE_PAINT_RUST = new Entity(276536681, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/rust"),
+                new MarketItemGroupComponent(276536681));
+            public static readonly Entity GARAGE_PAINT_SANDSTONE = new Entity(138818312, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/sandstone"),
+                new MarketItemGroupComponent(138818312));
+            public static readonly Entity GARAGE_PAINT_SAVANNA = new Entity(-470773521, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/savanna"),
+                new MarketItemGroupComponent(-470773521));
+            public static readonly Entity GARAGE_PAINT_SMOKE = new Entity(-9077354, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/smoke"),
+                new MarketItemGroupComponent(-9077354));
+            public static readonly Entity GARAGE_PAINT_SPECTRE = new Entity(-56970637, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/spectre"),
+                new MarketItemGroupComponent(-56970637));
+            public static readonly Entity GARAGE_PAINT_SPIDERWEB = new Entity(355636982, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/spiderweb"),
+                new MarketItemGroupComponent(355636982));
+            public static readonly Entity GARAGE_PAINT_SPORT = new Entity(-1207082244, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/sport"),
+                new MarketItemGroupComponent(-1207082244));
+            public static readonly Entity GARAGE_PAINT_STARRYSKY = new Entity(-1732490966, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/starrysky"),
+                new MarketItemGroupComponent(-1732490966));
+            public static readonly Entity GARAGE_PAINT_STEAMULATORF = new Entity(1880146981, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/steamulatorf"),
+                new MarketItemGroupComponent(1880146981));
+            public static readonly Entity GARAGE_PAINT_STEAMULATORSF = new Entity(-1844971488, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/steamulatorsf"),
+                new MarketItemGroupComponent(-1844971488));
+            public static readonly Entity GARAGE_PAINT_STEEL = new Entity(-1501779048, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/steel"),
+                new MarketItemGroupComponent(-1501779048));
+            public static readonly Entity GARAGE_PAINT_STONE = new Entity(-1756632159, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/stone"),
+                new MarketItemGroupComponent(-1756632159));
+            public static readonly Entity GARAGE_PAINT_STORM = new Entity(-8868592, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/storm"),
+                new MarketItemGroupComponent(-8868592));
+            public static readonly Entity GARAGE_PAINT_STVALENTINE2017 = new Entity(986557478, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/stvalentine2017"),
+                new MarketItemGroupComponent(986557478));
+            public static readonly Entity GARAGE_PAINT_SUMMER = new Entity(-274067352, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/summer"),
+                new MarketItemGroupComponent(-274067352));
+            public static readonly Entity GARAGE_PAINT_SWAMP = new Entity(-8792825, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/swamp"),
+                new MarketItemGroupComponent(-8792825));
+            public static readonly Entity GARAGE_PAINT_TAIGA = new Entity(-8517219, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/taiga"),
+                new MarketItemGroupComponent(-8517219));
+            public static readonly Entity GARAGE_PAINT_TAR = new Entity(-1209537658, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/tar"),
+                new MarketItemGroupComponent(-1209537658));
+            public static readonly Entity GARAGE_PAINT_TINA = new Entity(138280417, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/tina"),
+                new MarketItemGroupComponent(138280417));
+            public static readonly Entity GARAGE_PAINT_TRIANGLECAMO = new Entity(-1902859834, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/trianglecamo"),
+                new MarketItemGroupComponent(-1902859834));
+            public static readonly Entity GARAGE_PAINT_TROLLFACE = new Entity(1546602523, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/trollface"),
+                new MarketItemGroupComponent(1546602523));
+            public static readonly Entity GARAGE_PAINT_TUNDRA = new Entity(-245416673, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/tundra"),
+                new MarketItemGroupComponent(-245416673));
+            public static readonly Entity GARAGE_PAINT_UNIVERSE = new Entity(942805628, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/universe"),
+                new MarketItemGroupComponent(942805628));
+            public static readonly Entity GARAGE_PAINT_URBAN = new Entity(-7094151, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/urban"),
+                new MarketItemGroupComponent(-7094151));
+            public static readonly Entity GARAGE_PAINT_VOSTOK1 = new Entity(-2023428617, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/vostok1"),
+                new MarketItemGroupComponent(-2023428617));
+            public static readonly Entity GARAGE_PAINT_WALKER = new Entity(-50932577, new TemplateAccessor(new TankPaintMarketItemTemplate(), "garage/paint/walker"),
+                new MarketItemGroupComponent(-50932577));
             public static readonly Entity GARAGE_PREMIUM_BOOST = new Entity(-1816745725);
             public static readonly Entity GARAGE_PREMIUM_QUEST = new Entity(-180272377);
             public static readonly Entity GARAGE_PRESET = new Entity(-571744569);
@@ -822,7 +1213,8 @@ namespace TXServer.ECSSystem.Base
             public static readonly Entity GARAGE_WEAPON_THUNDER = new Entity(1667159001);
             public static readonly Entity GARAGE_WEAPON_TWINS = new Entity(-2004531520);
             public static readonly Entity GARAGE_WEAPON_VULCAN = new Entity(-1955445362);
-            public static readonly Entity GARAGE_XCRYSTAL = new Entity(1317350822);
+            public static readonly Entity GARAGE_XCRYSTAL = new Entity(1317350822, new TemplateAccessor(new XCrystalMarketItemTemplate(), "garage/xcrystal"),
+                new MarketItemGroupComponent(1317350822));
             public static readonly Entity HANGAR = new Entity(-1224574941);
             public static readonly Entity LEAGUES_LEAGUES_1_TRAINING = new Entity(-1837531149);
             public static readonly Entity LEAGUES_LEAGUES_2_BRONZE = new Entity(-101377070);

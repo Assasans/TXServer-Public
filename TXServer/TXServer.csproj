@@ -47,7 +47,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -57,7 +57,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -82,6 +82,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Core\CommandManager\CommandCodeAttribute.cs" />
+    <Compile Include="ECSSystem\Base\ModuleBehaviourType.cs" />
+    <Compile Include="ECSSystem\Base\ModulePrice.cs" />
     <Compile Include="ECSSystem\Components\BattleLeaveCounterComponent.cs" />
     <Compile Include="ECSSystem\Components\BlackListComponent.cs" />
     <Compile Include="ECSSystem\Components\ConfirmedUserEmailComponent.cs" />
@@ -89,18 +91,26 @@
     <Compile Include="ECSSystem\Components\FinishedFractionsCompetitionComponent.cs" />
     <Compile Include="ECSSystem\Components\FractionComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\BattleRewardGroupComponent.cs" />
-    <Compile Include="ECSSystem\Components\Groups\CountableItemsPackComponent.cs" />
-    <Compile Include="ECSSystem\Components\Groups\CrystalsPackComponent.cs" />
-    <Compile Include="ECSSystem\Components\Groups\DiscountComponent.cs" />
+    <Compile Include="ECSSystem\Components\CountableItemsPackComponent.cs" />
+    <Compile Include="ECSSystem\Components\CrystalsPackComponent.cs" />
+    <Compile Include="ECSSystem\Components\DiscountComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\FractionGroupComponent.cs" />
     <Compile Include="ECSSystem\Components\GameplayChestScoreComponent.cs" />
-    <Compile Include="ECSSystem\Components\Groups\FriendsLoadedEvent.cs" />
+    <Compile Include="ECSSystem\Components\FriendsLoadedEvent.cs" />
     <Compile Include="ECSSystem\Components\Groups\GroupComponent.cs" />
-    <Compile Include="ECSSystem\Components\Groups\ItemsPackFromConfigComponent.cs" />
-    <Compile Include="ECSSystem\Components\Groups\PackIdComponent.cs" />
+    <Compile Include="ECSSystem\Components\Groups\MarketItemGroupComponent.cs" />
+    <Compile Include="ECSSystem\Components\Groups\ParentGroupComponent.cs" />
+    <Compile Include="ECSSystem\Components\ImmutableModuleItemComponent.cs" />
+    <Compile Include="ECSSystem\Components\ItemsPackFromConfigComponent.cs" />
+    <Compile Include="ECSSystem\Components\ModuleBehaviourTypeComponent.cs" />
+    <Compile Include="ECSSystem\Components\ModuleCardsCompositionComponent.cs" />
+    <Compile Include="ECSSystem\Components\ModuleTankPartComponent.cs" />
+    <Compile Include="ECSSystem\Components\ModuleTierComponent.cs" />
+    <Compile Include="ECSSystem\Components\PackIdComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\SpecialOfferGroupComponent.cs" />
-    <Compile Include="ECSSystem\Components\Groups\UserOnlineComponent.cs" />
-    <Compile Include="ECSSystem\Components\Groups\XCrystalsPackComponent.cs" />
+    <Compile Include="ECSSystem\Components\RestrictionByUserFractionComponent.cs" />
+    <Compile Include="ECSSystem\Components\UserOnlineComponent.cs" />
+    <Compile Include="ECSSystem\Components\XCrystalsPackComponent.cs" />
     <Compile Include="ECSSystem\Components\KillsEquipmentStatisticsComponent.cs" />
     <Compile Include="ECSSystem\Components\Groups\LeagueGroupComponent.cs" />
     <Compile Include="ECSSystem\Components\MapComponent.cs" />
@@ -128,25 +138,31 @@
     <Compile Include="ECSSystem\Components\UserUidComponent.cs" />
     <Compile Include="ECSSystem\Components\UserXCrystalsComponent.cs" />
     <Compile Include="ECSSystem\EntityTemplates\ClientSessionTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\ContainerPackPriceMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\EnergyDailyBonusTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\FractionsCompetitionTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\FractionTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\GameplayChestMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\GoldBonusOfferTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\LeagueFirstEntranceRewardTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\LevelUpUnlockBattleRewardTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\LobbyTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\MapTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\ModuleContainerBattleRewardTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\ModuleMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\PersonalSpecialOfferPropertiesTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\TankPaintMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\TutorialBattleRewardTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\UserTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\XCrystalBattleRewardTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\XCrystalMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\Events\PaymentSectionLoadedEvent.cs" />
-    <Compile Include="ECSSystem\GlobalEntities.cs" />
+    <Compile Include="ECSSystem\Base\GlobalEntities.cs" />
     <Compile Include="ECSSystem\Components\FractionUserScoreComponent.cs" />
     <Compile Include="ECSSystem\Events\UpdateClientFractionScoresEvent.cs" />
     <Compile Include="Core\Protocol\ProtocolFixedAttribute.cs" />
     <Compile Include="Core\Protocol\ProtocolIgnoreAttribute.cs" />
+    <Compile Include="ECSSystem\Base\TankPartModuleType.cs" />
     <Compile Include="Library\BidirectionalDictionary.cs" />
     <Compile Include="Library\BigEndianIO.cs" />
     <Compile Include="ECSSystem\Events\CheckEmailEvent.cs" />
