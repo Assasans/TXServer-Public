@@ -63,14 +63,9 @@ namespace TXServer.ECSSystem.Events
 				new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.Competition),
 				new EntityShareCommand(user)
 			};
-
-			collectedCommands.AddRange(from global in typeof(Maps).GetFields()
-									   select new EntityShareCommand(global.GetValue(null) as Entity));
-
+			
 			collectedCommands.AddRange(from global in typeof(BattleRewards).GetFields()
 									   select new EntityShareCommand(global.GetValue(null) as Entity));
-
-			collectedCommands.Add(new SendEventCommand(new PaymentSectionLoadedEvent(), entity));
 
 			collectedCommands.AddRange(from global in typeof(GoldBonuses).GetFields()
 									   select new EntityShareCommand(global.GetValue(null) as Entity));
@@ -82,8 +77,10 @@ namespace TXServer.ECSSystem.Events
 			});
 
 			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands.ToArray());
-
 			collectedCommands.Clear();
+
+			collectedCommands.AddRange(from global in typeof(Maps).GetFields()
+									   select new EntityShareCommand(global.GetValue(null) as Entity));
 
 			collectedCommands.AddRange(from global in typeof(Containers).GetFields()
 									   select new EntityShareCommand(global.GetValue(null) as Entity));
@@ -95,6 +92,9 @@ namespace TXServer.ECSSystem.Events
 									   select new EntityShareCommand(global.GetValue(null) as Entity));
 
 			collectedCommands.AddRange(from global in typeof(Shells).GetFields()
+									   select new EntityShareCommand(global.GetValue(null) as Entity));
+
+			collectedCommands.AddRange(from global in typeof(WeaponSkins).GetFields()
 									   select new EntityShareCommand(global.GetValue(null) as Entity));
 
 			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands.ToArray());

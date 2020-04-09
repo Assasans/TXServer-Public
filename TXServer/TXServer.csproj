@@ -155,6 +155,7 @@
     <Compile Include="ECSSystem\EntityTemplates\TankPaintMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\TutorialBattleRewardTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\UserTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\WeaponSkinMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\XCrystalBattleRewardTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\XCrystalMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\Events\PaymentSectionLoadedEvent.cs" />
@@ -178,6 +179,7 @@
     <Compile Include="ECSSystem\GlobalEntities\Paints.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Shells.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Weapons.cs" />
+    <Compile Include="ECSSystem\GlobalEntities\WeaponSkins.cs" />
     <Compile Include="Library\BidirectionalDictionary.cs" />
     <Compile Include="Library\BigEndianIO.cs" />
     <Compile Include="ECSSystem\Events\CheckEmailEvent.cs" />
