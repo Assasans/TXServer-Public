@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using static TXServer.ECSSystem.Base.Entity;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.ECSSystem.Components
 {
@@ -10,28 +10,28 @@ namespace TXServer.ECSSystem.Components
     {
         public Dictionary<Entity, long> HullStatistics { get; set; } = new Dictionary<Entity, long>()
         {
-            { GlobalEntities.GARAGE_WEAPON_FLAMETHROWER, 0 },
-            { GlobalEntities.GARAGE_WEAPON_FREEZE, 0 },
-            { GlobalEntities.GARAGE_WEAPON_HAMMER, 0 },
-            { GlobalEntities.GARAGE_WEAPON_ISIS, 0 },
-            { GlobalEntities.GARAGE_WEAPON_RAILGUN, 1 },
-            { GlobalEntities.GARAGE_WEAPON_RICOCHET, 0 },
-            { GlobalEntities.GARAGE_WEAPON_SHAFT, 0 },
-            { GlobalEntities.GARAGE_WEAPON_SMOKY, 0 },
-            { GlobalEntities.GARAGE_WEAPON_THUNDER, 0 },
-            { GlobalEntities.GARAGE_WEAPON_TWINS, 0 },
-            { GlobalEntities.GARAGE_WEAPON_VULCAN, 0 }
+            { Weapons.Flamethrower, 0 },
+            { Weapons.Freeze, 0 },
+            { Weapons.Hammer, 0 },
+            { Weapons.Isis, 0 },
+            { Weapons.Railgun, 0 },
+            { Weapons.Ricochet, 0 },
+            { Weapons.Shaft, 0 },
+            { Weapons.Smoky, 0 },
+            { Weapons.Thunder, 0 },
+            { Weapons.Twins, 0 },
+            { Weapons.Vulcan, 0 }
         };
 
         public Dictionary<Entity, long> TurretStatistics { get; set; } = new Dictionary<Entity, long>()
         {
-            { GlobalEntities.GARAGE_TANK_WASP, 0 },
-            { GlobalEntities.GARAGE_TANK_HORNET, 1 },
-            { GlobalEntities.GARAGE_TANK_HUNTER, 0 },
-            { GlobalEntities.GARAGE_TANK_VIKING, 0 },
-            { GlobalEntities.GARAGE_TANK_TITAN, 0 },
-            { GlobalEntities.GARAGE_TANK_DICTATOR, 0 },
-            { GlobalEntities.GARAGE_TANK_MAMMOTH, 0 }
+            { Hulls.Wasp, 0 },
+            { Hulls.Hornet, 0 },
+            { Hulls.Hunter, 0 },
+            { Hulls.Viking, 0 },
+            { Hulls.Titan, 0 },
+            { Hulls.Dictator, 0 },
+            { Hulls.Mammoth, 0 }
         };
     }
 }

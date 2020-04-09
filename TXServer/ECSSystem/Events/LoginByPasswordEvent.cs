@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using TXServer.Core;
 using TXServer.Core.Commands;
 using TXServer.Core.ECSSystem.Events;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
-using static TXServer.ECSSystem.Base.Entity;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -32,10 +31,10 @@ namespace TXServer.ECSSystem.Events
 				new UserAvatarComponent("457e8f5f-953a-424c-bd97-67d9e116ab7a"), // hardcode!!!
 				new UserComponent(),
 				new UserMoneyComponent(1000000),
-				new FractionGroupComponent(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_FRONTIER),
+				new FractionGroupComponent(Fractions.Frontier),
 				new UserDailyBonusCycleComponent(1),
 				new TutorialCompleteIdsComponent(),
-				new LeagueGroupComponent(GlobalEntities.LEAGUES_LEAGUES_3_SILVER),
+				new LeagueGroupComponent(Leagues.Silver),
 				new UserDailyBonusZoneComponent(0),
 				new UserStatisticsComponent(),
 				new PersonalChatOwnerComponent(),
@@ -58,25 +57,22 @@ namespace TXServer.ECSSystem.Events
 			List<Command> collectedCommands = new List<Command>()
 			{
 				new ComponentAddCommand(entity, new UserGroupComponent(entity)),
-				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION),
-				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_FRONTIER),
-				new EntityShareCommand(GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS),
-				new SendEventCommand(new UpdateClientFractionScoresEvent(), GlobalEntities.FRACTIONSCOMPETITION),
+				new EntityShareCommand(Fractions.Competition),
+				new EntityShareCommand(Fractions.Frontier),
+				new EntityShareCommand(Fractions.Antaeus),
+				new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.Competition),
 				new EntityShareCommand(user)
 			};
 
-			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
-									   where global.Name.Contains("BATTLE_MAP")
+			collectedCommands.AddRange(from global in typeof(Maps).GetFields()
 									   select new EntityShareCommand(global.GetValue(null) as Entity));
 
-			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
-									   where global.Name.Contains("BATTLE_REWARDS")
+			collectedCommands.AddRange(from global in typeof(BattleRewards).GetFields()
 									   select new EntityShareCommand(global.GetValue(null) as Entity));
 
 			collectedCommands.Add(new SendEventCommand(new PaymentSectionLoadedEvent(), entity));
 
-			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
-									   where global.Name.Contains("PAYMENT_GOODS_GOLDBONUS")
+			collectedCommands.AddRange(from global in typeof(GoldBonuses).GetFields()
 									   select new EntityShareCommand(global.GetValue(null) as Entity));
 
 			collectedCommands.AddRange(new Command[] {
@@ -89,16 +85,16 @@ namespace TXServer.ECSSystem.Events
 
 			collectedCommands.Clear();
 
-			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
-									   where global.Name.Contains("GARAGE_CONTAINER")
+			collectedCommands.AddRange(from global in typeof(Containers).GetFields()
 									   select new EntityShareCommand(global.GetValue(null) as Entity));
 
-			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
-									   where global.Name.Contains("GARAGE_PAINT")
+			collectedCommands.AddRange(from global in typeof(Paints).GetFields()
 									   select new EntityShareCommand(global.GetValue(null) as Entity));
 
-			collectedCommands.AddRange(from global in typeof(GlobalEntities).GetFields()
-									   where global.Name.Contains("GARAGE_MODULE")
+			collectedCommands.AddRange(from global in typeof(Modules).GetFields()
+									   select new EntityShareCommand(global.GetValue(null) as Entity));
+
+			collectedCommands.AddRange(from global in typeof(Shells).GetFields()
 									   select new EntityShareCommand(global.GetValue(null) as Entity));
 
 			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands.ToArray());

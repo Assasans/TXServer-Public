@@ -51,7 +51,7 @@ namespace TXServer.Core
                 );
 
                 SpinWait.SpinUntil(() => !Active);
-                throw new Exception();
+                throw new NotImplementedException();
             }
             catch (Exception e)
             {

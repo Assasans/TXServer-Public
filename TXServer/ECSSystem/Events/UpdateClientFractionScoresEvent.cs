@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using static TXServer.ECSSystem.Base.Entity;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core.ECSSystem.Events
 {
@@ -10,8 +10,8 @@ namespace TXServer.Core.ECSSystem.Events
 	{
 		public Dictionary<Entity, long> Scores { get; set; } = new Dictionary<Entity, long>()
 		{
-			{ GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_FRONTIER, 1000000},
-			{ GlobalEntities.FRACTIONSCOMPETITION_FRACTIONS_ANTAEUS, 1000000}
+			{ Fractions.Frontier, 1000000},
+			{ Fractions.Antaeus, 1000000}
 		};
 
 		public long TotalCryFund { get; set; } = 1000000;
