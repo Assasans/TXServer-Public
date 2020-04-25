@@ -10,8 +10,8 @@ namespace TXServer.Core.ECSSystem.Events
 	{
 		public Dictionary<Entity, long> Scores { get; set; } = new Dictionary<Entity, long>()
 		{
-			{ Fractions.Frontier, 1000000},
-			{ Fractions.Antaeus, 1000000}
+			{ Fractions.GlobalItems.Frontier, 1000000},
+			{ Fractions.GlobalItems.Antaeus, 1000000}
 		};
 
 		public long TotalCryFund { get; set; } = 1000000;

@@ -10,7 +10,7 @@ namespace TXServer.Core.Commands
     {
         public EntityShareCommand(Entity Entity)
         {
-            this.Entity = Entity;
+            this.Entity = Entity ?? throw new ArgumentNullException(nameof(Entity));
         }
 
         public override void OnSend()

@@ -9,5 +9,9 @@ namespace TXServer.ECSSystem.Components
         public UserGroupComponent(Entity Key) : base(Key)
         {
         }
+
+        public UserGroupComponent(long Key) : base(Key)
+        {
+        }
     }
 }

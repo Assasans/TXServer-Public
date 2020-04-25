@@ -9,5 +9,9 @@ namespace TXServer.ECSSystem.Components
         public LeagueGroupComponent(Entity Key) : base(Key)
         {
         }
+
+        public LeagueGroupComponent(long Key) : base(Key)
+        {
+        }
     }
 }

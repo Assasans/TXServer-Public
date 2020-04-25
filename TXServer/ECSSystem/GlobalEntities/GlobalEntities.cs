@@ -1,450 +1,96 @@
-﻿using TXServer.ECSSystem.Base;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.GlobalEntities
 {
-
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1707:Идентификаторы не должны содержать символы подчеркивания", Justification = "<Ожидание>")]
-    public static partial class Unspec
+    public partial class Unspec
     {
-        public static readonly Entity CHAT_GENERAL_EN = new Entity(-968269241);
-        public static readonly Entity CHAT_GENERAL_RU = new Entity(-968268831);
-        public static readonly Entity CHAT_GENERAL_TR = new Entity(-968268772);
-        public static readonly Entity DAILYBONUS = new Entity(1529751974);
     }
 
-    public static partial class Unspec
+    public abstract class ItemList
     {
-        public static readonly Entity GARAGE_AVATAR_ALGHERIA_FLAG = new Entity(-910231604);
-        public static readonly Entity GARAGE_AVATAR_ALPHA = new Entity(934969104);
-        public static readonly Entity GARAGE_AVATAR_ANTHEUSFIGHTER = new Entity(6200);
-        public static readonly Entity GARAGE_AVATAR_ARGENTINA_FLAG = new Entity(-1202231726);
-        public static readonly Entity GARAGE_AVATAR_ARMENIA_FLAG = new Entity(6201);
-        public static readonly Entity GARAGE_AVATAR_AUSTRALIA_FLAG = new Entity(-1731159719);
-        public static readonly Entity GARAGE_AVATAR_AZERBAIJAN_FLAG = new Entity(1174801258);
-        public static readonly Entity GARAGE_AVATAR_BELORUSSIA_FLAG = new Entity(6202);
-        public static readonly Entity GARAGE_AVATAR_BLACKWIDOW = new Entity(1286714921);
-        public static readonly Entity GARAGE_AVATAR_BOGATYR = new Entity(6203);
-        public static readonly Entity GARAGE_AVATAR_BOY_VALDAY = new Entity(6204);
-        public static readonly Entity GARAGE_AVATAR_BRAZIL_FLAG = new Entity(6205);
-        public static readonly Entity GARAGE_AVATAR_CANADA_FLAG = new Entity(2123817583);
-        public static readonly Entity GARAGE_AVATAR_CHINA_FLAG = new Entity(1651733218);
-        public static readonly Entity GARAGE_AVATAR_CRAB = new Entity(-1632342818);
-        public static readonly Entity GARAGE_AVATAR_CYBORG = new Entity(6206);
-        public static readonly Entity GARAGE_AVATAR_CZECH_FLAG = new Entity(-171184634);
-        public static readonly Entity GARAGE_AVATAR_DARINA_LIEKHTONIEN = new Entity(-1473761734);
-        public static readonly Entity GARAGE_AVATAR_DEAN_CUNNINGHAM = new Entity(1479495495);
-        public static readonly Entity GARAGE_AVATAR_DYGEST = new Entity(-983105950);
-        public static readonly Entity GARAGE_AVATAR_EAGLE = new Entity(938326966);
-        public static readonly Entity GARAGE_AVATAR_EGYPT_FLAG = new Entity(-1089651106);
-        public static readonly Entity GARAGE_AVATAR_ELITE = new Entity(6207);
-        public static readonly Entity GARAGE_AVATAR_EMMA_BONNEY = new Entity(-2119697962);
-        public static readonly Entity GARAGE_AVATAR_ESTONIA_FLAG = new Entity(1781929660);
-        public static readonly Entity GARAGE_AVATAR_EVGENY_ROMANOV = new Entity(-1130044595);
-        public static readonly Entity GARAGE_AVATAR_FINLAND_FLAG = new Entity(-241092701);
-        public static readonly Entity GARAGE_AVATAR_FRANCE_FLAG = new Entity(117983554);
-        public static readonly Entity GARAGE_AVATAR_FRONTIERFIGHTER = new Entity(6208);
-        public static readonly Entity GARAGE_AVATAR_GAMBLER = new Entity(1569342716);
-        public static readonly Entity GARAGE_AVATAR_GARCIA_LOPEZ = new Entity(1953932916);
-        public static readonly Entity GARAGE_AVATAR_GEORGIA_FLAG = new Entity(6209);
-        public static readonly Entity GARAGE_AVATAR_GERMANY_FLAG = new Entity(6210);
-        public static readonly Entity GARAGE_AVATAR_GHOSTRIDER = new Entity(6211);
-        public static readonly Entity GARAGE_AVATAR_GIRL_VALDAY = new Entity(6212);
-        public static readonly Entity GARAGE_AVATAR_GREATBRITAIN_FLAG = new Entity(6213);
-        public static readonly Entity GARAGE_AVATAR_GREECE_FLAG = new Entity(1175725104);
-        public static readonly Entity GARAGE_AVATAR_HEART = new Entity(941211128);
-        public static readonly Entity GARAGE_AVATAR_HELLHOUND = new Entity(869046809);
-        public static readonly Entity GARAGE_AVATAR_HUNGARY_FLAG = new Entity(232090231);
-        public static readonly Entity GARAGE_AVATAR_HYDRA = new Entity(941809812);
-        public static readonly Entity GARAGE_AVATAR_INDIA_FLAG = new Entity(-2048808190);
-        public static readonly Entity GARAGE_AVATAR_IRMA_MASSACRE = new Entity(855079933);
-        public static readonly Entity GARAGE_AVATAR_ISRAEL_FLAG = new Entity(-1042657987);
-        public static readonly Entity GARAGE_AVATAR_ITALY_FLAG = new Entity(-1887453418);
-        public static readonly Entity GARAGE_AVATAR_JEDI = new Entity(6214);
-        public static readonly Entity GARAGE_AVATAR_KAZAKHSTAN_FLAG = new Entity(6215);
-        public static readonly Entity GARAGE_AVATAR_LATVIA_FLAG = new Entity(-1036805170);
-        public static readonly Entity GARAGE_AVATAR_LEGENDS = new Entity(1820960568);
-        public static readonly Entity GARAGE_AVATAR_LITHUANIA_FLAG = new Entity(-657725808);
-        public static readonly Entity GARAGE_AVATAR_MAGNUS_GRIM = new Entity(706204327);
-        public static readonly Entity GARAGE_AVATAR_MAMMOTH = new Entity(6216);
-        public static readonly Entity GARAGE_AVATAR_MARY_NEWELL = new Entity(1807734043);
-        public static readonly Entity GARAGE_AVATAR_MAUREEN_LAWRIE = new Entity(764921404);
-        public static readonly Entity GARAGE_AVATAR_MEXICO_FLAG = new Entity(224328936);
-        public static readonly Entity GARAGE_AVATAR_MICHELLE_REISNER = new Entity(-2083128946);
-        public static readonly Entity GARAGE_AVATAR_MOLDAVIA_FLAG = new Entity(6217);
-        public static readonly Entity GARAGE_AVATAR_MOROCCO_FLAG = new Entity(-814801911);
-        public static readonly Entity GARAGE_AVATAR_NETHERLANDS_FLAG = new Entity(1927964361);
-        public static readonly Entity GARAGE_AVATAR_ORDER = new Entity(948065536);
-        public static readonly Entity GARAGE_AVATAR_OSKAR_KHROM = new Entity(-880569858);
-        public static readonly Entity GARAGE_AVATAR_PAKISTAN_FLAG = new Entity(287575104);
-        public static readonly Entity GARAGE_AVATAR_PIRATE_GIRL = new Entity(1455996148);
-        public static readonly Entity GARAGE_AVATAR_POLAND_FLAG = new Entity(1472995923);
-        public static readonly Entity GARAGE_AVATAR_PROFESSOR = new Entity(-1330873567);
-        public static readonly Entity GARAGE_AVATAR_RACCOON = new Entity(6218);
-        public static readonly Entity GARAGE_AVATAR_RUSSIA_FLAG = new Entity(6219);
-        public static readonly Entity GARAGE_AVATAR_SAUDI_ARABIA_FLAG = new Entity(1602513792);
-        public static readonly Entity GARAGE_AVATAR_SAVAGE = new Entity(6220);
-        public static readonly Entity GARAGE_AVATAR_SKELETONINSPACE = new Entity(6221);
-        public static readonly Entity GARAGE_AVATAR_SLOVAKIA_FLAG = new Entity(1776630907);
-        public static readonly Entity GARAGE_AVATAR_SLOVENIA_FLAG = new Entity(-224755940);
-        public static readonly Entity GARAGE_AVATAR_SPAIN_FLAG = new Entity(399797680);
-        public static readonly Entity GARAGE_AVATAR_SPY_GIRL = new Entity(1612159053);
-        public static readonly Entity GARAGE_AVATAR_STORMTROOPER = new Entity(6222);
-        public static readonly Entity GARAGE_AVATAR_SWATSOLDIER = new Entity(6223);
-        public static readonly Entity GARAGE_AVATAR_SWEDEN_FLAG = new Entity(394437137);
-        public static readonly Entity GARAGE_AVATAR_TANKIST = new Entity(6224);
-        public static readonly Entity GARAGE_AVATAR_TANKIX = new Entity(6225);
-        public static readonly Entity GARAGE_AVATAR_TERESA_AMSEL = new Entity(1657247215);
-        public static readonly Entity GARAGE_AVATAR_THAILAND_FLAG = new Entity(187162326);
-        public static readonly Entity GARAGE_AVATAR_TROLL = new Entity(6226);
-        public static readonly Entity GARAGE_AVATAR_TURKEY_FLAG = new Entity(893099663);
-        public static readonly Entity GARAGE_AVATAR_UKRAINE_FLAG = new Entity(6227);
-        public static readonly Entity GARAGE_AVATAR_USA_FLAG = new Entity(6228);
-        public static readonly Entity GARAGE_AVATAR_VERA_KLEIN = new Entity(-1147853194);
-        public static readonly Entity GARAGE_AVATAR_VIKING = new Entity(6229);
-        public static readonly Entity GARAGE_AVATAR_VLADIMIR_REPIN = new Entity(-480997961);
-        public static readonly Entity GARAGE_AVATAR_WASP = new Entity(6230);
-        public static readonly Entity GARAGE_AVATAR_YAMAMOTO_TSUNETOMO = new Entity(605003762);
+        public Entity[] GetAllItems()
+        {
+            PropertyInfo[] properties = GetType().GetProperties();
+            Entity[] items = new Entity[properties.Length];
+
+            for (int index = 0; index < items.Length; index++)
+            {
+                items[index] = properties[index].GetValue(this) as Entity;
+            }
+
+            return items;
+        }
     }
 
-    public static partial class Unspec
+    public static class ResourceManager
     {
-        public static readonly Entity GARAGE_COVER_ANTAEUS1 = new Entity(-891349912);
-        public static readonly Entity GARAGE_COVER_ANTAEUS2018 = new Entity(1577640270);
-        public static readonly Entity GARAGE_COVER_BLUE = new Entity(-172609771);
-        public static readonly Entity GARAGE_COVER_CARBON = new Entity(1644116328);
-        public static readonly Entity GARAGE_COVER_CEDER = new Entity(-1055236844);
-        public static readonly Entity GARAGE_COVER_CHAMPION = new Entity(888876452);
-        public static readonly Entity GARAGE_COVER_COAL = new Entity(-172577710);
-        public static readonly Entity GARAGE_COVER_CORROSION = new Entity(-849655395);
-        public static readonly Entity GARAGE_COVER_DESERT = new Entity(1676472336);
-        public static readonly Entity GARAGE_COVER_DIGITAL = new Entity(534589821);
-        public static readonly Entity GARAGE_COVER_DIRT = new Entity(-172553150);
-        public static readonly Entity GARAGE_COVER_DRAGON = new Entity(1687943694);
-        public static readonly Entity GARAGE_COVER_FLAME = new Entity(-1052260392);
-        public static readonly Entity GARAGE_COVER_FLORA = new Entity(-1052246787);
-        public static readonly Entity GARAGE_COVER_FORESTER = new Entity(-75661627);
-        public static readonly Entity GARAGE_COVER_FRONTIER1 = new Entity(610004612);
-        public static readonly Entity GARAGE_COVER_FRONTIER2018 = new Entity(640844210);
-        public static readonly Entity GARAGE_COVER_GALAXY = new Entity(-64859568);
-        public static readonly Entity GARAGE_COVER_GLACIER = new Entity(-1705840017);
-        public static readonly Entity GARAGE_COVER_GLINA = new Entity(-1051329156);
-        public static readonly Entity GARAGE_COVER_GOLD = new Entity(-172458213);
-        public static readonly Entity GARAGE_COVER_GREEN = new Entity(-1051154520);
-        public static readonly Entity GARAGE_COVER_GREENSKULLS = new Entity(1953107513);
-        public static readonly Entity GARAGE_COVER_HALLOWEEN = new Entity(-1128248718);
-        public static readonly Entity GARAGE_COVER_HONEYCOMB = new Entity(-784118404);
-        public static readonly Entity GARAGE_COVER_HVOYA = new Entity(-1050101618);
-        public static readonly Entity GARAGE_COVER_INFERNO = new Entity(819242484);
-        public static readonly Entity GARAGE_COVER_IZUMRUD = new Entity(372065215);
-        public static readonly Entity GARAGE_COVER_LIGHTBLUE = new Entity(1167717168);
-        public static readonly Entity GARAGE_COVER_MARINE = new Entity(1930414525);
-        public static readonly Entity GARAGE_COVER_MARY = new Entity(-172292714);
-        public static readonly Entity GARAGE_COVER_MATTEBLACK = new Entity(1958622537);
-        public static readonly Entity GARAGE_COVER_MATTEBLUE = new Entity(1448655312);
-        public static readonly Entity GARAGE_COVER_MATTEGRAY = new Entity(1448809433);
-        public static readonly Entity GARAGE_COVER_MATTEGREEN = new Entity(1963422797);
-        public static readonly Entity GARAGE_COVER_MATTENAVI = new Entity(1449002268);
-        public static readonly Entity GARAGE_COVER_MATTEORANGE = new Entity(965487140);
-        public static readonly Entity GARAGE_COVER_MATTERED = new Entity(-230348709);
-        public static readonly Entity GARAGE_COVER_MATTEROSE = new Entity(1449134789);
-        public static readonly Entity GARAGE_COVER_MATTEVIOLET = new Entity(1157994613);
-        public static readonly Entity GARAGE_COVER_MATTEWHITE = new Entity(1977905523);
-        public static readonly Entity GARAGE_COVER_MATTEYELLOW = new Entity(1240098922);
-        public static readonly Entity GARAGE_COVER_MAY2018_1 = new Entity(-217437764);
-        public static readonly Entity GARAGE_COVER_MAY2018_2 = new Entity(-217437763);
-        public static readonly Entity GARAGE_COVER_METEL = new Entity(-1045986264);
-        public static readonly Entity GARAGE_COVER_NEFRIT = new Entity(1962388777);
-        public static readonly Entity GARAGE_COVER_NEWYEARGLOW = new Entity(1273539023);
-        public static readonly Entity GARAGE_COVER_NEWYEARICE = new Entity(-97463799);
-        public static readonly Entity GARAGE_COVER_NOISE = new Entity(-1044774977);
-        public static readonly Entity GARAGE_COVER_NONE = new Entity(-172249613);
-        public static readonly Entity GARAGE_COVER_NORTH = new Entity(-1044766294);
-        public static readonly Entity GARAGE_COVER_ORANGE = new Entity(2002870825);
-        public static readonly Entity GARAGE_COVER_PARTIZAN = new Entity(645983436);
-        public static readonly Entity GARAGE_COVER_PATINA = new Entity(2016361556);
-        public static readonly Entity GARAGE_COVER_PINK = new Entity(-172195791);
-        public static readonly Entity GARAGE_COVER_POLAR = new Entity(-1042925597);
-        public static readonly Entity GARAGE_COVER_PRIBOY = new Entity(2031727040);
-        public static readonly Entity GARAGE_COVER_PRODIGY = new Entity(-1435376695);
-        public static readonly Entity GARAGE_COVER_RADIATION = new Entity(-500584127);
-        public static readonly Entity GARAGE_COVER_RED = new Entity(410089078);
-        public static readonly Entity GARAGE_COVER_RIVETS = new Entity(2081063968);
-        public static readonly Entity GARAGE_COVER_ROCKS = new Entity(-1041086893);
-        public static readonly Entity GARAGE_COVER_RUST = new Entity(-172124513);
-        public static readonly Entity GARAGE_COVER_SANDSTONE = new Entity(2014177414);
-        public static readonly Entity GARAGE_COVER_SAVANNA = new Entity(746819053);
-        public static readonly Entity GARAGE_COVER_SMOKE = new Entity(-1040211436);
-        public static readonly Entity GARAGE_COVER_SPORT = new Entity(-1040121831);
-        public static readonly Entity GARAGE_COVER_STARRYSKY = new Entity(-1779740531);
-        public static readonly Entity GARAGE_COVER_STEAMULATORF = new Entity(1408168452);
-        public static readonly Entity GARAGE_COVER_STEAMULATORSF = new Entity(703549557);
-        public static readonly Entity GARAGE_COVER_STEEL = new Entity(-1040012688);
-        public static readonly Entity GARAGE_COVER_STONE = new Entity(-1040002806);
-        public static readonly Entity GARAGE_COVER_STORM = new Entity(-1040002674);
-        public static readonly Entity GARAGE_COVER_STVALENTINE2017 = new Entity(-26936066);
-        public static readonly Entity GARAGE_COVER_SWAMP = new Entity(-1039926907);
-        public static readonly Entity GARAGE_COVER_TAIGA = new Entity(-1039651301);
-        public static readonly Entity GARAGE_COVER_TAR = new Entity(410090890);
-        public static readonly Entity GARAGE_COVER_TINA = new Entity(-172076637);
-        public static readonly Entity GARAGE_COVER_TRIANGLECAMO = new Entity(-2097840184);
-        public static readonly Entity GARAGE_COVER_TUNDRA = new Entity(-2145802143);
-        public static readonly Entity GARAGE_COVER_UNIVERSE = new Entity(176253763);
-        public static readonly Entity GARAGE_COVER_URBAN = new Entity(-1038228233);
-        public static readonly Entity GARAGE_COVER_VOSTOK1 = new Entity(-487032800);
-        public static readonly Entity GARAGE_COVER_WALKER = new Entity(-2078438351);
-        public static readonly Entity GARAGE_COVER_YELLOW = new Entity(454169524);
-        public static readonly Entity GARAGE_DETAIL_GOLD = new Entity(215382134);
-        public static readonly Entity GARAGE_DETAIL_RUBBER = new Entity(1143965766);
-        public static readonly Entity GARAGE_DETAIL_XT = new Entity(-53406574);
-        public static readonly Entity GARAGE_ENERGY = new Entity(1746094671);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_DICTATOR = new Entity(-779102498);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_FLAMETHROWER = new Entity(-1319913646);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_FREEZE = new Entity(1530725353);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_HAMMER = new Entity(1590999596);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_HORNET = new Entity(1585608388);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_HUNTER = new Entity(1591036114);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_ISIS = new Entity(-758092378);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_MAMMOTH = new Entity(1646325085);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_RAILGUN = new Entity(1785144668);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_RICOCHET = new Entity(2140835849);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_SHAFT = new Entity(-2017127704);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_SMOKY = new Entity(-2016965135);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_THUNDER = new Entity(-523272750);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_TITAN = new Entity(-2016156294);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_TWINS = new Entity(-2015749383);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_VIKING = new Entity(1980662300);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_VULCAN = new Entity(1991768181);
-        public static readonly Entity GARAGE_GRAFFITI_CHILD_WASP = new Entity(-757692295);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_23FEBRUARY2017_1 = new Entity(-571325446);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_23FEBRUARY2017_2 = new Entity(-571325445);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_23FEBRUARY2018 = new Entity(473147977);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_8MARCHCAT = new Entity(-1669172271);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_8MARCHCRYSTAL = new Entity(2069414001);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_ALIEN = new Entity(-2022929356);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_ANTAEUS = new Entity(-1628984953);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_ARMSRACE = new Entity(-1968456698);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_ATLAS = new Entity(968765463);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_ATTACKOFTITAN = new Entity(891728345);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_BIRTHDAY2017GRAFFITI = new Entity(-1278226971);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_BULLDOG = new Entity(-107843627);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_BULLTERIER = new Entity(315308508);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_CAVEMAN = new Entity(-24677874);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_COSMOSX = new Entity(678025425);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_DEMOLISHER = new Entity(-343773791);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_DEMON = new Entity(971090551);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_DEVILSHEART = new Entity(-194604214);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_DOBERMAN = new Entity(519082359);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_FETIH = new Entity(292147378);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_FRONTIER = new Entity(-781845119);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_GHOSTTRAIN = new Entity(-1779805396);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_GIANT = new Entity(-1968456699);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_GODMODE = new Entity(880222526);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_GOLDBILL = new Entity(1737433896);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_GOLDBOX = new Entity(887330442);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_HELLHOUND = new Entity(1951474656);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_HEROORDER = new Entity(113459975);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_HYDRA = new Entity(1289970222);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_IWOJIMA = new Entity(-303400441);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_LETSGO = new Entity(1391443781);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_LOGO = new Entity(1001404575);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_LUCK = new Entity(-93361699);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_MARSHALSTAR = new Entity(988897323);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_MAY2018_1 = new Entity(1775068808);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_MAY2018_2 = new Entity(1775068809);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_MONSTER = new Entity(895058022);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_MOTHERLAND = new Entity(-2050212779);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_NUKE = new Entity(1001470037);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_PARTNERS = new Entity(-1611647112);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_PEACE = new Entity(674847565);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_PIXELDUCK = new Entity(1384981436);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_PUMPKIN = new Entity(457993351);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_PUMPKIN2017 = new Entity(-1786896255);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASON0 = new Entity(-247809917);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASON0TOP = new Entity(545710246);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASON1 = new Entity(-247809886);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASON1TOP = new Entity(546633767);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASON5 = new Entity(1690446069);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASON5TOP = new Entity(1587411008);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASON6 = new Entity(1626810943);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASON6TOP = new Entity(-86050122);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON10 = new Entity(-1834580363);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON10TOP = new Entity(-524637504);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON11 = new Entity(-1834580367);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON11TOP = new Entity(-524637507);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON12 = new Entity(-1834580368);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON12TOP = new Entity(-524637508);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON2 = new Entity(217914652);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON2TOP = new Entity(-2095038791);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON3 = new Entity(217914653);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON3TOP = new Entity(-2095009000);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON3_NY2018 = new Entity(1994390162);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON3_NY2018TOP = new Entity(-1700141693);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON4 = new Entity(217914654);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON4TOP = new Entity(-2094979209);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON7 = new Entity(345912680);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON7TOP = new Entity(-1792984208);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON8 = new Entity(217914658);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON8TOP = new Entity(-2094860045);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON9 = new Entity(217914659);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_SEASONS_SEASON9TOP = new Entity(-2094830254);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_STEAMPUNK = new Entity(62042919);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_STVALENTINE2017_1 = new Entity(-1808985494);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_STVALENTINE2017_2 = new Entity(-1808985493);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_TANKI2 = new Entity(1086271184);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_UP = new Entity(1884609450);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_VALHALLA_DRAKKAR = new Entity(1285677037);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_VALHALLA_VALKYRIE = new Entity(619790646);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_VALHALLA_YGGDRASIL = new Entity(-1871711547);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_VDNHSTATUE = new Entity(-1333610377);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_WAROFTHEWORLDS = new Entity(1374508848);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_WIDOW = new Entity(1704628950);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_XMAS1 = new Entity(-25726372);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_XMAS2 = new Entity(432765771);
-        public static readonly Entity GARAGE_GRAFFITI_INDEPENDENT_XMAS3 = new Entity(1435022351);
-        public static readonly Entity GARAGE_MODULE_CARD_ABSORBINGARMOR = new Entity(1070497259);
-        public static readonly Entity GARAGE_MODULE_CARD_ACCELERATEDGEARS = new Entity(1379340193);
-        public static readonly Entity GARAGE_MODULE_CARD_ADRENALINE = new Entity(1384519921);
-        public static readonly Entity GARAGE_MODULE_CARD_BACKHITDEFENCE = new Entity(-1143816664);
-        public static readonly Entity GARAGE_MODULE_CARD_DRONE = new Entity(69326151);
-        public static readonly Entity GARAGE_MODULE_CARD_EMERGENCYPROTECTION = new Entity(-443509498);
-        public static readonly Entity GARAGE_MODULE_CARD_EMP = new Entity(-1756465500);
-        public static readonly Entity GARAGE_MODULE_CARD_ENERGYINJECTION = new Entity(-1116052693);
-        public static readonly Entity GARAGE_MODULE_CARD_ENGINEER = new Entity(1464064213);
-        public static readonly Entity GARAGE_MODULE_CARD_EXPLOSIVEMASS = new Entity(-206369995);
-        public static readonly Entity GARAGE_MODULE_CARD_EXTERNALIMPACT = new Entity(1032613237);
-        public static readonly Entity GARAGE_MODULE_CARD_FIRERING = new Entity(-627265270);
-        public static readonly Entity GARAGE_MODULE_CARD_FORCEFIELD = new Entity(2100727840);
-        public static readonly Entity GARAGE_MODULE_CARD_ICETRAP = new Entity(1914815875);
-        public static readonly Entity GARAGE_MODULE_CARD_INCREASEDDAMAGE = new Entity(465438765);
-        public static readonly Entity GARAGE_MODULE_CARD_INVISIBILITY = new Entity(1625485211);
-        public static readonly Entity GARAGE_MODULE_CARD_INVULNERABILITY = new Entity(-1128519711);
-        public static readonly Entity GARAGE_MODULE_CARD_JUMPIMPACT = new Entity(-1596570946);
-        public static readonly Entity GARAGE_MODULE_CARD_KAMIKADZE = new Entity(489948195);
-        public static readonly Entity GARAGE_MODULE_CARD_LIFESTEAL = new Entity(2010921135);
-        public static readonly Entity GARAGE_MODULE_CARD_MINE = new Entity(1384378871);
-        public static readonly Entity GARAGE_MODULE_CARD_RAGE = new Entity(-786092160);
-        public static readonly Entity GARAGE_MODULE_CARD_RECHARGING = new Entity(881758280);
-        public static readonly Entity GARAGE_MODULE_CARD_SAPPER = new Entity(-887306593);
-        public static readonly Entity GARAGE_MODULE_CARD_SONAR = new Entity(-28208097);
-        public static readonly Entity GARAGE_MODULE_CARD_SPIDERMINE = new Entity(709690204);
-        public static readonly Entity GARAGE_MODULE_CARD_TEMPBLOCK = new Entity(-23536107);
-        public static readonly Entity GARAGE_MODULE_CARD_TURBOSPEED = new Entity(1378523021);
-    }
+        private static readonly Type[] itemTypes = new Type[]
+        {
+            typeof(Hulls),
+            typeof(Weapons),
+            typeof(Fractions),
+            typeof(Leagues),
+            typeof(Containers),
+            typeof(Paints),
+            typeof(Covers),
+            typeof(WeaponSkins),
+            typeof(HullSkins),
+            typeof(Modules),
+            typeof(ModuleCards),
+            typeof(Avatars),
+            typeof(Graffiti)
+        };
 
-    public static partial class Unspec
-    {
-        public static readonly Entity GARAGE_PREMIUM_BOOST = new Entity(-1816745725);
-        public static readonly Entity GARAGE_PREMIUM_QUEST = new Entity(-180272377);
-        public static readonly Entity GARAGE_PRESET = new Entity(-571744569);
-        public static readonly Entity GARAGE_QUANTUMS_BRONZE = new Entity(730464233);
-        public static readonly Entity GARAGE_QUANTUMS_GOLD = new Entity(170738287);
-        public static readonly Entity GARAGE_QUANTUMS_SILVER = new Entity(1208765788);
-    }
+        private volatile static Entity[] collectedGlobalEntities = Array.Empty<Entity>();
 
-    public static partial class Unspec
-    {
-        public static readonly Entity GARAGE_SKIN_TANK_DICTATOR_DREADNOUGHT = new Entity(732611697);
-        public static readonly Entity GARAGE_SKIN_TANK_DICTATOR_M0 = new Entity(-1555682652);
-        public static readonly Entity GARAGE_SKIN_TANK_DICTATOR_M1 = new Entity(-1555682651);
-        public static readonly Entity GARAGE_SKIN_TANK_DICTATOR_M1GOLD = new Entity(-767847828);
-        public static readonly Entity GARAGE_SKIN_TANK_DICTATOR_M1STEEL = new Entity(-1626035585);
-        public static readonly Entity GARAGE_SKIN_TANK_DICTATOR_M2 = new Entity(783713997);
-        public static readonly Entity GARAGE_SKIN_TANK_DICTATOR_M2FLAME = new Entity(1994127174);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_CRY = new Entity(1765925144);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_CRYDISCHARGE = new Entity(-955210933);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_CRYGLOW = new Entity(-955210932);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_CRYRAGE = new Entity(-955210934);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_M0 = new Entity(-1194388226);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_M1 = new Entity(-1194388225);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_M1GOLD = new Entity(679021958);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_M1STEEL = new Entity(-378883611);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_M2 = new Entity(-1992749017);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_MAY2017 = new Entity(963790407);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_T0 = new Entity(-47777666);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_T0GOLD = new Entity(-1475671586);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_XT = new Entity(-47777474);
-        public static readonly Entity GARAGE_SKIN_TANK_HORNET_XT_THOR = new Entity(-1636606664);
-        public static readonly Entity GARAGE_SKIN_TANK_HUNTER_23FEBRUARY2017 = new Entity(247232443);
-        public static readonly Entity GARAGE_SKIN_TANK_HUNTER_M0 = new Entity(1589207088);
-        public static readonly Entity GARAGE_SKIN_TANK_HUNTER_M1 = new Entity(1589207089);
-        public static readonly Entity GARAGE_SKIN_TANK_HUNTER_M1GOLD = new Entity(-318345288);
-        public static readonly Entity GARAGE_SKIN_TANK_HUNTER_M1STEEL = new Entity(-1267544717);
-        public static readonly Entity GARAGE_SKIN_TANK_HUNTER_M2 = new Entity(1589207091);
-        public static readonly Entity GARAGE_SKIN_TANK_HUNTER_MAY2017 = new Entity(110176853);
-        public static readonly Entity GARAGE_SKIN_TANK_HUNTER_XT = new Entity(790846704);
-        public static readonly Entity GARAGE_SKIN_TANK_HUNTER_XT_THOR = new Entity(1804747078);
-        public static readonly Entity GARAGE_SKIN_TANK_MAMMOTH_M0 = new Entity(-543026971);
-        public static readonly Entity GARAGE_SKIN_TANK_MAMMOTH_M1 = new Entity(-543026970);
-        public static readonly Entity GARAGE_SKIN_TANK_MAMMOTH_M1GOLD = new Entity(-920939649);
-        public static readonly Entity GARAGE_SKIN_TANK_MAMMOTH_M1STEEL = new Entity(-833500654);
-        public static readonly Entity GARAGE_SKIN_TANK_MAMMOTH_M2 = new Entity(-543026935);
-        public static readonly Entity GARAGE_SKIN_TANK_MAMMOTH_STEAM = new Entity(677046075);
-        public static readonly Entity GARAGE_SKIN_TANK_TITAN_FRONTIERZERO = new Entity(1470436461);
-        public static readonly Entity GARAGE_SKIN_TANK_TITAN_M0 = new Entity(-1584239704);
-        public static readonly Entity GARAGE_SKIN_TANK_TITAN_M1 = new Entity(-1584239703);
-        public static readonly Entity GARAGE_SKIN_TANK_TITAN_M1GOLD = new Entity(-754659582);
-        public static readonly Entity GARAGE_SKIN_TANK_TITAN_M1STEEL = new Entity(-133498961);
-        public static readonly Entity GARAGE_SKIN_TANK_TITAN_M2 = new Entity(-1584239766);
-        public static readonly Entity GARAGE_SKIN_TANK_TITAN_M2TSK = new Entity(-651639290);
-        public static readonly Entity GARAGE_SKIN_TANK_TITAN_XT = new Entity(1576595770);
-        public static readonly Entity GARAGE_SKIN_TANK_TITAN_XT_THOR = new Entity(1163905852);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_CRY = new Entity(-1353746752);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_CRYDISCHARGE = new Entity(-1363672965);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_CRYGLOW = new Entity(-110402718);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_CRYRAGE = new Entity(-110775867);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_M0 = new Entity(-353686874);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_M1 = new Entity(-353686873);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_M1GOLD = new Entity(499257134);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_M1STEEL = new Entity(-1656625859);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_M2 = new Entity(792923471);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_MAY2017 = new Entity(-313951841);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_T2 = new Entity(-1152047448);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_XT = new Entity(792923878);
-        public static readonly Entity GARAGE_SKIN_TANK_VIKING_XT_THOR = new Entity(1380618384);
-        public static readonly Entity GARAGE_SKIN_TANK_WASP_8MARCH2017 = new Entity(-1648311780);
-        public static readonly Entity GARAGE_SKIN_TANK_WASP_DREADNOUGHT = new Entity(-2009337684);
-        public static readonly Entity GARAGE_SKIN_TANK_WASP_M0 = new Entity(-1774581975);
-        public static readonly Entity GARAGE_SKIN_TANK_WASP_M1 = new Entity(-1774581974);
-        public static readonly Entity GARAGE_SKIN_TANK_WASP_M1GOLD = new Entity(-1774441975);
-        public static readonly Entity GARAGE_SKIN_TANK_WASP_M1STEEL = new Entity(-1555805158);
-        public static readonly Entity GARAGE_SKIN_TANK_WASP_M2 = new Entity(-10051566);
-        public static readonly Entity GARAGE_SKIN_TANK_WASP_XMAS = new Entity(72041592);
-        public static readonly Entity GARAGE_SKIN_TANK_WASP_XT = new Entity(-1129770519);
-        public static readonly Entity GARAGE_SKIN_TANK_WASP_XT_THOR = new Entity(-1838544851);
-    }
+        public static Entity[] GetEntities(Entity user)
+        {
+            if (collectedGlobalEntities.Length == 0)
+            lock (collectedGlobalEntities)
+            {
+                if (collectedGlobalEntities.Length == 0) CollectGlobalEntities();
+            }
 
-    public static partial class Unspec
-    {
-        public static readonly Entity HANGAR = new Entity(-1224574941);
-    }
+            Entity[] userEntities = GetUserEntities(user);
 
-    public static partial class Unspec
-    {
-        public static readonly Entity LOBBY_ENTRANCE_AUTHENTICATION = new Entity(-2094363978);
-    }
+            Entity[] entities = new Entity[collectedGlobalEntities.Length + userEntities.Length];
+            collectedGlobalEntities.CopyTo(entities, 0);
+            userEntities.CopyTo(entities, collectedGlobalEntities.Length);
 
-    public static partial class Unspec
-    {
-        public static readonly Entity PAYMENT_GOODS_PREMIUM_30DAYX = new Entity(1957963539);
-        public static readonly Entity PAYMENT_GOODS_PREMIUM_3DAY = new Entity(-763254490);
-        public static readonly Entity PAYMENT_GOODS_PREMIUM_7DAY = new Entity(-1186619009);
-        public static readonly Entity PAYMENT_GOODS_PREMIUM_7DAYX = new Entity(1869516473);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_ALFAPACK = new Entity(-522705963);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_BLACKWIDOWPACK = new Entity(-1812309888);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_FULLGARAGE = new Entity(1065255648);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_HELLHOUNDSPACK = new Entity(-1667702305);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_HYDRAPACK = new Entity(174674409);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_LEGENDARYTANK_ANNIHILATION = new Entity(1477775383);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_LEGENDARYTANK_OFFENSIVE = new Entity(-1082171894);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_LEGENDARYTANK_SUPPORT = new Entity(1477775394);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_NEW_LEAGUE_BRONZE = new Entity(219476058);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_NEW_LEAGUE_GOLD = new Entity(-504653024);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_NEW_LEAGUE_MASTER = new Entity(518821154);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_NEW_LEAGUE_SILVER = new Entity(697777613);
-        public static readonly Entity PAYMENT_GOODS_SPECIALOFFERS_TANKSINCITY_2018 = new Entity(1495748760);
-        public static readonly Entity PAYMENT_PAYABLE_CHANGEUID = new Entity(147354721);
-        public static readonly Entity PAYMENT_PROVIDER_ADYEN = new Entity(-1791933078);
-        public static readonly Entity RANKSCONFIG = new Entity(333088802);
-        public static readonly Entity UI_ELEMENT_RANKSNAMES = new Entity(1193439791);
+            return entities;
+        }
+
+        private static void CollectGlobalEntities()
+        {
+            List<Entity> entities = new List<Entity>();
+
+            foreach (Type type in itemTypes)
+            {
+                PropertyInfo info = type.GetProperty("GlobalItems");
+                if (info == null) continue;
+                entities.AddRange(((ItemList)info.GetValue(null)).GetAllItems());
+            }
+
+            collectedGlobalEntities = entities.ToArray();
+        }
+
+        private static Entity[] GetUserEntities(Entity user)
+        {
+            List<Entity> entities = new List<Entity>();
+
+            foreach (Type type in itemTypes)
+            {
+                MethodInfo info = type.GetMethod("GetUserItems");
+                if (info == null) continue;
+                entities.AddRange((info.Invoke(null, new object[] { user }) as ItemList).GetAllItems());
+            }
+
+            return entities.ToArray();
+        }
     }
 }

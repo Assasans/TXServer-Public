@@ -28,13 +28,16 @@ namespace TXServer.ECSSystem.Events
 			Entity user = new Entity(new TemplateAccessor(new UserTemplate(), "quests/daily/battle"),
 				new UserXCrystalsComponent(50000),
 				new UserCountryComponent("RU"),
-				new UserAvatarComponent("457e8f5f-953a-424c-bd97-67d9e116ab7a"), // hardcode!!!
+				new UserAvatarComponent("8b74e6a3-849d-4a8d-a20e-be3c142fd5e8"),
 				new UserComponent(),
 				new UserMoneyComponent(1000000),
-				new FractionGroupComponent(Fractions.Frontier),
+				new FractionGroupComponent(Fractions.GlobalItems.Frontier),
 				new UserDailyBonusCycleComponent(1),
 				new TutorialCompleteIdsComponent(),
-				new LeagueGroupComponent(Leagues.Silver),
+				new RegistrationDateComponent(),
+				new LeagueGroupComponent(Leagues.GlobalItems.Silver),
+				new UserDailyBonusNextReceivingDateComponent(),
+				new UserDailyBonusInitializedComponent(),
 				new UserDailyBonusZoneComponent(0),
 				new UserStatisticsComponent(),
 				new PersonalChatOwnerComponent(),
@@ -43,59 +46,34 @@ namespace TXServer.ECSSystem.Events
 				new BlackListComponent(),
 				new UserUidComponent(Player.Instance.Uid),
 				new FractionUserScoreComponent(500),
-				new UserExperienceComponent(200000),
+				new UserExperienceComponent(1000000),
 				new QuestReadyComponent(),
 				new UserPublisherComponent(),
 				new FavoriteEquipmentStatisticsComponent(),
-				new UserGroupComponent(entity),
 				new UserDailyBonusReceivedRewardsComponent(),
 				new ConfirmedUserEmailComponent(Player.Instance.Email),
+				new UserSubscribeComponent(),
 				new KillsEquipmentStatisticsComponent(),
 				new BattleLeaveCounterComponent(),
 				new UserReputationComponent(0.0));
 
+			user.Components.Add(new UserGroupComponent(user.EntityId));
+
 			List<Command> collectedCommands = new List<Command>()
 			{
-				new ComponentAddCommand(entity, new UserGroupComponent(entity)),
-				new EntityShareCommand(Fractions.Competition),
-				new EntityShareCommand(Fractions.Frontier),
-				new EntityShareCommand(Fractions.Antaeus),
-				new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.Competition),
-				new EntityShareCommand(user)
+				new EntityShareCommand(user),
+				new ComponentAddCommand(entity, new UserGroupComponent(user.EntityId)),
 			};
-			
-			collectedCommands.AddRange(from global in typeof(BattleRewards).GetFields()
-									   select new EntityShareCommand(global.GetValue(null) as Entity));
 
-			collectedCommands.AddRange(from global in typeof(GoldBonuses).GetFields()
-									   select new EntityShareCommand(global.GetValue(null) as Entity));
+			collectedCommands.AddRange(from collectedEntity in ResourceManager.GetEntities(user)
+									   select new EntityShareCommand(collectedEntity));
 
 			collectedCommands.AddRange(new Command[] {
-				new SendEventCommand(new PaymentSectionLoadedEvent(), entity),
-				new ComponentAddCommand(entity, new UserOnlineComponent()),
-				new SendEventCommand(new FriendsLoadedEvent(), entity)
+				new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
+				new SendEventCommand(new PaymentSectionLoadedEvent(), user),
+				new ComponentAddCommand(user, new UserOnlineComponent()),
+				new SendEventCommand(new FriendsLoadedEvent(), user)
 			});
-
-			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands.ToArray());
-			collectedCommands.Clear();
-
-			collectedCommands.AddRange(from global in typeof(Maps).GetFields()
-									   select new EntityShareCommand(global.GetValue(null) as Entity));
-
-			collectedCommands.AddRange(from global in typeof(Containers).GetFields()
-									   select new EntityShareCommand(global.GetValue(null) as Entity));
-
-			collectedCommands.AddRange(from global in typeof(Paints).GetFields()
-									   select new EntityShareCommand(global.GetValue(null) as Entity));
-
-			collectedCommands.AddRange(from global in typeof(Modules).GetFields()
-									   select new EntityShareCommand(global.GetValue(null) as Entity));
-
-			collectedCommands.AddRange(from global in typeof(Shells).GetFields()
-									   select new EntityShareCommand(global.GetValue(null) as Entity));
-
-			collectedCommands.AddRange(from global in typeof(WeaponSkins).GetFields()
-									   select new EntityShareCommand(global.GetValue(null) as Entity));
 
 			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands.ToArray());
 		}
@@ -103,5 +81,37 @@ namespace TXServer.ECSSystem.Events
 		public string HardwareFingerprint { get; set; }
 		public string PasswordEncipher { get; set; }
 		public bool RememberMe { get; set; }
+	}
+
+	[SerialVersionUID(1497606008074L)]
+	public class UserQuestReadyEvent : ECSEvent
+	{
+	}
+
+	[SerialVersionUID(1464349204724L)]
+	public class ClientInfoSendEvent : ECSEvent
+	{
+		public string Settings { get; set; }
+	}
+
+	[SerialVersionUID(1507022246767L)]
+	public class UserOnlineEvent : ECSEvent
+	{
+	}
+
+	[SerialVersionUID(5356229304896471086L)]
+	public class PingEvent : ECSEvent
+	{
+		public long ServerTime { get; set; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+		public byte CommandId { get; set; } = 0xf0;
+	}
+
+	[SerialVersionUID(1115422024552825915L)]
+	public class PongEvent : ECSEvent
+	{
+		public float PongCommandClientRealTime { get; set; }
+
+		public byte CommandId { get; set; }
 	}
 }

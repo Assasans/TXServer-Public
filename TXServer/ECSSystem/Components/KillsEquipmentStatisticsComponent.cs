@@ -10,28 +10,28 @@ namespace TXServer.ECSSystem.Components
     {
         public Dictionary<Entity, long> HullStatistics { get; set; } = new Dictionary<Entity, long>()
         {
-            { Weapons.Flamethrower, 0 },
-            { Weapons.Freeze, 0 },
-            { Weapons.Hammer, 0 },
-            { Weapons.Isis, 0 },
-            { Weapons.Railgun, 0 },
-            { Weapons.Ricochet, 0 },
-            { Weapons.Shaft, 0 },
-            { Weapons.Smoky, 0 },
-            { Weapons.Thunder, 0 },
-            { Weapons.Twins, 0 },
-            { Weapons.Vulcan, 0 }
+            { Weapons.GlobalItems.Flamethrower, 0 },
+            { Weapons.GlobalItems.Freeze, 0 },
+            { Weapons.GlobalItems.Hammer, 0 },
+            { Weapons.GlobalItems.Isis, 0 },
+            { Weapons.GlobalItems.Railgun, 0 },
+            { Weapons.GlobalItems.Ricochet, 0 },
+            { Weapons.GlobalItems.Shaft, 0 },
+            { Weapons.GlobalItems.Smoky, 0 },
+            { Weapons.GlobalItems.Thunder, 0 },
+            { Weapons.GlobalItems.Twins, 0 },
+            { Weapons.GlobalItems.Vulcan, 0 }
         };
 
         public Dictionary<Entity, long> TurretStatistics { get; set; } = new Dictionary<Entity, long>()
         {
-            { Hulls.Wasp, 0 },
-            { Hulls.Hornet, 0 },
-            { Hulls.Hunter, 0 },
-            { Hulls.Viking, 0 },
-            { Hulls.Titan, 0 },
-            { Hulls.Dictator, 0 },
-            { Hulls.Mammoth, 0 }
+            { Hulls.GlobalItems.Wasp, 0 },
+            { Hulls.GlobalItems.Hornet, 0 },
+            { Hulls.GlobalItems.Hunter, 0 },
+            { Hulls.GlobalItems.Viking, 0 },
+            { Hulls.GlobalItems.Titan, 0 },
+            { Hulls.GlobalItems.Dictator, 0 },
+            { Hulls.GlobalItems.Mammoth, 0 }
         };
     }
 }

@@ -49,9 +49,16 @@ namespace TXServer.Library
             return BitConverter.ToUInt64(data, 0);
         }
 
-        public float ReadFloat()
+        public override float ReadSingle()
         {
             var data = base.ReadBytes(4);
+            Array.Reverse(data);
+            return BitConverter.ToSingle(data, 0);
+        }
+
+        public override double ReadDouble()
+        {
+            var data = base.ReadBytes(8);
             Array.Reverse(data);
             return BitConverter.ToSingle(data, 0);
         }
@@ -104,6 +111,13 @@ namespace TXServer.Library
         }
 
         public override void Write(float i)
+        {
+            byte[] data = BitConverter.GetBytes(i);
+            Array.Reverse(data);
+            base.Write(data);
+        }
+
+        public override void Write(double i)
         {
             byte[] data = BitConverter.GetBytes(i);
             Array.Reverse(data);

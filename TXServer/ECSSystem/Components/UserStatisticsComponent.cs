@@ -24,6 +24,7 @@ namespace TXServer.ECSSystem.Components
 			{ "CTF_PLAYED", 0 },
 			{ "DEFEATS", 0 },
 			{ "DM_PLAYED", 0 },
+			{ "HITS", 0 },
 			{ "KILL_ASSIST_XP", 0 },
 			{ "KILL_XP", 0 },
 			{ "CURRENT_WINNING_STREAK", 0 },

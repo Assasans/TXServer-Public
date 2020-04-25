@@ -7,6 +7,6 @@ namespace TXServer.ECSSystem.Components
     [SerialVersionUID(1545394828752)]
     public class FinishedFractionsCompetitionComponent : Component
     {
-        public Entity Winner { get; } = Fractions.Antaeus;
+        public long Winner { get; } = -1650120701;
     }
 }

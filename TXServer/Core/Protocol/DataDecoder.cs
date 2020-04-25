@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
 using TXServer.Library;
@@ -34,8 +35,25 @@ namespace TXServer.Core.Protocol
         {
             return reader.GetType()
                          .GetMethods()
-                         .Single(method => method.Name.Contains("Read") && method.ReturnType == objType)
+                         .Single(method => method.Name == "Read" + objType.Name)
                          .Invoke(reader, null);
+        }
+
+        private object DecodeString()
+        {
+            byte part1 = reader.ReadByte();
+            byte[] bytes;
+
+            if ((part1 & 0x80) == 0x80)
+            {
+                bytes = reader.ReadBytes(((part1 & 0x3f) << 8) & reader.ReadByte());
+            }
+            else
+            {
+                bytes = reader.ReadBytes(part1);
+            }
+
+            return Encoding.UTF8.GetString(bytes);
         }
 
         private object DecodeCollection(Type objType)
@@ -70,9 +88,14 @@ namespace TXServer.Core.Protocol
 
         private object SelectDecode(Type objType)
         {
-            if (objType.IsPrimitive || objType == typeof(string) || objType == typeof(decimal))
+            if (objType.IsPrimitive || objType == typeof(decimal))
             {
                 return DecodePrimitive(objType);
+            }
+
+            if (objType == typeof(string))
+            {
+                return DecodeString();
             }
 
             if (objType == typeof(Entity))

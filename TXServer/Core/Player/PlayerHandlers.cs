@@ -12,6 +12,8 @@ namespace TXServer.Core
 {
     public partial class Player
     {
+        internal static object instance;
+
         public bool InBattle { get; set; }
 
         public BlockingCollection<Command> LobbyCommandQueue { get; }

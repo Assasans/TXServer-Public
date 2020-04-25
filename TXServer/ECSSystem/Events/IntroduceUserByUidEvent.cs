@@ -10,6 +10,7 @@ namespace TXServer.ECSSystem.Events
 	{
 		public override void Execute(Entity entity)
 		{
+			Player.Instance.Email = "none";
 			Player.Instance.Uid = Uid;
 			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new PersonalPasscodeEvent(), entity));
 		}

@@ -6,7 +6,6 @@ namespace TXServer.ECSSystem.Base
     {
         public virtual void Execute(Entity entity)
         {
-            throw new NotImplementedException();
         }
     }
 }

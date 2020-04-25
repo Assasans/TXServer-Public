@@ -57,7 +57,7 @@ namespace TXServer.ECSSystem.Base
 
         public override int GetHashCode() => EntityId.GetHashCode();
 
-        public long EntityId { get; }
+        public long EntityId { get; set; }
         public TemplateAccessor TemplateAccessor { get; set; }
         public HashSet<Component> Components { get; set; } = new HashSet<Component>(new HashCodeEqualityComparer<Component>());
     }
