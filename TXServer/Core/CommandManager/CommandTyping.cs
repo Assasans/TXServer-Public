@@ -6,6 +6,23 @@ namespace TXServer.Core.Commands
 {
     public static partial class CommandManager
     {
+        private static readonly Dictionary<byte, Type> CommandTypeByCode = new Dictionary<byte, Type>();
+
+        static CommandManager()
+        {
+            Assembly currentAssembly = Assembly.GetExecutingAssembly();
+
+            foreach (Type type in currentAssembly.GetTypes())
+            {
+                CommandCodeAttribute attribute = type.GetCustomAttribute<CommandCodeAttribute>();
+
+                if (attribute != null)
+                {
+                    CommandTypeByCode.Add(attribute.Code, type);
+                }
+            }
+        }
+
         /// <summary>
         /// Получает код команды.
         /// </summary>
@@ -24,8 +41,6 @@ namespace TXServer.Core.Commands
         /// </summary>
         public static Type FindCommandType(byte code)
         {
-            LoadCommandCodes();
-
             try
             {
                 return CommandTypeByCode[code];
@@ -35,32 +50,5 @@ namespace TXServer.Core.Commands
                 throw new ArgumentException(string.Format("Команда с кодом {0} не найдена.", code));
             }
         }
-
-        private static void LoadCommandCodes()
-        {
-            if (CommandCodesLoaded) return;
-
-            lock (CommandTypeByCode)
-            {
-                if (CommandCodesLoaded) return; // Если было ожидание загрузки.
-
-                Assembly currentAssembly = Assembly.GetExecutingAssembly();
-
-                foreach (Type type in currentAssembly.GetTypes())
-                {
-                    CommandCodeAttribute attribute = type.GetCustomAttribute<CommandCodeAttribute>();
-
-                    if (attribute != null)
-                    {
-                        CommandTypeByCode.Add(attribute.Code, type);
-                    }
-                }
-
-                CommandCodesLoaded = true;
-            }
-        }
-
-        private static volatile bool CommandCodesLoaded;
-        private static readonly Dictionary<byte, Type> CommandTypeByCode = new Dictionary<byte, Type>();
     }
 }

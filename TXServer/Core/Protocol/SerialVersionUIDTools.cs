@@ -7,32 +7,22 @@ namespace TXServer.Core.Protocol
     public static class SerialVersionUIDTools
     {
         private static readonly Dictionary<Int64, Type> TypeBySerialVersionUID = new Dictionary<Int64, Type>();
-        private volatile static bool SerialVersionUIDsLoaded = false;
 
         /// <summary>
         /// Заполняет словарь с SerialVersionUID типов, если не заполнены.
         /// </summary>
-        private static void LoadSerialVersionUIDs()
+        static SerialVersionUIDTools()
         {
-            if (SerialVersionUIDsLoaded) return;
+            Assembly currentAssembly = Assembly.GetExecutingAssembly();
 
-            lock (TypeBySerialVersionUID)
+            foreach (Type type in currentAssembly.GetTypes())
             {
-                if (SerialVersionUIDsLoaded) return; // Если было ожидание загрузки.
+                SerialVersionUIDAttribute attribute = type.GetCustomAttribute<SerialVersionUIDAttribute>();
 
-                Assembly currentAssembly = Assembly.GetExecutingAssembly();
-
-                foreach (Type type in currentAssembly.GetTypes())
+                if (attribute != null)
                 {
-                    SerialVersionUIDAttribute attribute = type.GetCustomAttribute<SerialVersionUIDAttribute>();
-
-                    if (attribute != null)
-                    {
-                        TypeBySerialVersionUID.Add(attribute.Id, type);
-                    }
+                    TypeBySerialVersionUID.Add(attribute.Id, type);
                 }
-
-                SerialVersionUIDsLoaded = true;
             }
         }
 
@@ -55,8 +45,6 @@ namespace TXServer.Core.Protocol
         /// </summary>
         public static Type FindType(Int64 id)
         {
-            LoadSerialVersionUIDs();
-
             try
             {
                 return TypeBySerialVersionUID[id];

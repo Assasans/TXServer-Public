@@ -25,7 +25,7 @@ namespace TXServer.ECSSystem.Events
 
 			_ = entity ?? throw new ArgumentNullException(nameof(entity));
 
-			Entity user = new Entity(new TemplateAccessor(new UserTemplate(), "quests/daily/battle"),
+			Entity user = new Entity(new TemplateAccessor(new UserTemplate(), ""),
 				new UserXCrystalsComponent(50000),
 				new UserCountryComponent("RU"),
 				new UserAvatarComponent("8b74e6a3-849d-4a8d-a20e-be3c142fd5e8"),
@@ -56,6 +56,8 @@ namespace TXServer.ECSSystem.Events
 				new KillsEquipmentStatisticsComponent(),
 				new BattleLeaveCounterComponent(),
 				new UserReputationComponent(0.0));
+
+			Player.Instance.User = user;
 
 			user.Components.Add(new UserGroupComponent(user.EntityId));
 

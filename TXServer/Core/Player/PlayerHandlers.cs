@@ -12,10 +12,6 @@ namespace TXServer.Core
 {
     public partial class Player
     {
-        internal static object instance;
-
-        public bool InBattle { get; set; }
-
         public BlockingCollection<Command> LobbyCommandQueue { get; }
         public ConcurrentHashSet<Command> BattleCommandQueue { get; }
 
@@ -35,8 +31,10 @@ namespace TXServer.Core
 
             try
             {
-                Entity ClientSession = new Entity(TemplateAccessor: new TemplateAccessor(new ClientSessionTemplate(), "notification/emailconfirmation"),
+                Entity ClientSession = new Entity(TemplateAccessor: new TemplateAccessor(new ClientSessionTemplate(), ""),
                                                     new ClientSessionComponent());
+
+                Instance.ClientSession = ClientSession;
 
                 Entity Lobby = new Entity(TemplateAccessor: new TemplateAccessor(new LobbyTemplate(), "lobby"),
                                             new LobbyComponent(),

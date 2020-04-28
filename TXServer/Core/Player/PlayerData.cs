@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using TXServer.ECSSystem.Base;
 using TXServer.Library;
 
@@ -15,10 +16,12 @@ namespace TXServer.Core
 
         // Entity list.
         public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
+        public ConcurrentDictionary<string, Entity> ReferencedEntities { get; } = new ConcurrentDictionary<string, Entity>();
 
+        public Entity ClientSession { get; set; }
         public Entity User { get; set; }
 
-        public string Uid { get; set; } = "user";
-        public string Email { get; set; } = "none";
+        public string Uid { get; set; }
+        public string Email { get; set; }
     }
 }

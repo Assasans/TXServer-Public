@@ -43,19 +43,24 @@ namespace TXServer.ECSSystem.GlobalEntities
             typeof(Modules),
             typeof(ModuleCards),
             typeof(Avatars),
-            typeof(Graffiti)
+            typeof(Graffiti),
+            typeof(Maps),
+            typeof(BattleRewards),
+            typeof(ExtraItems),
+            typeof(GoldBonusOffers),
+            typeof(PremiumOffers),
+            typeof(PersonalSpecialOffers),
         };
+
+        static ResourceManager()
+        {
+            CollectGlobalEntities();
+        }
 
         private volatile static Entity[] collectedGlobalEntities = Array.Empty<Entity>();
 
         public static Entity[] GetEntities(Entity user)
         {
-            if (collectedGlobalEntities.Length == 0)
-            lock (collectedGlobalEntities)
-            {
-                if (collectedGlobalEntities.Length == 0) CollectGlobalEntities();
-            }
-
             Entity[] userEntities = GetUserEntities(user);
 
             Entity[] entities = new Entity[collectedGlobalEntities.Length + userEntities.Length];
