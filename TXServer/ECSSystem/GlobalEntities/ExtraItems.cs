@@ -41,6 +41,8 @@ namespace TXServer.ECSSystem.GlobalEntities
             public Entity Preset { get; } = new Entity(-571744569, new TemplateAccessor(new PresetMarketItemTemplate(), "garage/preset"),
                 new MarketItemGroupComponent(-571744569));
             public Entity Matchmaking { get; } = new Entity(1016044373, new TemplateAccessor(new MatchMakingTemplate(), "battleselect/matchmaking"));
+            public Entity ModuleSlot { get; } = new Entity(1335431730, new TemplateAccessor(new SlotMarketItemTemplate(), "garage/module/slot/market"),
+                new MarketItemGroupComponent(1335431730));
         }
 
         public class UserItems : ItemList

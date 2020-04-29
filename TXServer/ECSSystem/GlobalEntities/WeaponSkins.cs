@@ -22,6 +22,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 item.TemplateAccessor.Template = new WeaponSkinUserItemTemplate();
 
                 item.Components.Add(new UserGroupComponent(user.EntityId));
+                item.Components.Remove(new DefaultSkinItemComponent());
             }
 
             items.SmokyM0.Components.Add(new MountedItemComponent());
@@ -32,11 +33,12 @@ namespace TXServer.ECSSystem.GlobalEntities
         public class Items : ItemList
         {
             public Entity FlamethrowerDreadnought { get; } = new Entity(602602131, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/flamethrower/Dreadnought"),
-            new ParentGroupComponent(Weapons.GlobalItems.Flamethrower),
-            new MarketItemGroupComponent(602602131));
+                new ParentGroupComponent(Weapons.GlobalItems.Flamethrower),
+                new MarketItemGroupComponent(602602131));
             public Entity FlamethrowerM0 { get; } = new Entity(2078566312, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/flamethrower/m0"),
                 new ParentGroupComponent(Weapons.GlobalItems.Flamethrower),
-                new MarketItemGroupComponent(2078566312));
+                new MarketItemGroupComponent(2078566312),
+                new DefaultSkinItemComponent());
             public Entity FlamethrowerM1 { get; } = new Entity(2078566313, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/flamethrower/m1"),
                 new ParentGroupComponent(Weapons.GlobalItems.Flamethrower),
                 new MarketItemGroupComponent(2078566313));
@@ -54,7 +56,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(-983916600));
             public Entity FreezeM0 { get; } = new Entity(-472765007, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/freeze/m0"),
                 new ParentGroupComponent(Weapons.GlobalItems.Freeze),
-                new MarketItemGroupComponent(-472765007));
+                new MarketItemGroupComponent(-472765007),
+                new DefaultSkinItemComponent());
             public Entity FreezeM1 { get; } = new Entity(-472765006, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/freeze/m1"),
                 new ParentGroupComponent(Weapons.GlobalItems.Freeze),
                 new MarketItemGroupComponent(-472765006));
@@ -84,7 +87,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(-350323545));
             public Entity HammerM0 { get; } = new Entity(-635589854, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/hammer/m0"),
                 new ParentGroupComponent(Weapons.GlobalItems.Hammer),
-                new MarketItemGroupComponent(-635589854));
+                new MarketItemGroupComponent(-635589854),
+                new DefaultSkinItemComponent());
             public Entity HammerM1 { get; } = new Entity(-635589853, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/hammer/m1"),
                 new ParentGroupComponent(Weapons.GlobalItems.Hammer),
                 new MarketItemGroupComponent(-635589853));
@@ -102,7 +106,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(-305773183));
             public Entity IsisM0 { get; } = new Entity(-746649388, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/isis/m0"),
                 new ParentGroupComponent(Weapons.GlobalItems.Isis),
-                new MarketItemGroupComponent(-746649388));
+                new MarketItemGroupComponent(-746649388),
+                new DefaultSkinItemComponent());
             public Entity IsisM1 { get; } = new Entity(-746649387, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/isis/m1"),
                 new ParentGroupComponent(Weapons.GlobalItems.Isis),
                 new MarketItemGroupComponent(-746649387));
@@ -117,7 +122,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(765745271));
             public Entity RailgunM0 { get; } = new Entity(599453582, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/railgun/m0"),
                 new ParentGroupComponent(Weapons.GlobalItems.Railgun),
-                new MarketItemGroupComponent(599453582));
+                new MarketItemGroupComponent(599453582),
+                new DefaultSkinItemComponent());
             public Entity RailgunM1 { get; } = new Entity(599453583, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/railgun/m1"),
                 new ParentGroupComponent(Weapons.GlobalItems.Railgun),
                 new MarketItemGroupComponent(599453583));
@@ -147,7 +153,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(1077283204));
             public Entity RicochetM0 { get; } = new Entity(-909167727, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/ricochet/m0"),
                 new ParentGroupComponent(Weapons.GlobalItems.Ricochet),
-                new MarketItemGroupComponent(-909167727));
+                new MarketItemGroupComponent(-909167727),
+                new DefaultSkinItemComponent());
             public Entity RicochetM1 { get; } = new Entity(-909167726, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/ricochet/m1"),
                 new ParentGroupComponent(Weapons.GlobalItems.Ricochet),
                 new MarketItemGroupComponent(-909167726));
@@ -162,7 +169,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(-342766924));
             public Entity ShaftM0 { get; } = new Entity(1460259970, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/shaft/m0"),
                 new ParentGroupComponent(Weapons.GlobalItems.Shaft),
-                new MarketItemGroupComponent(1460259970));
+                new MarketItemGroupComponent(1460259970),
+                new DefaultSkinItemComponent());
             public Entity ShaftM1 { get; } = new Entity(1460259971, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/shaft/m1"),
                 new ParentGroupComponent(Weapons.GlobalItems.Shaft),
                 new MarketItemGroupComponent(1460259971));
@@ -183,7 +191,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(-1141123658));
             public Entity SmokyM0 { get; } = new Entity(2008385753, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/smoky/m0"),
                 new ParentGroupComponent(Weapons.GlobalItems.Smoky),
-                new MarketItemGroupComponent(2008385753));
+                new MarketItemGroupComponent(2008385753),
+                new DefaultSkinItemComponent());
             public Entity SmokyM1 { get; } = new Entity(2008385754, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/smoky/m1"),
                 new ParentGroupComponent(Weapons.GlobalItems.Smoky),
                 new MarketItemGroupComponent(2008385754));
@@ -210,7 +219,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(1770762539));
             public Entity ThunderM0 { get; } = new Entity(1552497496, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/thunder/m0"),
                 new ParentGroupComponent(Weapons.GlobalItems.Thunder),
-                new MarketItemGroupComponent(1552497496));
+                new MarketItemGroupComponent(1552497496),
+                new DefaultSkinItemComponent());
             public Entity ThunderM1 { get; } = new Entity(1552497497, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/thunder/m1"),
                 new ParentGroupComponent(Weapons.GlobalItems.Thunder),
                 new MarketItemGroupComponent(1552497497));
@@ -234,7 +244,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(-688039802));
             public Entity TwinsM0 { get; } = new Entity(1468232592, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/twins/m0"),
                 new ParentGroupComponent(Weapons.GlobalItems.Twins),
-                new MarketItemGroupComponent(1468232592));
+                new MarketItemGroupComponent(1468232592),
+                new DefaultSkinItemComponent());
             public Entity TwinsM1 { get; } = new Entity(274558103, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/twins/m1"),
                 new ParentGroupComponent(Weapons.GlobalItems.Twins),
                 new MarketItemGroupComponent(274558103));
@@ -270,7 +281,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(-1560119161));
             public Entity VulcanM0 { get; } = new Entity(-851288667, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/vulcan/m0"),
                 new ParentGroupComponent(Weapons.GlobalItems.Vulcan),
-                new MarketItemGroupComponent(-851288667));
+                new MarketItemGroupComponent(-851288667),
+                new DefaultSkinItemComponent());
             public Entity VulcanM1 { get; } = new Entity(-851288666, new TemplateAccessor(new WeaponSkinMarketItemTemplate(), "garage/skin/weapon/vulcan/m1"),
                 new ParentGroupComponent(Weapons.GlobalItems.Vulcan),
                 new MarketItemGroupComponent(-851288666));

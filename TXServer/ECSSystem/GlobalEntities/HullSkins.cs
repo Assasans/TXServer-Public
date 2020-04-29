@@ -22,6 +22,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 item.TemplateAccessor.Template = new HullSkinUserItemTemplate();
 
                 item.Components.Add(new UserGroupComponent(user.EntityId));
+                item.Components.Remove(new DefaultSkinItemComponent());
             }
 
             items.HunterM0.Components.Add(new MountedItemComponent());
@@ -36,7 +37,8 @@ namespace TXServer.ECSSystem.GlobalEntities
             new MarketItemGroupComponent(732611697));
             public Entity DictatorM0 { get; } = new Entity(-1555682652, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/dictator/m0"),
                 new ParentGroupComponent(Hulls.GlobalItems.Dictator),
-                new MarketItemGroupComponent(-1555682652));
+                new MarketItemGroupComponent(-1555682652),
+                new DefaultSkinItemComponent());
             public Entity DictatorM1 { get; } = new Entity(-1555682651, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/dictator/m1"),
                 new ParentGroupComponent(Hulls.GlobalItems.Dictator),
                 new MarketItemGroupComponent(-1555682651));
@@ -66,7 +68,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(-955210934));
             public Entity HornetM0 { get; } = new Entity(-1194388226, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/hornet/m0"),
                 new ParentGroupComponent(Hulls.GlobalItems.Hornet),
-                new MarketItemGroupComponent(-1194388226));
+                new MarketItemGroupComponent(-1194388226),
+                new DefaultSkinItemComponent());
             public Entity HornetM1 { get; } = new Entity(-1194388225, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/hornet/m1"),
                 new ParentGroupComponent(Hulls.GlobalItems.Hornet),
                 new MarketItemGroupComponent(-1194388225));
@@ -99,7 +102,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(247232443));
             public Entity HunterM0 { get; } = new Entity(1589207088, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/hunter/m0"),
                 new ParentGroupComponent(Hulls.GlobalItems.Hunter),
-                new MarketItemGroupComponent(1589207088));
+                new MarketItemGroupComponent(1589207088),
+                new DefaultSkinItemComponent());
             public Entity HunterM1 { get; } = new Entity(1589207089, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/hunter/m1"),
                 new ParentGroupComponent(Hulls.GlobalItems.Hunter),
                 new MarketItemGroupComponent(1589207089));
@@ -123,7 +127,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(1804747078));
             public Entity MammothM0 { get; } = new Entity(-543026971, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/mammoth/m0"),
                 new ParentGroupComponent(Hulls.GlobalItems.Mammoth),
-                new MarketItemGroupComponent(-543026971));
+                new MarketItemGroupComponent(-543026971),
+                new DefaultSkinItemComponent());
             public Entity MammothM1 { get; } = new Entity(-543026970, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/mammoth/m1"),
                 new ParentGroupComponent(Hulls.GlobalItems.Mammoth),
                 new MarketItemGroupComponent(-543026970));
@@ -144,7 +149,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(1470436461));
             public Entity TitanM0 { get; } = new Entity(-1584239704, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/titan/m0"),
                 new ParentGroupComponent(Hulls.GlobalItems.Titan),
-                new MarketItemGroupComponent(-1584239704));
+                new MarketItemGroupComponent(-1584239704),
+                new DefaultSkinItemComponent());
             public Entity TitanM1 { get; } = new Entity(-1584239703, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/titan/m1"),
                 new ParentGroupComponent(Hulls.GlobalItems.Titan),
                 new MarketItemGroupComponent(-1584239703));
@@ -180,7 +186,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(-110775867));
             public Entity VikingM0 { get; } = new Entity(-353686874, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/viking/m0"),
                 new ParentGroupComponent(Hulls.GlobalItems.Viking),
-                new MarketItemGroupComponent(-353686874));
+                new MarketItemGroupComponent(-353686874),
+                new DefaultSkinItemComponent());
             public Entity VikingM1 { get; } = new Entity(-353686873, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/viking/m1"),
                 new ParentGroupComponent(Hulls.GlobalItems.Viking),
                 new MarketItemGroupComponent(-353686873));
@@ -213,7 +220,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(-2009337684));
             public Entity WaspM0 { get; } = new Entity(-1774581975, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/wasp/m0"),
                 new ParentGroupComponent(Hulls.GlobalItems.Wasp),
-                new MarketItemGroupComponent(-1774581975));
+                new MarketItemGroupComponent(-1774581975),
+                new DefaultSkinItemComponent());
             public Entity WaspM1 { get; } = new Entity(-1774581974, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/wasp/m1"),
                 new ParentGroupComponent(Hulls.GlobalItems.Wasp),
                 new MarketItemGroupComponent(-1774581974));

@@ -3,8 +3,8 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.EntityTemplates
 {
-	[SerialVersionUID(1493731178976L)]
-	public class ScoreQuestTemplate : IEntityTemplate
+	[SerialVersionUID(636390988457169067L)]
+	public class SlotMarketItemTemplate : IEntityTemplate
 	{
 	}
 }

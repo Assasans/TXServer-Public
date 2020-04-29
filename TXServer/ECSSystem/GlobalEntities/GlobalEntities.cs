@@ -5,11 +5,6 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.GlobalEntities
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1707:Идентификаторы не должны содержать символы подчеркивания", Justification = "<Ожидание>")]
-    public partial class Unspec
-    {
-    }
-
     public abstract class ItemList
     {
         public Entity[] GetAllItems()
@@ -52,7 +47,8 @@ namespace TXServer.ECSSystem.GlobalEntities
             typeof(DailyBonuses),
             typeof(Quests),
             typeof(MatchmakingModes),
-            typeof(Chats)
+            typeof(Chats),
+            typeof(ModuleSlots)
         };
 
         static ResourceManager()

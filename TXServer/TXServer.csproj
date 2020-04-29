@@ -86,6 +86,7 @@
     <Compile Include="ECSSystem\Base\ModuleBehaviourType.cs" />
     <Compile Include="ECSSystem\Base\ModulePrice.cs" />
     <Compile Include="ECSSystem\Base\QuestConditionType.cs" />
+    <Compile Include="ECSSystem\Base\Slot.cs" />
     <Compile Include="ECSSystem\Base\TXDate.cs" />
     <Compile Include="ECSSystem\Components\BattleCountQuestComponent.cs" />
     <Compile Include="ECSSystem\Components\BattleLeaveCounterComponent.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="ECSSystem\Components\ConfirmedUserEmailComponent.cs" />
     <Compile Include="ECSSystem\Components\CurrentSeasonNumberComponent.cs" />
     <Compile Include="ECSSystem\Components\CurrentSeasonRewardForClientComponent.cs" />
+    <Compile Include="ECSSystem\Components\DefaultSkinItemComponent.cs" />
     <Compile Include="ECSSystem\Components\DurationUserItemComponent.cs" />
     <Compile Include="ECSSystem\Components\ExperienceItemComponent.cs" />
     <Compile Include="ECSSystem\Components\ExpireDateComponent.cs" />
@@ -145,6 +147,8 @@
     <Compile Include="ECSSystem\Components\ScoreQuestComponent.cs" />
     <Compile Include="ECSSystem\Components\SeasonEndDateComponent.cs" />
     <Compile Include="ECSSystem\Components\SlotIndexComponent.cs" />
+    <Compile Include="ECSSystem\Components\SlotTankPartComponent.cs" />
+    <Compile Include="ECSSystem\Components\SlotUserItemInfoComponent.cs" />
     <Compile Include="ECSSystem\Components\SpecialOfferVisibleComponent.cs" />
     <Compile Include="ECSSystem\Components\UpgradeLevelItemComponent.cs" />
     <Compile Include="ECSSystem\Components\UpgradeMaxLevelItemComponent.cs" />
@@ -246,6 +250,8 @@
     <Compile Include="ECSSystem\EntityTemplates\ShaftMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\ShaftUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\ShellMarketItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\SlotMarketItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\SlotUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\SmokyMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\SmokyUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\TankMarketItemTemplate.cs" />
@@ -297,6 +303,7 @@
     <Compile Include="ECSSystem\GlobalEntities\MatchmakingModes.cs" />
     <Compile Include="ECSSystem\GlobalEntities\ModuleCards.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Modules.cs" />
+    <Compile Include="ECSSystem\GlobalEntities\ModuleSlots.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Paints.cs" />
     <Compile Include="ECSSystem\GlobalEntities\PersonalSpecialOffers.cs" />
     <Compile Include="ECSSystem\GlobalEntities\PremiumOffers.cs" />
