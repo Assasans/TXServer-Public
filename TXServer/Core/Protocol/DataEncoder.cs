@@ -72,6 +72,11 @@ namespace TXServer.Core.Protocol
                 SelectEncode(el);
             }
         }
+
+        private void EncodeDateTime(DateTime date)
+        {
+            writer.Write((new DateTimeOffset(date).UtcTicks - DateTime.UtcNow.Ticks) / 10000);
+        }
         
         private void SelectEncode(object obj)
         {
@@ -96,6 +101,9 @@ namespace TXServer.Core.Protocol
                     break;
                 case Enum @enum:
                     EncodeEnum(@enum);
+                    return;
+                case DateTime date:
+                    EncodeDateTime(date);
                     return;
             }
 

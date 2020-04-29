@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using TXServer.ECSSystem.Base;
 
@@ -50,6 +49,10 @@ namespace TXServer.ECSSystem.GlobalEntities
             typeof(GoldBonusOffers),
             typeof(PremiumOffers),
             typeof(PersonalSpecialOffers),
+            typeof(DailyBonuses),
+            typeof(Quests),
+            typeof(MatchmakingModes),
+            typeof(Chats)
         };
 
         static ResourceManager()

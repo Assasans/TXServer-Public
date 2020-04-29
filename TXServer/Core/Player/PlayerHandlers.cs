@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
+#if DEBUG
+using System.Diagnostics;
+#endif
 using System.Threading;
 using TXServer.Core.Commands;
-using TXServer.ECSSystem;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
@@ -78,6 +80,9 @@ namespace TXServer.Core
             }
             catch (Exception e)
             {
+#if DEBUG
+                Debugger.Launch();
+#endif
                 Console.WriteLine(e.ToString());
                 Dispose();
             }

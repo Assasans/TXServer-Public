@@ -62,6 +62,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 item.Components.Add(new UpgradeMaxLevelItemComponent());
             }
 
+            items.Smoky.Components.Add(new MountedItemComponent());
+
             return items;
         }
 

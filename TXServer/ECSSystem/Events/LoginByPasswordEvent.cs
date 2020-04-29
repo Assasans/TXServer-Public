@@ -74,7 +74,9 @@ namespace TXServer.ECSSystem.Events
 				new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
 				new SendEventCommand(new PaymentSectionLoadedEvent(), user),
 				new ComponentAddCommand(user, new UserOnlineComponent()),
-				new SendEventCommand(new FriendsLoadedEvent(), user)
+				new SendEventCommand(new FriendsLoadedEvent(), user),
+				new ComponentAddCommand(user, new PremiumAccountBoostComponent()),
+				new ComponentAddCommand(user, new PremiumAccountQuestComponent())
 			});
 
 			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands.ToArray());
