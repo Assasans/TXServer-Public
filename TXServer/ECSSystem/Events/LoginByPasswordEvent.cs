@@ -87,20 +87,16 @@ namespace TXServer.ECSSystem.Events
 		public bool RememberMe { get; set; }
 	}
 
-	[SerialVersionUID(1497606008074L)]
-	public class UserQuestReadyEvent : ECSEvent
+	[SerialVersionUID(1471252962981L)]
+	public class PaymentStatisticsEvent : ECSEvent
 	{
-	}
+		public PaymentStatisticsAction Action { get; set; }
 
-	[SerialVersionUID(1464349204724L)]
-	public class ClientInfoSendEvent : ECSEvent
-	{
-		public string Settings { get; set; }
-	}
+		public long Item { get; set; }
 
-	[SerialVersionUID(1507022246767L)]
-	public class UserOnlineEvent : ECSEvent
-	{
+		public long Method { get; set; }
+
+		public string Screen { get; set; }
 	}
 
 	[SerialVersionUID(5356229304896471086L)]

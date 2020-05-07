@@ -6,6 +6,16 @@ namespace TXServer.ECSSystem.Components
     [SerialVersionUID(1479807693001L)]
     public class UserItemCounterComponent : Component
     {
-        public long Count { get; set; } = 1;
+        public UserItemCounterComponent()
+        {
+            Count = 1;
+        }
+
+        public UserItemCounterComponent(long count)
+        {
+            Count = count;
+        }
+
+        public long Count { get; set; }
     }
 }

@@ -98,6 +98,11 @@ namespace TXServer.Core.Protocol
                 return DecodeString();
             }
 
+            if (objType.IsEnum)
+            {
+                return Enum.ToObject(objType, reader.ReadByte());
+            }
+
             if (objType == typeof(Entity))
             {
                 return DecodeEntity();

@@ -194,6 +194,8 @@
     <Compile Include="ECSSystem\EntityTemplates\ContainerUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\CrystalMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\CrystalUserItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\DetailMarketItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\DetailUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\DonutChestMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\EnergyDailyBonusTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\FlamethrowerMarketItemTemplate.cs" />
@@ -250,6 +252,8 @@
     <Compile Include="ECSSystem\EntityTemplates\ShaftMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\ShaftUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\ShellMarketItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\ShellUserItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\SimpleChestUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\SlotMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\SlotUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\SmokyMarketItemTemplate.cs" />
@@ -277,9 +281,19 @@
     <Compile Include="ECSSystem\EntityTemplates\XCrystalBattleRewardTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\XCrystalMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\XCrystalUserItemTemplate.cs" />
+    <Compile Include="ECSSystem\Events\ChangeScreenEvent.cs" />
     <Compile Include="ECSSystem\Events\CheckGiftsEvent.cs" />
+    <Compile Include="ECSSystem\Events\ClientEnterLobbyEvent.cs" />
+    <Compile Include="ECSSystem\Events\ClientGarageFirstLoadEvent.cs" />
+    <Compile Include="ECSSystem\Events\ClientInfoSendEvent.cs" />
+    <Compile Include="ECSSystem\Events\ExchangeCrystalsEvent.cs" />
+    <Compile Include="ECSSystem\Events\GetLeagueInfoEvent.cs" />
+    <Compile Include="ECSSystem\Events\GoToPaymentRequestEvent.cs" />
     <Compile Include="ECSSystem\Events\OpenGameCurrencyPaymentSectionEvent.cs" />
     <Compile Include="ECSSystem\Events\PaymentSectionLoadedEvent.cs" />
+    <Compile Include="ECSSystem\Events\UpdateTopLeagueInfoEvent.cs" />
+    <Compile Include="ECSSystem\Events\UserOnlineEvent.cs" />
+    <Compile Include="ECSSystem\Events\UserQuestReadyEvent.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Avatars.cs" />
     <Compile Include="ECSSystem\GlobalEntities\BattleRewards.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Chats.cs" />
@@ -308,6 +322,7 @@
     <Compile Include="ECSSystem\GlobalEntities\PersonalSpecialOffers.cs" />
     <Compile Include="ECSSystem\GlobalEntities\PremiumOffers.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Quests.cs" />
+    <Compile Include="ECSSystem\GlobalEntities\Shells.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Weapons.cs" />
     <Compile Include="ECSSystem\GlobalEntities\WeaponSkins.cs" />
     <Compile Include="Library\BidirectionalDictionary.cs" />

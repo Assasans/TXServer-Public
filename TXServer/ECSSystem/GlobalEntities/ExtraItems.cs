@@ -55,7 +55,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
             public Entity Goldbonus { get; } = new Entity(new TemplateAccessor(new GoldBonusUserItemTemplate(), "garage/goldbonus"),
                 new MarketItemGroupComponent(636909271),
-                new UserItemCounterComponent());
+                new UserItemCounterComponent(100));
             public Entity Premiumboost { get; } = new Entity(new TemplateAccessor(new PremiumBoostUserItemTemplate(), "garage/premium/boost"),
                 new MarketItemGroupComponent(-1816745725),
                 new DurationUserItemComponent());
@@ -64,10 +64,10 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new DurationUserItemComponent());
             public Entity Crystal { get; } = new Entity(new TemplateAccessor(new CrystalUserItemTemplate(), "garage/crystal"),
                 new MarketItemGroupComponent(1317350822),
-                new UserItemCounterComponent());
+                new UserItemCounterComponent(0));
             public Entity Xcrystal { get; } = new Entity(new TemplateAccessor(new XCrystalUserItemTemplate(), "garage/xcrystal"),
                 new MarketItemGroupComponent(947348559),
-                new UserItemCounterComponent());
+                new UserItemCounterComponent(0));
             public Entity Preset { get; } = new Entity(new TemplateAccessor(new PresetUserItemTemplate(), "garage/preset"),
                 new MarketItemGroupComponent(-571744569),
                 new PresetEquipmentComponent(),

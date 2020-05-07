@@ -29,6 +29,9 @@ namespace TXServer.ECSSystem.GlobalEntities
                     case TutorialGameplayChestMarketItemTemplate _:
                         item.TemplateAccessor.Template = new TutorialGameplayChestUserItemTemplate();
                         break;
+                    case DonutChestMarketItemTemplate _:
+                        item.TemplateAccessor.Template = new SimpleChestUserItemTemplate();
+                        break;
                 }
 
                 item.Components.Remove(new RestrictionByUserFractionComponent());
@@ -43,8 +46,8 @@ namespace TXServer.ECSSystem.GlobalEntities
         public class Items : ItemList
         {
             public Entity _12april2017 { get; } = new Entity(759177625, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/12april2017"),
-            new RestrictionByUserFractionComponent(),
-            new MarketItemGroupComponent(759177625));
+                new RestrictionByUserFractionComponent(),
+                new MarketItemGroupComponent(759177625));
             public Entity _12april2018 { get; } = new Entity(100024310, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/12april2018"),
                 new RestrictionByUserFractionComponent(),
                 new MarketItemGroupComponent(100024310));
@@ -85,17 +88,17 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(-370755132));
             public Entity Cardsgold { get; } = new Entity(-1147355315, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardsgold"),
                 new MarketItemGroupComponent(-1147355315));
-            public Entity Cardsgolddonut { get; } = new Entity(-1667426315, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardsgolddonut"),
+            public Entity Cardsgolddonut { get; } = new Entity(-1667426315, new TemplateAccessor(new DonutChestMarketItemTemplate(), "garage/container/cardsgolddonut"),
                 new MarketItemGroupComponent(-1667426315));
             public Entity Cardsmaster { get; } = new Entity(1357210127, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardsmaster"),
                 new MarketItemGroupComponent(1357210127));
-            public Entity Cardsscout { get; } = new Entity(1357210027, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardsscout"),
+            public Entity Cardsscout { get; } = new Entity(1357210027, new TemplateAccessor(new DonutChestMarketItemTemplate(), "garage/container/cardsscout"),
                 new MarketItemGroupComponent(1357210027));
             public Entity Cardssilver { get; } = new Entity(1536166586, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardssilver"),
                 new MarketItemGroupComponent(1536166586));
-            public Entity Cardssilverdonut { get; } = new Entity(-1308563288, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardssilverdonut"),
+            public Entity Cardssilverdonut { get; } = new Entity(-1308563288, new TemplateAccessor(new DonutChestMarketItemTemplate(), "garage/container/cardssilverdonut"),
                 new MarketItemGroupComponent(-1308563288));
-            public Entity Cardsspydonut { get; } = new Entity(1060751187, new TemplateAccessor(new GameplayChestMarketItemTemplate(), "garage/container/cardsspydonut"),
+            public Entity Cardsspydonut { get; } = new Entity(1060751187, new TemplateAccessor(new DonutChestMarketItemTemplate(), "garage/container/cardsspydonut"),
                 new MarketItemGroupComponent(1060751187));
             public Entity Cover { get; } = new Entity(655960513, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/cover"),
                 new RestrictionByUserFractionComponent(),
