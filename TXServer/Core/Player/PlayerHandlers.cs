@@ -57,11 +57,11 @@ namespace TXServer.Core
             }
             catch (Exception e)
             {
+                if (Instance.User != null) Instance.User.Components.Remove(new UserOnlineComponent());
                 Console.WriteLine(e.ToString());
                 Dispose();
             }
         }
-
 
         /// <summary>
         /// Обработка событий клиент -> сервер.
@@ -83,6 +83,7 @@ namespace TXServer.Core
 #if DEBUG
                 Debugger.Launch();
 #endif
+                if (Instance.User != null) Instance.User.Components.Remove(new UserOnlineComponent());
                 Console.WriteLine(e.ToString());
                 Dispose();
             }

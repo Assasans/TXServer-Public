@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Events
 	{
 		public long XCrystals { get; set; }
 
-		public override void Execute(Entity entity)
+		public void Execute(Entity entity)
 		{
 			Component tmpComponent;
 			entity.Components.TryGetValue(new UserXCrystalsComponent(0), out tmpComponent);

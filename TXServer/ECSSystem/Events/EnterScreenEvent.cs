@@ -6,7 +6,7 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1453867134827)]
     public class EnterScreenEvent : ECSEvent
     {
-        public override void Execute(Entity entity) { }
+        public void Execute(Entity entity) { }
 
         public string Screen { get; set; }
     }

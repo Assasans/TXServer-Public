@@ -65,7 +65,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             typeof(MatchmakingModes),
 
             typeof(Leagues),
-            typeof(Fractions),
+            //typeof(Fractions),
 
             typeof(Hulls),
             typeof(Weapons),

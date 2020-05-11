@@ -2,10 +2,7 @@
 
 namespace TXServer.ECSSystem.Base
 {
-    public abstract class ECSEvent
+    public interface ECSEvent
     {
-        public virtual void Execute(Entity entity)
-        {
-        }
     }
 }

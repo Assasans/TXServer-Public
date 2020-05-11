@@ -1,9 +1,0 @@
-﻿4) make server events' message loop
-60) write tests
-64) write docs
-66) move ServerLauncher parts to ServerStats
-67) change null check in DataEncoder
-68) delete all offers
-69) fix containers
-70) create server loop set
-71) rewrite DataEncoder & DataDecoder to set of runtime collected classes (like CommandCode & SerialVersionUID)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using TXServer.ECSSystem.Base;
 using TXServer.Library;
 
@@ -22,6 +23,5 @@ namespace TXServer.Core
         public Entity User { get; set; }
 
         public string Uid { get; set; }
-        public string Email { get; set; }
     }
 }

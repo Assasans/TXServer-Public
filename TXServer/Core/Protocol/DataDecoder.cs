@@ -113,7 +113,7 @@ namespace TXServer.Core.Protocol
                 throw new NotImplementedException();
             }
             
-            if (typeof(ICollection).IsAssignableFrom(objType))
+            if (objType.IsArray || (objType.IsGenericType && typeof(ICollection<>).MakeGenericType(objType.GetGenericArguments()[0]).IsAssignableFrom(objType)))
             {
                 return DecodeCollection(objType);
             }

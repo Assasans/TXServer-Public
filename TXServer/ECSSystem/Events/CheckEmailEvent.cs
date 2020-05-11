@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events
 			Email = email;
 		}
 
-		public override void Execute(Entity entity)
+		public void Execute(Entity entity)
 		{
 			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new EmailInvalidEvent(Email), entity));
 		}

@@ -38,7 +38,7 @@ namespace TXServer
             if (errorState) return;
             errorState = true;
 
-            MessageBox.Show("Произошла критическая ошибка. Для дополнительной информации см. консоль.", "Критическая ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("При запуске сервера произошла ошибка. Попробуйте перезапустить приложение от имени администратора.", "", MessageBoxButton.OK, MessageBoxImage.Error);
             (Application.Current.MainWindow as MainWindow).ChangeServerState();
         }
 

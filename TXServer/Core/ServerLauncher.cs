@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
@@ -34,14 +37,21 @@ namespace TXServer.Core
             public static extern IntPtr GetConsoleWindow();
         }
 
-        // Запуск сервера.
+        /// <summary>
+        /// Запуск сервера.
+        /// </summary>
+        /// <param name="ip">IP-адрес сервера.</param>
+        /// <param name="port">Порт.</param>
+        /// <param name="PoolSize">Макс. игроков.</param>
         public static void InitServer(IPAddress ip, short port, int PoolSize)
         {
-#if !DEBUG
-            NativeMethods.AllocConsole();
-            _ = NativeMethods.DeleteMenu(NativeMethods.GetSystemMenu(NativeMethods.GetConsoleWindow(), false), 0xF060, 0);
-            Console.OutputEncoding = Encoding.GetEncoding(1251);
-#endif
+            if (!Debugger.IsAttached)
+            {
+                NativeMethods.AllocConsole();
+                _ = NativeMethods.DeleteMenu(NativeMethods.GetSystemMenu(NativeMethods.GetConsoleWindow(), false), 0xF060, 0);
+                Console.OutputEncoding = Encoding.GetEncoding(1251);
+                IsConsoleAttached = true;
+            }
 
             ServerLauncher.PoolSize = PoolSize;
             IsStarted = true;
@@ -70,9 +80,11 @@ namespace TXServer.Core
             Pool.ForEach(player => player.Dispose());
             Pool.Clear();
 
-#if !DEBUG
-            NativeMethods.FreeConsole();
-#endif
+            if (IsConsoleAttached)
+            {
+                NativeMethods.FreeConsole();
+                IsConsoleAttached = false;
+            }
         }
 
         // Добавление игрока в пул.
@@ -142,6 +154,7 @@ namespace TXServer.Core
         public static void StateServer(IPAddress ip)
         {
             string rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/StateServer";
+            string resourcePath = "/resources";
 
             using (HttpListener listener = new HttpListener())
             {
@@ -192,7 +205,7 @@ namespace TXServer.Core
         }
 
         // Пул игроков.
-        private static List<Player> Pool = new List<Player>();
+        public static List<Player> Pool { get; } = new List<Player>();
         private static int PoolSize;
 
         // Поток, принимающий соединения.
@@ -203,6 +216,7 @@ namespace TXServer.Core
 
         // Состояние сервера.
         public static bool IsStarted { get; private set; }
+        private static bool IsConsoleAttached;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Поля, не являющиеся константами, не должны быть видимыми", Justification = "<Ожидание>")]
         public static int PlayerCount = 0;

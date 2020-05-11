@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -23,10 +24,15 @@ namespace TXServer.Core.Commands
 
         public override void OnReceive()
         {
-            foreach (Entity entity in Entities)
+            Type[] methodArgs = new Type[Entities.Count];
+            for (int i = 0; i < methodArgs.Length; i++)
             {
-                Event.Execute(entity);
+                methodArgs[i] = typeof(Entity);
             }
+
+            MethodInfo method = Event.GetType().GetMethod("Execute");
+            if (method != null && method.GetParameters().Length != Entities.Count) throw new MissingMethodException(Event.GetType().Name, "Execute");
+            method?.Invoke(Event, Entities.ToArray());
         }
 
         [ProtocolFixed] public ECSEvent Event { get; set; }

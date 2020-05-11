@@ -15,13 +15,15 @@ namespace TXServer.ECSSystem.Events
 	[SerialVersionUID(1437480091995)]
 	public class LoginByPasswordEvent : ECSEvent
 	{
-		public override void Execute(Entity entity)
+		public void Execute(Entity entity)
 		{
-			/*
-			CommandManager.SendCommands(Player.Instance.Socket,
-				new SendEventCommand(new LoginFailedEvent(), entity),
-				new SendEventCommand(new InvalidPasswordEvent(), entity));
-			*/
+			if (Player.Instance.Uid == null)
+			{
+				CommandManager.SendCommands(Player.Instance.Socket,
+					new SendEventCommand(new LoginFailedEvent(), entity),
+					new SendEventCommand(new InvalidPasswordEvent(), entity));
+				return;
+			}
 
 			_ = entity ?? throw new ArgumentNullException(nameof(entity));
 
@@ -31,27 +33,24 @@ namespace TXServer.ECSSystem.Events
 				new UserAvatarComponent("8b74e6a3-849d-4a8d-a20e-be3c142fd5e8"),
 				new UserComponent(),
 				new UserMoneyComponent(1000000),
-				new FractionGroupComponent(Fractions.GlobalItems.Frontier),
-				new UserDailyBonusCycleComponent(1),
+				//new FractionGroupComponent(Fractions.GlobalItems.Frontier),
+				//new UserDailyBonusCycleComponent(1),
 				new TutorialCompleteIdsComponent(),
 				new RegistrationDateComponent(),
 				new LeagueGroupComponent(Leagues.GlobalItems.Silver),
-				new UserDailyBonusNextReceivingDateComponent(),
-				new UserDailyBonusInitializedComponent(),
-				new UserDailyBonusZoneComponent(0),
 				new UserStatisticsComponent(),
 				new PersonalChatOwnerComponent(),
 				new GameplayChestScoreComponent(),
-				new UserRankComponent(100),
+				new UserRankComponent(101),
 				new BlackListComponent(),
 				new UserUidComponent(Player.Instance.Uid),
-				new FractionUserScoreComponent(500),
-				new UserExperienceComponent(1000000),
-				new QuestReadyComponent(),
+				//new FractionUserScoreComponent(500),
+				new UserExperienceComponent(2000000),
+				//new QuestReadyComponent(),
 				new UserPublisherComponent(),
 				new FavoriteEquipmentStatisticsComponent(),
-				new UserDailyBonusReceivedRewardsComponent(),
-				new ConfirmedUserEmailComponent(Player.Instance.Email),
+				//new UserDailyBonusReceivedRewardsComponent(),
+				new ConfirmedUserEmailComponent("none"),
 				new UserSubscribeComponent(),
 				new KillsEquipmentStatisticsComponent(),
 				new BattleLeaveCounterComponent(),
@@ -71,12 +70,10 @@ namespace TXServer.ECSSystem.Events
 									   select new EntityShareCommand(collectedEntity));
 
 			collectedCommands.AddRange(new Command[] {
-				new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
+				//new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
 				new SendEventCommand(new PaymentSectionLoadedEvent(), user),
 				new ComponentAddCommand(user, new UserOnlineComponent()),
-				new SendEventCommand(new FriendsLoadedEvent(), user),
-				new ComponentAddCommand(user, new PremiumAccountBoostComponent()),
-				new ComponentAddCommand(user, new PremiumAccountQuestComponent())
+				new SendEventCommand(new FriendsLoadedEvent(), Player.Instance.ClientSession)
 			});
 
 			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands.ToArray());
@@ -99,19 +96,12 @@ namespace TXServer.ECSSystem.Events
 		public string Screen { get; set; }
 	}
 
-	[SerialVersionUID(5356229304896471086L)]
-	public class PingEvent : ECSEvent
+	[SerialVersionUID(1434530333851L)]
+	public class MountItemEvent : ECSEvent
 	{
-		public long ServerTime { get; set; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-
-		public byte CommandId { get; set; } = 0xf0;
-	}
-
-	[SerialVersionUID(1115422024552825915L)]
-	public class PongEvent : ECSEvent
-	{
-		public float PongCommandClientRealTime { get; set; }
-
-		public byte CommandId { get; set; }
+		public void Execute(Entity item)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

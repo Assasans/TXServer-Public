@@ -8,9 +8,8 @@ namespace TXServer.ECSSystem.Events
 	[SerialVersionUID(1439375251389)]
 	public class IntroduceUserByUidEvent : ECSEvent
 	{
-		public override void Execute(Entity entity)
+		public void Execute(Entity entity)
 		{
-			Player.Instance.Email = "none";
 			Player.Instance.Uid = Uid;
 			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new PersonalPasscodeEvent(), entity));
 		}
