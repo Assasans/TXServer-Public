@@ -8,7 +8,7 @@ namespace TXServer.ECSSystem.Base
     public partial class Entity
     {
         /// <summary>
-        /// Создание сущности со случайным id.
+        /// Create Entity with random id.
         /// </summary>
         public Entity(TemplateAccessor TemplateAccessor, params Component[] components)
         {
@@ -18,7 +18,7 @@ namespace TXServer.ECSSystem.Base
         }
 
         /// <summary>
-        /// Создание сущности с заданным id.
+        /// Create Entity with preset id.
         /// </summary>
         public Entity(long EntityId, TemplateAccessor TemplateAccessor, params Component[] components)
         {
@@ -27,10 +27,7 @@ namespace TXServer.ECSSystem.Base
             PopulateEntity(TemplateAccessor, components);
         }
 
-        /// <summary>
-        /// Создание сущности для поиска по id.
-        /// </summary>
-        public Entity(long EntityId) => this.EntityId = EntityId;
+        private Entity(long EntityId) => this.EntityId = EntityId;
 
         private void PopulateEntity(TemplateAccessor TemplateAccessor, Component[] components)
         {
@@ -40,7 +37,7 @@ namespace TXServer.ECSSystem.Base
         }
 
         /// <summary>
-        /// Поиск сущности по id.
+        /// Find Entity by id.
         /// </summary>
         public static Entity FindById(Int64 id)
         {
@@ -51,7 +48,7 @@ namespace TXServer.ECSSystem.Base
             }
             catch (KeyNotFoundException)
             {
-                throw new ArgumentException("Сущность с id " + id + "не найдена.");
+                throw new ArgumentException("Entity with id " + id + "not found.");
             }
         }
 

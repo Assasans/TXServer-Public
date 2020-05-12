@@ -150,15 +150,15 @@ namespace TXServer.Core.Protocol
         {
             Int32 mapLength, length;
 
-            // Получение заголовка.
+            // Magic.
             if (!reader.ReadBytes(2).SequenceEqual(Magic))
                 throw new FileFormatException();
 
-            // Получение значений из заголовка.
+            // Length values.
             mapLength = reader.ReadInt32();
             length = reader.ReadInt32();
 
-            // Получение OptionalMap и содержимого пакета.
+            // OptionalMap and packet contents.
             OptionalMap map = new OptionalMap(reader.ReadBytes((int)Math.Ceiling(mapLength / 8.0)), mapLength);
 
             using (MemoryStream stream = new MemoryStream(reader.ReadBytes(length)))
@@ -168,7 +168,7 @@ namespace TXServer.Core.Protocol
 
                 if (objType == null)
                 {
-                    // Развертывание команд в объекты.
+                    // Deserialize objects.
                     List<Command> commands = new List<Command>();
 
                     while (buffer.BaseStream.Position != length)

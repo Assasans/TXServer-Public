@@ -33,7 +33,7 @@ namespace TXServer.Core.Commands
             if (attribute != null)
                 return attribute.Code;
             else
-                throw new ArgumentException(string.Format("Код команды для {0} не указан.", type.ToString()));
+                throw new ArgumentException(string.Format("Command code for {0} is not defined.", type.ToString()));
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace TXServer.Core.Commands
             }
             catch (KeyNotFoundException)
             {
-                throw new ArgumentException(string.Format("Команда с кодом {0} не найдена.", code));
+                throw new ArgumentException(string.Format("Command with code {0} not found.", code));
             }
         }
     }

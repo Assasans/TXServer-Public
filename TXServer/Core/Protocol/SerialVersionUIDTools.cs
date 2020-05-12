@@ -9,7 +9,7 @@ namespace TXServer.Core.Protocol
         private static readonly Dictionary<Int64, Type> TypeBySerialVersionUID = new Dictionary<Int64, Type>();
 
         /// <summary>
-        /// Заполняет словарь с SerialVersionUID типов, если не заполнены.
+        /// Fill SerialVersionUID dictionary, if not filled.
         /// </summary>
         static SerialVersionUIDTools()
         {
@@ -27,7 +27,7 @@ namespace TXServer.Core.Protocol
         }
 
         /// <summary>
-        /// Получает SerialVersionUID типа.
+        /// Get SerialVersionUID of Type.
         /// </summary>
         public static Int64 GetId(Type type)
         {
@@ -37,11 +37,11 @@ namespace TXServer.Core.Protocol
             if (attribute != null)
                 return attribute.Id;
             else
-                throw new ArgumentException("SerialVersionUID для " + type.FullName + " не указан.");
+                throw new ArgumentException("SerialVersionUID of " + type.FullName + " is not defined.");
         }
 
         /// <summary>
-        /// Получает тип по SerialVersionUID.
+        /// Get Type by SerialVersionUID.
         /// </summary>
         public static Type FindType(Int64 id)
         {
@@ -51,7 +51,7 @@ namespace TXServer.Core.Protocol
             }
             catch (KeyNotFoundException)
             {
-                throw new ArgumentException("Тип с SerialVersionUID " + id + " не найден.");
+                throw new ArgumentException("Type with SerialVersionUID " + id + " not found.");
             }
         }
     }

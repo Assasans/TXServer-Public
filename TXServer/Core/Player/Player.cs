@@ -5,7 +5,9 @@ using System.Windows;
 
 namespace TXServer.Core
 {
-    // Соединение с игроком.
+    /// <summary>
+    /// Player connection.
+    /// </summary>
     public sealed partial class Player : IDisposable
     {
         public Player(Socket Socket)
@@ -15,7 +17,7 @@ namespace TXServer.Core
             Interlocked.Increment(ref ServerLauncher.PlayerCount);
             Application.Current.Dispatcher.Invoke(new Action(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); }));
 
-            // Запуск потоков клиента.
+            // Start player threads.
             UpWorker = new Thread(() => ServerSideEvents());
             UpWorker.Name = "ServerSide #" + Socket.Handle;
             UpWorker.Start();

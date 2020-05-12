@@ -22,6 +22,9 @@ namespace TXServer.Core.Commands
         {
         }
 
+        /// <summary>
+        /// Detects event method with same number of Entity parameters and calls it.
+        /// </summary>
         public override void OnReceive()
         {
             Type[] methodArgs = new Type[Entities.Count];

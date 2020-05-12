@@ -3,6 +3,7 @@ using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.GlobalEntities
 {

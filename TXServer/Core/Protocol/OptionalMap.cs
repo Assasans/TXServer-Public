@@ -35,7 +35,7 @@ namespace TXServer.Core.Protocol
         {
             if (Position >= Length)
             {
-                throw new InvalidOperationException("Попытка чтения в конце OptionalMap");
+                throw new InvalidOperationException("Read attempt in end of OptionalMap");
             }
             return Convert.ToBoolean((data[Position / 8] >> (7 - Position++ % 8)) & 1);
         }

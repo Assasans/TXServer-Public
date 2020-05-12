@@ -38,11 +38,11 @@ namespace TXServer.Core
         }
 
         /// <summary>
-        /// Запуск сервера.
+        /// Starts server.
         /// </summary>
-        /// <param name="ip">IP-адрес сервера.</param>
-        /// <param name="port">Порт.</param>
-        /// <param name="PoolSize">Макс. игроков.</param>
+        /// <param name="ip">IP address.</param>
+        /// <param name="port">Port.</param>
+        /// <param name="PoolSize">Max players.</param>
         public static void InitServer(IPAddress ip, short port, int PoolSize)
         {
             if (!Debugger.IsAttached)
@@ -69,7 +69,9 @@ namespace TXServer.Core
             StateServerWorker.Start();
         }
 
-        // Остановка сервера.
+        /// <summary>
+        /// Stops server.
+        /// </summary>
         public static void StopServer()
         {
             IsStarted = false;
@@ -87,7 +89,10 @@ namespace TXServer.Core
             }
         }
 
-        // Добавление игрока в пул.
+        /// <summary>
+        /// Adds player to pool.
+        /// </summary>
+        /// <param name="socket"></param>
         private static void AddPlayer(Socket socket)
         {
             int freeIndex = Pool.FindIndex(player => !player.Active);
@@ -108,7 +113,9 @@ namespace TXServer.Core
         }
 
 
-        // Прием новых клиентов.
+        /// <summary>
+        /// Waits for new clients.
+        /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов", Justification = "<Ожидание>")]
         public static void AcceptPlayers(IPAddress ip, short port, int PoolSize)
         {
@@ -151,6 +158,10 @@ namespace TXServer.Core
             }
         }
 
+        /// <summary>
+        /// HTTP state server.
+        /// </summary>
+        /// <param name="ip">IP address.</param>
         public static void StateServer(IPAddress ip)
         {
             string rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/StateServer";
@@ -173,7 +184,6 @@ namespace TXServer.Core
 
                 while (true)
                 {
-                    // Асинхронные методы позволяют остановить поток, когда требуется.
                     IAsyncResult result = listener.BeginGetContext(null, listener);
                     HttpListenerContext context = listener.EndGetContext(result);
 
@@ -204,17 +214,17 @@ namespace TXServer.Core
             }
         }
 
-        // Пул игроков.
+        // Player pool.
         public static List<Player> Pool { get; } = new List<Player>();
         private static int PoolSize;
 
-        // Поток, принимающий соединения.
+        // Client accept thread.
         private static Thread acceptWorker;
 
-        // Поток сервера состояния.
+        // HTTP state server thread.
         private static Thread StateServerWorker;
 
-        // Состояние сервера.
+        // Server state.
         public static bool IsStarted { get; private set; }
         private static bool IsConsoleAttached;
 

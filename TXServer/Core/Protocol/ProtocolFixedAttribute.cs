@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace TXServer.Core.Protocol
 {
     /// <summary>
-    /// Задает фиксированную позицию свойства в списке.
+    /// Sets fixed fixed property position.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public sealed class ProtocolFixedAttribute : Attribute

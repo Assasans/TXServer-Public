@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using TXServer.ECSSystem.Base;
 using TXServer.Library;
 
@@ -11,12 +10,14 @@ namespace TXServer.Core
         [ThreadStatic] private static Player _Instance;
         public static Player Instance => _Instance;
 
-        // Генератор случайных значений.
         [ThreadStatic] private static Random Random;
         public static Int64 GenerateId() => ((long)Random.Next() << 32) + Random.Next();
 
-        // Entity list.
         public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
+
+        /// <summary>
+        /// Use for cross-Entity reference handling.
+        /// </summary>
         public ConcurrentDictionary<string, Entity> ReferencedEntities { get; } = new ConcurrentDictionary<string, Entity>();
 
         public Entity ClientSession { get; set; }

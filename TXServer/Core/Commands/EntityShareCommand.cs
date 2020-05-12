@@ -15,7 +15,7 @@ namespace TXServer.Core.Commands
 
         public override void OnSend()
         {
-            // Добавить Entity в общий список.
+            // Add Entity to list.
             Player.Instance.EntityList.Add(Entity);
 
             EntityId = Entity.EntityId;

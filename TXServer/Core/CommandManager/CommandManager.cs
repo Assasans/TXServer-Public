@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -13,12 +11,12 @@ namespace TXServer.Core.Commands
     public static partial class CommandManager
     {
         /// <summary>
-        /// Последовательность, указывающая начало пакета.
+        /// Packet start sequence.
         /// </summary>
         public static readonly byte[] Magic = { 0xff, 0x00 };
 
         /// <summary>
-        /// Прием данных от клиента.
+        /// Receive data from client.
         /// </summary>
         public static void ReceiveAndExecuteCommands(Socket socket)
         {
@@ -34,7 +32,7 @@ namespace TXServer.Core.Commands
         }
 
         /// <summary>
-        /// Передача данных клиенту.
+        /// Send data to client.
         /// </summary>
         public static void SendCommands(Socket socket, params Command[] commands)
         {
@@ -58,7 +56,7 @@ namespace TXServer.Core.Commands
         }
 
         /// <summary>
-        /// Получает список свойств, не игнорируемых явно, в явно заданном или алфавитном порядке.
+        /// Returns properties (not ignored with [ProtocolIgnore]) in alphabetical or preset by [ProtocolFixed] order.
         /// </summary>
         public static IOrderedEnumerable<PropertyInfo> GetProtocolProperties(Type type)
         {
