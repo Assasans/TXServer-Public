@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.NetworkInformation;
 using System.Windows;
 using System.Windows.Input;
@@ -14,6 +13,8 @@ namespace TXServer
     {
         public MainWindow()
         {
+            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("ru");
+
             InitializeComponent();
 
             // Заполнение списка IP-адресов.
@@ -38,7 +39,7 @@ namespace TXServer
             if (errorState) return;
             errorState = true;
 
-            MessageBox.Show("При запуске сервера произошла ошибка. Попробуйте перезапустить приложение от имени администратора.", "", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("An error occured while starting server. Try running application as administrator.", "", MessageBoxButton.OK, MessageBoxImage.Error);
             (Application.Current.MainWindow as MainWindow).ChangeServerState();
         }
 
@@ -59,7 +60,7 @@ namespace TXServer
 
                 ServerLauncher.InitServer(IPAddressComboBox.SelectedItem as IPAddress, short.Parse(PortTextBox.Text), int.Parse(MaxPlayersTextBox.Text));
 
-                StartButton.Content = "Остановить";
+                StartButton.Content = "Stop";
             }
             else
             {
@@ -67,7 +68,7 @@ namespace TXServer
 
                 ServerLauncher.StopServer();
 
-                StartButton.Content = "Запуск";
+                StartButton.Content = "Start";
             }
 
             Activate();
@@ -79,7 +80,7 @@ namespace TXServer
         {
             if (ServerLauncher.IsStarted)
             {
-                MessageBox.Show("Сначала остановите сервер.", "", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Stop server first.", "", MessageBoxButton.OK, MessageBoxImage.Warning);
                 e.Cancel = true;
             }
         }
@@ -88,11 +89,11 @@ namespace TXServer
         {
             if (!ServerLauncher.IsStarted)
             {
-                ServerStateText.Text = "Сервер остановлен.";
+                ServerStateText.Text = "Server is stopped.";
                 return;
             }
 
-            ServerStateText.Text = "Игроков онлайн: " + ServerLauncher.PlayerCount;
+            ServerStateText.Text = "Online players: " + ServerLauncher.PlayerCount;
         }
 
         private static volatile bool errorState;
