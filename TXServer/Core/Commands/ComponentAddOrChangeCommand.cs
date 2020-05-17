@@ -5,8 +5,6 @@ namespace TXServer.Core.Commands
 {
     public abstract class ComponentAddOrChangeCommand : Command
     {
-        public ComponentAddOrChangeCommand() { }
-
         public ComponentAddOrChangeCommand(Entity Target, Component Component)
         {
             this.Target = Target;

@@ -16,7 +16,7 @@ namespace TXServer.ECSSystem.Types
 
         public TXDate(TimeSpan span)
         {
-            Time = new DateTimeOffset(DateTimeOffset.Now.Ticks, span).ToUnixTimeSeconds();
+            Time = new DateTimeOffset(DateTimeOffset.Now.Ticks, span).ToUnixTimeMilliseconds();
         }
 
         public long Time { get; set; }

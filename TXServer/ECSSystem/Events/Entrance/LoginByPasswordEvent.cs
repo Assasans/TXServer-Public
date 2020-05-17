@@ -16,17 +16,17 @@ namespace TXServer.ECSSystem.Events
 	[SerialVersionUID(1437480091995)]
 	public class LoginByPasswordEvent : ECSEvent
 	{
-		public void Execute(Entity entity)
+		public void Execute(Entity clientSession)
 		{
 			if (Player.Instance.Uid == null)
 			{
 				CommandManager.SendCommands(Player.Instance.Socket,
-					new SendEventCommand(new LoginFailedEvent(), entity),
-					new SendEventCommand(new InvalidPasswordEvent(), entity));
+					new SendEventCommand(new LoginFailedEvent(), clientSession),
+					new SendEventCommand(new InvalidPasswordEvent(), clientSession));
 				return;
 			}
 
-			_ = entity ?? throw new ArgumentNullException(nameof(entity));
+			_ = clientSession ?? throw new ArgumentNullException(nameof(clientSession));
 
 			Entity user = new Entity(new TemplateAccessor(new UserTemplate(), ""),
 				new UserXCrystalsComponent(50000),
@@ -47,7 +47,7 @@ namespace TXServer.ECSSystem.Events
 				new UserUidComponent(Player.Instance.Uid),
 				//new FractionUserScoreComponent(500),
 				new UserExperienceComponent(2000000),
-				//new QuestReadyComponent(),
+				new QuestReadyComponent(),
 				new UserPublisherComponent(),
 				new FavoriteEquipmentStatisticsComponent(),
 				//new UserDailyBonusReceivedRewardsComponent(),
@@ -64,11 +64,36 @@ namespace TXServer.ECSSystem.Events
 			List<Command> collectedCommands = new List<Command>()
 			{
 				new EntityShareCommand(user),
-				new ComponentAddCommand(entity, new UserGroupComponent(user.EntityId)),
+				new ComponentAddCommand(clientSession, new UserGroupComponent(user.EntityId)),
 			};
 
 			collectedCommands.AddRange(from collectedEntity in ResourceManager.GetEntities(user)
 									   select new EntityShareCommand(collectedEntity));
+
+			Player.Instance.CurrentPreset.WeaponItem.Components.Add(new MountedItemComponent());
+			Player.Instance.CurrentPreset.HullItem.Components.Add(new MountedItemComponent());
+
+			Player.Instance.CurrentPreset.WeaponPaint.Components.Add(new MountedItemComponent());
+			Player.Instance.CurrentPreset.TankPaint.Components.Add(new MountedItemComponent());
+
+			foreach (Entity item in Player.Instance.CurrentPreset.WeaponSkins.Values)
+			{
+				item.Components.Add(new MountedItemComponent());
+			}
+			foreach (Entity item in Player.Instance.CurrentPreset.HullSkins.Values)
+			{
+				item.Components.Add(new MountedItemComponent());
+			}
+
+			foreach (Entity item in Player.Instance.CurrentPreset.WeaponShells.Values)
+			{
+				item.Components.Add(new MountedItemComponent());
+			}
+			Player.Instance.CurrentPreset.Graffiti.Components.Add(new MountedItemComponent());
+
+			Entity avatar = (Player.Instance.UserItems["Avatars"] as Avatars.Items).Tankist;
+			avatar.Components.Add(new MountedItemComponent());
+			Player.Instance.ReferencedEntities.TryAdd("CurrentAvatar", avatar);
 
 			collectedCommands.AddRange(new Command[] {
 				//new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
@@ -77,7 +102,7 @@ namespace TXServer.ECSSystem.Events
 				new SendEventCommand(new FriendsLoadedEvent(), Player.Instance.ClientSession)
 			});
 
-			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands.ToArray());
+			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands);
 		}
 
 		public string HardwareFingerprint { get; set; }
@@ -95,14 +120,5 @@ namespace TXServer.ECSSystem.Events
 		public long Method { get; set; }
 
 		public string Screen { get; set; }
-	}
-
-	[SerialVersionUID(1434530333851L)]
-	public class MountItemEvent : ECSEvent
-	{
-		public void Execute(Entity item)
-		{
-			throw new NotImplementedException();
-		}
 	}
 }

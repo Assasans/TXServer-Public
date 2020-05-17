@@ -77,6 +77,11 @@ namespace TXServer.Core.Protocol
         {
             writer.Write((new DateTimeOffset(date).UtcTicks - DateTime.UtcNow.Ticks) / 10000);
         }
+
+        private void EncodeType(Type type)
+        {
+            writer.Write(SerialVersionUIDTools.GetId(type));
+        }
         
         private void SelectEncode(object obj)
         {
@@ -104,6 +109,9 @@ namespace TXServer.Core.Protocol
                     return;
                 case DateTime date:
                     EncodeDateTime(date);
+                    return;
+                case Type type:
+                    EncodeType(type);
                     return;
             }
 
@@ -140,7 +148,7 @@ namespace TXServer.Core.Protocol
             }
         }
 
-        public void EncodeCommands(Command[] commands)
+        public void EncodeCommands(IEnumerable<Command> commands)
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {

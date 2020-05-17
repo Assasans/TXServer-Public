@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -34,7 +36,12 @@ namespace TXServer.Core.Commands
         /// <summary>
         /// Send data to client.
         /// </summary>
-        public static void SendCommands(Socket socket, params Command[] commands)
+        public static void SendCommands(Socket socket, params Command[] commands) => SendCommands(socket, (IEnumerable<Command>)commands);
+
+        /// <summary>
+        /// Send data to client.
+        /// </summary>
+        public static void SendCommands(Socket socket, IEnumerable<Command> commands)
         {
             foreach (Command command in commands)
             {

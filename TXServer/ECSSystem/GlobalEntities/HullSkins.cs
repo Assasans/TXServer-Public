@@ -22,10 +22,11 @@ namespace TXServer.ECSSystem.GlobalEntities
                 item.TemplateAccessor.Template = new HullSkinUserItemTemplate();
 
                 item.Components.Add(new UserGroupComponent(user.EntityId));
-                item.Components.Remove(new DefaultSkinItemComponent());
+                if (item.Components.Remove(new DefaultSkinItemComponent()))
+                {
+                    item.Components.Add(new MountedItemComponent());
+                }
             }
-
-            items.HunterM0.Components.Add(new MountedItemComponent());
 
             return items;
         }
@@ -33,8 +34,8 @@ namespace TXServer.ECSSystem.GlobalEntities
         public class Items : ItemList
         {
             public Entity DictatorDreadnought { get; } = new Entity(732611697, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/dictator/dreadnought"),
-            new ParentGroupComponent(Hulls.GlobalItems.Dictator),
-            new MarketItemGroupComponent(732611697));
+                new ParentGroupComponent(Hulls.GlobalItems.Dictator),
+                new MarketItemGroupComponent(732611697));
             public Entity DictatorM0 { get; } = new Entity(-1555682652, new TemplateAccessor(new HullSkinMarketItemTemplate(), "garage/skin/tank/dictator/m0"),
                 new ParentGroupComponent(Hulls.GlobalItems.Dictator),
                 new MarketItemGroupComponent(-1555682652),

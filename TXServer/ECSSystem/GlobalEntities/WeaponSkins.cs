@@ -22,10 +22,11 @@ namespace TXServer.ECSSystem.GlobalEntities
                 item.TemplateAccessor.Template = new WeaponSkinUserItemTemplate();
 
                 item.Components.Add(new UserGroupComponent(user.EntityId));
-                item.Components.Remove(new DefaultSkinItemComponent());
+                if (item.Components.Remove(new DefaultSkinItemComponent()))
+                {
+                    item.Components.Add(new MountedItemComponent());
+                }
             }
-
-            items.SmokyM0.Components.Add(new MountedItemComponent());
 
             return items;
         }

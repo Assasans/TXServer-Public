@@ -84,7 +84,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Core\CommandManager\CommandCodeAttribute.cs" />
+    <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\IWeaponUserItemTemplate.cs" />
+    <Compile Include="ECSSystem\Events\MountItemEvent.cs" />
+    <Compile Include="ECSSystem\GlobalEntities\Details.cs" />
     <Compile Include="ECSSystem\Types\EndSeasonRewardItem.cs" />
     <Compile Include="ECSSystem\Types\ModuleBehaviourType.cs" />
     <Compile Include="ECSSystem\Types\ModulePrice.cs" />
@@ -216,10 +220,10 @@
     <Compile Include="ECSSystem\EntityTemplates\Item\Container\Gameplay\GameplayChestMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\Container\Gameplay\GameplayChestUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Chat\GeneralChatTemplate.cs" />
-    <Compile Include="ECSSystem\EntityTemplates\GoldBonus\GoldBonusMarketItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Item\GoldBonus\GoldBonusMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\Module\GoldBonusModuleUserItemTemplate.cs" />
-    <Compile Include="ECSSystem\EntityTemplates\GoldBonus\GoldBonusOfferTemplate.cs" />
-    <Compile Include="ECSSystem\EntityTemplates\GoldBonus\GoldBonusUserItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Offer\GoldBonusOfferTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Item\GoldBonus\GoldBonusUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\Graffiti\GraffitiMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\Graffiti\GraffitiUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\Hammer\HammerMarketItemTemplate.cs" />

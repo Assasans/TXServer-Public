@@ -49,8 +49,11 @@ namespace TXServer.ECSSystem.GlobalEntities
         {
             public UserItems()
             {
-                Player.Instance.ReferencedEntities.TryGetValue("GoldBonusModuleUserItemTemplate", out Entity goldBonusModule);
+                Player.Instance.ReferencedEntities.TryRemove("GoldBonusModuleUserItemTemplate", out Entity goldBonusModule);
                 Goldbonus.Components.Add(new ModuleGroupComponent(goldBonusModule));
+
+                Preset.Components.TryGetValue(new PresetEquipmentComponent(), out Component component);
+                Player.Instance.CurrentPreset = component as PresetEquipmentComponent;
             }
 
             public Entity Goldbonus { get; } = new Entity(new TemplateAccessor(new GoldBonusUserItemTemplate(), "garage/goldbonus"),

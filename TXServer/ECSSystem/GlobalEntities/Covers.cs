@@ -24,8 +24,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                 item.Components.Add(new UserGroupComponent(user.EntityId));
             }
 
-            items.None.Components.Add(new MountedItemComponent());
-
             return items;
         }
 

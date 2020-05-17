@@ -27,8 +27,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                 item.Components.Add(new UpgradeMaxLevelItemComponent());
             }
 
-            items.Hunter.Components.Add(new MountedItemComponent());
-
             return items;
         }
 
