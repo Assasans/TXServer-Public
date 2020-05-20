@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.Serialization;
 using TXServer.Core;
 using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
@@ -8,7 +11,7 @@ using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.ECSSystem.Events
 {
-    [SerialVersionUID(1434530333851L)]
+	[SerialVersionUID(1434530333851L)]
 	public class MountItemEvent : ECSEvent
 	{
 		public void Execute(Entity item)
@@ -52,6 +55,51 @@ namespace TXServer.ECSSystem.Events
 				case GraffitiUserItemTemplate _:
 					prevItem = Player.Instance.CurrentPreset.Graffiti;
 					Player.Instance.CurrentPreset.Graffiti = item;
+					break;
+				case PresetUserItemTemplate _:
+					LinkedList<Command> commands = new LinkedList<Command>();
+
+					PresetEquipmentComponent preset = Player.Instance.CurrentPreset;
+					List<Entity> entities = new List<Entity>
+					{
+						preset.HullItem,
+						preset.WeaponItem,
+						preset.TankPaint,
+						preset.WeaponPaint,
+						preset.Graffiti,
+					};
+					entities.AddRange(preset.HullSkins.Values);
+					entities.AddRange(preset.WeaponSkins.Values);
+					entities.AddRange(preset.WeaponShells.Values);
+
+					foreach (Entity entity in entities)
+					{
+						commands.AddLast(new ComponentRemoveCommand(entity, typeof(MountedItemComponent)));
+					}
+
+					item.Components.TryGetValue(FormatterServices.GetUninitializedObject(typeof(PresetEquipmentComponent)) as PresetEquipmentComponent, out Component component);
+					PresetEquipmentComponent newPreset = component as PresetEquipmentComponent;
+					entities = new List<Entity>
+					{
+						newPreset.HullItem,
+						newPreset.WeaponItem,
+						newPreset.TankPaint,
+						newPreset.WeaponPaint,
+						newPreset.Graffiti,
+					};
+					entities.AddRange(newPreset.HullSkins.Values);
+					entities.AddRange(newPreset.WeaponSkins.Values);
+					entities.AddRange(newPreset.WeaponShells.Values);
+
+					foreach (Entity entity in entities)
+					{
+						commands.AddLast(new ComponentAddCommand(entity, new MountedItemComponent()));
+					}
+
+					CommandManager.SendCommands(Player.Instance.Socket, commands);
+
+					prevItem = preset.Preset;
+					Player.Instance.CurrentPreset = newPreset;
 					break;
 				default:
 					throw new NotImplementedException();

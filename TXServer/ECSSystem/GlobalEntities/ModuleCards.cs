@@ -22,7 +22,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 item.TemplateAccessor.Template = new ModuleCardUserItemTemplate();
 
                 item.Components.Add(new UserGroupComponent(user.EntityId));
-                item.Components.Add(new UserItemCounterComponent(1));
+                item.Components.Add(new UserItemCounterComponent(0));
             }
 
             return items;

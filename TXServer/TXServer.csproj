@@ -86,8 +86,13 @@
     <Compile Include="Core\CommandManager\CommandCodeAttribute.cs" />
     <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Item\IMarketItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Item\IMountableItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Item\IUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\IWeaponUserItemTemplate.cs" />
     <Compile Include="ECSSystem\Events\MountItemEvent.cs" />
+    <Compile Include="ECSSystem\Events\RemoveRentedPresetEvent.cs" />
+    <Compile Include="ECSSystem\Events\XBuyMarketItemEvent.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Details.cs" />
     <Compile Include="ECSSystem\Types\EndSeasonRewardItem.cs" />
     <Compile Include="ECSSystem\Types\ModuleBehaviourType.cs" />

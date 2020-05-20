@@ -9,8 +9,10 @@ namespace TXServer.ECSSystem.Components
 	[SerialVersionUID(1502886877871L)]
 	public class PresetEquipmentComponent : Component
 	{
-		public PresetEquipmentComponent()
+		public PresetEquipmentComponent(Entity preset)
 		{
+            Preset = preset;
+
             Weapons.Items weaponList = Player.Instance.UserItems["Weapons"] as Weapons.Items;
             Hulls.Items hullList = Player.Instance.UserItems["Hulls"] as Hulls.Items;
             WeaponSkins.Items weaponSkinList = Player.Instance.UserItems["WeaponSkins"] as WeaponSkins.Items;
@@ -76,6 +78,8 @@ namespace TXServer.ECSSystem.Components
                 return Entity.FindById((component as ParentGroupComponent).Key);
             }
         }
+
+        [ProtocolIgnore] public Entity Preset { get; set; }
 
         [ProtocolIgnore] public Entity WeaponItem { get; set; } = (Player.Instance.UserItems["Weapons"] as Weapons.Items).Smoky;
         [ProtocolIgnore] public Entity HullItem { get; set; } = (Player.Instance.UserItems["Hulls"] as Hulls.Items).Hunter;

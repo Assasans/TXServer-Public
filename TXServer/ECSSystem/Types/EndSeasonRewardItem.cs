@@ -8,6 +8,6 @@ namespace TXServer.ECSSystem.Types
 
         public long EndPlace { get; set; } = 1000;
 
-        [OptionalMapped] object padding { get; set; } = null;
+        [OptionalMapped] public object Padding { get; set; } = null;
     }
 }

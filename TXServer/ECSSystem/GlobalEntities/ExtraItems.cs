@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.Serialization;
 using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -52,8 +53,9 @@ namespace TXServer.ECSSystem.GlobalEntities
                 Player.Instance.ReferencedEntities.TryRemove("GoldBonusModuleUserItemTemplate", out Entity goldBonusModule);
                 Goldbonus.Components.Add(new ModuleGroupComponent(goldBonusModule));
 
-                Preset.Components.TryGetValue(new PresetEquipmentComponent(), out Component component);
-                Player.Instance.CurrentPreset = component as PresetEquipmentComponent;
+                PresetEquipmentComponent component = new PresetEquipmentComponent(Preset);
+                Preset.Components.Add(component);
+                Player.Instance.CurrentPreset = component;
             }
 
             public Entity Goldbonus { get; } = new Entity(new TemplateAccessor(new GoldBonusUserItemTemplate(), "garage/goldbonus"),
@@ -73,7 +75,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new UserItemCounterComponent(0));
             public Entity Preset { get; } = new Entity(new TemplateAccessor(new PresetUserItemTemplate(), "garage/preset"),
                 new MarketItemGroupComponent(-571744569),
-                new PresetEquipmentComponent(),
                 new PresetNameComponent("Пресет 1"),
                 new MountedItemComponent());
         }

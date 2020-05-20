@@ -98,6 +98,9 @@ namespace TXServer.Core.Protocol
                 case Entity entity:
                     EncodeEntity(entity);
                     return;
+                case IEntityTemplate _:
+                    EncodeType(objType);
+                    return;
                 case ICollection collection:
                     EncodeCollection(collection);
                     return;
