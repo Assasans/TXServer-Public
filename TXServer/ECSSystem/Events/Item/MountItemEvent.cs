@@ -59,6 +59,7 @@ namespace TXServer.ECSSystem.Events
 				case PresetUserItemTemplate _:
 					LinkedList<Command> commands = new LinkedList<Command>();
 
+					// Unmount previous preset items
 					PresetEquipmentComponent preset = Player.Instance.CurrentPreset;
 					List<Entity> entities = new List<Entity>
 					{
@@ -77,6 +78,7 @@ namespace TXServer.ECSSystem.Events
 						commands.AddLast(new ComponentRemoveCommand(entity, typeof(MountedItemComponent)));
 					}
 
+					// Mount new preset items
 					item.Components.TryGetValue(FormatterServices.GetUninitializedObject(typeof(PresetEquipmentComponent)) as PresetEquipmentComponent, out Component component);
 					PresetEquipmentComponent newPreset = component as PresetEquipmentComponent;
 					entities = new List<Entity>
@@ -94,6 +96,18 @@ namespace TXServer.ECSSystem.Events
 					foreach (Entity entity in entities)
 					{
 						commands.AddLast(new ComponentAddCommand(entity, new MountedItemComponent()));
+					}
+
+					foreach (KeyValuePair<Entity, Entity> pair in newPreset.Modules)
+					{
+						if (pair.Key.Components.Contains(new ModuleGroupComponent(0)))
+						{
+							commands.AddLast(new ComponentRemoveCommand(pair.Key, typeof(ModuleGroupComponent)));
+						}
+						if (pair.Value != null)
+						{
+							commands.AddLast(new ComponentAddCommand(pair.Key, new ModuleGroupComponent(pair.Value)));
+						}
 					}
 
 					CommandManager.SendCommands(Player.Instance.Socket, commands);

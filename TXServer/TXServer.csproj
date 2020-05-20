@@ -90,9 +90,11 @@
     <Compile Include="ECSSystem\EntityTemplates\Item\IMountableItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\IWeaponUserItemTemplate.cs" />
-    <Compile Include="ECSSystem\Events\MountItemEvent.cs" />
-    <Compile Include="ECSSystem\Events\RemoveRentedPresetEvent.cs" />
-    <Compile Include="ECSSystem\Events\XBuyMarketItemEvent.cs" />
+    <Compile Include="ECSSystem\Events\Item\ModuleMountEvent.cs" />
+    <Compile Include="ECSSystem\Events\Item\MountItemEvent.cs" />
+    <Compile Include="ECSSystem\Events\Item\RemoveRentedPresetEvent.cs" />
+    <Compile Include="ECSSystem\Events\Item\UnmountModuleFromSlotEvent.cs" />
+    <Compile Include="ECSSystem\Events\Item\XBuyMarketItemEvent.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Details.cs" />
     <Compile Include="ECSSystem\Types\EndSeasonRewardItem.cs" />
     <Compile Include="ECSSystem\Types\ModuleBehaviourType.cs" />

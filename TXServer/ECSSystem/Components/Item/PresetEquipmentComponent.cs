@@ -9,8 +9,8 @@ namespace TXServer.ECSSystem.Components
 	[SerialVersionUID(1502886877871L)]
 	public class PresetEquipmentComponent : Component
 	{
-		public PresetEquipmentComponent(Entity preset)
-		{
+        public PresetEquipmentComponent(Entity preset)
+        {
             Preset = preset;
 
             Weapons.Items weaponList = Player.Instance.UserItems["Weapons"] as Weapons.Items;
@@ -18,6 +18,7 @@ namespace TXServer.ECSSystem.Components
             WeaponSkins.Items weaponSkinList = Player.Instance.UserItems["WeaponSkins"] as WeaponSkins.Items;
             HullSkins.Items hullSkinList = Player.Instance.UserItems["HullSkins"] as HullSkins.Items;
             Shells.Items shellList = Player.Instance.UserItems["Shells"] as Shells.Items;
+            ModuleSlots.Items moduleSlotList = Player.Instance.UserItems["ModuleSlots"] as ModuleSlots.Items;
 
             WeaponSkins = new Dictionary<Entity, Entity>
             {
@@ -59,6 +60,16 @@ namespace TXServer.ECSSystem.Components
                 { weaponList.Twins, shellList.TwinsBlue },
                 { weaponList.Vulcan, shellList.VulcanStandard }
             };
+
+            Modules = new Dictionary<Entity, Entity>
+            {
+                { moduleSlotList.Slot1, null },
+                { moduleSlotList.Slot2, null },
+                { moduleSlotList.Slot3, null },
+                { moduleSlotList.Slot4, null },
+                { moduleSlotList.Slot5, null },
+                { moduleSlotList.Slot6, null }
+            };
         }
 
 		public Entity Weapon
@@ -92,5 +103,7 @@ namespace TXServer.ECSSystem.Components
 
         [ProtocolIgnore] public Dictionary<Entity, Entity> WeaponShells { get; set; }
         [ProtocolIgnore] public Entity Graffiti { get; set; } = (Player.Instance.UserItems["Graffiti"] as Graffiti.Items).Logo;
+
+        [ProtocolIgnore] public Dictionary<Entity, Entity> Modules { get; set; }
     }
 }
