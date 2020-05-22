@@ -72,10 +72,20 @@ namespace TXServer.ECSSystem.Events
 					entities.AddRange(preset.HullSkins.Values);
 					entities.AddRange(preset.WeaponSkins.Values);
 					entities.AddRange(preset.WeaponShells.Values);
+					entities.AddRange(preset.Modules.Values);
 
 					foreach (Entity entity in entities)
 					{
-						commands.AddLast(new ComponentRemoveCommand(entity, typeof(MountedItemComponent)));
+						if (entity != null)
+							commands.AddLast(new ComponentRemoveCommand(entity, typeof(MountedItemComponent)));
+					}
+
+					foreach (KeyValuePair<Entity, Entity> pair in preset.Modules)
+					{
+						if (pair.Key.Components.Contains(new ModuleGroupComponent(0)))
+						{
+							commands.AddLast(new ComponentRemoveCommand(pair.Key, typeof(ModuleGroupComponent)));
+						}
 					}
 
 					// Mount new preset items
@@ -92,18 +102,16 @@ namespace TXServer.ECSSystem.Events
 					entities.AddRange(newPreset.HullSkins.Values);
 					entities.AddRange(newPreset.WeaponSkins.Values);
 					entities.AddRange(newPreset.WeaponShells.Values);
+					entities.AddRange(newPreset.Modules.Values);
 
 					foreach (Entity entity in entities)
 					{
-						commands.AddLast(new ComponentAddCommand(entity, new MountedItemComponent()));
+						if (entity != null)
+							commands.AddLast(new ComponentAddCommand(entity, new MountedItemComponent()));
 					}
 
 					foreach (KeyValuePair<Entity, Entity> pair in newPreset.Modules)
 					{
-						if (pair.Key.Components.Contains(new ModuleGroupComponent(0)))
-						{
-							commands.AddLast(new ComponentRemoveCommand(pair.Key, typeof(ModuleGroupComponent)));
-						}
 						if (pair.Value != null)
 						{
 							commands.AddLast(new ComponentAddCommand(pair.Key, new ModuleGroupComponent(pair.Value)));

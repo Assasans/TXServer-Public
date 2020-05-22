@@ -14,7 +14,8 @@ namespace TXServer.ECSSystem.Events
 			Player.Instance.CurrentPreset.Modules[slot] = null;
 
 			CommandManager.SendCommands(Player.Instance.Socket,
-				new ComponentRemoveCommand(slot, typeof(ModuleGroupComponent)));
+				new ComponentRemoveCommand(slot, typeof(ModuleGroupComponent)),
+				new ComponentRemoveCommand(module, typeof(MountedItemComponent)));
 		}
 	}
 }

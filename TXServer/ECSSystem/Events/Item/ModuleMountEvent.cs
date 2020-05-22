@@ -16,7 +16,8 @@ namespace TXServer.ECSSystem.Events
 			ModuleGroupComponent component = new ModuleGroupComponent(module);
 
 			CommandManager.SendCommands(Player.Instance.Socket,
-				new ComponentAddCommand(slot, component));
+				new ComponentAddCommand(slot, component),
+				new ComponentAddCommand(module, new MountedItemComponent()));
 		}
 	}
 }
