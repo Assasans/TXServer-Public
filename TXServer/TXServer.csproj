@@ -86,6 +86,7 @@
     <Compile Include="Core\CommandManager\CommandCodeAttribute.cs" />
     <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Chat\PersonalChatTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IMountableItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IUserItemTemplate.cs" />
@@ -95,6 +96,9 @@
     <Compile Include="ECSSystem\Events\Item\RemoveRentedPresetEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\UnmountModuleFromSlotEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\XBuyMarketItemEvent.cs" />
+    <Compile Include="ECSSystem\Events\Chat\ChatMessageReceivedEvent.cs" />
+    <Compile Include="ECSSystem\Events\Chat\CreatePrivateChatEvent.cs" />
+    <Compile Include="ECSSystem\Events\Chat\SendChatMessageEvent.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Details.cs" />
     <Compile Include="ECSSystem\Types\EndSeasonRewardItem.cs" />
     <Compile Include="ECSSystem\Types\ModuleBehaviourType.cs" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 #if DEBUG
 using System.Diagnostics;
 #endif
@@ -14,8 +15,8 @@ namespace TXServer.Core
 {
     public partial class Player
     {
-        public BlockingCollection<Command> LobbyCommandQueue { get; }
-        public ConcurrentHashSet<Command> BattleCommandQueue { get; }
+        public ConcurrentQueue<Command> LobbyCommandQueue { get; } = new ConcurrentQueue<Command>();
+        public ConcurrentHashSet<Command> BattleCommandQueue { get; } = new ConcurrentHashSet<Command>();
 
         private void InitThreadLocals()
         {
@@ -46,6 +47,18 @@ namespace TXServer.Core
                     new EntityShareCommand(ClientSession),
                     new ComponentAddCommand(ClientSession, new SessionSecurityPublicComponent())
                 );
+
+                while (true)
+                {
+                    SpinWait.SpinUntil(() => LobbyCommandQueue.Count + BattleCommandQueue.Count > 0 || !Instance.Active);
+
+                    while (LobbyCommandQueue.TryDequeue(out Command command))
+                    {
+                        CommandManager.SendCommands(Instance.Socket, command);
+                    }
+
+                    // TODO battle commands
+                }
             }
             catch (Exception e)
             {

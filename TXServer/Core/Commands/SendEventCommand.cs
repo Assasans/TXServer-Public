@@ -27,15 +27,23 @@ namespace TXServer.Core.Commands
         /// </summary>
         public override void OnReceive()
         {
-            Type[] methodArgs = new Type[Entities.Count];
-            for (int i = 0; i < methodArgs.Length; i++)
-            {
-                methodArgs[i] = typeof(Entity);
-            }
+            bool executable = false;
 
-            MethodInfo method = Event.GetType().GetMethod("Execute");
-            if (method != null && method.GetParameters().Length != Entities.Count) throw new MissingMethodException(Event.GetType().Name, "Execute");
-            method?.Invoke(Event, Entities.ToArray());
+            MethodInfo[] methods = Event.GetType().GetMethods();
+            foreach (MethodInfo method in methods)
+            {
+                if (method.Name == "Execute")
+                {
+                    executable = true;
+                    if (method.GetParameters().Length == Entities.Count)
+                    {
+                        method.Invoke(Event, Entities.ToArray());
+                        return;
+                    }
+                }
+            }
+            if (executable)
+                throw new MissingMethodException(Event.GetType().Name, string.Format("Execute({0})", Entities.Count));
         }
 
         [ProtocolFixed] public ECSEvent Event { get; set; }
