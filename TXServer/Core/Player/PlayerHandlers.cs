@@ -37,24 +37,25 @@ namespace TXServer.Core
                 Entity ClientSession = new Entity(TemplateAccessor: new TemplateAccessor(new ClientSessionTemplate(), null),
                                                     new ClientSessionComponent());
 
-                Instance.ClientSession = ClientSession;
+                this.ClientSession = ClientSession;
 
                 // Server time message
-                CommandManager.SendCommands(Instance.Socket, new InitTimeCommand());
+                CommandManager.SendCommands(Socket, new InitTimeCommand());
 
                 // Session init message
-                CommandManager.SendCommands(Instance.Socket,
+                CommandManager.SendCommands(Socket,
                     new EntityShareCommand(ClientSession),
                     new ComponentAddCommand(ClientSession, new SessionSecurityPublicComponent())
                 );
 
                 while (true)
                 {
-                    SpinWait.SpinUntil(() => LobbyCommandQueue.Count + BattleCommandQueue.Count > 0 || !Instance.Active);
+                    SpinWait.SpinUntil(() => LobbyCommandQueue.Count + BattleCommandQueue.Count > 0 || !Active);
+                    if (!Active) return;
 
                     while (LobbyCommandQueue.TryDequeue(out Command command))
                     {
-                        CommandManager.SendCommands(Instance.Socket, command);
+                        CommandManager.SendCommands(Socket, command);
                     }
 
                     // TODO battle commands
@@ -62,7 +63,7 @@ namespace TXServer.Core
             }
             catch (Exception e)
             {
-                if (Instance.User != null) Instance.User.Components.Remove(new UserOnlineComponent());
+                if (User != null) User.Components.Remove(new UserOnlineComponent());
                 Console.WriteLine(e.ToString());
                 Dispose();
             }
@@ -80,7 +81,7 @@ namespace TXServer.Core
             {
                 while (true)
                 {
-                    CommandManager.ReceiveAndExecuteCommands(Instance.Socket);
+                    CommandManager.ReceiveAndExecuteCommands(Socket);
                 }
             }
             catch (Exception e)
@@ -88,7 +89,7 @@ namespace TXServer.Core
 #if DEBUG
                 Debugger.Launch();
 #endif
-                if (Instance.User != null) Instance.User.Components.Remove(new UserOnlineComponent());
+                if (User != null) User.Components.Remove(new UserOnlineComponent());
                 Console.WriteLine(e.ToString());
                 Dispose();
             }

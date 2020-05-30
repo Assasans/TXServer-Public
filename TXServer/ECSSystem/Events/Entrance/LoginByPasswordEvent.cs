@@ -9,11 +9,10 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
-using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events
 {
-	[SerialVersionUID(1437480091995)]
+    [SerialVersionUID(1437480091995)]
 	public class LoginByPasswordEvent : ECSEvent
 	{
 		public void Execute(Entity clientSession)
@@ -108,17 +107,5 @@ namespace TXServer.ECSSystem.Events
 		public string HardwareFingerprint { get; set; }
 		public string PasswordEncipher { get; set; }
 		public bool RememberMe { get; set; }
-	}
-
-	[SerialVersionUID(1471252962981L)]
-	public class PaymentStatisticsEvent : ECSEvent
-	{
-		public PaymentStatisticsAction Action { get; set; }
-
-		public long Item { get; set; }
-
-		public long Method { get; set; }
-
-		public string Screen { get; set; }
 	}
 }

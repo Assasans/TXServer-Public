@@ -50,8 +50,7 @@ namespace TXServer.ECSSystem.GlobalEntities
         {
             public UserItems()
             {
-                Player.Instance.ReferencedEntities.TryRemove("GoldBonusModuleUserItemTemplate", out Entity goldBonusModule);
-                Goldbonus.Components.Add(new ModuleGroupComponent(goldBonusModule));
+                Goldbonus.Components.Add(new ModuleGroupComponent((Player.Instance.UserItems[typeof(Modules).Name] as Modules.Items).Gold));
 
                 PresetEquipmentComponent component = new PresetEquipmentComponent(Preset);
                 Preset.Components.Add(component);

@@ -86,11 +86,19 @@
     <Compile Include="Core\CommandManager\CommandCodeAttribute.cs" />
     <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
+    <Compile Include="ECSSystem\Components\Chat\ChatParticipantsComponent.cs" />
+    <Compile Include="ECSSystem\Components\Notification\NewItemNotificationComponent.cs" />
+    <Compile Include="ECSSystem\Components\Notification\NotificationComponent.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Chat\PersonalChatTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IMountableItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\IWeaponUserItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Notification\NewItemNotificationTemplate.cs" />
+    <Compile Include="ECSSystem\Events\Item\OpenContainerEvent.cs" />
+    <Compile Include="ECSSystem\Events\Notification\NotificationShownEvent.cs" />
+    <Compile Include="ECSSystem\Events\Notification\ShowNotificationGroupEvent.cs" />
+    <Compile Include="ECSSystem\Events\Payment\PaymentStatisticsEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\ModuleMountEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\MountItemEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\RemoveRentedPresetEvent.cs" />
@@ -103,6 +111,7 @@
     <Compile Include="ECSSystem\Types\EndSeasonRewardItem.cs" />
     <Compile Include="ECSSystem\Types\ModuleBehaviourType.cs" />
     <Compile Include="ECSSystem\Types\ModulePrice.cs" />
+    <Compile Include="ECSSystem\Types\NotificationPriority.cs" />
     <Compile Include="ECSSystem\Types\QuestConditionType.cs" />
     <Compile Include="ECSSystem\Types\Slot.cs" />
     <Compile Include="ECSSystem\Types\TXDate.cs" />

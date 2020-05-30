@@ -24,6 +24,7 @@ namespace TXServer.ECSSystem.Base
         public Entity(long EntityId, TemplateAccessor TemplateAccessor, params Component[] components)
         {
             this.EntityId = EntityId;
+            Owner = null;
 
             PopulateEntity(TemplateAccessor, components);
         }
