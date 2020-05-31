@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1480325268669L)]
 	public class OpenContainerEvent : ECSEvent
 	{
-		public void Execute(Entity container)
+		public void Execute(Player player, Entity container)
         {
 			Entity notification = new Entity(new TemplateAccessor(new NewItemNotificationTemplate(), "notification/newitem"),
 				new NotificationGroupComponent(container),
@@ -25,7 +25,7 @@ namespace TXServer.ECSSystem.Events
 			if (Amount > component.Count) throw new ArgumentOutOfRangeException(nameof(Amount));
 			component.Count -= Amount;
 
-			CommandManager.SendCommands(Player.Instance.Socket,
+			CommandManager.SendCommands(player,
 				new ComponentChangeCommand(container, component),
 				new EntityShareCommand(notification),
 				new SendEventCommand(new ShowNotificationGroupEvent(1), container));

@@ -26,6 +26,20 @@ namespace TXServer.Core.Data.Database.Impl
             }
         }
 
+        public PlayerData FetchPlayerDataByEmail(string email)
+        {
+            using (var cmd = new SQLiteCommand(connection))
+            {
+                cmd.CommandText = "SELECT * FROM Players WHERE Email=@email";
+                cmd.Parameters.AddWithValue("@email", email);
+                cmd.Prepare();
+                SQLiteDataReader reader = cmd.ExecuteReader();
+
+                if (!reader.Read()) return null;
+                return new SqLitePlayer(reader.GetString(reader.GetOrdinal("UniqueId"))).From(reader);
+            }
+        }
+
         public bool SavePlayerData(PlayerData data)
         {
             using (var cmd = new SQLiteCommand(connection))
@@ -40,6 +54,7 @@ namespace TXServer.Core.Data.Database.Impl
         public bool Startup()
         {
             connection.Open();
+            //todo create if not exists
             return true;
         }
 

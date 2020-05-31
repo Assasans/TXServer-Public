@@ -16,14 +16,14 @@ namespace TXServer.ECSSystem.Events
 			throw new NotImplementedException();
 		}
 
-		public void Execute(Entity user, Entity sourceChat)
+		public void Execute(Player player, Entity user, Entity sourceChat)
         {
 			Entity goalUser = null;
-			foreach (Player player in ServerLauncher.Pool)
+			foreach (Player p in player.Server.Connection.Pool)
             {
-				if (player.Uid == UserUid)
+				if (p.GetUniqueId() == UserUid)
 				{
-					goalUser = player.User;
+					goalUser = p.User;
 					break;
 				}
             }
@@ -33,12 +33,12 @@ namespace TXServer.ECSSystem.Events
 				new ChatComponent(),
 				new ChatParticipantsComponent(user, goalUser));
 
-			PersonalChatOwnerComponent component = Player.Instance.User.GetComponent<PersonalChatOwnerComponent>();
+			PersonalChatOwnerComponent component = player.User.GetComponent<PersonalChatOwnerComponent>();
 			component.ChatsIs.Add(newChat);
 
-			CommandManager.SendCommands(Player.Instance.Socket,
+			CommandManager.SendCommands(player,
 				new EntityShareCommand(goalUser),
-				new ComponentChangeCommand(Player.Instance.User, component),
+				new ComponentChangeCommand(player.User, component),
 				new EntityShareCommand(newChat),
 				new EntityUnshareCommand(goalUser));
         }

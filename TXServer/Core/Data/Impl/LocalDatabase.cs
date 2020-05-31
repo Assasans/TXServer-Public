@@ -7,6 +7,12 @@
             return new LocalPlayer(uid).From(null);
         }
 
+        public PlayerData FetchPlayerDataByEmail(string email)
+        {
+            //todo impl
+            return null;
+        }
+
         public bool SavePlayerData(PlayerData data)
         {
             return true;

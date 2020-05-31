@@ -69,6 +69,7 @@ namespace TXServer.Core
                 Console.WriteLine("Сервер переполнен!");
             }
         }
+        
         /// <summary>
         /// Waits for new clients.
         /// </summary>
@@ -85,7 +86,7 @@ namespace TXServer.Core
                 catch (SocketException e)
                 {
                     Console.WriteLine(e);
-                    Application.Current.Dispatcher.Invoke(new Action(MainWindow.HandleCriticalError));
+                    Application.Current.Dispatcher.Invoke(MainWindow.HandleCriticalError);
                     return;
                 }
 
@@ -134,7 +135,7 @@ namespace TXServer.Core
                 catch (HttpListenerException e)
                 {
                     Console.WriteLine(e);
-                    Application.Current.Dispatcher.Invoke(new Action(MainWindow.HandleCriticalError));
+                    Application.Current.Dispatcher.Invoke(MainWindow.HandleCriticalError);
                     return;
                 }
 

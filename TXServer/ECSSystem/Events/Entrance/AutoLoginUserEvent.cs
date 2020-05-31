@@ -10,10 +10,14 @@ namespace TXServer.ECSSystem.Events.Entrance
         public void Execute(Player player, Entity entity)
         {
             PlayerData data = player.Server.Database.FetchPlayerData(Uid);
-            data.Player = player;
-            player.Data = data;
-            //todo move this to the player class
-            new LoginByPasswordEvent().Execute(player, entity);
+            // Player#LogIn(Entity) will kick the player if data == null
+            if (data != null)
+            {
+                data.Player = player;
+                player.Data = data;
+            }
+
+            player.LogIn(entity);
         }
 
         public string Uid { get; set; }

@@ -11,6 +11,12 @@ namespace TXServer.ECSSystem.Components
 			this.Email = Email;
 		}
 
+		public ConfirmedUserEmailComponent(string email, bool subscribed)
+		{
+			Email = email;
+			Subscribed = subscribed;
+		}
+
 		public string Email { get; set; }
 
 		public bool Subscribed { get; set; }

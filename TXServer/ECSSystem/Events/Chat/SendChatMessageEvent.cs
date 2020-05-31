@@ -30,23 +30,23 @@ namespace TXServer.ECSSystem.Events
 					}
 					break;
 				case PersonalChatTemplate _:
-					foreach (Entity user in chat.GetComponent<ChatParticipantsComponent>().Users)
+					foreach (Player p in chat.GetComponent<ChatParticipantsComponent>().GetPlayers())
                     {
 						bool isShared = false;
-						if (!user.Owner.EntityList.Contains(chat))
+						if (!p.EntityList.Contains(chat))
                         {
-							if (!user.Owner.EntityList.Contains(player.User))
+							if (!p.EntityList.Contains(player.User))
 							{
-								CommandManager.SendCommands(user.Owner, new EntityShareCommand(player.User));
+								CommandManager.SendCommands(p, new EntityShareCommand(player.User));
 								isShared = true;
 							}
 
-							CommandManager.SendCommands(user.Owner, new EntityShareCommand(chat));
+							CommandManager.SendCommands(p, new EntityShareCommand(chat));
                         }
-						CommandManager.SendCommands(user.Owner, command);
+						CommandManager.SendCommands(p, command);
 
 						if (isShared)
-							CommandManager.SendCommands(user.Owner, new EntityUnshareCommand(Player.Instance.User));
+							CommandManager.SendCommands(p, new EntityUnshareCommand(player.User));
 					}
 					break;
 			}

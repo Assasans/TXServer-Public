@@ -20,9 +20,25 @@ namespace TXServer.Core
             Database.Startup();
         }
 
+        public Player FindPlayerById(long entityId)
+        {
+            foreach (Player player in Connection.Pool)
+            {
+                if (player.User.EntityId == entityId)
+                {
+                    return player;
+                }
+            }
+
+            return null;
+        }
+
         public void Stop()
         {
+            if (!Connection.IsStarted) return;
+            
             Connection.StopServer();
+            Database.Shutdown();
         }
     }
 }

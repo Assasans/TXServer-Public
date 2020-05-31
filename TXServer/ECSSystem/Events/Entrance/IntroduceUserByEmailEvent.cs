@@ -10,8 +10,10 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			//todo ??
-			player.Data = null;
+			PlayerData data = player.Server.Database.FetchPlayerDataByEmail(Email);
+			if (data == null) return; // Player#LogIn(Entity) will kick the player
+			data.Player = player;
+			player.Data = data;
 			CommandManager.SendCommands(player, new SendEventCommand(new PersonalPasscodeEvent(), entity));
 		}
 

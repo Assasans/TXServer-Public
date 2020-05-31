@@ -14,6 +14,8 @@ namespace TXServer.Core
         public Player Player { get; set; }
 
         public string UniqueId { get; }
+        public string Email { get; protected set; }
+        public bool Subscribed { get; protected set; }
         public string Username { get; protected set; }
         public string HashedPassword { get; protected set; }
 
@@ -29,6 +31,20 @@ namespace TXServer.Core
         public PlayerData(string uid)
         {
             UniqueId = uid;
+        }
+
+        public ConfirmedUserEmailComponent SetEmail(string email)
+        {
+            var component = SetValue<ConfirmedUserEmailComponent>(email);
+            Email = Email;
+            return component;
+        }
+
+        public ConfirmedUserEmailComponent SetSubscribed(bool subscribed)
+        {
+            var component = SetValue<ConfirmedUserEmailComponent>(subscribed);
+            Subscribed = subscribed;
+            return component;
         }
 
         public void SetUsername(string username)
@@ -98,9 +114,19 @@ namespace TXServer.Core
         private T SetValue<T>(object value) where T : Component
         {
             T component = Player.User.GetComponent<T>();
-            PropertyInfo info = typeof(T).GetProperties()[0];
-            Console.WriteLine(info.Name);
-            info.SetValue(component, value);
+            if (component == null)
+            {
+                component = Activator.CreateInstance<T>();
+                Player.User.Components.Add(component);
+            }
+
+            foreach (PropertyInfo info in typeof(T).GetProperties())
+            {
+                if (info.PropertyType != value.GetType()) continue;
+                Console.WriteLine(info.Name);
+                info.SetValue(component, value);
+            }
+            
             return component;
         }
 

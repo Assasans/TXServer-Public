@@ -10,6 +10,8 @@ namespace TXServer.Core.Data.Database.Impl
         {
             try
             {
+                Email = "none";
+                Subscribed = false;
                 Username = "tim";
                 HashedPassword = "abc";
                 CountryCode = "EN";
