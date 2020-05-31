@@ -36,7 +36,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.Components.Remove(new RestrictionByUserFractionComponent());
                 item.Components.Add(new UserGroupComponent(user.EntityId));
-                item.Components.Add(new UserItemCounterComponent(1));
+                item.Components.Add(new UserItemCounterComponent(2));
                 item.Components.Add(new NotificationGroupComponent(item.EntityId));
             }
 

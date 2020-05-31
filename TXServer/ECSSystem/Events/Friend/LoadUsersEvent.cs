@@ -23,7 +23,10 @@ namespace TXServer.ECSSystem.Events
                 Entity found;
                 try
                 {
-                    found = Server.Instance.Connection.Pool.Where(p => p.User != null && p.User.EntityId != player.User.EntityId && id == p.User.EntityId).Select(p => p.User).Single();
+                    found = Server.Instance.Connection.Pool
+                        .Where(p => p.User != null && p.User.EntityId != player.User.EntityId && id == p.User.EntityId)
+                        .Select(p => p.User)
+                        .Single();
                 }
                 catch (InvalidOperationException)
                 {

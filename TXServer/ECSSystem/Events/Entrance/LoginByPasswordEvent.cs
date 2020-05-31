@@ -13,7 +13,7 @@ using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events
 {
-	[SerialVersionUID(1437480091995)]
+    [SerialVersionUID(1437480091995)]
 	public class LoginByPasswordEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity clientSession)
@@ -72,11 +72,7 @@ namespace TXServer.ECSSystem.Events
 				new EntityShareCommand(user),
 				new ComponentAddCommand(clientSession, new UserGroupComponent(user.EntityId)),
 			};
-
-			//todo every entity (weapons, hulls, avatars, containers, covers, daily bonus etc.) is coming from here
-			// and maybe it looks like that some things don't have a reference, but then you might not see it because of the
-			// Player.Instance. stuff, so we have to search for Player.Instance first (Ctrl+Shift+F) and replace them before
-			// deciding that a field for example isn't used
+			
 			collectedCommands.AddRange(from collectedEntity in ResourceManager.GetEntities(player, user)
 									   select new EntityShareCommand(collectedEntity));
 
@@ -118,17 +114,5 @@ namespace TXServer.ECSSystem.Events
 		public string HardwareFingerprint { get; set; }
 		public string PasswordEncipher { get; set; }
 		public bool RememberMe { get; set; }
-	}
-
-	[SerialVersionUID(1471252962981L)]
-	public class PaymentStatisticsEvent : ECSEvent
-	{
-		public PaymentStatisticsAction Action { get; set; }
-
-		public long Item { get; set; }
-
-		public long Method { get; set; }
-
-		public string Screen { get; set; }
 	}
 }
