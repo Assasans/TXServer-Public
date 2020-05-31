@@ -11,6 +11,8 @@ namespace TXServer
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static volatile bool errorState;
+        
         public MainWindow()
         {
             System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("ru");
@@ -54,7 +56,7 @@ namespace TXServer
         public void ChangeServerState()
         {
             Cursor = Cursors.Wait;
-            if (!ServerLauncher.IsStarted)
+            if (!ServerLauncher.IsStarted())
             {
                 SettingsGroupBox.IsEnabled = false;
 
@@ -78,7 +80,7 @@ namespace TXServer
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (ServerLauncher.IsStarted)
+            if (ServerLauncher.IsStarted())
             {
                 MessageBox.Show("Stop server first.", "", MessageBoxButton.OK, MessageBoxImage.Warning);
                 e.Cancel = true;
@@ -87,15 +89,13 @@ namespace TXServer
         
         public void UpdateStateText()
         {
-            if (!ServerLauncher.IsStarted)
+            if (!ServerLauncher.IsStarted())
             {
                 ServerStateText.Text = "Server is stopped.";
                 return;
             }
 
-            ServerStateText.Text = "Online players: " + ServerLauncher.PlayerCount;
+            ServerStateText.Text = "Online players: " + ServerLauncher.GetPlayerCount();
         }
-
-        private static volatile bool errorState;
     }
 }

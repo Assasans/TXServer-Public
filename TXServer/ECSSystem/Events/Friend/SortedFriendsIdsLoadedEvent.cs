@@ -10,11 +10,11 @@ namespace TXServer.ECSSystem.Events
     {
         public SortedFriendsIdsLoadedEvent()
         {
-            for (int poolIndex = 0; poolIndex < ServerLauncher.Pool.Count; poolIndex++)
+            for (int poolIndex = 0; poolIndex < Server.Instance.Connection.Pool.Count; poolIndex++)
             {
-                Player player = ServerLauncher.Pool[poolIndex];
-                if (player.User.EntityId != Player.Instance.User.EntityId)
-                    FriendsAcceptedIds.Add(player.User.EntityId, player.Uid);
+                Player player = Server.Instance.Connection.Pool[poolIndex];
+                if (player.User.EntityId != player.User.EntityId)
+                    FriendsAcceptedIds.Add(player.User.EntityId, player.GetUniqueId());
             }
         }
 

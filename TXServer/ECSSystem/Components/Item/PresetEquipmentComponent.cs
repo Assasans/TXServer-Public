@@ -8,17 +8,20 @@ namespace TXServer.ECSSystem.Components
 {
 	[SerialVersionUID(1502886877871L)]
 	public class PresetEquipmentComponent : Component
-	{
-        public PresetEquipmentComponent(Entity preset)
+    {
+        private Player Player;
+        
+        public PresetEquipmentComponent(Player player, Entity preset)
         {
+            Player = player;
             Preset = preset;
 
-            Weapons.Items weaponList = Player.Instance.UserItems["Weapons"] as Weapons.Items;
-            Hulls.Items hullList = Player.Instance.UserItems["Hulls"] as Hulls.Items;
-            WeaponSkins.Items weaponSkinList = Player.Instance.UserItems["WeaponSkins"] as WeaponSkins.Items;
-            HullSkins.Items hullSkinList = Player.Instance.UserItems["HullSkins"] as HullSkins.Items;
-            Shells.Items shellList = Player.Instance.UserItems["Shells"] as Shells.Items;
-            ModuleSlots.Items moduleSlotList = Player.Instance.UserItems["ModuleSlots"] as ModuleSlots.Items;
+            Weapons.Items weaponList = player.UserItems["Weapons"] as Weapons.Items;
+            Hulls.Items hullList = player.UserItems["Hulls"] as Hulls.Items;
+            WeaponSkins.Items weaponSkinList = player.UserItems["WeaponSkins"] as WeaponSkins.Items;
+            HullSkins.Items hullSkinList = player.UserItems["HullSkins"] as HullSkins.Items;
+            Shells.Items shellList = player.UserItems["Shells"] as Shells.Items;
+            ModuleSlots.Items moduleSlotList = player.UserItems["ModuleSlots"] as ModuleSlots.Items;
 
             WeaponSkins = new Dictionary<Entity, Entity>
             {
@@ -77,7 +80,7 @@ namespace TXServer.ECSSystem.Components
             get
             {
                 WeaponItem.Components.TryGetValue(new ParentGroupComponent(0), out Component component);
-                return Entity.FindById((component as ParentGroupComponent).Key);
+                return Player.FindById((component as ParentGroupComponent).Key);
             }
         }
 
@@ -86,23 +89,49 @@ namespace TXServer.ECSSystem.Components
             get
             {
                 HullItem.Components.TryGetValue(new ParentGroupComponent(0), out Component component);
-                return Entity.FindById((component as ParentGroupComponent).Key);
+                return Player.FindById((component as ParentGroupComponent).Key);
             }
         }
 
         [ProtocolIgnore] public Entity Preset { get; set; }
 
-        [ProtocolIgnore] public Entity WeaponItem { get; set; } = (Player.Instance.UserItems["Weapons"] as Weapons.Items).Smoky;
-        [ProtocolIgnore] public Entity HullItem { get; set; } = (Player.Instance.UserItems["Hulls"] as Hulls.Items).Hunter;
+        [ProtocolIgnore] public Entity WeaponItem {
+            get => (Player.UserItems["Weapons"] as Weapons.Items).Smoky;
+            set { /* ignored rn */ }
+        }
 
-        [ProtocolIgnore] public Entity WeaponPaint { get; set; } = (Player.Instance.UserItems["Covers"] as Covers.Items).None;
-        [ProtocolIgnore] public Entity TankPaint { get; set; } = (Player.Instance.UserItems["Paints"] as Paints.Items).Green;
+        [ProtocolIgnore]
+        public Entity HullItem
+        {
+            get => (Player.UserItems["Hulls"] as Hulls.Items).Hunter;
+            set { /* ignored rn */ }
+        }
+
+        [ProtocolIgnore]
+        public Entity WeaponPaint
+        {
+            get => (Player.UserItems["Covers"] as Covers.Items).None;
+            set { /* ignored rn */ }
+        }
+
+        [ProtocolIgnore]
+        public Entity TankPaint
+        {
+            get => (Player.UserItems["Paints"] as Paints.Items).Green;
+            set { /* ignored rn */ }
+        }
 
         [ProtocolIgnore] public Dictionary<Entity, Entity> WeaponSkins { get; set; }
         [ProtocolIgnore] public Dictionary<Entity, Entity> HullSkins { get; set; }
 
         [ProtocolIgnore] public Dictionary<Entity, Entity> WeaponShells { get; set; }
-        [ProtocolIgnore] public Entity Graffiti { get; set; } = (Player.Instance.UserItems["Graffiti"] as Graffiti.Items).Logo;
+
+        [ProtocolIgnore]
+        public Entity Graffiti
+        {
+            get => (Player.UserItems["Graffiti"] as Graffiti.Items).Logo;
+            set { /* ignored rn */ }
+        }
 
         [ProtocolIgnore] public Dictionary<Entity, Entity> Modules { get; set; }
     }

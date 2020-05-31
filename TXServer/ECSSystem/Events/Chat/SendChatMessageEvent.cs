@@ -10,19 +10,19 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1446035600297L)]
 	public class SendChatMessageEvent : ECSEvent
 	{
-		public void Execute(Entity userOrChannel)
+		public void Execute(Player player, Entity userOrChannel)
         {
 			if (userOrChannel.TemplateAccessor.Template is GeneralChatTemplate)
 			{
-				foreach (Player player in ServerLauncher.Pool)
+				foreach (Player connectedPlayer in player.Server.Connection.Pool)
 				{
-					player.LobbyCommandQueue.Enqueue(new SendEventCommand(new ChatMessageReceivedEvent
+					CommandManager.SendCommands(connectedPlayer, new SendEventCommand(new ChatMessageReceivedEvent
 					{
-						Message = this.Message,
+						Message = Message,
 						SystemMessage = false,
-						UserId = Player.Instance.User.EntityId,
-						UserUid = Player.Instance.User.GetComponent<UserUidComponent>().Uid,
-						UserAvatarId = Player.Instance.User.GetComponent<UserAvatarComponent>().Id
+						UserId = player.User.EntityId,
+						UserUid = player.User.GetComponent<UserUidComponent>().Uid,
+						UserAvatarId = player.User.GetComponent<UserAvatarComponent>().Id
 					}, userOrChannel));
 				}
 			}

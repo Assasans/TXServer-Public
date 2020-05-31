@@ -14,7 +14,7 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1458555246853L)]
     public class LoadUsersEvent : ECSEvent
     {
-        public void Execute(Entity entity)
+        public void Execute(Player player, Entity entity)
         {
             List<Command> commands = new List<Command>();
 
@@ -23,8 +23,7 @@ namespace TXServer.ECSSystem.Events
                 Entity found;
                 try
                 {
-
-                    found = ServerLauncher.Pool.Where(player => player.User != null && player.User.EntityId != Player.Instance.User.EntityId && id == player.User.EntityId).Select(player => player.User).Single();
+                    found = Server.Instance.Connection.Pool.Where(p => p.User != null && p.User.EntityId != player.User.EntityId && id == p.User.EntityId).Select(p => p.User).Single();
                 }
                 catch (InvalidOperationException)
                 {
@@ -63,7 +62,7 @@ namespace TXServer.ECSSystem.Events
             }
 
             commands.Add(new SendEventCommand(new UsersLoadedEvent(RequestEntityId), entity));
-            CommandManager.SendCommands(Player.Instance.Socket, commands.ToArray());
+            CommandManager.SendCommands(player, commands.ToArray());
         }
 
         public long RequestEntityId { get; set; }

@@ -12,12 +12,12 @@ namespace TXServer.Core.Commands
             this.Entity = Entity ?? throw new ArgumentNullException(nameof(Entity));
         }
 
-        public override void OnSend()
+        public override void OnSend(Player player)
         {
-            Player.Instance.EntityList.Remove(Entity);
+            player.EntityList.Remove(Entity);
         }
 
-        public override void OnReceive()
+        public override void OnReceive(Player player)
         {
             throw new NotSupportedException();
         }

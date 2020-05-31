@@ -9,11 +9,11 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1485777830853L)]
 	public class UnmountModuleFromSlotEvent : ECSEvent
 	{
-		public void Execute(Entity module, Entity slot)
+		public void Execute(Player player, Entity module, Entity slot)
 		{
-			Player.Instance.CurrentPreset.Modules[slot] = null;
+			player.CurrentPreset.Modules[slot] = null;
 
-			CommandManager.SendCommands(Player.Instance.Socket,
+			CommandManager.SendCommands(player,
 				new ComponentRemoveCommand(slot, typeof(ModuleGroupComponent)),
 				new ComponentRemoveCommand(module, typeof(MountedItemComponent)));
 		}

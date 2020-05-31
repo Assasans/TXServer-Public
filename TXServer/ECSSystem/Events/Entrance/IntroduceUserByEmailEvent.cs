@@ -8,10 +8,11 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1458846544326)]
 	public class IntroduceUserByEmailEvent : ECSEvent
 	{
-		public void Execute(Entity entity)
+		public void Execute(Player player, Entity entity)
 		{
-			Player.Instance.Uid = null;
-			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new PersonalPasscodeEvent(), entity));
+			//todo ??
+			player.Data = null;
+			CommandManager.SendCommands(player, new SendEventCommand(new PersonalPasscodeEvent(), entity));
 		}
 
 		public string Email { get; set; }

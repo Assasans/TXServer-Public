@@ -9,13 +9,13 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1485777098598L)]
 	public class ModuleMountEvent : ECSEvent
 	{
-		public void Execute(Entity module, Entity slot)
+		public void Execute(Player player, Entity module, Entity slot)
 		{
-			Player.Instance.CurrentPreset.Modules[slot] = module;
+			player.CurrentPreset.Modules[slot] = module;
 
 			ModuleGroupComponent component = new ModuleGroupComponent(module);
 
-			CommandManager.SendCommands(Player.Instance.Socket,
+			CommandManager.SendCommands(player,
 				new ComponentAddCommand(slot, component),
 				new ComponentAddCommand(module, new MountedItemComponent()));
 		}

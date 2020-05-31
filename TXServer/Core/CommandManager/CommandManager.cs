@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,15 +19,15 @@ namespace TXServer.Core.Commands
         /// <summary>
         /// Receive data from client.
         /// </summary>
-        public static void ReceiveAndExecuteCommands(Socket socket)
+        public static void ReceiveAndExecuteCommands(PlayerConnection connection)
         {
-            using (NetworkStream stream = new NetworkStream(socket))
+            using (NetworkStream stream = new NetworkStream(connection.Socket))
             using (BinaryReader reader = new BigEndianBinaryReader(stream))
             {
                 DataDecoder decoder = new DataDecoder(reader);
-                foreach (Command command in decoder.DecodeCommands())
+                foreach (Command command in decoder.DecodeCommands(connection.Player))
                 {
-                    command.OnReceive();
+                    command.OnReceive(connection.Player);
                 }
             }
         }
@@ -36,16 +35,17 @@ namespace TXServer.Core.Commands
         /// <summary>
         /// Send data to client.
         /// </summary>
-        public static void SendCommands(Socket socket, params Command[] commands) => SendCommands(socket, (IEnumerable<Command>)commands);
+        public static void SendCommands(Player player, params Command[] commands) => SendCommands(player, (IEnumerable<Command>)commands);
 
         /// <summary>
         /// Send data to client.
         /// </summary>
-        public static void SendCommands(Socket socket, IEnumerable<Command> commands)
+        public static void SendCommands(Player player, IEnumerable<Command> commands)
         {
             foreach (Command command in commands)
             {
-                command.OnSend();
+                Console.WriteLine(command.GetType());
+                command.OnSend(player);
             }
 
             using (MemoryStream buffer = new MemoryStream())
@@ -57,7 +57,7 @@ namespace TXServer.Core.Commands
 
                 writer.BaseStream.Position = 0;
 
-                using (NetworkStream stream = new NetworkStream(socket))
+                using (NetworkStream stream = new NetworkStream(player.Connection.Socket))
                     writer.BaseStream.CopyTo(stream);
             }
         }

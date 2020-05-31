@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1458555309592L)]
     public class UnLoadUsersEvent : ECSEvent
     {
-        public void Execute(Entity entity)
+        public void Execute(Player player, Entity entity)
         {
             List<Command> commands = new List<Command>();
 
@@ -18,7 +18,7 @@ namespace TXServer.ECSSystem.Events
                 commands.Add(new EntityUnshareCommand(toUnload));
             }
 
-            CommandManager.SendCommands(Player.Instance.Socket, commands.ToArray());
+            CommandManager.SendCommands(player, commands.ToArray());
         }
 
         public HashSet<Entity> Users { get; set; }

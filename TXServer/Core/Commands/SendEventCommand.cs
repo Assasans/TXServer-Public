@@ -18,14 +18,14 @@ namespace TXServer.Core.Commands
             this.Entities = Entities.ToList();
         }
 
-        public override void OnSend()
+        public override void OnSend(Player player)
         {
         }
 
         /// <summary>
         /// Detects event method with same number of Entity parameters and calls it.
         /// </summary>
-        public override void OnReceive()
+        public override void OnReceive(Player player)
         {
             bool executable = false;
 
@@ -35,10 +35,24 @@ namespace TXServer.Core.Commands
                 if (method.Name == "Execute")
                 {
                     executable = true;
+                    if (method.GetParameters().Length == Entities.Count + 1)
+                    {
+                        object[] args = new object[Entities.Count + 1];
+                        args[0] = player;
+                        Array.Copy(Entities.ToArray(), 0, args, 1, Entities.Count);
+
+                        method.Invoke(Event, args);
+                        return;
+                    }
+
                     if (method.GetParameters().Length == Entities.Count)
                     {
+                        if (method.GetParameters().Length > 0)
+                        {
+                            if (method.GetParameters()[0].ParameterType == typeof(Player))
+                                continue; // not this one
+                        }
                         method.Invoke(Event, Entities.ToArray());
-                        return;
                     }
                 }
             }

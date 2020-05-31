@@ -8,9 +8,9 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1451368548585L)]
     public class RequestLoadUserProfileEvent : ECSEvent
     {
-        public void Execute(Entity entity)
+        public void Execute(Player player, Entity entity)
         {
-            CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new UserProfileLoadedEvent()));
+            CommandManager.SendCommands(player, new SendEventCommand(new UserProfileLoadedEvent()));
         }
 
         public long UserId { get; set; }

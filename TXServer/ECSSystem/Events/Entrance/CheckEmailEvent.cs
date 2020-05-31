@@ -13,9 +13,10 @@ namespace TXServer.ECSSystem.Events
 			Email = email;
 		}
 
-		public void Execute(Entity entity)
+		public void Execute(Player player, Entity entity)
 		{
-			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new EmailInvalidEvent(Email), entity));
+			//todo
+			CommandManager.SendCommands(player, new SendEventCommand(new EmailInvalidEvent(Email), entity));
 		}
 
 		public string Email { get; set; } = "";

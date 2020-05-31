@@ -13,10 +13,10 @@ namespace TXServer.Core.Commands
             this.Entity = Entity ?? throw new ArgumentNullException(nameof(Entity));
         }
 
-        public override void OnSend()
+        public override void OnSend(Player player)
         {
             // Add Entity to list.
-            Player.Instance.EntityList.Add(Entity);
+            player.EntityList.Add(Entity);
 
             EntityId = Entity.EntityId;
             TemplateAccessor = Entity.TemplateAccessor;
@@ -27,7 +27,7 @@ namespace TXServer.Core.Commands
             }
         }
 
-        public override void OnReceive()
+        public override void OnReceive(Player player)
         {
             throw new NotSupportedException();
         }

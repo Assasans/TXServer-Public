@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 using TXServer.Core;
 using TXServer.Library;
 
 namespace TXServer.ECSSystem.Base
 {
-    public partial class Entity
+    public class Entity
     {
         /// <summary>
         /// Create Entity with random id.
@@ -37,20 +36,9 @@ namespace TXServer.ECSSystem.Base
             Components.UnionWith(components);
         }
 
-        /// <summary>
-        /// Find Entity by id.
-        /// </summary>
-        public static Entity FindById(Int64 id)
+        public static Entity EqualValue(long entityId)
         {
-            try
-            {
-                Player.Instance.EntityList.TryGetValue(new Entity(id), out Entity found);
-                return found;
-            }
-            catch (KeyNotFoundException)
-            {
-                throw new ArgumentException("Entity with id " + id + "not found.");
-            }
+            return new Entity(entityId);
         }
 
         /// <summary>
@@ -70,6 +58,6 @@ namespace TXServer.ECSSystem.Base
         public long EntityId { get; set; }
         public TemplateAccessor TemplateAccessor { get; set; }
         public HashSet<Component> Components { get; set; } = new HashSet<Component>(new HashCodeEqualityComparer<Component>());
-        public Player Owner { get; } = Player.Instance;
+        // public Player Owner { get; } = Player.Instance;
     }
 }

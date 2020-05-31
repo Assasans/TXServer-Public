@@ -8,10 +8,16 @@ namespace TXServer.ECSSystem.Events
 	[SerialVersionUID(1439375251389)]
 	public class IntroduceUserByUidEvent : ECSEvent
 	{
-		public void Execute(Entity entity)
+		public void Execute(Player player, Entity entity)
 		{
-			Player.Instance.Uid = Uid;
-			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new PersonalPasscodeEvent(), entity));
+			//todo ??
+			PlayerData data = player.Server.Database.FetchPlayerData(Uid);
+			data.Player = player;
+			if (data != null)
+			{
+				player.Data = data;
+				CommandManager.SendCommands(player, new SendEventCommand(new PersonalPasscodeEvent(), entity));
+			}
 		}
 
 		public string Uid { get; set; }

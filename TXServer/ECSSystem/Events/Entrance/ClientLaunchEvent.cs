@@ -8,10 +8,10 @@ namespace TXServer.Core.ECSSystem.Events
     [SerialVersionUID(1478774431678)]
     public class ClientLaunchEvent : ECSEvent
     {
-        public void Execute(Entity entity)
+        public void Execute(Player player, Entity entity)
         {
             // WebId message
-            CommandManager.SendCommands(Player.Instance.Socket,
+            CommandManager.SendCommands(player,
                 new ComponentAddCommand(entity, new WebIdComponent()),
                 new ComponentChangeCommand(entity, new WebIdComponent())
             );

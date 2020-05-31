@@ -10,9 +10,9 @@ namespace TXServer.ECSSystem.Events
 	{
 		public long UserId { get; set; }
 
-		public void Execute(Entity entity)
+		public void Execute(Player player, Entity entity)
 		{
-			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new UpdateTopLeagueInfoEvent(UserId), entity));
+			CommandManager.SendCommands(player, new SendEventCommand(new UpdateTopLeagueInfoEvent(UserId), entity));
 		}
 	}
 }

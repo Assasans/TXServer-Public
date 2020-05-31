@@ -26,7 +26,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                         if (item.TemplateAccessor.ConfigPath.Split('/')[3] == "common")
                         {
                             item.TemplateAccessor.Template = new GoldBonusModuleUserItemTemplate();
-                            Player.Instance.ReferencedEntities.TryAdd("GoldBonusModuleUserItemTemplate", item);
                             break;
                         }
                         item.TemplateAccessor.Template = new ModuleUserItemTemplate();

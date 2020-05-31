@@ -14,7 +14,7 @@ namespace TXServer.Core.Commands
             ComponentType = componentType ?? throw new ArgumentNullException(nameof(componentType));
         }
 
-        public override void OnSend()
+        public override void OnSend(Player player)
         {
             if (!Target.Components.Remove(FormatterServices.GetUninitializedObject(ComponentType) as Component))
             {
@@ -22,7 +22,7 @@ namespace TXServer.Core.Commands
             }
         }
 
-        public override void OnReceive()
+        public override void OnReceive(Player player)
         {
             throw new NotSupportedException();
         }

@@ -67,9 +67,9 @@ namespace TXServer.ECSSystem.GlobalEntities
 
         private volatile static Entity[] collectedGlobalEntities = Array.Empty<Entity>();
 
-        public static Entity[] GetEntities(Entity user)
+        public static Entity[] GetEntities(Player player, Entity user)
         {
-            Entity[] userEntities = GetUserEntities(user);
+            Entity[] userEntities = GetUserEntities(player, user);
 
             Entity[] entities = new Entity[collectedGlobalEntities.Length + userEntities.Length];
             collectedGlobalEntities.CopyTo(entities, 0);
@@ -92,7 +92,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             collectedGlobalEntities = entities.ToArray();
         }
 
-        private static Entity[] GetUserEntities(Entity user)
+        private static Entity[] GetUserEntities(Player player, Entity user)
         {
             List<Entity> entities = new List<Entity>();
 
@@ -100,10 +100,14 @@ namespace TXServer.ECSSystem.GlobalEntities
             {
                 MethodInfo info = type.GetMethod("GetUserItems");
                 if (info == null) continue;
-
-                ItemList list = info.Invoke(null, new object[] { user }) as ItemList;
+                
+                Console.WriteLine(info.ReflectedType.FullName +" "+ info.GetParameters()[0].ParameterType.FullName);
+                Console.WriteLine(info.GetParameters()[0].ParameterType == typeof(Player));
+                ItemList list = (info.GetParameters()[0].ParameterType.IsAssignableFrom(typeof(Player)) ? 
+                    info.Invoke(null, new object[] { player }) : 
+                    info.Invoke(null, new object[] { user })) as ItemList;
                 entities.AddRange(list.GetAllItems());
-                Player.Instance.UserItems.TryAdd(type.Name, list);
+                player.UserItems.TryAdd(type.Name, list);
             }
 
             return entities.ToArray();

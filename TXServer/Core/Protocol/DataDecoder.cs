@@ -56,37 +56,61 @@ namespace TXServer.Core.Protocol
             return Encoding.UTF8.GetString(bytes);
         }
 
-        private object DecodeCollection(Type objType)
+        private int DecodeLength(BinaryReader buf)
         {
+            byte num1 = buf.ReadByte();
+            if ((num1 & 128) == 0) return num1;
+            
+            byte num2 = buf.ReadByte();
+            if ((num1 & 64) == 0) return ((num1 & 63) << 8) + (num2 & byte.MaxValue);
+            
+            byte num3 = buf.ReadByte();
+            return ((num1 & 63) << 16) + ((num2 & byte.MaxValue) << 8) + (num3 & byte.MaxValue);
+        }
+
+        private object DecodeCollection(Type objType, Player player)
+        {
+            int count = DecodeLength(reader);
+
+            if (objType.IsArray)
+            {
+                Array array = Array.CreateInstance(objType.GetElementType(), count);
+
+                for (int i = 0; i < count; i++)
+                {
+                    array.SetValue(SelectDecode(objType.GetElementType(), player), i);
+                }
+
+                return array;
+            }
+
             object obj = Activator.CreateInstance(objType);
             Type collectionInnerType = objType.GetGenericArguments()[0];
-
-            byte count = reader.ReadByte();
 
             for (int i = 0; i < count; i++)
             {
                 objType.GetMethod("Add", new Type[] { collectionInnerType })
-                       .Invoke(obj, new object[] { SelectDecode(collectionInnerType) });
+                    .Invoke(obj, new object[] { SelectDecode(collectionInnerType, player) });
             }
 
             return obj;
         }
 
-        private object DecodeEntity()
+        private object DecodeEntity(Player player)
         {
             Int64 EntityId = reader.ReadInt64();
 
-            return Entity.FindById(EntityId);
+            return player.FindById(EntityId);
         }
 
-        private object DecodeCommand()
+        private object DecodeCommand(Player player)
         {
             Type objType = FindCommandType(reader.ReadByte());
 
-            return DecodeObject(objType);
+            return DecodeObject(objType, player);
         }
 
-        private object SelectDecode(Type objType)
+        private object SelectDecode(Type objType, Player player)
         {
             if (objType.IsPrimitive || objType == typeof(decimal))
             {
@@ -105,7 +129,7 @@ namespace TXServer.Core.Protocol
 
             if (objType == typeof(Entity))
             {
-                return DecodeEntity();
+                return DecodeEntity(player);
             }
 
             if (typeof(IDictionary).IsAssignableFrom(objType))
@@ -115,12 +139,12 @@ namespace TXServer.Core.Protocol
             
             if (objType.IsArray || (objType.IsGenericType && typeof(ICollection<>).MakeGenericType(objType.GetGenericArguments()[0]).IsAssignableFrom(objType)))
             {
-                return DecodeCollection(objType);
+                return DecodeCollection(objType, player);
             }
 
             if (typeof(Command).IsAssignableFrom(objType))
             {
-                return DecodeCommand();
+                return DecodeCommand(player);
             }
 
             if (objType.IsAbstract || objType.IsInterface)
@@ -128,10 +152,10 @@ namespace TXServer.Core.Protocol
                 objType = SerialVersionUIDTools.FindType(reader.ReadInt64());
             }
 
-            return UnpackData(objType);
+            return UnpackData(player, objType);
         }
 
-        private object DecodeObject(Type objType)
+        private object DecodeObject(Type objType, Player player)
         {
             object obj = FormatterServices.GetUninitializedObject(objType);
 
@@ -140,13 +164,13 @@ namespace TXServer.Core.Protocol
                 if (Attribute.IsDefined(info.PropertyType, typeof(OptionalMappedAttribute)))
                     if (map.Read()) continue;
 
-                info.SetValue(obj, SelectDecode(info.PropertyType));
+                info.SetValue(obj, SelectDecode(info.PropertyType, player));
             }
 
             return obj;
         }
 
-        private object UnpackData(Type objType = null)
+        private object UnpackData(Player player, Type objType = null)
         {
             Int32 mapLength, length;
 
@@ -173,18 +197,18 @@ namespace TXServer.Core.Protocol
 
                     while (buffer.BaseStream.Position != length)
                     {
-                        commands.Add(unpacker.SelectDecode(typeof(Command)) as Command);
+                        commands.Add(unpacker.SelectDecode(typeof(Command), player) as Command);
                     }
 
                     return commands;
                 }
                 else
                 {
-                    return unpacker.DecodeObject(objType);
+                    return unpacker.DecodeObject(objType, player);
                 }
             }
         }
 
-        public List<Command> DecodeCommands() => UnpackData() as List<Command>;
+        public List<Command> DecodeCommands(Player player) => UnpackData(player) as List<Command>;
     }
 }

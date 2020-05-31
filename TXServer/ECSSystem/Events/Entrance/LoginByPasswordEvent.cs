@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Commands;
-using TXServer.Core.ECSSystem.Events;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
+using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events
@@ -16,24 +16,27 @@ namespace TXServer.ECSSystem.Events
 	[SerialVersionUID(1437480091995)]
 	public class LoginByPasswordEvent : ECSEvent
 	{
-		public void Execute(Entity clientSession)
+		public void Execute(Player player, Entity clientSession)
 		{
-			if (Player.Instance.Uid == null)
+			//todo move this to the player class
+			if (player.GetUniqueId() == null)
 			{
-				CommandManager.SendCommands(Player.Instance.Socket,
+				CommandManager.SendCommands(player,
 					new SendEventCommand(new LoginFailedEvent(), clientSession),
 					new SendEventCommand(new InvalidPasswordEvent(), clientSession));
 				return;
 			}
 
 			_ = clientSession ?? throw new ArgumentNullException(nameof(clientSession));
+			PlayerData data = player.Data;
+			Console.WriteLine(data.HashedPassword+" "+data.XCrystals+" "+data.CountryCode+" "+data.Avatar+" "+data.Crystals+" "+data.UniqueId+" "+data.Admin+" "+data.Beta);
 
 			Entity user = new Entity(new TemplateAccessor(new UserTemplate(), ""),
-				new UserXCrystalsComponent(50000),
-				new UserCountryComponent("RU"),
-				new UserAvatarComponent("8b74e6a3-849d-4a8d-a20e-be3c142fd5e8"),
+				new UserXCrystalsComponent(data.XCrystals),
+				new UserCountryComponent(data.CountryCode),
+				new UserAvatarComponent(data.Avatar),
 				new UserComponent(),
-				new UserMoneyComponent(1000000),
+				new UserMoneyComponent(data.Crystals),
 				//new FractionGroupComponent(Fractions.GlobalItems.Frontier),
 				//new UserDailyBonusCycleComponent(1),
 				new TutorialCompleteIdsComponent(),
@@ -44,7 +47,7 @@ namespace TXServer.ECSSystem.Events
 				new GameplayChestScoreComponent(),
 				new UserRankComponent(101),
 				new BlackListComponent(),
-				new UserUidComponent(Player.Instance.Uid),
+				new UserUidComponent(player.GetUniqueId()),
 				//new FractionUserScoreComponent(500),
 				new UserExperienceComponent(2000000),
 				new QuestReadyComponent(),
@@ -57,52 +60,59 @@ namespace TXServer.ECSSystem.Events
 				new BattleLeaveCounterComponent(),
 				new UserReputationComponent(0.0));
 
-			Player.Instance.User = user;
+			if (data.Admin) user.Components.Add(new UserAdminComponent());
+			if (data.Beta) user.Components.Add(new ClosedBetaQuestAchievementComponent());
+
+			player.User = user;
 
 			user.Components.Add(new UserGroupComponent(user.EntityId));
 
-			List<Command> collectedCommands = new List<Command>()
+			List<Command> collectedCommands = new List<Command>
 			{
 				new EntityShareCommand(user),
 				new ComponentAddCommand(clientSession, new UserGroupComponent(user.EntityId)),
 			};
 
-			collectedCommands.AddRange(from collectedEntity in ResourceManager.GetEntities(user)
+			//todo every entity (weapons, hulls, avatars, containers, covers, daily bonus etc.) is coming from here
+			// and maybe it looks like that some things don't have a reference, but then you might not see it because of the
+			// Player.Instance. stuff, so we have to search for Player.Instance first (Ctrl+Shift+F) and replace them before
+			// deciding that a field for example isn't used
+			collectedCommands.AddRange(from collectedEntity in ResourceManager.GetEntities(player, user)
 									   select new EntityShareCommand(collectedEntity));
 
-			Player.Instance.CurrentPreset.WeaponItem.Components.Add(new MountedItemComponent());
-			Player.Instance.CurrentPreset.HullItem.Components.Add(new MountedItemComponent());
+			player.CurrentPreset.WeaponItem.Components.Add(new MountedItemComponent());
+			player.CurrentPreset.HullItem.Components.Add(new MountedItemComponent());
 
-			Player.Instance.CurrentPreset.WeaponPaint.Components.Add(new MountedItemComponent());
-			Player.Instance.CurrentPreset.TankPaint.Components.Add(new MountedItemComponent());
+			player.CurrentPreset.WeaponPaint.Components.Add(new MountedItemComponent());
+			player.CurrentPreset.TankPaint.Components.Add(new MountedItemComponent());
 
-			foreach (Entity item in Player.Instance.CurrentPreset.WeaponSkins.Values)
+			foreach (Entity item in player.CurrentPreset.WeaponSkins.Values)
 			{
 				item.Components.Add(new MountedItemComponent());
 			}
-			foreach (Entity item in Player.Instance.CurrentPreset.HullSkins.Values)
+			foreach (Entity item in player.CurrentPreset.HullSkins.Values)
 			{
 				item.Components.Add(new MountedItemComponent());
 			}
 
-			foreach (Entity item in Player.Instance.CurrentPreset.WeaponShells.Values)
+			foreach (Entity item in player.CurrentPreset.WeaponShells.Values)
 			{
 				item.Components.Add(new MountedItemComponent());
 			}
-			Player.Instance.CurrentPreset.Graffiti.Components.Add(new MountedItemComponent());
+			player.CurrentPreset.Graffiti.Components.Add(new MountedItemComponent());
 
-			Entity avatar = (Player.Instance.UserItems["Avatars"] as Avatars.Items).Tankist;
+			Entity avatar = (player.UserItems["Avatars"] as Avatars.Items).Tankist;
 			avatar.Components.Add(new MountedItemComponent());
-			Player.Instance.ReferencedEntities.TryAdd("CurrentAvatar", avatar);
+			player.ReferencedEntities.TryAdd("CurrentAvatar", avatar);
 
 			collectedCommands.AddRange(new Command[] {
 				//new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
 				new SendEventCommand(new PaymentSectionLoadedEvent(), user),
 				new ComponentAddCommand(user, new UserOnlineComponent()),
-				new SendEventCommand(new FriendsLoadedEvent(), Player.Instance.ClientSession)
+				new SendEventCommand(new FriendsLoadedEvent(), player.ClientSession)
 			});
 
-			CommandManager.SendCommands(Player.Instance.Socket, collectedCommands);
+			CommandManager.SendCommands(player, collectedCommands);
 		}
 
 		public string HardwareFingerprint { get; set; }

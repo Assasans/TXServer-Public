@@ -12,25 +12,22 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1473424321578L)]
 	public class XBuyMarketItemEvent : ECSEvent
 	{
-		public void Execute(Entity user, Entity item)
+		public void Execute(Player player, Entity user, Entity item)
 		{
-			user.Components.TryGetValue(new UserXCrystalsComponent(0), out Component tmpComponent);
-			UserXCrystalsComponent XCrystals = tmpComponent as UserXCrystalsComponent;
-
-			XCrystals.Money -= Price;
+			var XCrystals = player.Data.SetXCrystals(player.Data.XCrystals - Price);
 
 			Entity newItem = new Entity(new TemplateAccessor(Activator.CreateInstance((item.TemplateAccessor.Template as IMarketItemTemplate).UserItemType) as IEntityTemplate, item.TemplateAccessor.ConfigPath),
 				item.Components.ToArray());
 			newItem.Components.Add(new UserGroupComponent(user));
-			(newItem.TemplateAccessor.Template as IUserItemTemplate).AddUserItemComponents(newItem);
+			(newItem.TemplateAccessor.Template as IUserItemTemplate).AddUserItemComponents(player, newItem);
 
-			CommandManager.SendCommands(Player.Instance.Socket,
+			CommandManager.SendCommands(player,
 				new EntityShareCommand(newItem),
 				new ComponentChangeCommand(user, XCrystals));
 
 			if (newItem.TemplateAccessor.Template as IMountableItemTemplate != null)
 			{
-				new MountItemEvent().Execute(newItem);
+				new MountItemEvent().Execute(player, newItem);
 			}
 		}
 

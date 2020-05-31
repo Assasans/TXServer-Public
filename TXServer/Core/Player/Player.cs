@@ -1,48 +1,77 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Threading;
-using System.Windows;
+using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.GlobalEntities;
+using TXServer.Library;
 
 namespace TXServer.Core
 {
     /// <summary>
     /// Player connection.
     /// </summary>
-    public sealed partial class Player : IDisposable
+    public sealed class Player : IDisposable
     {
-        public Player(Socket Socket)
+        public Server Server { get; }
+        public PlayerConnection Connection { get; }
+        public PlayerData Data { get; set; }
+        
+        public Player(Server server, Socket socket)
         {
-            this.Socket = Socket ?? throw new ArgumentNullException(nameof(Socket));
-
-            Interlocked.Increment(ref ServerLauncher.PlayerCount);
-            Application.Current.Dispatcher.Invoke(new Action(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); }));
-
-            // Start player threads.
-            UpWorker = new Thread(() => ServerSideEvents());
-            UpWorker.Name = "ServerSide #" + Socket.Handle;
-            UpWorker.Start();
-
-            DownWorker = new Thread(() => ClientSideEvents());
-            DownWorker.Name = "ClientSide #" + Socket.Handle;
-            DownWorker.Start();
+            Server = server;
+            Connection = new PlayerConnection(this, socket);
         }
 
         public void Dispose()
         {
-            if (Interlocked.Exchange(ref _Active, 0) == 0) return;
-
-            Socket.Disconnect(false);
-
-            Interlocked.Decrement(ref ServerLauncher.PlayerCount);
-            Application.Current.Dispatcher.Invoke(new Action(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); }));
+            if (Connection.IsActive()) return;
+            
+            Connection.Dispose();
         }
 
-        public Socket Socket { get; private set; }
+        public bool IsActive()
+        {
+            return Connection.IsActive();
+        }
 
-        public bool Active => Convert.ToBoolean(_Active);
-        private int _Active = 1;
+        /// <summary>
+        /// Find Entity by id.
+        /// </summary>
+        public Entity FindById(Int64 id)
+        {
+            try
+            {
+                EntityList.TryGetValue(Entity.EqualValue(id), out Entity found);
+                return found;
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new ArgumentException("Entity with id " + id + "not found.");
+            }
+        }
 
-        private readonly Thread UpWorker;
-        private readonly Thread DownWorker;
+        public static Int64 GenerateId() => ((long)PlayerConnection.Random.Next() << 32) + PlayerConnection.Random.Next();
+
+        public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
+
+        /// <summary>
+        /// Use for cross-Entity reference handling.
+        /// </summary>
+        public ConcurrentDictionary<string, Entity> ReferencedEntities { get; } = new ConcurrentDictionary<string, Entity>();
+        
+        //todo add those two in PlayerData
+        public ConcurrentDictionary<string, ItemList> UserItems { get; } = new ConcurrentDictionary<string, ItemList>();
+        public PresetEquipmentComponent CurrentPreset { get; set; }
+
+        public Entity ClientSession { get; set; }
+
+        public Entity User { get; set; }
+
+        public string GetUniqueId()
+        {
+            return Data?.UniqueId;
+        }
     }
 }

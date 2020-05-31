@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.Serialization;
 using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -11,14 +10,14 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static Items GlobalItems { get; } = new Items();
 
-        public static ItemList GetUserItems(Entity user)
+        public static ItemList GetUserItems(Player player)
         {
-            ItemList items = new UserItems();
+            ItemList items = new UserItems(player);
 
             foreach (PropertyInfo info in typeof(UserItems).GetProperties())
             {
                 Entity item = info.GetValue(items) as Entity;
-                item.Components.Add(new UserGroupComponent(user));
+                item.Components.Add(new UserGroupComponent(player.User));
             }
 
             return items;
@@ -48,14 +47,13 @@ namespace TXServer.ECSSystem.GlobalEntities
 
         public class UserItems : ItemList
         {
-            public UserItems()
+            public UserItems(Player player)
             {
-                Player.Instance.ReferencedEntities.TryRemove("GoldBonusModuleUserItemTemplate", out Entity goldBonusModule);
-                Goldbonus.Components.Add(new ModuleGroupComponent(goldBonusModule));
+                Goldbonus.Components.Add(new ModuleGroupComponent((player.UserItems[typeof(Modules).Name] as Modules.Items).Gold));
 
-                PresetEquipmentComponent component = new PresetEquipmentComponent(Preset);
+                PresetEquipmentComponent component = new PresetEquipmentComponent(player, Preset);
                 Preset.Components.Add(component);
-                Player.Instance.CurrentPreset = component;
+                player.CurrentPreset = component;
             }
 
             public Entity Goldbonus { get; } = new Entity(new TemplateAccessor(new GoldBonusUserItemTemplate(), "garage/goldbonus"),

@@ -14,53 +14,53 @@ namespace TXServer.ECSSystem.Events
 	[SerialVersionUID(1434530333851L)]
 	public class MountItemEvent : ECSEvent
 	{
-		public void Execute(Entity item)
+		public void Execute(Player player, Entity item)
 		{
 			Entity prevItem;
 
 			switch (item.TemplateAccessor.Template)
 			{
 				case IWeaponUserItemTemplate _:
-					prevItem = Player.Instance.CurrentPreset.WeaponItem;
-					Player.Instance.CurrentPreset.WeaponItem = item;
+					prevItem = player.CurrentPreset.WeaponItem;
+					player.CurrentPreset.WeaponItem = item;
 					break;
 				case TankUserItemTemplate _:
-					prevItem = Player.Instance.CurrentPreset.HullItem;
-					Player.Instance.CurrentPreset.HullItem = item;
+					prevItem = player.CurrentPreset.HullItem;
+					player.CurrentPreset.HullItem = item;
 					break;
 				case AvatarUserItemTemplate _:
-					Player.Instance.ReferencedEntities.TryGetValue("CurrentAvatar", out prevItem);
-					Player.Instance.ReferencedEntities["CurrentAvatar"] = item;
+					player.ReferencedEntities.TryGetValue("CurrentAvatar", out prevItem);
+					player.ReferencedEntities["CurrentAvatar"] = item;
 					break;
 				case TankPaintUserItemTemplate _:
-					prevItem = Player.Instance.CurrentPreset.TankPaint;
-					Player.Instance.CurrentPreset.TankPaint = item;
+					prevItem = player.CurrentPreset.TankPaint;
+					player.CurrentPreset.TankPaint = item;
 					break;
 				case WeaponPaintUserItemTemplate _:
-					prevItem = Player.Instance.CurrentPreset.WeaponPaint;
-					Player.Instance.CurrentPreset.WeaponPaint = item;
+					prevItem = player.CurrentPreset.WeaponPaint;
+					player.CurrentPreset.WeaponPaint = item;
 					break;
 				case WeaponSkinUserItemTemplate _:
-					prevItem = Player.Instance.CurrentPreset.WeaponSkins[Player.Instance.CurrentPreset.WeaponItem];
-					Player.Instance.CurrentPreset.WeaponSkins[Player.Instance.CurrentPreset.WeaponItem] = item;
+					prevItem = player.CurrentPreset.WeaponSkins[player.CurrentPreset.WeaponItem];
+					player.CurrentPreset.WeaponSkins[player.CurrentPreset.WeaponItem] = item;
 					break;
 				case HullSkinUserItemTemplate _:
-					prevItem = Player.Instance.CurrentPreset.HullSkins[Player.Instance.CurrentPreset.HullItem];
-					Player.Instance.CurrentPreset.HullSkins[Player.Instance.CurrentPreset.HullItem] = item;
+					prevItem = player.CurrentPreset.HullSkins[player.CurrentPreset.HullItem];
+					player.CurrentPreset.HullSkins[player.CurrentPreset.HullItem] = item;
 					break;
 				case ShellUserItemTemplate _:
-					prevItem = Player.Instance.CurrentPreset.WeaponShells[Player.Instance.CurrentPreset.WeaponItem];
-					Player.Instance.CurrentPreset.WeaponShells[Player.Instance.CurrentPreset.WeaponItem] = item;
+					prevItem = player.CurrentPreset.WeaponShells[player.CurrentPreset.WeaponItem];
+					player.CurrentPreset.WeaponShells[player.CurrentPreset.WeaponItem] = item;
 					break;
 				case GraffitiUserItemTemplate _:
-					prevItem = Player.Instance.CurrentPreset.Graffiti;
-					Player.Instance.CurrentPreset.Graffiti = item;
+					prevItem = player.CurrentPreset.Graffiti;
+					player.CurrentPreset.Graffiti = item;
 					break;
 				case PresetUserItemTemplate _:
 					LinkedList<Command> commands = new LinkedList<Command>();
 
 					// Unmount previous preset items
-					PresetEquipmentComponent preset = Player.Instance.CurrentPreset;
+					PresetEquipmentComponent preset = player.CurrentPreset;
 					List<Entity> entities = new List<Entity>
 					{
 						preset.HullItem,
@@ -118,16 +118,16 @@ namespace TXServer.ECSSystem.Events
 						}
 					}
 
-					CommandManager.SendCommands(Player.Instance.Socket, commands);
+					CommandManager.SendCommands(player, commands);
 
 					prevItem = preset.Preset;
-					Player.Instance.CurrentPreset = newPreset;
+					player.CurrentPreset = newPreset;
 					break;
 				default:
 					throw new NotImplementedException();
 			}
 
-			CommandManager.SendCommands(Player.Instance.Socket,
+			CommandManager.SendCommands(player,
 				new ComponentRemoveCommand(prevItem, typeof(MountedItemComponent)),
 				new ComponentAddCommand(item, new MountedItemComponent()));
 		}

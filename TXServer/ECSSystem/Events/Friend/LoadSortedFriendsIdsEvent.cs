@@ -2,16 +2,15 @@
 using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
 
 namespace TXServer.ECSSystem.Events
 {
     [SerialVersionUID(1450243543232L)]
 	public class LoadSortedFriendsIdsEvent : ECSEvent
 	{
-		public void Execute(Entity entity)
+		public void Execute(Player player, Entity entity)
 		{
-			CommandManager.SendCommands(Player.Instance.Socket, new SendEventCommand(new SortedFriendsIdsLoadedEvent(), entity));
+			CommandManager.SendCommands(player, new SendEventCommand(new SortedFriendsIdsLoadedEvent(), entity));
 		}
 	}
 }

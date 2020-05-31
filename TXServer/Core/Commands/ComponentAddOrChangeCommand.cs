@@ -11,12 +11,12 @@ namespace TXServer.Core.Commands
             this.Component = Component;
         }
 
-        public override void OnSend()
+        public override void OnSend(Player player)
         {
             AddOrChangeComponent();
         }
 
-        public override void OnReceive()
+        public override void OnReceive(Player player)
         {
             AddOrChangeComponent();
         }

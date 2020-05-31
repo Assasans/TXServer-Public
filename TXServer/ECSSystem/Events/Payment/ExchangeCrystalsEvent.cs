@@ -11,21 +11,16 @@ namespace TXServer.ECSSystem.Events
 	{
 		public long XCrystals { get; set; }
 
-		public void Execute(Entity entity)
+		public void Execute(Player player, Entity entity)
 		{
-			Component tmpComponent;
-			entity.Components.TryGetValue(new UserXCrystalsComponent(0), out tmpComponent);
-			UserXCrystalsComponent XCrystals = tmpComponent as UserXCrystalsComponent;
+			PlayerData data = player.Data;
 
-			entity.Components.TryGetValue(new UserMoneyComponent(0), out tmpComponent);
-			UserMoneyComponent Crystals = tmpComponent as UserMoneyComponent;
+			UserXCrystalsComponent xCrystals = data.SetXCrystals(data.XCrystals - XCrystals);
+			UserMoneyComponent crystals = data.SetCrystals(data.Crystals + XCrystals * 50);
 
-			XCrystals.Money -= this.XCrystals;
-			Crystals.Money += this.XCrystals * 50;
-
-			CommandManager.SendCommands(Player.Instance.Socket,
-				new ComponentChangeCommand(entity, XCrystals),
-				new ComponentChangeCommand(entity, Crystals));
+			CommandManager.SendCommands(player, 
+				new ComponentChangeCommand(entity, xCrystals), 
+				new ComponentChangeCommand(entity, crystals));
 		}
 	}
 }

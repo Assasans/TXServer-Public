@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Protocol;
+﻿using TXServer.Core;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Events
@@ -6,7 +7,7 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1455283639698L)]
 	public class OpenGameCurrencyPaymentSectionEvent : ECSEvent
 	{
-		public void Execute(Entity entity)
+		public void Execute(Player player, Entity entity)
 		{
 		}
 	}
