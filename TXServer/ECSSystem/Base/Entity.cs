@@ -1,17 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 using TXServer.Core;
 using TXServer.Library;
 
 namespace TXServer.ECSSystem.Base
 {
-    public partial class Entity
+    [DebuggerDisplay("Id = {EntityId}, Template = {TemplateAccessor.Template.GetType().Name}, Components = {Components.Count}")]
+    public class Entity
     {
+        /// <summary>
+        /// Create Entity with preset id.
+        /// </summary>
+        public Entity(TemplateAccessor TemplateAccessor, params Component[] components) : this(TemplateAccessor, (IEnumerable<Component>)components) { }
+
         /// <summary>
         /// Create Entity with random id.
         /// </summary>
-        public Entity(TemplateAccessor TemplateAccessor, params Component[] components)
+        public Entity(TemplateAccessor TemplateAccessor, IEnumerable<Component> components)
         {
             EntityId = Player.GenerateId();
 
@@ -21,7 +28,12 @@ namespace TXServer.ECSSystem.Base
         /// <summary>
         /// Create Entity with preset id.
         /// </summary>
-        public Entity(long EntityId, TemplateAccessor TemplateAccessor, params Component[] components)
+        public Entity(long EntityId, TemplateAccessor TemplateAccessor, params Component[] components) : this(EntityId, TemplateAccessor, (IEnumerable<Component>)components) { }
+
+        /// <summary>
+        /// Create Entity with preset id.
+        /// </summary>
+        public Entity(long EntityId, TemplateAccessor TemplateAccessor, IEnumerable<Component> components)
         {
             this.EntityId = EntityId;
             Owner = null;
@@ -31,7 +43,7 @@ namespace TXServer.ECSSystem.Base
 
         private Entity(long EntityId) => this.EntityId = EntityId;
 
-        private void PopulateEntity(TemplateAccessor TemplateAccessor, Component[] components)
+        private void PopulateEntity(TemplateAccessor TemplateAccessor, IEnumerable<Component> components)
         {
             this.TemplateAccessor = TemplateAccessor;
 

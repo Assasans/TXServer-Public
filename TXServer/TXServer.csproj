@@ -94,6 +94,7 @@
     <Compile Include="ECSSystem\EntityTemplates\Item\IMountableItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\IWeaponUserItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\WeaponMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Notification\NewItemNotificationTemplate.cs" />
     <Compile Include="ECSSystem\Events\Item\OpenContainerEvent.cs" />
     <Compile Include="ECSSystem\Events\Notification\NotificationShownEvent.cs" />
@@ -107,7 +108,6 @@
     <Compile Include="ECSSystem\Events\Chat\ChatMessageReceivedEvent.cs" />
     <Compile Include="ECSSystem\Events\Chat\CreatePrivateChatEvent.cs" />
     <Compile Include="ECSSystem\Events\Chat\SendChatMessageEvent.cs" />
-    <Compile Include="ECSSystem\GlobalEntities\Details.cs" />
     <Compile Include="ECSSystem\Types\EndSeasonRewardItem.cs" />
     <Compile Include="ECSSystem\Types\ModuleBehaviourType.cs" />
     <Compile Include="ECSSystem\Types\ModulePrice.cs" />
@@ -332,16 +332,12 @@
     <Compile Include="ECSSystem\GlobalEntities\Chats.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Containers.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Covers.cs" />
-    <Compile Include="ECSSystem\GlobalEntities\DailyBonuses.cs" />
     <Compile Include="ECSSystem\GlobalEntities\ExtraItems.cs" />
-    <Compile Include="ECSSystem\GlobalEntities\Fractions.cs" />
     <Compile Include="ECSSystem\GlobalEntities\GlobalEntities.cs" />
     <Compile Include="ECSSystem\Components\Fraction\FractionUserScoreComponent.cs" />
-    <Compile Include="ECSSystem\Events\Fraction\UpdateClientFractionScoresEvent.cs" />
     <Compile Include="Core\Protocol\ProtocolFixedAttribute.cs" />
     <Compile Include="Core\Protocol\ProtocolIgnoreAttribute.cs" />
     <Compile Include="ECSSystem\Types\TankPartModuleType.cs" />
-    <Compile Include="ECSSystem\GlobalEntities\GoldBonusOffers.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Graffiti.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Hulls.cs" />
     <Compile Include="ECSSystem\GlobalEntities\HullSkins.cs" />
@@ -352,9 +348,6 @@
     <Compile Include="ECSSystem\GlobalEntities\Modules.cs" />
     <Compile Include="ECSSystem\GlobalEntities\ModuleSlots.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Paints.cs" />
-    <Compile Include="ECSSystem\GlobalEntities\PersonalSpecialOffers.cs" />
-    <Compile Include="ECSSystem\GlobalEntities\PremiumOffers.cs" />
-    <Compile Include="ECSSystem\GlobalEntities\Quests.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Shells.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Weapons.cs" />
     <Compile Include="ECSSystem\GlobalEntities\WeaponSkins.cs" />

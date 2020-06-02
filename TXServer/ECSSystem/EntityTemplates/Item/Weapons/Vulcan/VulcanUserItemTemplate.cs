@@ -3,7 +3,7 @@
 namespace TXServer.ECSSystem.EntityTemplates
 {
 	[SerialVersionUID(1435139228955L)]
-	public class VulcanUserItemTemplate : IWeaponUserItemTemplate
+	public class VulcanUserItemTemplate : WeaponUserItemTemplate
 	{
 	}
 }

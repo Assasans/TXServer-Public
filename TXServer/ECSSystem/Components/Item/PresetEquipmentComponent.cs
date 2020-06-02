@@ -13,12 +13,12 @@ namespace TXServer.ECSSystem.Components
         {
             Preset = preset;
 
-            Weapons.Items weaponList = Player.Instance.UserItems["Weapons"] as Weapons.Items;
-            Hulls.Items hullList = Player.Instance.UserItems["Hulls"] as Hulls.Items;
-            WeaponSkins.Items weaponSkinList = Player.Instance.UserItems["WeaponSkins"] as WeaponSkins.Items;
-            HullSkins.Items hullSkinList = Player.Instance.UserItems["HullSkins"] as HullSkins.Items;
-            Shells.Items shellList = Player.Instance.UserItems["Shells"] as Shells.Items;
-            ModuleSlots.Items moduleSlotList = Player.Instance.UserItems["ModuleSlots"] as ModuleSlots.Items;
+            Weapons weaponList = Player.Instance.UserItems["Weapons"] as Weapons;
+            Hulls hullList = Player.Instance.UserItems["Hulls"] as Hulls;
+            WeaponSkins weaponSkinList = Player.Instance.UserItems["WeaponSkins"] as WeaponSkins;
+            HullSkins hullSkinList = Player.Instance.UserItems["HullSkins"] as HullSkins;
+            Shells shellList = Player.Instance.UserItems["Shells"] as Shells;
+            ModuleSlots moduleSlotList = Player.Instance.UserItems["ModuleSlots"] as ModuleSlots;
 
             WeaponSkins = new Dictionary<Entity, Entity>
             {
@@ -92,17 +92,17 @@ namespace TXServer.ECSSystem.Components
 
         [ProtocolIgnore] public Entity Preset { get; set; }
 
-        [ProtocolIgnore] public Entity WeaponItem { get; set; } = (Player.Instance.UserItems["Weapons"] as Weapons.Items).Smoky;
-        [ProtocolIgnore] public Entity HullItem { get; set; } = (Player.Instance.UserItems["Hulls"] as Hulls.Items).Hunter;
+        [ProtocolIgnore] public Entity WeaponItem { get; set; } = (Player.Instance.UserItems["Weapons"] as Weapons).Smoky;
+        [ProtocolIgnore] public Entity HullItem { get; set; } = (Player.Instance.UserItems["Hulls"] as Hulls).Hunter;
 
-        [ProtocolIgnore] public Entity WeaponPaint { get; set; } = (Player.Instance.UserItems["Covers"] as Covers.Items).None;
-        [ProtocolIgnore] public Entity TankPaint { get; set; } = (Player.Instance.UserItems["Paints"] as Paints.Items).Green;
+        [ProtocolIgnore] public Entity WeaponPaint { get; set; } = (Player.Instance.UserItems["Covers"] as Covers).None;
+        [ProtocolIgnore] public Entity TankPaint { get; set; } = (Player.Instance.UserItems["Paints"] as Paints).Green;
 
         [ProtocolIgnore] public Dictionary<Entity, Entity> WeaponSkins { get; set; }
         [ProtocolIgnore] public Dictionary<Entity, Entity> HullSkins { get; set; }
 
         [ProtocolIgnore] public Dictionary<Entity, Entity> WeaponShells { get; set; }
-        [ProtocolIgnore] public Entity Graffiti { get; set; } = (Player.Instance.UserItems["Graffiti"] as Graffiti.Items).Logo;
+        [ProtocolIgnore] public Entity Graffiti { get; set; } = (Player.Instance.UserItems["Graffiti"] as Graffiti).Logo;
 
         [ProtocolIgnore] public Dictionary<Entity, Entity> Modules { get; set; }
     }

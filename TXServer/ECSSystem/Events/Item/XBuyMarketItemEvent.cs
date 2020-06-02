@@ -14,15 +14,10 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Entity user, Entity item)
 		{
-			user.Components.TryGetValue(new UserXCrystalsComponent(0), out Component tmpComponent);
-			UserXCrystalsComponent XCrystals = tmpComponent as UserXCrystalsComponent;
-
+			UserXCrystalsComponent XCrystals = user.GetComponent<UserXCrystalsComponent>();
 			XCrystals.Money -= Price;
 
-			Entity newItem = new Entity(new TemplateAccessor(Activator.CreateInstance((item.TemplateAccessor.Template as IMarketItemTemplate).UserItemType) as IEntityTemplate, item.TemplateAccessor.ConfigPath),
-				item.Components.ToArray());
-			newItem.Components.Add(new UserGroupComponent(user));
-			(newItem.TemplateAccessor.Template as IUserItemTemplate).AddUserItemComponents(newItem);
+			Entity newItem = (item.TemplateAccessor.Template as IMarketItemTemplate).GetUserItem(item, user);
 
 			CommandManager.SendCommands(Player.Instance.Socket,
 				new EntityShareCommand(newItem),

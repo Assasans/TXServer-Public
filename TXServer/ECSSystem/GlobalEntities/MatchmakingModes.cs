@@ -4,14 +4,11 @@ using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.ECSSystem.GlobalEntities
 {
-    public static class MatchmakingModes
+    public class MatchmakingModes : ItemList
     {
-        public static Items GlobalItems { get; } = new Items();
+        public static MatchmakingModes GlobalItems { get; } = new MatchmakingModes();
 
-        public class Items : ItemList
-        {
-            public Entity Rating { get; } = new Entity(-2076021809, new TemplateAccessor(new MatchMakingModeTemplate(), "battleselect/matchmaking/mode/rating"),
-                new MatchMakingRatingModeComponent());
-        }
+        public Entity Rating { get; } = new Entity(-2076021809, new TemplateAccessor(new MatchMakingModeTemplate(), "battleselect/matchmaking/mode/rating"),
+            new MatchMakingRatingModeComponent());
     }
 }

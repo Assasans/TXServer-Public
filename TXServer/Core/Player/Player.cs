@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
 using System.Windows;
@@ -8,6 +9,7 @@ namespace TXServer.Core
     /// <summary>
     /// Player connection.
     /// </summary>
+    [DebuggerDisplay("Active = {Active}, LoggedIn = {User != null}")]
     public sealed partial class Player : IDisposable
     {
         public Player(Socket Socket)

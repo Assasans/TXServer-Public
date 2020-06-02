@@ -4,7 +4,7 @@ using TXServer.ECSSystem.Base;
 namespace TXServer.ECSSystem.EntityTemplates
 {
     [SerialVersionUID(1435138131935L)]
-	public class FlamethrowerMarketItemTemplate : IEntityTemplate
+	public class FlamethrowerMarketItemTemplate : WeaponMarketItemTemplate
 	{
 	}
 }

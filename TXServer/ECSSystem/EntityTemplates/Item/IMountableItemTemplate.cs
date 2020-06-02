@@ -2,5 +2,5 @@
 
 namespace TXServer.ECSSystem.EntityTemplates
 {
-    public interface IMountableItemTemplate : IEntityTemplate { }
+    public interface IMountableItemTemplate { }
 }

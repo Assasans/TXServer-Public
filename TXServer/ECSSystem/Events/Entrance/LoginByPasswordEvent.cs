@@ -90,7 +90,7 @@ namespace TXServer.ECSSystem.Events
 			}
 			Player.Instance.CurrentPreset.Graffiti.Components.Add(new MountedItemComponent());
 
-			Entity avatar = (Player.Instance.UserItems["Avatars"] as Avatars.Items).Tankist;
+			Entity avatar = (Player.Instance.UserItems["Avatars"] as Avatars).Tankist;
 			avatar.Components.Add(new MountedItemComponent());
 			Player.Instance.ReferencedEntities.TryAdd("CurrentAvatar", avatar);
 

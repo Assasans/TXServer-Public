@@ -4,15 +4,12 @@ using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.ECSSystem.GlobalEntities
 {
-    public static class Chats
+    public class Chats : ItemList
     {
-        public static Items GlobalItems { get; } = new Items();
+        public static Chats GlobalItems { get; } = new Chats();
 
-        public class Items : ItemList
-        {
-            public Entity Ru { get; } = new Entity(-968268831, new TemplateAccessor(new GeneralChatTemplate(), "/chat/general/ru"),
-                new GeneralChatComponent(),
-                new ChatComponent());
-        }
+        public Entity Ru { get; } = new Entity(-968268831, new TemplateAccessor(new GeneralChatTemplate(), "/chat/general/ru"),
+            new GeneralChatComponent(),
+            new ChatComponent());
     }
 }

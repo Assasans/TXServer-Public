@@ -4,7 +4,7 @@ using TXServer.ECSSystem.Base;
 namespace TXServer.ECSSystem.EntityTemplates
 {
     [SerialVersionUID(1435138575888L)]
-	public class RailgunUserItemTemplate : IWeaponUserItemTemplate
+	public class RailgunUserItemTemplate : WeaponUserItemTemplate
 	{
 	}
 }

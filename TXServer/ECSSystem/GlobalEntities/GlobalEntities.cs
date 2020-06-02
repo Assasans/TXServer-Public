@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public Entity[] GetAllItems()
         {
-            PropertyInfo[] properties = GetType().GetProperties();
+            PropertyInfo[] properties = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
             Entity[] items = new Entity[properties.Length];
 
             for (int index = 0; index < items.Length; index++)

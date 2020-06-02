@@ -20,7 +20,7 @@ namespace TXServer.ECSSystem.Events
 
 			switch (item.TemplateAccessor.Template)
 			{
-				case IWeaponUserItemTemplate _:
+				case WeaponUserItemTemplate _:
 					prevItem = Player.Instance.CurrentPreset.WeaponItem;
 					Player.Instance.CurrentPreset.WeaponItem = item;
 					break;

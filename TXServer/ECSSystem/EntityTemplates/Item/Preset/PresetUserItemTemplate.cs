@@ -6,12 +6,20 @@ using TXServer.ECSSystem.Components;
 namespace TXServer.ECSSystem.EntityTemplates
 {
     [SerialVersionUID(1493972686116L)]
-    public class PresetUserItemTemplate : IUserItemTemplate, IMountableItemTemplate
+    public class PresetUserItemTemplate : IEntityTemplate, IMountableItemTemplate
     {
-        public void AddUserItemComponents(Entity item)
+        public static Entity CreateEntity(Entity marketItem, Entity user)
         {
-            item.Components.Add(new PresetEquipmentComponent(item));
-            item.Components.Add(new PresetNameComponent(Player.GenerateId().ToString()));
+            Entity item = new Entity(new TemplateAccessor(new PresetUserItemTemplate(), marketItem.TemplateAccessor.ConfigPath), marketItem.Components);
+
+            item.Components.UnionWith(new Component[]
+            {
+                new PresetEquipmentComponent(item),
+                new PresetNameComponent(Player.GenerateId().ToString()),
+                new UserGroupComponent(user)
+            });
+
+            return item;
         }
     }
 }

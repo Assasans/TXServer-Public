@@ -36,7 +36,6 @@ namespace TXServer.ECSSystem.Events
                         new UserAvatarComponent("8b74e6a3-849d-4a8d-a20e-be3c142fd5e8"),
                         new UserComponent(),
                         new UserMoneyComponent(1000000),
-                        new FractionGroupComponent(Fractions.GlobalItems.Frontier),
                         new UserDailyBonusCycleComponent(1),
                         new TutorialCompleteIdsComponent(),
                         new RegistrationDateComponent(),

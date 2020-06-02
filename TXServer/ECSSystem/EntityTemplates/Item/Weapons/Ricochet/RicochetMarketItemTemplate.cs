@@ -4,7 +4,7 @@ using TXServer.ECSSystem.Base;
 namespace TXServer.ECSSystem.EntityTemplates
 {
     [SerialVersionUID(1435138247945L)]
-	public class RicochetMarketItemTemplate : IEntityTemplate
+	public class RicochetMarketItemTemplate : WeaponMarketItemTemplate
 	{
 	}
 }

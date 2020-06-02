@@ -5,6 +5,6 @@ namespace TXServer.ECSSystem.EntityTemplates
 {
     public interface IMarketItemTemplate : IEntityTemplate
     {
-        Type UserItemType { get; }
+        Entity GetUserItem(Entity marketItem, Entity user);
     }
 }
