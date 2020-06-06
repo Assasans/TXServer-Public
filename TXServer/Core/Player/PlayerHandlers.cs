@@ -34,8 +34,7 @@ namespace TXServer.Core
 
             try
             {
-                Entity ClientSession = new Entity(TemplateAccessor: new TemplateAccessor(new ClientSessionTemplate(), null),
-                                                    new ClientSessionComponent());
+                Entity ClientSession = ClientSessionTemplate.CreateEntity();
 
                 this.ClientSession = ClientSession;
 

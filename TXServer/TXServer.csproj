@@ -328,7 +328,6 @@
     <Compile Include="ECSSystem\Events\User\UserOnlineEvent.cs" />
     <Compile Include="ECSSystem\Events\User\UserQuestReadyEvent.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Avatars.cs" />
-    <Compile Include="ECSSystem\GlobalEntities\BattleRewards.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Chats.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Containers.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Covers.cs" />

@@ -9,9 +9,10 @@ namespace TXServer.ECSSystem.EntityTemplates
 	{
 		public static Entity CreateEntity(Entity marketItem, Entity user)
         {
-			return new Entity(new TemplateAccessor(new AvatarUserItemTemplate(), marketItem.TemplateAccessor.ConfigPath),
-				new MarketItemGroupComponent(marketItem),
-				new UserGroupComponent(user));
+			Entity userItem = new Entity(new TemplateAccessor(new AvatarUserItemTemplate(), marketItem.TemplateAccessor.ConfigPath), marketItem.Components);
+			userItem.Components.Add(new UserGroupComponent(user));
+
+			return userItem;
         }
 	}
 }

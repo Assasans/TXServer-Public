@@ -30,7 +30,6 @@ namespace TXServer.ECSSystem.GlobalEntities
             typeof(MatchmakingModes),
 
             typeof(Leagues),
-            //typeof(Fractions),
 
             typeof(Hulls),
             typeof(Weapons),
@@ -43,12 +42,6 @@ namespace TXServer.ECSSystem.GlobalEntities
 
             typeof(Avatars),
             typeof(Graffiti),
-            
-            typeof(BattleRewards),
-
-            //typeof(Details),
-            //typeof(DailyBonuses),
-            //typeof(Quests),
             
             typeof(ModuleSlots),
             typeof(Modules),

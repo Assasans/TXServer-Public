@@ -26,86 +26,31 @@ namespace TXServer.ECSSystem.GlobalEntities
             return items;
         }
 
-        public Entity Absorbingarmor { get; private set; } = new Entity(1070497259, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/absorbingarmor"),
-            new ParentGroupComponent(Modules.GlobalItems.Absorbingarmor),
-            new MarketItemGroupComponent(1070497259));
-        public Entity Acceleratedgears { get; private set; } = new Entity(1379340193, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/acceleratedgears"),
-            new ParentGroupComponent(Modules.GlobalItems.Acceleratedgears),
-            new MarketItemGroupComponent(1379340193));
-        public Entity Adrenaline { get; private set; } = new Entity(1384519921, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/adrenaline"),
-            new ParentGroupComponent(Modules.GlobalItems.Adrenaline),
-            new MarketItemGroupComponent(1384519921));
-        public Entity Backhitdefence { get; private set; } = new Entity(-1143816664, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/backhitdefence"),
-            new ParentGroupComponent(Modules.GlobalItems.Backhitdefence),
-            new MarketItemGroupComponent(-1143816664));
-        public Entity Drone { get; private set; } = new Entity(69326151, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/drone"),
-            new ParentGroupComponent(Modules.GlobalItems.Drone),
-            new MarketItemGroupComponent(69326151));
-        public Entity Emergencyprotection { get; private set; } = new Entity(-443509498, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/emergencyprotection"),
-            new ParentGroupComponent(Modules.GlobalItems.Emergencyprotection),
-            new MarketItemGroupComponent(-443509498));
-        public Entity Emp { get; private set; } = new Entity(-1756465500, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/emp"),
-            new ParentGroupComponent(Modules.GlobalItems.Emp),
-            new MarketItemGroupComponent(-1756465500));
-        public Entity Energyinjection { get; private set; } = new Entity(-1116052693, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/energyinjection"),
-            new ParentGroupComponent(Modules.GlobalItems.Energyinjection),
-            new MarketItemGroupComponent(-1116052693));
-        public Entity Engineer { get; private set; } = new Entity(1464064213, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/engineer"),
-            new ParentGroupComponent(Modules.GlobalItems.Engineer),
-            new MarketItemGroupComponent(1464064213));
-        public Entity Explosivemass { get; private set; } = new Entity(-206369995, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/explosivemass"),
-            new ParentGroupComponent(Modules.GlobalItems.Explosivemass),
-            new MarketItemGroupComponent(-206369995));
-        public Entity Externalimpact { get; private set; } = new Entity(1032613237, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/externalimpact"),
-            new ParentGroupComponent(Modules.GlobalItems.Externalimpact),
-            new MarketItemGroupComponent(1032613237));
-        public Entity Firering { get; private set; } = new Entity(-627265270, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/firering"),
-            new ParentGroupComponent(Modules.GlobalItems.Firering),
-            new MarketItemGroupComponent(-627265270));
-        public Entity Forcefield { get; private set; } = new Entity(2100727840, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/forcefield"),
-            new ParentGroupComponent(Modules.GlobalItems.Forcefield),
-            new MarketItemGroupComponent(2100727840));
-        public Entity Icetrap { get; private set; } = new Entity(1914815875, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/icetrap"),
-            new ParentGroupComponent(Modules.GlobalItems.Icetrap),
-            new MarketItemGroupComponent(1914815875));
-        public Entity Increaseddamage { get; private set; } = new Entity(465438765, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/increaseddamage"),
-            new ParentGroupComponent(Modules.GlobalItems.Increaseddamage),
-            new MarketItemGroupComponent(465438765));
-        public Entity Invisibility { get; private set; } = new Entity(1625485211, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/invisibility"),
-            new ParentGroupComponent(Modules.GlobalItems.Invisibility),
-            new MarketItemGroupComponent(1625485211));
-        public Entity Invulnerability { get; private set; } = new Entity(-1128519711, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/invulnerability"),
-            new ParentGroupComponent(Modules.GlobalItems.Invulnerability),
-            new MarketItemGroupComponent(-1128519711));
-        public Entity Jumpimpact { get; private set; } = new Entity(-1596570946, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/jumpimpact"),
-            new ParentGroupComponent(Modules.GlobalItems.Jumpimpact),
-            new MarketItemGroupComponent(-1596570946));
-        public Entity Kamikadze { get; private set; } = new Entity(489948195, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/kamikadze"),
-            new ParentGroupComponent(Modules.GlobalItems.Kamikadze),
-            new MarketItemGroupComponent(489948195));
-        public Entity Lifesteal { get; private set; } = new Entity(2010921135, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/lifesteal"),
-            new ParentGroupComponent(Modules.GlobalItems.Lifesteal),
-            new MarketItemGroupComponent(2010921135));
-        public Entity Mine { get; private set; } = new Entity(1384378871, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/mine"),
-            new ParentGroupComponent(Modules.GlobalItems.Mine),
-            new MarketItemGroupComponent(1384378871));
-        public Entity Rage { get; private set; } = new Entity(-786092160, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/rage"),
-            new ParentGroupComponent(Modules.GlobalItems.Rage),
-            new MarketItemGroupComponent(-786092160));
-        public Entity Sapper { get; private set; } = new Entity(-887306593, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/sapper"),
-            new ParentGroupComponent(Modules.GlobalItems.Sapper),
-            new MarketItemGroupComponent(-887306593));
-        public Entity Sonar { get; private set; } = new Entity(-28208097, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/sonar"),
-            new ParentGroupComponent(Modules.GlobalItems.Sonar),
-            new MarketItemGroupComponent(-28208097));
-        public Entity Spidermine { get; private set; } = new Entity(709690204, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/spidermine"),
-            new ParentGroupComponent(Modules.GlobalItems.Spidermine),
-            new MarketItemGroupComponent(709690204));
-        public Entity Tempblock { get; private set; } = new Entity(-23536107, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/tempblock"),
-            new ParentGroupComponent(Modules.GlobalItems.Tempblock),
-            new MarketItemGroupComponent(-23536107));
-        public Entity Turbospeed { get; private set; } = new Entity(1378523021, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/turbospeed"),
-            new ParentGroupComponent(Modules.GlobalItems.Turbospeed),
-            new MarketItemGroupComponent(1378523021));
+        public Entity Acceleratedgears { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(1379340193, "acceleratedgears", Modules.GlobalItems.Acceleratedgears);
+        public Entity Adrenaline { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(1384519921, "adrenaline", Modules.GlobalItems.Adrenaline);
+        public Entity Backhitdefence { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(-1143816664, "backhitdefence", Modules.GlobalItems.Backhitdefence);
+        public Entity Drone { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(69326151, "drone", Modules.GlobalItems.Drone);
+        public Entity Emergencyprotection { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(-443509498, "emergencyprotection", Modules.GlobalItems.Emergencyprotection);
+        public Entity Emp { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(-1756465500, "emp", Modules.GlobalItems.Emp);
+        public Entity Energyinjection { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(-1116052693, "energyinjection", Modules.GlobalItems.Energyinjection);
+        public Entity Engineer { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(1464064213, "engineer", Modules.GlobalItems.Engineer);
+        public Entity Explosivemass { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(-206369995, "explosivemass", Modules.GlobalItems.Explosivemass);
+        public Entity Externalimpact { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(1032613237, "externalimpact", Modules.GlobalItems.Externalimpact);
+        public Entity Firering { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(-627265270, "firering", Modules.GlobalItems.Firering);
+        public Entity Forcefield { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(2100727840, "forcefield", Modules.GlobalItems.Forcefield);
+        public Entity Icetrap { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(1914815875, "icetrap", Modules.GlobalItems.Icetrap);
+        public Entity Increaseddamage { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(465438765, "increaseddamage", Modules.GlobalItems.Increaseddamage);
+        public Entity Invisibility { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(1625485211, "invisibility", Modules.GlobalItems.Invisibility);
+        public Entity Invulnerability { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(-1128519711, "invulnerability", Modules.GlobalItems.Invulnerability);
+        public Entity Jumpimpact { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(-1596570946, "jumpimpact", Modules.GlobalItems.Jumpimpact);
+        public Entity Kamikadze { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(489948195, "kamikadze", Modules.GlobalItems.Kamikadze);
+        public Entity Lifesteal { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(2010921135, "lifesteal", Modules.GlobalItems.Lifesteal);
+        public Entity Mine { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(1384378871, "mine", Modules.GlobalItems.Mine);
+        public Entity Rage { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(-786092160, "rage", Modules.GlobalItems.Rage);
+        public Entity Sapper { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(-887306593, "sapper", Modules.GlobalItems.Sapper);
+        public Entity Sonar { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(-28208097, "sonar", Modules.GlobalItems.Sonar);
+        public Entity Spidermine { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(709690204, "spidermine", Modules.GlobalItems.Spidermine);
+        public Entity Tempblock { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(-23536107, "tempblock", Modules.GlobalItems.Tempblock);
+        public Entity Turbospeed { get; private set; } = ModuleCardMarketItemTemplate.CreateEntity(1378523021, "turbospeed", Modules.GlobalItems.Turbospeed);
     }
 }

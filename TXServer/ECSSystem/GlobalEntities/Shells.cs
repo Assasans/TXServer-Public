@@ -26,143 +26,50 @@ namespace TXServer.ECSSystem.GlobalEntities
             return items;
         }
 
-        public Entity FlamethrowerAcid { get; private set; } = new Entity(692677861, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/flamethrower/acid"),
-            new ParentGroupComponent(Weapons.GlobalItems.Flamethrower),
-            new MarketItemGroupComponent(692677861));
-        public Entity FlamethrowerOrange { get; private set; } = new Entity(357929046, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/flamethrower/orange"),
-            new ParentGroupComponent(Weapons.GlobalItems.Flamethrower),
-            new MarketItemGroupComponent(357929046));
-        public Entity FlamethrowerRed { get; private set; } = new Entity(-947470487, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/flamethrower/red"),
-            new ParentGroupComponent(Weapons.GlobalItems.Flamethrower),
-            new MarketItemGroupComponent(-947470487));
-        public Entity FreezeIndigo { get; private set; } = new Entity(224610499, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/freeze/indigo"),
-            new ParentGroupComponent(Weapons.GlobalItems.Freeze),
-            new MarketItemGroupComponent(224610499));
-        public Entity FreezeSkyblue { get; private set; } = new Entity(-1408603862, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/freeze/skyblue"),
-            new ParentGroupComponent(Weapons.GlobalItems.Freeze),
-            new MarketItemGroupComponent(-1408603862));
-        public Entity FreezeWhite { get; private set; } = new Entity(-395640808, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/freeze/white"),
-            new ParentGroupComponent(Weapons.GlobalItems.Freeze),
-            new MarketItemGroupComponent(-395640808));
-        public Entity HammerPapercracker { get; private set; } = new Entity(142652989, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/hammer/papercracker"),
-            new ParentGroupComponent(Weapons.GlobalItems.Hammer),
-            new MarketItemGroupComponent(142652989));
-        public Entity HammerStandard { get; private set; } = new Entity(530945311, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/hammer/standard"),
-            new ParentGroupComponent(Weapons.GlobalItems.Hammer),
-            new MarketItemGroupComponent(530945311));
-        public Entity HammerThor { get; private set; } = new Entity(1317881529, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/hammer/thor"),
-            new ParentGroupComponent(Weapons.GlobalItems.Hammer),
-            new MarketItemGroupComponent(1317881529));
-        public Entity IsisEmerald { get; private set; } = new Entity(2065928272, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/isis/emerald"),
-            new ParentGroupComponent(Weapons.GlobalItems.Isis),
-            new MarketItemGroupComponent(2065928272));
-        public Entity IsisShine { get; private set; } = new Entity(-132552041, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/isis/shine"),
-            new ParentGroupComponent(Weapons.GlobalItems.Isis),
-            new MarketItemGroupComponent(-132552041));
-        public Entity IsisStandard { get; private set; } = new Entity(48235025, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/isis/standard"),
-            new ParentGroupComponent(Weapons.GlobalItems.Isis),
-            new MarketItemGroupComponent(48235025));
-        public Entity RailgunGlitch { get; private set; } = new Entity(-1975536348, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/railgun/glitch"),
-            new ParentGroupComponent(Weapons.GlobalItems.Railgun),
-            new MarketItemGroupComponent(-1975536348));
-        public Entity RailgunGloom { get; private set; } = new Entity(-375403918, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/railgun/gloom"),
-            new ParentGroupComponent(Weapons.GlobalItems.Railgun),
-            new MarketItemGroupComponent(-375403918));
-        public Entity RailgunGreen { get; private set; } = new Entity(-660457061, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/railgun/green"),
-            new ParentGroupComponent(Weapons.GlobalItems.Railgun),
-            new MarketItemGroupComponent(-660457061));
-        public Entity RailgunOrange { get; private set; } = new Entity(1229590166, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/railgun/orange"),
-            new ParentGroupComponent(Weapons.GlobalItems.Railgun),
-            new MarketItemGroupComponent(1229590166));
-        public Entity RailgunPaleblue { get; private set; } = new Entity(366763244, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/railgun/paleblue"),
-            new ParentGroupComponent(Weapons.GlobalItems.Railgun),
-            new MarketItemGroupComponent(366763244));
-        public Entity RailgunPurple { get; private set; } = new Entity(1261498404, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/railgun/purple"),
-            new ParentGroupComponent(Weapons.GlobalItems.Railgun),
-            new MarketItemGroupComponent(1261498404));
-        public Entity RailgunSmoke { get; private set; } = new Entity(-1195981301, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/railgun/smoke"),
-            new ParentGroupComponent(Weapons.GlobalItems.Railgun),
-            new MarketItemGroupComponent(-1195981301));
-        public Entity RicochetAcid { get; private set; } = new Entity(-492753567, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/ricochet/acid"),
-            new ParentGroupComponent(Weapons.GlobalItems.Ricochet),
-            new MarketItemGroupComponent(-492753567));
-        public Entity RicochetAurulent { get; private set; } = new Entity(139800007, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/ricochet/aurulent"),
-            new ParentGroupComponent(Weapons.GlobalItems.Ricochet),
-            new MarketItemGroupComponent(139800007));
-        public Entity RicochetCannonball { get; private set; } = new Entity(-1899861235, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/ricochet/cannonball"),
-            new ParentGroupComponent(Weapons.GlobalItems.Ricochet),
-            new MarketItemGroupComponent(-1899861235));
-        public Entity RicochetCoral { get; private set; } = new Entity(577198848, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/ricochet/coral"),
-            new ParentGroupComponent(Weapons.GlobalItems.Ricochet),
-            new MarketItemGroupComponent(577198848));
-        public Entity RicochetMoon { get; private set; } = new Entity(-585038633, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/ricochet/moon"),
-            new ParentGroupComponent(Weapons.GlobalItems.Ricochet),
-            new MarketItemGroupComponent(-585038633));
-        public Entity RicochetRicsnowball { get; private set; } = new Entity(-1073342998, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/ricochet/ricsnowball"),
-            new ParentGroupComponent(Weapons.GlobalItems.Ricochet),
-            new MarketItemGroupComponent(-1073342998));
-        public Entity ShaftBlue { get; private set; } = new Entity(-1488314890, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/shaft/blue"),
-            new ParentGroupComponent(Weapons.GlobalItems.Shaft),
-            new MarketItemGroupComponent(-1488314890));
-        public Entity ShaftLighting { get; private set; } = new Entity(-250346840, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/shaft/lighting"),
-            new ParentGroupComponent(Weapons.GlobalItems.Shaft),
-            new MarketItemGroupComponent(-250346840));
-        public Entity ShaftRed { get; private set; } = new Entity(-47995019, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/shaft/red"),
-            new ParentGroupComponent(Weapons.GlobalItems.Shaft),
-            new MarketItemGroupComponent(-47995019));
-        public Entity ShaftStandard { get; private set; } = new Entity(70311513, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/shaft/standard"),
-            new ParentGroupComponent(Weapons.GlobalItems.Shaft),
-            new MarketItemGroupComponent(70311513));
-        public Entity SmokyFumes { get; private set; } = new Entity(860375257, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/smoky/fumes"),
-            new ParentGroupComponent(Weapons.GlobalItems.Smoky),
-            new MarketItemGroupComponent(860375257));
-        public Entity SmokyLightning { get; private set; } = new Entity(-1260549513, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/smoky/lightning"),
-            new ParentGroupComponent(Weapons.GlobalItems.Smoky),
-            new MarketItemGroupComponent(-1260549513));
-        public Entity SmokyStandard { get; private set; } = new Entity(-966935184, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/smoky/standard"),
-            new ParentGroupComponent(Weapons.GlobalItems.Smoky),
-            new MarketItemGroupComponent(-966935184));
-        public Entity SmokyThermite { get; private set; } = new Entity(-1165747871, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/smoky/thermite"),
-            new ParentGroupComponent(Weapons.GlobalItems.Smoky),
-            new MarketItemGroupComponent(-1165747871));
-        public Entity ThunderDragon { get; private set; } = new Entity(-1852311024, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/thunder/dragon"),
-            new ParentGroupComponent(Weapons.GlobalItems.Thunder),
-            new MarketItemGroupComponent(-1852311024));
-        public Entity ThunderLightning { get; private set; } = new Entity(794635633, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/thunder/lightning"),
-            new ParentGroupComponent(Weapons.GlobalItems.Thunder),
-            new MarketItemGroupComponent(794635633));
-        public Entity ThunderStandard { get; private set; } = new Entity(1067800943, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/thunder/standard"),
-            new ParentGroupComponent(Weapons.GlobalItems.Thunder),
-            new MarketItemGroupComponent(1067800943));
-        public Entity TwinsBlue { get; private set; } = new Entity(807172229, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/twins/blue"),
-            new ParentGroupComponent(Weapons.GlobalItems.Twins),
-            new MarketItemGroupComponent(807172229));
-        public Entity TwinsOrange { get; private set; } = new Entity(-1319432295, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/twins/orange"),
-            new ParentGroupComponent(Weapons.GlobalItems.Twins),
-            new MarketItemGroupComponent(-1319432295));
-        public Entity TwinsTurquoise { get; private set; } = new Entity(-1173768746, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/twins/turquoise"),
-            new ParentGroupComponent(Weapons.GlobalItems.Twins),
-            new MarketItemGroupComponent(-1173768746));
-        public Entity TwinsTwinssnowball { get; private set; } = new Entity(-1092514341, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/twins/twinssnowball"),
-            new ParentGroupComponent(Weapons.GlobalItems.Twins),
-            new MarketItemGroupComponent(-1092514341));
-        public Entity TwinsViolet { get; private set; } = new Entity(-1126924822, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/twins/violet"),
-            new ParentGroupComponent(Weapons.GlobalItems.Twins),
-            new MarketItemGroupComponent(-1126924822));
-        public Entity TwinsWhite { get; private set; } = new Entity(-728200866, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/twins/white"),
-            new ParentGroupComponent(Weapons.GlobalItems.Twins),
-            new MarketItemGroupComponent(-728200866));
-        public Entity VulcanAcid { get; private set; } = new Entity(189181410, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/vulcan/acid"),
-            new ParentGroupComponent(Weapons.GlobalItems.Vulcan),
-            new MarketItemGroupComponent(189181410));
-        public Entity VulcanBlue { get; private set; } = new Entity(189220223, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/vulcan/blue"),
-            new ParentGroupComponent(Weapons.GlobalItems.Vulcan),
-            new MarketItemGroupComponent(189220223));
-        public Entity VulcanRed { get; private set; } = new Entity(-963712308, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/vulcan/red"),
-            new ParentGroupComponent(Weapons.GlobalItems.Vulcan),
-            new MarketItemGroupComponent(-963712308));
-        public Entity VulcanStandard { get; private set; } = new Entity(1322064226, new TemplateAccessor(new ShellMarketItemTemplate(), "garage/shell/vulcan/standard"),
-            new ParentGroupComponent(Weapons.GlobalItems.Vulcan),
-            new MarketItemGroupComponent(1322064226));
+        public Entity FlamethrowerOrange { get; private set; } = ShellMarketItemTemplate.CreateEntity(357929046, "flamethrower/orange", Weapons.GlobalItems.Flamethrower);
+        public Entity FlamethrowerRed { get; private set; } = ShellMarketItemTemplate.CreateEntity(-947470487, "flamethrower/red", Weapons.GlobalItems.Flamethrower);
+        public Entity FreezeIndigo { get; private set; } = ShellMarketItemTemplate.CreateEntity(224610499, "freeze/indigo", Weapons.GlobalItems.Freeze);
+        public Entity FreezeSkyblue { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1408603862, "freeze/skyblue", Weapons.GlobalItems.Freeze);
+        public Entity FreezeWhite { get; private set; } = ShellMarketItemTemplate.CreateEntity(-395640808, "freeze/white", Weapons.GlobalItems.Freeze);
+        public Entity HammerPapercracker { get; private set; } = ShellMarketItemTemplate.CreateEntity(142652989, "hammer/papercracker", Weapons.GlobalItems.Hammer);
+        public Entity HammerStandard { get; private set; } = ShellMarketItemTemplate.CreateEntity(530945311, "hammer/standard", Weapons.GlobalItems.Hammer);
+        public Entity HammerThor { get; private set; } = ShellMarketItemTemplate.CreateEntity(1317881529, "hammer/thor", Weapons.GlobalItems.Hammer);
+        public Entity IsisEmerald { get; private set; } = ShellMarketItemTemplate.CreateEntity(2065928272, "isis/emerald", Weapons.GlobalItems.Isis);
+        public Entity IsisShine { get; private set; } = ShellMarketItemTemplate.CreateEntity(-132552041, "isis/shine", Weapons.GlobalItems.Isis);
+        public Entity IsisStandard { get; private set; } = ShellMarketItemTemplate.CreateEntity(48235025, "isis/standard", Weapons.GlobalItems.Isis);
+        public Entity RailgunGlitch { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1975536348, "railgun/glitch", Weapons.GlobalItems.Railgun);
+        public Entity RailgunGloom { get; private set; } = ShellMarketItemTemplate.CreateEntity(-375403918, "railgun/gloom", Weapons.GlobalItems.Railgun);
+        public Entity RailgunGreen { get; private set; } = ShellMarketItemTemplate.CreateEntity(-660457061, "railgun/green", Weapons.GlobalItems.Railgun);
+        public Entity RailgunOrange { get; private set; } = ShellMarketItemTemplate.CreateEntity(1229590166, "railgun/orange", Weapons.GlobalItems.Railgun);
+        public Entity RailgunPaleblue { get; private set; } = ShellMarketItemTemplate.CreateEntity(366763244, "railgun/paleblue", Weapons.GlobalItems.Railgun);
+        public Entity RailgunPurple { get; private set; } = ShellMarketItemTemplate.CreateEntity(1261498404, "railgun/purple", Weapons.GlobalItems.Railgun);
+        public Entity RailgunSmoke { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1195981301, "railgun/smoke", Weapons.GlobalItems.Railgun);
+        public Entity RicochetAcid { get; private set; } = ShellMarketItemTemplate.CreateEntity(-492753567, "ricochet/acid", Weapons.GlobalItems.Ricochet);
+        public Entity RicochetAurulent { get; private set; } = ShellMarketItemTemplate.CreateEntity(139800007, "ricochet/aurulent", Weapons.GlobalItems.Ricochet);
+        public Entity RicochetCannonball { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1899861235, "ricochet/cannonball", Weapons.GlobalItems.Ricochet);
+        public Entity RicochetCoral { get; private set; } = ShellMarketItemTemplate.CreateEntity(577198848, "ricochet/coral", Weapons.GlobalItems.Ricochet);
+        public Entity RicochetMoon { get; private set; } = ShellMarketItemTemplate.CreateEntity(-585038633, "ricochet/moon", Weapons.GlobalItems.Ricochet);
+        public Entity RicochetRicsnowball { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1073342998, "ricochet/ricsnowball", Weapons.GlobalItems.Ricochet);
+        public Entity ShaftBlue { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1488314890, "shaft/blue", Weapons.GlobalItems.Shaft);
+        public Entity ShaftLighting { get; private set; } = ShellMarketItemTemplate.CreateEntity(-250346840, "shaft/lighting", Weapons.GlobalItems.Shaft);
+        public Entity ShaftRed { get; private set; } = ShellMarketItemTemplate.CreateEntity(-47995019, "shaft/red", Weapons.GlobalItems.Shaft);
+        public Entity ShaftStandard { get; private set; } = ShellMarketItemTemplate.CreateEntity(70311513, "shaft/standard", Weapons.GlobalItems.Shaft);
+        public Entity SmokyFumes { get; private set; } = ShellMarketItemTemplate.CreateEntity(860375257, "smoky/fumes", Weapons.GlobalItems.Smoky);
+        public Entity SmokyLightning { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1260549513, "smoky/lightning", Weapons.GlobalItems.Smoky);
+        public Entity SmokyStandard { get; private set; } = ShellMarketItemTemplate.CreateEntity(-966935184, "smoky/standard", Weapons.GlobalItems.Smoky);
+        public Entity SmokyThermite { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1165747871, "smoky/thermite", Weapons.GlobalItems.Smoky);
+        public Entity ThunderDragon { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1852311024, "thunder/dragon", Weapons.GlobalItems.Thunder);
+        public Entity ThunderLightning { get; private set; } = ShellMarketItemTemplate.CreateEntity(794635633, "thunder/lightning", Weapons.GlobalItems.Thunder);
+        public Entity ThunderStandard { get; private set; } = ShellMarketItemTemplate.CreateEntity(1067800943, "thunder/standard", Weapons.GlobalItems.Thunder);
+        public Entity TwinsBlue { get; private set; } = ShellMarketItemTemplate.CreateEntity(807172229, "twins/blue", Weapons.GlobalItems.Twins);
+        public Entity TwinsOrange { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1319432295, "twins/orange", Weapons.GlobalItems.Twins);
+        public Entity TwinsTurquoise { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1173768746, "twins/turquoise", Weapons.GlobalItems.Twins);
+        public Entity TwinsTwinssnowball { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1092514341, "twins/twinssnowball", Weapons.GlobalItems.Twins);
+        public Entity TwinsViolet { get; private set; } = ShellMarketItemTemplate.CreateEntity(-1126924822, "twins/violet", Weapons.GlobalItems.Twins);
+        public Entity TwinsWhite { get; private set; } = ShellMarketItemTemplate.CreateEntity(-728200866, "twins/white", Weapons.GlobalItems.Twins);
+        public Entity VulcanAcid { get; private set; } = ShellMarketItemTemplate.CreateEntity(189181410, "vulcan/acid", Weapons.GlobalItems.Vulcan);
+        public Entity VulcanBlue { get; private set; } = ShellMarketItemTemplate.CreateEntity(189220223, "vulcan/blue", Weapons.GlobalItems.Vulcan);
+        public Entity VulcanRed { get; private set; } = ShellMarketItemTemplate.CreateEntity(-963712308, "vulcan/red", Weapons.GlobalItems.Vulcan);
+        public Entity VulcanStandard { get; private set; } = ShellMarketItemTemplate.CreateEntity(1322064226, "vulcan/standard", Weapons.GlobalItems.Vulcan);
     }
 }

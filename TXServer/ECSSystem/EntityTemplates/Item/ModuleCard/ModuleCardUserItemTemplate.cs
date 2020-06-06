@@ -10,11 +10,15 @@ namespace TXServer.ECSSystem.EntityTemplates
     {
         public static Entity CreateEntity(Entity marketItem, Entity user)
         {
-            return new Entity(new TemplateAccessor(new ModuleCardUserItemTemplate(), marketItem.TemplateAccessor.ConfigPath),
-                marketItem.GetComponent<ParentGroupComponent>(),
-                new MarketItemGroupComponent(marketItem),
+            Entity userItem = new Entity(new TemplateAccessor(new ModuleCardUserItemTemplate(), marketItem.TemplateAccessor.ConfigPath), marketItem.Components);
+
+            userItem.Components.UnionWith(new Component[]
+            {
                 new UserGroupComponent(user),
-                new UserItemCounterComponent(0));
+                new UserItemCounterComponent(0)
+            });
+
+            return userItem;
         }
     }
 }

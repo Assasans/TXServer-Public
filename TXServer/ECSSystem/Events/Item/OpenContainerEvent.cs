@@ -15,10 +15,7 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Entity container)
         {
-			Entity notification = new Entity(new TemplateAccessor(new NewItemNotificationTemplate(), "notification/newitem"),
-				new NotificationGroupComponent(container),
-				new NewItemNotificationComponent(ExtraItems.GlobalItems.Crystal, 10),
-				new NotificationComponent(NotificationPriority.MESSAGE));
+			Entity notification = NewItemNotificationTemplate.CreateEntity(container, ExtraItems.GlobalItems.Crystal, 10);
 
 			UserItemCounterComponent component = container.GetComponent<UserItemCounterComponent>();
 

@@ -29,9 +29,7 @@ namespace TXServer.ECSSystem.Events
             }
 			if (goalUser is null) return;
 
-			Entity newChat = new Entity(new TemplateAccessor(new PersonalChatTemplate(), "chat"),
-				new ChatComponent(),
-				new ChatParticipantsComponent(user, goalUser));
+			Entity newChat = PersonalChatTemplate.CreateEntity(user, goalUser);
 
 			PersonalChatOwnerComponent component = Player.Instance.User.GetComponent<PersonalChatOwnerComponent>();
 			component.ChatsIs.Add(newChat);

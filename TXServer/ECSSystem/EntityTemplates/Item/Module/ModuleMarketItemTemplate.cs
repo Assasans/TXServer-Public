@@ -8,12 +8,27 @@ namespace TXServer.ECSSystem.EntityTemplates
     [SerialVersionUID(1484905625943)]
     public class ModuleMarketItemTemplate : IMarketItemTemplate
     {
+        public static Entity CreateEntity(long id, string configPathEntry, TankPartModuleType part, int tier, ModuleBehaviourType behaviour, bool immutable = false)
+        {
+            Entity entity = new Entity(id, new TemplateAccessor(new ModuleMarketItemTemplate(), string.Format("garage/module/{0}module/", immutable ? "prebuild" : "") + configPathEntry),
+                new ParentGroupComponent(id),
+                new MarketItemGroupComponent(id),
+                new ModuleTankPartComponent(part),
+                new ModuleTierComponent(tier),
+                new ModuleBehaviourTypeComponent(behaviour),
+                new ModuleCardsCompositionComponent());
+            if (immutable)
+                entity.Components.Add(new ImmutableModuleItemComponent());
+
+            return entity;
+        }
+
         public Entity GetUserItem(Entity marketItem, Entity user)
         {
             IEntityTemplate template = null;
             ModuleTankPartComponent part = marketItem.GetComponent<ModuleTankPartComponent>();
 
-            if (part.TankPart == Types.TankPartModuleType.COMMON)
+            if (part.TankPart == TankPartModuleType.COMMON)
             {
                 template = new GoldBonusModuleUserItemTemplate();
             }

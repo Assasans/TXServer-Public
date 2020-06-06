@@ -21,33 +21,12 @@ namespace TXServer.ECSSystem.GlobalEntities
             return items;
         }
 
-        public Entity Slot1 { get; } = new Entity(new TemplateAccessor(new SlotUserItemTemplate(), "garage/module/slot/market"),
-            new MarketItemGroupComponent(ExtraItems.GlobalItems.ModuleSlot),
-            new SlotTankPartComponent(TankPartModuleType.WEAPON),
-            new SlotUserItemInfoComponent(Slot.SLOT1, ModuleBehaviourType.ACTIVE));
-        public Entity Slot2 { get; } = new Entity(new TemplateAccessor(new SlotUserItemTemplate(), "garage/module/slot/market"),
-            new MarketItemGroupComponent(ExtraItems.GlobalItems.ModuleSlot),
-            new SlotTankPartComponent(TankPartModuleType.WEAPON),
-            new SlotUserItemInfoComponent(Slot.SLOT2, ModuleBehaviourType.ACTIVE));
-        public Entity Slot3 { get; } = new Entity(new TemplateAccessor(new SlotUserItemTemplate(), "garage/module/slot/market"),
-            new MarketItemGroupComponent(ExtraItems.GlobalItems.ModuleSlot),
-            new SlotTankPartComponent(TankPartModuleType.WEAPON),
-            new SlotUserItemInfoComponent(Slot.SLOT3, ModuleBehaviourType.PASSIVE));
-        public Entity Slot4 { get; } = new Entity(new TemplateAccessor(new SlotUserItemTemplate(), "garage/module/slot/market"),
-            new MarketItemGroupComponent(ExtraItems.GlobalItems.ModuleSlot),
-            new SlotTankPartComponent(TankPartModuleType.TANK),
-            new SlotUserItemInfoComponent(Slot.SLOT4, ModuleBehaviourType.ACTIVE));
-        public Entity Slot5 { get; } = new Entity(new TemplateAccessor(new SlotUserItemTemplate(), "garage/module/slot/market"),
-            new MarketItemGroupComponent(ExtraItems.GlobalItems.ModuleSlot),
-            new SlotTankPartComponent(TankPartModuleType.TANK),
-            new SlotUserItemInfoComponent(Slot.SLOT5, ModuleBehaviourType.ACTIVE));
-        public Entity Slot6 { get; } = new Entity(new TemplateAccessor(new SlotUserItemTemplate(), "garage/module/slot/market"),
-            new MarketItemGroupComponent(ExtraItems.GlobalItems.ModuleSlot),
-            new SlotTankPartComponent(TankPartModuleType.TANK),
-            new SlotUserItemInfoComponent(Slot.SLOT6, ModuleBehaviourType.PASSIVE));
-        public Entity Slot7 { get; } = new Entity(new TemplateAccessor(new SlotUserItemTemplate(), "garage/module/slot/market"),
-            new MarketItemGroupComponent(ExtraItems.GlobalItems.ModuleSlot),
-            new SlotTankPartComponent(TankPartModuleType.COMMON),
-            new SlotUserItemInfoComponent(Slot.SLOT7, ModuleBehaviourType.ACTIVE));
+        public Entity Slot1 { get; } = SlotUserItemTemplate.CreateEntity(TankPartModuleType.WEAPON, Slot.SLOT1, ModuleBehaviourType.ACTIVE);
+        public Entity Slot2 { get; } = SlotUserItemTemplate.CreateEntity(TankPartModuleType.WEAPON, Slot.SLOT2, ModuleBehaviourType.ACTIVE);
+        public Entity Slot3 { get; } = SlotUserItemTemplate.CreateEntity(TankPartModuleType.WEAPON, Slot.SLOT3, ModuleBehaviourType.PASSIVE);
+        public Entity Slot4 { get; } = SlotUserItemTemplate.CreateEntity(TankPartModuleType.TANK, Slot.SLOT4, ModuleBehaviourType.ACTIVE);
+        public Entity Slot5 { get; } = SlotUserItemTemplate.CreateEntity(TankPartModuleType.TANK, Slot.SLOT5, ModuleBehaviourType.ACTIVE);
+        public Entity Slot6 { get; } = SlotUserItemTemplate.CreateEntity(TankPartModuleType.TANK, Slot.SLOT6, ModuleBehaviourType.PASSIVE);
+        public Entity Slot7 { get; } = SlotUserItemTemplate.CreateEntity(TankPartModuleType.COMMON, Slot.SLOT7, ModuleBehaviourType.ACTIVE);
     }
 }

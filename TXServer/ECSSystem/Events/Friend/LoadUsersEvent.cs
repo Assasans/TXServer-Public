@@ -30,34 +30,7 @@ namespace TXServer.ECSSystem.Events
                 }
                 catch (InvalidOperationException)
                 {
-                    found = new Entity(id, new TemplateAccessor(new UserTemplate(), ""),
-                        new UserXCrystalsComponent(50000),
-                        new UserCountryComponent("RU"),
-                        new UserAvatarComponent("8b74e6a3-849d-4a8d-a20e-be3c142fd5e8"),
-                        new UserComponent(),
-                        new UserMoneyComponent(1000000),
-                        new UserDailyBonusCycleComponent(1),
-                        new TutorialCompleteIdsComponent(),
-                        new RegistrationDateComponent(),
-                        new LeagueGroupComponent(Leagues.GlobalItems.Silver),
-                        new UserStatisticsComponent(),
-                        new PersonalChatOwnerComponent(),
-                        new GameplayChestScoreComponent(),
-                        new UserRankComponent(101),
-                        new BlackListComponent(),
-                        new UserUidComponent("null"),
-                        new FractionUserScoreComponent(500),
-                        new UserExperienceComponent(2000000),
-                        new QuestReadyComponent(),
-                        new UserPublisherComponent(),
-                        new FavoriteEquipmentStatisticsComponent(),
-                        new UserDailyBonusReceivedRewardsComponent(),
-                        new ConfirmedUserEmailComponent("none"),
-                        new UserSubscribeComponent(),
-                        new KillsEquipmentStatisticsComponent(),
-                        new BattleLeaveCounterComponent(),
-                        new UserReputationComponent(0.0),
-                        new UserGroupComponent(id));
+                    found = UserTemplate.CreateEntity("null");
                 }
 
                 commands.Add(new EntityShareCommand(found));

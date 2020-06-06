@@ -8,7 +8,6 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static MatchmakingModes GlobalItems { get; } = new MatchmakingModes();
 
-        public Entity Rating { get; } = new Entity(-2076021809, new TemplateAccessor(new MatchMakingModeTemplate(), "battleselect/matchmaking/mode/rating"),
-            new MatchMakingRatingModeComponent());
+        public Entity Rating { get; } = MatchMakingModeTemplate.CreateEntity(-2076021809, "rating");
     }
 }

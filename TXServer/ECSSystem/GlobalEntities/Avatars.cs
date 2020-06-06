@@ -26,185 +26,95 @@ namespace TXServer.ECSSystem.GlobalEntities
             return items;
         }
 
-        public Entity AlgheriaFlag { get; private set; } = new Entity(-910231604, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/algheria_flag"),
-            new MarketItemGroupComponent(-910231604));
-        public Entity Alpha { get; private set; } = new Entity(934969104, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/alpha"),
-            new MarketItemGroupComponent(934969104));
-        public Entity Antheusfighter { get; private set; } = new Entity(6200, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/antheusfighter"),
-            new MarketItemGroupComponent(6200));
-        public Entity ArgentinaFlag { get; private set; } = new Entity(-1202231726, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/argentina_flag"),
-            new MarketItemGroupComponent(-1202231726));
-        public Entity ArmeniaFlag { get; private set; } = new Entity(6201, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/armenia_flag"),
-            new MarketItemGroupComponent(6201));
-        public Entity AustraliaFlag { get; private set; } = new Entity(-1731159719, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/australia_flag"),
-            new MarketItemGroupComponent(-1731159719));
-        public Entity AzerbaijanFlag { get; private set; } = new Entity(1174801258, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/azerbaijan_flag"),
-            new MarketItemGroupComponent(1174801258));
-        public Entity BelorussiaFlag { get; private set; } = new Entity(6202, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/belorussia_flag"),
-            new MarketItemGroupComponent(6202));
-        public Entity Blackwidow { get; private set; } = new Entity(1286714921, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/blackwidow"),
-            new MarketItemGroupComponent(1286714921));
-        public Entity Bogatyr { get; private set; } = new Entity(6203, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/bogatyr"),
-            new MarketItemGroupComponent(6203));
-        public Entity BoyValday { get; private set; } = new Entity(6204, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/boy_valday"),
-            new MarketItemGroupComponent(6204));
-        public Entity BrazilFlag { get; private set; } = new Entity(6205, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/brazil_flag"),
-            new MarketItemGroupComponent(6205));
-        public Entity CanadaFlag { get; private set; } = new Entity(2123817583, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/canada_flag"),
-            new MarketItemGroupComponent(2123817583));
-        public Entity ChinaFlag { get; private set; } = new Entity(1651733218, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/china_flag"),
-            new MarketItemGroupComponent(1651733218));
-        public Entity Crab { get; private set; } = new Entity(-1632342818, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/crab"),
-            new MarketItemGroupComponent(-1632342818));
-        public Entity Cyborg { get; private set; } = new Entity(6206, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/cyborg"),
-            new MarketItemGroupComponent(6206));
-        public Entity CzechFlag { get; private set; } = new Entity(-171184634, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/czech_flag"),
-            new MarketItemGroupComponent(-171184634));
-        public Entity DarinaLiekhtonien { get; private set; } = new Entity(-1473761734, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/darina_liekhtonien"),
-            new MarketItemGroupComponent(-1473761734));
-        public Entity DeanCunningham { get; private set; } = new Entity(1479495495, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/dean_cunningham"),
-            new MarketItemGroupComponent(1479495495));
-        public Entity Dygest { get; private set; } = new Entity(-983105950, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/dygest"),
-            new MarketItemGroupComponent(-983105950));
-        public Entity Eagle { get; private set; } = new Entity(938326966, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/eagle"),
-            new MarketItemGroupComponent(938326966));
-        public Entity EgyptFlag { get; private set; } = new Entity(-1089651106, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/egypt_flag"),
-            new MarketItemGroupComponent(-1089651106));
-        public Entity Elite { get; private set; } = new Entity(6207, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/elite"),
-            new MarketItemGroupComponent(6207));
-        public Entity EmmaBonney { get; private set; } = new Entity(-2119697962, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/emma_bonney"),
-            new MarketItemGroupComponent(-2119697962));
-        public Entity EstoniaFlag { get; private set; } = new Entity(1781929660, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/estonia_flag"),
-            new MarketItemGroupComponent(1781929660));
-        public Entity EvgenyRomanov { get; private set; } = new Entity(-1130044595, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/evgeny_romanov"),
-            new MarketItemGroupComponent(-1130044595));
-        public Entity FinlandFlag { get; private set; } = new Entity(-241092701, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/finland_flag"),
-            new MarketItemGroupComponent(-241092701));
-        public Entity FranceFlag { get; private set; } = new Entity(117983554, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/france_flag"),
-            new MarketItemGroupComponent(117983554));
-        public Entity Frontierfighter { get; private set; } = new Entity(6208, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/frontierfighter"),
-            new MarketItemGroupComponent(6208));
-        public Entity Gambler { get; private set; } = new Entity(1569342716, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/gambler"),
-            new MarketItemGroupComponent(1569342716));
-        public Entity GarciaLopez { get; private set; } = new Entity(1953932916, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/garcia_lopez"),
-            new MarketItemGroupComponent(1953932916));
-        public Entity GeorgiaFlag { get; private set; } = new Entity(6209, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/georgia_flag"),
-            new MarketItemGroupComponent(6209));
-        public Entity GermanyFlag { get; private set; } = new Entity(6210, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/germany_flag"),
-            new MarketItemGroupComponent(6210));
-        public Entity Ghostrider { get; private set; } = new Entity(6211, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/ghostrider"),
-            new MarketItemGroupComponent(6211));
-        public Entity GirlValday { get; private set; } = new Entity(6212, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/girl_valday"),
-            new MarketItemGroupComponent(6212));
-        public Entity GreatbritainFlag { get; private set; } = new Entity(6213, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/greatbritain_flag"),
-            new MarketItemGroupComponent(6213));
-        public Entity GreeceFlag { get; private set; } = new Entity(1175725104, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/greece_flag"),
-            new MarketItemGroupComponent(1175725104));
-        public Entity Heart { get; private set; } = new Entity(941211128, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/heart"),
-            new MarketItemGroupComponent(941211128));
-        public Entity Hellhound { get; private set; } = new Entity(869046809, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/hellhound"),
-            new MarketItemGroupComponent(869046809));
-        public Entity HungaryFlag { get; private set; } = new Entity(232090231, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/hungary_flag"),
-            new MarketItemGroupComponent(232090231));
-        public Entity Hydra { get; private set; } = new Entity(941809812, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/hydra"),
-            new MarketItemGroupComponent(941809812));
-        public Entity IndiaFlag { get; private set; } = new Entity(-2048808190, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/india_flag"),
-            new MarketItemGroupComponent(-2048808190));
-        public Entity IrmaMassacre { get; private set; } = new Entity(855079933, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/irma_massacre"),
-            new MarketItemGroupComponent(855079933));
-        public Entity IsraelFlag { get; private set; } = new Entity(-1042657987, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/israel_flag"),
-            new MarketItemGroupComponent(-1042657987));
-        public Entity ItalyFlag { get; private set; } = new Entity(-1887453418, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/italy_flag"),
-            new MarketItemGroupComponent(-1887453418));
-        public Entity Jedi { get; private set; } = new Entity(6214, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/jedi"),
-            new MarketItemGroupComponent(6214));
-        public Entity KazakhstanFlag { get; private set; } = new Entity(6215, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/kazakhstan_flag"),
-            new MarketItemGroupComponent(6215));
-        public Entity LatviaFlag { get; private set; } = new Entity(-1036805170, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/latvia_flag"),
-            new MarketItemGroupComponent(-1036805170));
-        public Entity Legends { get; private set; } = new Entity(1820960568, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/legends"),
-            new MarketItemGroupComponent(1820960568));
-        public Entity LithuaniaFlag { get; private set; } = new Entity(-657725808, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/lithuania_flag"),
-            new MarketItemGroupComponent(-657725808));
-        public Entity MagnusGrim { get; private set; } = new Entity(706204327, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/magnus_grim"),
-            new MarketItemGroupComponent(706204327));
-        public Entity Mammoth { get; private set; } = new Entity(6216, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/mammoth"),
-            new MarketItemGroupComponent(6216));
-        public Entity MaryNewell { get; private set; } = new Entity(1807734043, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/mary_newell"),
-            new MarketItemGroupComponent(1807734043));
-        public Entity MaureenLawrie { get; private set; } = new Entity(764921404, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/maureen_lawrie"),
-            new MarketItemGroupComponent(764921404));
-        public Entity MexicoFlag { get; private set; } = new Entity(224328936, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/mexico_flag"),
-            new MarketItemGroupComponent(224328936));
-        public Entity MichelleReisner { get; private set; } = new Entity(-2083128946, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/michelle_reisner"),
-            new MarketItemGroupComponent(-2083128946));
-        public Entity MoldaviaFlag { get; private set; } = new Entity(6217, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/moldavia_flag"),
-            new MarketItemGroupComponent(6217));
-        public Entity MoroccoFlag { get; private set; } = new Entity(-814801911, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/morocco_flag"),
-            new MarketItemGroupComponent(-814801911));
-        public Entity NetherlandsFlag { get; private set; } = new Entity(1927964361, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/netherlands_flag"),
-            new MarketItemGroupComponent(1927964361));
-        public Entity Order { get; private set; } = new Entity(948065536, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/order"),
-            new MarketItemGroupComponent(948065536));
-        public Entity OskarKhrom { get; private set; } = new Entity(-880569858, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/oskar_khrom"),
-            new MarketItemGroupComponent(-880569858));
-        public Entity PakistanFlag { get; private set; } = new Entity(287575104, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/pakistan_flag"),
-            new MarketItemGroupComponent(287575104));
-        public Entity PirateGirl { get; private set; } = new Entity(1455996148, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/pirate_girl"),
-            new MarketItemGroupComponent(1455996148));
-        public Entity PolandFlag { get; private set; } = new Entity(1472995923, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/poland_flag"),
-            new MarketItemGroupComponent(1472995923));
-        public Entity Professor { get; private set; } = new Entity(-1330873567, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/professor"),
-            new MarketItemGroupComponent(-1330873567));
-        public Entity Raccoon { get; private set; } = new Entity(6218, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/raccoon"),
-            new MarketItemGroupComponent(6218));
-        public Entity RussiaFlag { get; private set; } = new Entity(6219, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/russia_flag"),
-            new MarketItemGroupComponent(6219));
-        public Entity SaudiArabia { get; private set; } = new Entity(1602513792, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/saudi_arabia_flag"),
-            new MarketItemGroupComponent(1602513792));
-        public Entity Savage { get; private set; } = new Entity(6220, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/savage"),
-            new MarketItemGroupComponent(6220));
-        public Entity Skeletoninspace { get; private set; } = new Entity(6221, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/skeletoninspace"),
-            new MarketItemGroupComponent(6221));
-        public Entity SlovakiaFlag { get; private set; } = new Entity(1776630907, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/slovakia_flag"),
-            new MarketItemGroupComponent(1776630907));
-        public Entity SloveniaFlag { get; private set; } = new Entity(-224755940, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/slovenia_flag"),
-            new MarketItemGroupComponent(-224755940));
-        public Entity SpainFlag { get; private set; } = new Entity(399797680, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/spain_flag"),
-            new MarketItemGroupComponent(399797680));
-        public Entity SpyGirl { get; private set; } = new Entity(1612159053, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/spy_girl"),
-            new MarketItemGroupComponent(1612159053));
-        public Entity Stormtrooper { get; private set; } = new Entity(6222, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/stormtrooper"),
-            new MarketItemGroupComponent(6222));
-        public Entity Swatsoldier { get; private set; } = new Entity(6223, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/swatsoldier"),
-            new MarketItemGroupComponent(6223));
-        public Entity SwedenFlag { get; private set; } = new Entity(394437137, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/sweden_flag"),
-            new MarketItemGroupComponent(394437137));
-        public Entity Tankist { get; private set; } = new Entity(6224, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/tankist"),
-            new MarketItemGroupComponent(6224));
-        public Entity Tankix { get; private set; } = new Entity(6225, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/tankix"),
-            new MarketItemGroupComponent(6225));
-        public Entity TeresaAmsel { get; private set; } = new Entity(1657247215, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/teresa_amsel"),
-            new MarketItemGroupComponent(1657247215));
-        public Entity ThailandFlag { get; private set; } = new Entity(187162326, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/thailand_flag"),
-            new MarketItemGroupComponent(187162326));
-        public Entity Troll { get; private set; } = new Entity(6226, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/troll"),
-            new MarketItemGroupComponent(6226));
-        public Entity TurkeyFlag { get; private set; } = new Entity(893099663, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/turkey_flag"),
-            new MarketItemGroupComponent(893099663));
-        public Entity UkraineFlag { get; private set; } = new Entity(6227, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/ukraine_flag"),
-            new MarketItemGroupComponent(6227));
-        public Entity UsaFlag { get; private set; } = new Entity(6228, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/usa_flag"),
-            new MarketItemGroupComponent(6228));
-        public Entity VeraKlein { get; private set; } = new Entity(-1147853194, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/vera_klein"),
-            new MarketItemGroupComponent(-1147853194));
-        public Entity Viking { get; private set; } = new Entity(6229, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/viking"),
-            new MarketItemGroupComponent(6229));
-        public Entity VladimirRepin { get; private set; } = new Entity(-480997961, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/vladimir_repin"),
-            new MarketItemGroupComponent(-480997961));
-        public Entity Wasp { get; private set; } = new Entity(6230, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/wasp"),
-            new MarketItemGroupComponent(6230));
-        public Entity YamamotoTsunetomo { get; private set; } = new Entity(605003762, new TemplateAccessor(new AvatarMarketItemTemplate(), "garage/avatar/yamamoto_tsunetomo"),
-            new MarketItemGroupComponent(605003762));
+        public Entity Algheriaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-910231604, "algheria_flag");
+        public Entity Alpha { get; private set; } = AvatarMarketItemTemplate.CreateEntity(934969104, "alpha");
+        public Entity Antheusfighter { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6200, "antheusfighter");
+        public Entity Argentinaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-1202231726, "argentina_flag");
+        public Entity Armeniaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6201, "armenia_flag");
+        public Entity Australiaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-1731159719, "australia_flag");
+        public Entity Azerbaijanflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1174801258, "azerbaijan_flag");
+        public Entity Belorussiaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6202, "belorussia_flag");
+        public Entity Blackwidow { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1286714921, "blackwidow");
+        public Entity Bogatyr { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6203, "bogatyr");
+        public Entity Boyvalday { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6204, "boy_valday");
+        public Entity Brazilflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6205, "brazil_flag");
+        public Entity Canadaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(2123817583, "canada_flag");
+        public Entity Chinaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1651733218, "china_flag");
+        public Entity Crab { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-1632342818, "crab");
+        public Entity Cyborg { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6206, "cyborg");
+        public Entity Czechflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-171184634, "czech_flag");
+        public Entity Darinaliekhtonien { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-1473761734, "darina_liekhtonien");
+        public Entity Deancunningham { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1479495495, "dean_cunningham");
+        public Entity Dygest { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-983105950, "dygest");
+        public Entity Eagle { get; private set; } = AvatarMarketItemTemplate.CreateEntity(938326966, "eagle");
+        public Entity Egyptflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-1089651106, "egypt_flag");
+        public Entity Elite { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6207, "elite");
+        public Entity Emmabonney { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-2119697962, "emma_bonney");
+        public Entity Estoniaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1781929660, "estonia_flag");
+        public Entity Evgenyromanov { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-1130044595, "evgeny_romanov");
+        public Entity Finlandflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-241092701, "finland_flag");
+        public Entity Franceflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(117983554, "france_flag");
+        public Entity Frontierfighter { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6208, "frontierfighter");
+        public Entity Gambler { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1569342716, "gambler");
+        public Entity Garcialopez { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1953932916, "garcia_lopez");
+        public Entity Georgiaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6209, "georgia_flag");
+        public Entity Germanyflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6210, "germany_flag");
+        public Entity Ghostrider { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6211, "ghostrider");
+        public Entity Girlvalday { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6212, "girl_valday");
+        public Entity Greatbritainflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6213, "greatbritain_flag");
+        public Entity Greeceflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1175725104, "greece_flag");
+        public Entity Heart { get; private set; } = AvatarMarketItemTemplate.CreateEntity(941211128, "heart");
+        public Entity Hellhound { get; private set; } = AvatarMarketItemTemplate.CreateEntity(869046809, "hellhound");
+        public Entity Hungaryflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(232090231, "hungary_flag");
+        public Entity Hydra { get; private set; } = AvatarMarketItemTemplate.CreateEntity(941809812, "hydra");
+        public Entity Indiaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-2048808190, "india_flag");
+        public Entity Irmamassacre { get; private set; } = AvatarMarketItemTemplate.CreateEntity(855079933, "irma_massacre");
+        public Entity Israelflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-1042657987, "israel_flag");
+        public Entity Italyflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-1887453418, "italy_flag");
+        public Entity Jedi { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6214, "jedi");
+        public Entity Kazakhstanflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6215, "kazakhstan_flag");
+        public Entity Latviaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-1036805170, "latvia_flag");
+        public Entity Legends { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1820960568, "legends");
+        public Entity Lithuaniaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-657725808, "lithuania_flag");
+        public Entity Magnusgrim { get; private set; } = AvatarMarketItemTemplate.CreateEntity(706204327, "magnus_grim");
+        public Entity Mammoth { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6216, "mammoth");
+        public Entity Marynewell { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1807734043, "mary_newell");
+        public Entity Maureenlawrie { get; private set; } = AvatarMarketItemTemplate.CreateEntity(764921404, "maureen_lawrie");
+        public Entity Mexicoflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(224328936, "mexico_flag");
+        public Entity Michellereisner { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-2083128946, "michelle_reisner");
+        public Entity Moldaviaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6217, "moldavia_flag");
+        public Entity Moroccoflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-814801911, "morocco_flag");
+        public Entity Netherlandsflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1927964361, "netherlands_flag");
+        public Entity Order { get; private set; } = AvatarMarketItemTemplate.CreateEntity(948065536, "order");
+        public Entity Oskarkhrom { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-880569858, "oskar_khrom");
+        public Entity Pakistanflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(287575104, "pakistan_flag");
+        public Entity Pirategirl { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1455996148, "pirate_girl");
+        public Entity Polandflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1472995923, "poland_flag");
+        public Entity Professor { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-1330873567, "professor");
+        public Entity Raccoon { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6218, "raccoon");
+        public Entity Russiaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6219, "russia_flag");
+        public Entity Saudiarabiaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1602513792, "saudi_arabia_flag");
+        public Entity Savage { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6220, "savage");
+        public Entity Skeletoninspace { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6221, "skeletoninspace");
+        public Entity Slovakiaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1776630907, "slovakia_flag");
+        public Entity Sloveniaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-224755940, "slovenia_flag");
+        public Entity Spainflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(399797680, "spain_flag");
+        public Entity Spygirl { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1612159053, "spy_girl");
+        public Entity Stormtrooper { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6222, "stormtrooper");
+        public Entity Swatsoldier { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6223, "swatsoldier");
+        public Entity Swedenflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(394437137, "sweden_flag");
+        public Entity Tankist { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6224, "tankist");
+        public Entity Tankix { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6225, "tankix");
+        public Entity Teresaamsel { get; private set; } = AvatarMarketItemTemplate.CreateEntity(1657247215, "teresa_amsel");
+        public Entity Thailandflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(187162326, "thailand_flag");
+        public Entity Troll { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6226, "troll");
+        public Entity Turkeyflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(893099663, "turkey_flag");
+        public Entity Ukraineflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6227, "ukraine_flag");
+        public Entity Usaflag { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6228, "usa_flag");
+        public Entity Veraklein { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-1147853194, "vera_klein");
+        public Entity Viking { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6229, "viking");
+        public Entity Vladimirrepin { get; private set; } = AvatarMarketItemTemplate.CreateEntity(-480997961, "vladimir_repin");
+        public Entity Wasp { get; private set; } = AvatarMarketItemTemplate.CreateEntity(6230, "wasp");
+        public Entity Yamamototsunetomo { get; private set; } = AvatarMarketItemTemplate.CreateEntity(605003762, "yamamoto_tsunetomo");
     }
 }

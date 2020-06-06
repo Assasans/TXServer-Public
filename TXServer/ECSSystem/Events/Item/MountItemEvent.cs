@@ -57,10 +57,12 @@ namespace TXServer.ECSSystem.Events
 					Player.Instance.CurrentPreset.Graffiti = item;
 					break;
 				case PresetUserItemTemplate _:
-					LinkedList<Command> commands = new LinkedList<Command>();
+					List<Command> commands = new List<Command>();
 
 					// Unmount previous preset items
 					PresetEquipmentComponent preset = Player.Instance.CurrentPreset;
+					prevItem = preset.Preset;
+
 					List<Entity> entities = new List<Entity>
 					{
 						preset.HullItem,
@@ -77,51 +79,23 @@ namespace TXServer.ECSSystem.Events
 					foreach (Entity entity in entities)
 					{
 						if (entity != null)
-							commands.AddLast(new ComponentRemoveCommand(entity, typeof(MountedItemComponent)));
+							commands.Add(new ComponentRemoveCommand(entity, typeof(MountedItemComponent)));
 					}
 
 					foreach (KeyValuePair<Entity, Entity> pair in preset.Modules)
 					{
 						if (pair.Key.Components.Contains(new ModuleGroupComponent(0)))
 						{
-							commands.AddLast(new ComponentRemoveCommand(pair.Key, typeof(ModuleGroupComponent)));
+							commands.Add(new ComponentRemoveCommand(pair.Key, typeof(ModuleGroupComponent)));
 						}
 					}
 
 					// Mount new preset items
-					item.Components.TryGetValue(FormatterServices.GetUninitializedObject(typeof(PresetEquipmentComponent)) as PresetEquipmentComponent, out Component component);
-					PresetEquipmentComponent newPreset = component as PresetEquipmentComponent;
-					entities = new List<Entity>
-					{
-						newPreset.HullItem,
-						newPreset.WeaponItem,
-						newPreset.TankPaint,
-						newPreset.WeaponPaint,
-						newPreset.Graffiti,
-					};
-					entities.AddRange(newPreset.HullSkins.Values);
-					entities.AddRange(newPreset.WeaponSkins.Values);
-					entities.AddRange(newPreset.WeaponShells.Values);
-					entities.AddRange(newPreset.Modules.Values);
-
-					foreach (Entity entity in entities)
-					{
-						if (entity != null)
-							commands.AddLast(new ComponentAddCommand(entity, new MountedItemComponent()));
-					}
-
-					foreach (KeyValuePair<Entity, Entity> pair in newPreset.Modules)
-					{
-						if (pair.Value != null)
-						{
-							commands.AddLast(new ComponentAddCommand(pair.Key, new ModuleGroupComponent(pair.Value)));
-						}
-					}
+					PresetEquipmentComponent newPreset = item.GetComponent<PresetEquipmentComponent>();
+					commands.AddRange(MountPresetItems(newPreset));
+					Player.Instance.CurrentPreset = newPreset;
 
 					CommandManager.SendCommands(Player.Instance.Socket, commands);
-
-					prevItem = preset.Preset;
-					Player.Instance.CurrentPreset = newPreset;
 					break;
 				default:
 					throw new NotImplementedException();
@@ -130,6 +104,46 @@ namespace TXServer.ECSSystem.Events
 			CommandManager.SendCommands(Player.Instance.Socket,
 				new ComponentRemoveCommand(prevItem, typeof(MountedItemComponent)),
 				new ComponentAddCommand(item, new MountedItemComponent()));
+		}
+
+		public static List<Command> MountPresetItems(PresetEquipmentComponent newPreset)
+        {
+			List<Command> commands = new List<Command>();
+
+			List<Entity> entities = new List<Entity>
+			{
+				newPreset.HullItem,
+				newPreset.WeaponItem,
+				newPreset.TankPaint,
+				newPreset.WeaponPaint,
+				newPreset.Graffiti,
+			};
+			entities.AddRange(newPreset.HullSkins.Values);
+			entities.AddRange(newPreset.WeaponSkins.Values);
+			entities.AddRange(newPreset.WeaponShells.Values);
+			entities.AddRange(newPreset.Modules.Values);
+
+			foreach (Entity entity in entities)
+			{
+				if (entity != null)
+					commands.Add(new ComponentAddCommand(entity, new MountedItemComponent()));
+			}
+
+			foreach (KeyValuePair<Entity, Entity> pair in newPreset.Modules)
+			{
+				if (pair.Value != null)
+				{
+					commands.Add(new ComponentAddCommand(pair.Key, new ModuleGroupComponent(pair.Value)));
+				}
+			}
+
+			return commands;
+		}
+
+		public static ComponentAddCommand MountAvatar(Entity item)
+        {
+			Player.Instance.ReferencedEntities["CurrentAvatar"] = item;
+			return new ComponentAddCommand(item, new MountedItemComponent());
 		}
 	}
 }

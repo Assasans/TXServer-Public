@@ -27,38 +27,8 @@ namespace TXServer.ECSSystem.Events
 
 			_ = clientSession ?? throw new ArgumentNullException(nameof(clientSession));
 
-			Entity user = new Entity(new TemplateAccessor(new UserTemplate(), ""),
-				new UserXCrystalsComponent(50000),
-				new UserCountryComponent("RU"),
-				new UserAvatarComponent("8b74e6a3-849d-4a8d-a20e-be3c142fd5e8"),
-				new UserComponent(),
-				new UserMoneyComponent(1000000),
-				//new FractionGroupComponent(Fractions.GlobalItems.Frontier),
-				//new UserDailyBonusCycleComponent(1),
-				new TutorialCompleteIdsComponent(),
-				new RegistrationDateComponent(),
-				new LeagueGroupComponent(Leagues.GlobalItems.Silver),
-				new UserStatisticsComponent(),
-				new PersonalChatOwnerComponent(),
-				new GameplayChestScoreComponent(),
-				new UserRankComponent(101),
-				new BlackListComponent(),
-				new UserUidComponent(Player.Instance.Uid),
-				//new FractionUserScoreComponent(500),
-				new UserExperienceComponent(2000000),
-				new QuestReadyComponent(),
-				new UserPublisherComponent(),
-				new FavoriteEquipmentStatisticsComponent(),
-				//new UserDailyBonusReceivedRewardsComponent(),
-				new ConfirmedUserEmailComponent("none"),
-				new UserSubscribeComponent(),
-				new KillsEquipmentStatisticsComponent(),
-				new BattleLeaveCounterComponent(),
-				new UserReputationComponent(0.0));
-
+			Entity user = UserTemplate.CreateEntity(Player.Instance.Uid);
 			Player.Instance.User = user;
-
-			user.Components.Add(new UserGroupComponent(user.EntityId));
 
 			List<Command> collectedCommands = new List<Command>()
 			{
@@ -69,33 +39,10 @@ namespace TXServer.ECSSystem.Events
 			collectedCommands.AddRange(from collectedEntity in ResourceManager.GetEntities(user)
 									   select new EntityShareCommand(collectedEntity));
 
-			Player.Instance.CurrentPreset.WeaponItem.Components.Add(new MountedItemComponent());
-			Player.Instance.CurrentPreset.HullItem.Components.Add(new MountedItemComponent());
-
-			Player.Instance.CurrentPreset.WeaponPaint.Components.Add(new MountedItemComponent());
-			Player.Instance.CurrentPreset.TankPaint.Components.Add(new MountedItemComponent());
-
-			foreach (Entity item in Player.Instance.CurrentPreset.WeaponSkins.Values)
-			{
-				item.Components.Add(new MountedItemComponent());
-			}
-			foreach (Entity item in Player.Instance.CurrentPreset.HullSkins.Values)
-			{
-				item.Components.Add(new MountedItemComponent());
-			}
-
-			foreach (Entity item in Player.Instance.CurrentPreset.WeaponShells.Values)
-			{
-				item.Components.Add(new MountedItemComponent());
-			}
-			Player.Instance.CurrentPreset.Graffiti.Components.Add(new MountedItemComponent());
-
-			Entity avatar = (Player.Instance.UserItems["Avatars"] as Avatars).Tankist;
-			avatar.Components.Add(new MountedItemComponent());
-			Player.Instance.ReferencedEntities.TryAdd("CurrentAvatar", avatar);
+			collectedCommands.AddRange(MountItemEvent.MountPresetItems(Player.Instance.CurrentPreset));
+			collectedCommands.Add(MountItemEvent.MountAvatar((Player.Instance.UserItems["Avatars"] as Avatars).Tankist));
 
 			collectedCommands.AddRange(new Command[] {
-				//new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
 				new SendEventCommand(new PaymentSectionLoadedEvent(), user),
 				new ComponentAddCommand(user, new UserOnlineComponent()),
 				new SendEventCommand(new FriendsLoadedEvent(), Player.Instance.ClientSession)

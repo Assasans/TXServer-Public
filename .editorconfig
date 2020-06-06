@@ -23,3 +23,6 @@ dotnet_diagnostic.CA1062.severity = none
 
 # IDE0055: Исправить форматирование
 dotnet_diagnostic.IDE0055.severity = none
+
+# Default severity for analyzer diagnostics with category 'Globalization'
+dotnet_analyzer_diagnostic.category-Globalization.severity = none

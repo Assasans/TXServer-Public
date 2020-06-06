@@ -8,8 +8,6 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static Chats GlobalItems { get; } = new Chats();
 
-        public Entity Ru { get; } = new Entity(-968268831, new TemplateAccessor(new GeneralChatTemplate(), "/chat/general/ru"),
-            new GeneralChatComponent(),
-            new ChatComponent());
+        public Entity Ru { get; } = GeneralChatTemplate.CreateEntity(-968268831, "ru");
     }
 }
