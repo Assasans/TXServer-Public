@@ -1,7 +1,7 @@
 host: 127.0.0.1
 acceptorPort: 5050
-configVersion: visual3-48546
-bundleDbVersion: visual3-48546
+configVersion: master-48606
+bundleDbVersion: master-48606
 resourcesUrl: http://127.0.0.1:8080/resources
 configsUrl: http://127.0.0.1:8080/config
 updateConfigUrl: http://127.0.0.1:8080/update/{BuildTarget}

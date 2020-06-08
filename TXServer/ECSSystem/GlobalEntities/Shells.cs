@@ -26,6 +26,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             return items;
         }
 
+        public Entity FlamethrowerAcid { get; private set; } = ShellMarketItemTemplate.CreateEntity(692677861, "flamethrower/acid", Weapons.GlobalItems.Flamethrower);
         public Entity FlamethrowerOrange { get; private set; } = ShellMarketItemTemplate.CreateEntity(357929046, "flamethrower/orange", Weapons.GlobalItems.Flamethrower);
         public Entity FlamethrowerRed { get; private set; } = ShellMarketItemTemplate.CreateEntity(-947470487, "flamethrower/red", Weapons.GlobalItems.Flamethrower);
         public Entity FreezeIndigo { get; private set; } = ShellMarketItemTemplate.CreateEntity(224610499, "freeze/indigo", Weapons.GlobalItems.Freeze);
