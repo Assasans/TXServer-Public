@@ -18,7 +18,8 @@ namespace TXServer.ECSSystem.Events
                 commands.Add(new EntityUnshareCommand(toUnload));
             }
 
-            CommandManager.SendCommands(Player.Instance.Socket, commands.ToArray());
+            lock (Player.Instance.EntityList)
+                CommandManager.SendCommands(Player.Instance.Socket, commands);
         }
 
         public HashSet<Entity> Users { get; set; }

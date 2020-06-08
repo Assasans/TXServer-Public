@@ -37,7 +37,9 @@ namespace TXServer.ECSSystem.Events
             }
 
             commands.Add(new SendEventCommand(new UsersLoadedEvent(RequestEntityId), entity));
-            CommandManager.SendCommands(Player.Instance.Socket, commands.ToArray());
+
+            lock (Player.Instance.EntityList)
+                CommandManager.SendCommands(Player.Instance.Socket, commands.ToArray());
         }
 
         public long RequestEntityId { get; set; }

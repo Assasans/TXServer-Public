@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 #if DEBUG
 using System.Diagnostics;
 #endif
@@ -15,7 +14,7 @@ namespace TXServer.Core
 {
     public partial class Player
     {
-        public ConcurrentQueue<Command> LobbyCommandQueue { get; } = new ConcurrentQueue<Command>();
+        public ConcurrentQueue<Action> LobbyCommandQueue { get; } = new ConcurrentQueue<Action>();
         public ConcurrentHashSet<Command> BattleCommandQueue { get; } = new ConcurrentHashSet<Command>();
 
         private void InitThreadLocals()
@@ -52,9 +51,9 @@ namespace TXServer.Core
                     SpinWait.SpinUntil(() => LobbyCommandQueue.Count + BattleCommandQueue.Count > 0 || !Active);
                     if (!Active) return;
 
-                    while (LobbyCommandQueue.TryDequeue(out Command command))
+                    while (LobbyCommandQueue.TryDequeue(out Action action))
                     {
-                        CommandManager.SendCommands(Socket, command);
+                        action();
                     }
 
                     // TODO battle commands

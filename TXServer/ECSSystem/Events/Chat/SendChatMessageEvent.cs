@@ -1,4 +1,5 @@
-﻿using TXServer.Core;
+﻿using System.Collections.Generic;
+using TXServer.Core;
 using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -26,27 +27,40 @@ namespace TXServer.ECSSystem.Events
 				case GeneralChatTemplate _:
 					foreach (Player player in ServerLauncher.Pool)
 					{
-						player.LobbyCommandQueue.Enqueue(command);
+						player.LobbyCommandQueue.Enqueue(() => CommandManager.SendCommands(player.Socket, command));
 					}
 					break;
 				case PersonalChatTemplate _:
+					Entity sender = Player.Instance.User;
+
 					foreach (Entity user in chat.GetComponent<ChatParticipantsComponent>().Users)
                     {
-						bool isShared = false;
-						if (!user.Owner.EntityList.Contains(chat))
-                        {
-							if (!user.Owner.EntityList.Contains(Player.Instance.User))
+						user.Owner.LobbyCommandQueue.Enqueue(() =>
+						{
+							lock (Player.Instance.EntityList)
 							{
-								user.Owner.LobbyCommandQueue.Enqueue(new EntityShareCommand(Player.Instance.User));
-								isShared = true;
+								List<Command> commands = new List<Command>();
+
+								bool isShared = false;
+
+								if (!user.Owner.EntityList.Contains(sender))
+								{
+									commands.Add(new EntityShareCommand(sender));
+									isShared = true;
+								}
+
+								if (!user.Owner.EntityList.Contains(chat))
+									commands.Add(new EntityShareCommand(chat));
+
+								commands.Add(command);
+
+								if (isShared)
+									commands.Add(new EntityUnshareCommand(sender));
+
+
+								CommandManager.SendCommands(Player.Instance.Socket, commands);
 							}
-
-							user.Owner.LobbyCommandQueue.Enqueue(new EntityShareCommand(chat));
-                        }
-						user.Owner.LobbyCommandQueue.Enqueue(command);
-
-						if (isShared)
-							user.Owner.LobbyCommandQueue.Enqueue(new EntityUnshareCommand(Player.Instance.User));
+						});
 					}
 					break;
 			}
