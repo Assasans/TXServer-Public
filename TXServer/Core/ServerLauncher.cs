@@ -62,7 +62,7 @@ namespace TXServer.Core
             };
             acceptWorker.Start();
 
-            StateServerWorker = new Thread(() => StateServer(ip))
+            StateServerWorker = new Thread(() => StateServer(ip, port))
             {
                 Name = "StateServer"
             };
@@ -162,7 +162,7 @@ namespace TXServer.Core
         /// HTTP state server.
         /// </summary>
         /// <param name="ip">IP address.</param>
-        public static void StateServer(IPAddress ip)
+        public static void StateServer(IPAddress ip, short serverPort)
         {
             string rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/StateServer";
             string resourcePath = "/resources";
@@ -195,7 +195,14 @@ namespace TXServer.Core
                         byte[] buffer;
                         try
                         {
-                            buffer = File.ReadAllBytes(rootPath + request.RawUrl.Split('?')[0]);
+                            buffer = File.ReadAllBytes(rootPath + request.Url.LocalPath);
+
+                            string extension = Path.GetExtension(request.Url.LocalPath);
+                            if (extension == ".yml" || string.IsNullOrEmpty(extension))
+                            {
+                                string unformatted = Encoding.UTF8.GetString(buffer);
+                                buffer = Encoding.UTF8.GetBytes(string.Format(unformatted, request.Url.Host, serverPort, request.UserHostAddress));
+                            }
                         }
                         catch
                         {

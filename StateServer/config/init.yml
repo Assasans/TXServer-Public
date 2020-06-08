@@ -1,8 +1,8 @@
-host: 127.0.0.1
-acceptorPort: 5050
+host: {0}
+acceptorPort: {1}
 configVersion: master-48606
 bundleDbVersion: master-48606
-resourcesUrl: http://127.0.0.1:8080/resources
-configsUrl: http://127.0.0.1:8080/config
-updateConfigUrl: http://127.0.0.1:8080/update/{BuildTarget}
-stateFileUrl: http://127.0.0.1:8080/state/_state.yml
+resourcesUrl: http://{2}/resources
+configsUrl: http://{2}/config
+updateConfigUrl: http://{2}/update/{{BuildTarget}}
+stateFileUrl: http://{2}/state/_state.yml
