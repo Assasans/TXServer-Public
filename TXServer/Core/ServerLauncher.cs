@@ -79,9 +79,12 @@ namespace TXServer.Core
             acceptWorker.Abort();
             StateServerWorker.Abort();
 
-            Pool.ForEach(player => player.Dispose());
-            Pool.Clear();
-
+            lock (Pool)
+            {
+                Pool.ForEach(player => player.Dispose());
+                Pool.Clear();
+            }
+            
             if (IsConsoleAttached)
             {
                 NativeMethods.FreeConsole();
@@ -95,20 +98,23 @@ namespace TXServer.Core
         /// <param name="socket"></param>
         private static void AddPlayer(Socket socket)
         {
-            int freeIndex = Pool.FindIndex(player => !player.Active);
+            lock (Pool)
+            {
+                int freeIndex = Pool.FindIndex(player => !player.Active);
 
-            if (freeIndex != -1)
-            {
-                Pool[freeIndex] = new Player(socket);
-            }
-            else if (PlayerCount < PoolSize)
-            {
-                Pool.Add(new Player(socket));
-            }
-            else
-            {
-                socket.Close();
-                Console.WriteLine("Сервер переполнен!");
+                if (freeIndex != -1)
+                {
+                    Pool[freeIndex] = new Player(socket);
+                }
+                else if (PlayerCount < PoolSize)
+                {
+                    Pool.Add(new Player(socket));
+                }
+                else
+                {
+                    socket.Close();
+                    Console.WriteLine("Сервер переполнен!");
+                }
             }
         }
 
@@ -197,8 +203,7 @@ namespace TXServer.Core
                         {
                             buffer = File.ReadAllBytes(rootPath + request.Url.LocalPath);
 
-                            string extension = Path.GetExtension(request.Url.LocalPath);
-                            if (extension == ".yml" || string.IsNullOrEmpty(extension))
+                            if (Path.GetExtension(request.Url.LocalPath) == ".yml")
                             {
                                 string unformatted = Encoding.UTF8.GetString(buffer);
                                 buffer = Encoding.UTF8.GetBytes(string.Format(unformatted, request.Url.Host, serverPort, request.UserHostAddress));

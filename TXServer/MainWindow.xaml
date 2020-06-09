@@ -29,7 +29,7 @@
                 <ComboBox x:Name="IPAddressComboBox" Grid.Column="1" Margin="10,10,21,0" VerticalAlignment="Top" SelectedIndex="0" Height="22"/>
 
                 <TextBlock HorizontalAlignment="Left" Margin="10,13,0,0" TextWrapping="Wrap" Text="IP address:" VerticalAlignment="Top" Height="16" Width="70"/>
-                <TextBox x:Name="PortTextBox" Grid.Column="1" Height="23" Margin="10,37,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="5050" IsEnabled="False"/>
+                <TextBox x:Name="PortTextBox" Grid.Column="1" Height="23" Margin="10,37,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="5050"/>
 
                 <TextBlock HorizontalAlignment="Left" Margin="10,66,0,0" TextWrapping="Wrap" Text="Max players:" VerticalAlignment="Top" Height="22" Width="109"/>
                 <TextBox x:Name="MaxPlayersTextBox" Height="23" Margin="10,65,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Text="5"/>

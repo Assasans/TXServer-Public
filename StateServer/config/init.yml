@@ -4,5 +4,5 @@ configVersion: master-48606
 bundleDbVersion: master-48606
 resourcesUrl: http://{2}/resources
 configsUrl: http://{2}/config
-updateConfigUrl: http://{2}/update/{{BuildTarget}}
+updateConfigUrl: http://{2}/update/{{BuildTarget}}.yml
 stateFileUrl: http://{2}/state/_state.yml
