@@ -90,12 +90,15 @@
     <Compile Include="ECSSystem\Components\Notification\NewItemNotificationComponent.cs" />
     <Compile Include="ECSSystem\Components\Notification\NotificationComponent.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Chat\PersonalChatTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Item\ICountableItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IMountableItemTemplate.cs" />
-    <Compile Include="ECSSystem\EntityTemplates\Item\IUserItemTemplate.cs" />
-    <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\IWeaponUserItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Item\UserItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\WeaponUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\WeaponMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Notification\NewItemNotificationTemplate.cs" />
+    <Compile Include="ECSSystem\Events\Item\BuyMarketItemEvent.cs" />
+    <Compile Include="ECSSystem\Events\Item\ItemsCountChangedEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\OpenContainerEvent.cs" />
     <Compile Include="ECSSystem\Events\Notification\NotificationShownEvent.cs" />
     <Compile Include="ECSSystem\Events\Notification\ShowNotificationGroupEvent.cs" />

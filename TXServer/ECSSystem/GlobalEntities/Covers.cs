@@ -10,9 +10,9 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static Covers GlobalItems { get; } = new Covers();
 
-        public static ItemList GetUserItems(Entity user)
+        public static Covers GetUserItems(Entity user)
         {
-            ItemList items = FormatterServices.GetUninitializedObject(typeof(Covers)) as ItemList;
+            Covers items = FormatterServices.GetUninitializedObject(typeof(Covers)) as Covers;
 
             foreach (PropertyInfo info in typeof(Covers).GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {

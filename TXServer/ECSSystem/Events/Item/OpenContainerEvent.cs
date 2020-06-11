@@ -25,7 +25,8 @@ namespace TXServer.ECSSystem.Events
 			CommandManager.SendCommands(Player.Instance.Socket,
 				new ComponentChangeCommand(container, component),
 				new EntityShareCommand(notification),
-				new SendEventCommand(new ShowNotificationGroupEvent(1), container));
+				new SendEventCommand(new ShowNotificationGroupEvent(1), container),
+				new SendEventCommand(new ItemsCountChangedEvent(-Amount), container));
         }
 
         public long Amount { get; set; }

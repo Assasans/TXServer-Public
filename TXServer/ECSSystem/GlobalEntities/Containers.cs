@@ -10,10 +10,10 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static Containers GlobalItems { get; } = new Containers();
 
-        public static ItemList GetUserItems(Entity user)
+        public static Containers GetUserItems(Entity user)
         {
-            ItemList items = FormatterServices.GetUninitializedObject(typeof(Containers)) as ItemList;
-
+            Containers items = FormatterServices.GetUninitializedObject(typeof(Containers)) as Containers;
+            
             foreach (PropertyInfo info in typeof(Containers).GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
                 Entity marketItem = info.GetValue(GlobalItems) as Entity;

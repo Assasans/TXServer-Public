@@ -50,7 +50,7 @@ namespace TXServer.ECSSystem.GlobalEntities
         {
             public UserItems()
             {
-                Goldbonus.Components.Add(new ModuleGroupComponent((Player.Instance.UserItems[typeof(Modules).Name] as Modules).Gold));
+                Goldbonus.Components.Add(new ModuleGroupComponent((Player.Instance.UserItems[typeof(Modules)] as Modules).Gold));
 
                 PresetEquipmentComponent component = new PresetEquipmentComponent(Preset);
                 Preset.Components.Add(component);

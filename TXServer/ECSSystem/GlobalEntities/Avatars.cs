@@ -11,9 +11,9 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static Avatars GlobalItems { get; } = new Avatars();
 
-        public static ItemList GetUserItems(Entity user)
+        public static Avatars GetUserItems(Entity user)
         {
-            ItemList items = FormatterServices.GetUninitializedObject(typeof(Avatars)) as ItemList;
+            Avatars items = FormatterServices.GetUninitializedObject(typeof(Avatars)) as Avatars;
 
             foreach (PropertyInfo info in typeof(Avatars).GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {

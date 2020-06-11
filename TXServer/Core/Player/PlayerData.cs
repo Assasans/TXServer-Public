@@ -26,7 +26,7 @@ namespace TXServer.Core
 
         public string Uid { get; set; }
 
-        public ConcurrentDictionary<string, ItemList> UserItems { get; } = new ConcurrentDictionary<string, ItemList>();
+        public ConcurrentDictionary<Type, ItemList> UserItems { get; } = new ConcurrentDictionary<Type, ItemList>();
         public PresetEquipmentComponent CurrentPreset { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using TXServer.Core;
 using TXServer.ECSSystem.Base;
@@ -95,8 +96,10 @@ namespace TXServer.ECSSystem.GlobalEntities
                 if (info == null) continue;
 
                 ItemList list = info.Invoke(null, new object[] { user }) as ItemList;
-                entities.AddRange(list.GetAllItems());
-                Player.Instance.UserItems.TryAdd(type.Name, list);
+                entities.AddRange(from entity in list.GetAllItems()
+                                  where entity != null
+                                  select entity);
+                Player.Instance.UserItems.TryAdd(type, list);
             }
 
             return entities.ToArray();

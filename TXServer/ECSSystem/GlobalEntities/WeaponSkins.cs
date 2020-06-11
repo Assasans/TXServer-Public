@@ -10,9 +10,9 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static WeaponSkins GlobalItems { get; } = new WeaponSkins();
 
-        public static ItemList GetUserItems(Entity user)
+        public static WeaponSkins GetUserItems(Entity user)
         {
-            ItemList items = FormatterServices.GetUninitializedObject(typeof(WeaponSkins)) as ItemList;
+            WeaponSkins items = FormatterServices.GetUninitializedObject(typeof(WeaponSkins)) as WeaponSkins;
 
             foreach (PropertyInfo info in typeof(WeaponSkins).GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {

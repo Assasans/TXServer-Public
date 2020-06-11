@@ -40,7 +40,7 @@ namespace TXServer.ECSSystem.Events
 									   select new EntityShareCommand(collectedEntity));
 
 			collectedCommands.AddRange(MountItemEvent.MountPresetItems(Player.Instance.CurrentPreset));
-			collectedCommands.Add(MountItemEvent.MountAvatar((Player.Instance.UserItems["Avatars"] as Avatars).Tankist));
+			collectedCommands.Add(MountItemEvent.MountAvatar((Player.Instance.UserItems[typeof(Avatars)] as Avatars).Tankist));
 
 			collectedCommands.AddRange(new Command[] {
 				new SendEventCommand(new PaymentSectionLoadedEvent(), user),

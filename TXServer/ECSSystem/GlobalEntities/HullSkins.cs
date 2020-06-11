@@ -11,9 +11,9 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static HullSkins GlobalItems { get; } = new HullSkins();
 
-        public static ItemList GetUserItems(Entity user)
+        public static HullSkins GetUserItems(Entity user)
         {
-            ItemList items = FormatterServices.GetUninitializedObject(typeof(HullSkins)) as ItemList;
+            HullSkins items = FormatterServices.GetUninitializedObject(typeof(HullSkins)) as HullSkins;
 
             foreach (PropertyInfo info in typeof(HullSkins).GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {

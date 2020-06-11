@@ -11,9 +11,9 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static Graffiti GlobalItems { get; } = new Graffiti();
 
-        public static ItemList GetUserItems(Entity user)
+        public static Graffiti GetUserItems(Entity user)
         {
-            ItemList items = FormatterServices.GetUninitializedObject(typeof(Graffiti)) as ItemList;
+            Graffiti items = FormatterServices.GetUninitializedObject(typeof(Graffiti)) as Graffiti;
 
             foreach (PropertyInfo info in typeof(Graffiti).GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {

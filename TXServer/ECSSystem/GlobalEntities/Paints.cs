@@ -10,9 +10,9 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static Paints GlobalItems { get; } = new Paints();
 
-        public static ItemList GetUserItems(Entity user)
+        public static Paints GetUserItems(Entity user)
         {
-            ItemList items = FormatterServices.GetUninitializedObject(typeof(Paints)) as ItemList;
+            Paints items = FormatterServices.GetUninitializedObject(typeof(Paints)) as Paints;
 
             foreach (PropertyInfo info in typeof(Paints).GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
@@ -21,6 +21,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 Entity userItem = (marketItem.TemplateAccessor.Template as IMarketItemTemplate).GetUserItem(marketItem, user);
                 info.SetValue(items, userItem);
             }
+
+            items.Green = new TankPaintMarketItemTemplate().GetUserItem(GlobalItems.Green, user);
 
             return items;
         }

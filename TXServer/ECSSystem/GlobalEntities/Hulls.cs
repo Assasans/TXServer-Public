@@ -11,9 +11,9 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static Hulls GlobalItems { get; } = new Hulls();
 
-        public static ItemList GetUserItems(Entity user)
+        public static Hulls GetUserItems(Entity user)
         {
-            ItemList items = FormatterServices.GetUninitializedObject(typeof(Hulls)) as ItemList;
+            Hulls items = FormatterServices.GetUninitializedObject(typeof(Hulls)) as Hulls;
 
             foreach (PropertyInfo info in typeof(Hulls).GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {

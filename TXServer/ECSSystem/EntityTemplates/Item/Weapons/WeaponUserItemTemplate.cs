@@ -1,9 +1,10 @@
 ﻿using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.ECSSystem.EntityTemplates
 {
-    public abstract class WeaponUserItemTemplate : IEntityTemplate, IMountableItemTemplate
+    public abstract class WeaponUserItemTemplate : UserItemTemplate, IMountableItemTemplate
 	{
 		public static Entity CreateEntity(Entity marketItem, Entity user)
         {
@@ -46,8 +47,8 @@ namespace TXServer.ECSSystem.EntityTemplates
                     break;
             }
 
-            Entity item = new Entity(new TemplateAccessor(template, marketItem.TemplateAccessor.ConfigPath), marketItem.Components);
-            item.Components.UnionWith(new Component[]
+            Entity userItem = new Entity(new TemplateAccessor(template, marketItem.TemplateAccessor.ConfigPath), marketItem.Components);
+            userItem.Components.UnionWith(new Component[]
             {
                 new UserGroupComponent(user),
                 new ExperienceItemComponent(),
@@ -55,7 +56,8 @@ namespace TXServer.ECSSystem.EntityTemplates
                 new UpgradeMaxLevelItemComponent()
             });
 
-            return item;
+            AddToUserItems(typeof(Weapons), userItem);
+            return userItem;
         }
 	}
 }

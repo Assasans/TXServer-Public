@@ -11,9 +11,9 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static Shells GlobalItems { get; } = new Shells();
 
-        public static ItemList GetUserItems(Entity user)
+        public static Shells GetUserItems(Entity user)
         {
-            ItemList items = FormatterServices.GetUninitializedObject(typeof(Shells)) as ItemList;
+            Shells items = FormatterServices.GetUninitializedObject(typeof(Shells)) as Shells;
 
             foreach (PropertyInfo info in typeof(Shells).GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {

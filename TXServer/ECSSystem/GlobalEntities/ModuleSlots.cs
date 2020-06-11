@@ -8,9 +8,9 @@ namespace TXServer.ECSSystem.GlobalEntities
 {
     public class ModuleSlots : ItemList
     {
-        public static ItemList GetUserItems(Entity user)
+        public static ModuleSlots GetUserItems(Entity user)
         {
-            ItemList items = new ModuleSlots();
+            ModuleSlots items = new ModuleSlots();
 
             foreach (PropertyInfo info in typeof(ModuleSlots).GetProperties())
             {
