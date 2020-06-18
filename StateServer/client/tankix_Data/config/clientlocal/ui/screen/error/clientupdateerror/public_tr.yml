@@ -1,0 +1,7 @@
+---
+headerText: Hata
+errorText: Oyunu güncellerken bir hata oluştu
+exitButtonLabel: ÇIKIŞ
+reportButtonLabel: RAPOR ET
+reportUrl: https://help.tankix.com/en/tanki-x
+reConnectTime: 999999

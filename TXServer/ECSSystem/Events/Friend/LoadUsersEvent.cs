@@ -24,7 +24,7 @@ namespace TXServer.ECSSystem.Events
                 try
                 {
                     found = ServerLauncher.Pool
-                        .Where(player => player.User != null && player.User.EntityId != Player.Instance.User.EntityId && id == player.User.EntityId)
+                        .Where(player => player.User?.EntityId != Player.Instance.User.EntityId && player.User?.EntityId == id)
                         .Select(player => player.User)
                         .Single();
                 }

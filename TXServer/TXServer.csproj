@@ -59,6 +59,9 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -97,6 +100,8 @@
     <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\WeaponUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\WeaponMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Notification\NewItemNotificationTemplate.cs" />
+    <Compile Include="ECSSystem\Events\Friend\LoadSortedFriendsIdsWithNicknamesEvent.cs" />
+    <Compile Include="ECSSystem\Events\Friend\SortedFriendsIdsWithNicknamesLoaded.cs" />
     <Compile Include="ECSSystem\Events\Item\BuyMarketItemEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\ItemsCountChangedEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\OpenContainerEvent.cs" />
@@ -495,6 +500,7 @@
   </Target>
   <PropertyGroup>
     <PostBuildEvent>(robocopy "$(SolutionDir)StateServer" "$(TargetDir)StateServer" /mir /xo /nfl /ndl /njs /nc /ns /np
-) ^&amp; IF %25ERRORLEVEL%25 LEQ 1 exit 0</PostBuildEvent>
+) ^&amp; IF %25ERRORLEVEL%25 LEQ 1  type nul&gt;nul
+"$(SolutionDir)7-Zip\7z.exe" a -ttar -so -an "$(TargetDir)StateServer\client\*" | "$(SolutionDir)7-Zip\7z.exe" a -si "$(TargetDir)StateServer\resources\StandaloneWindows\tankix.tgz"</PostBuildEvent>
   </PropertyGroup>
 </Project>

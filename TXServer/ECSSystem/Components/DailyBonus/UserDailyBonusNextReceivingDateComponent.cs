@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Components
 	public class UserDailyBonusNextReceivingDateComponent : Component
 	{
 		[OptionalMapped]
-		public TXDate Date { get; set; } = new TXDate(DateTimeOffset.Now);
+		public TXDate Date { get; set; } = new TXDate();
 
 		public long TotalMillisLength { get; set; } = 24000000;
 	}

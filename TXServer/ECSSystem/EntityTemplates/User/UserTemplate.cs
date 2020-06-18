@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.EntityTemplates
     {
         public static Entity CreateEntity(string uid)
         {
-            Entity entity = new Entity(new TemplateAccessor(new UserTemplate(), ""),
+			Entity entity = new Entity(new TemplateAccessor(new UserTemplate(), ""),
 				new UserXCrystalsComponent(50000),
 				new UserCountryComponent("RU"),
 				new UserAvatarComponent("8b74e6a3-849d-4a8d-a20e-be3c142fd5e8"),
@@ -26,7 +26,11 @@ namespace TXServer.ECSSystem.EntityTemplates
 				new BlackListComponent(),
 				new UserUidComponent(uid),
 				new UserExperienceComponent(2000000),
-				new QuestReadyComponent(),
+				new UserDailyBonusCycleComponent(0),
+				new UserDailyBonusZoneComponent(0),
+				new UserDailyBonusInitializedComponent(),
+				new UserDailyBonusNextReceivingDateComponent(),
+				new UserDailyBonusReceivedRewardsComponent(),
 				new UserPublisherComponent(),
 				new FavoriteEquipmentStatisticsComponent(),
 				new ConfirmedUserEmailComponent("none"),
@@ -34,6 +38,7 @@ namespace TXServer.ECSSystem.EntityTemplates
 				new KillsEquipmentStatisticsComponent(),
 				new BattleLeaveCounterComponent(),
 				new UserReputationComponent(0.0));
+
 			entity.Components.Add(new UserGroupComponent(entity));
 
 			return entity;

@@ -1,0 +1,6 @@
+---
+loadScreenLocalizedText:
+  loadFromDiskText: Yükleniyor
+  networkLoadText: İndiriliyor
+  skipLoadingButton: OYNA
+  initializationText: Başlatılıyor...

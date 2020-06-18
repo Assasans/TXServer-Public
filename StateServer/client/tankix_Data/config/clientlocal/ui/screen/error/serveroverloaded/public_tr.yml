@@ -1,0 +1,4 @@
+---
+headerText: "SUNUCULAR ÇOK DOLU"
+errorText: "Sunucumuza katılan çok sayıda oyuncu sebebiyle şu anda seni oyuna alamıyoruz.\nYer açılır açılmaz seni otomatik olarak oyuna alacağız."
+reConnectTime: 30

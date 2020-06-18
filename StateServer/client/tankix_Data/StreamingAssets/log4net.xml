@@ -1,0 +1,35 @@
+<log4net>
+    <appender name="unity" type="Platform.Tool.ClientUnityLogger.API.UnityAppender">
+        <layout type="log4net.Layout.PatternLayout">
+            <converter>
+                <name value="frameCount" />
+                <type value="Platform.Tool.ClientUnityLogger.API.FrameCountConverter" />
+            </converter>
+            <conversionPattern value="log4net: %date{ABSOLUTE} (frame %frameCount) %logger{1} - %m%n" />
+        </layout>
+    </appender>
+    <root>
+        <level value="ERROR" />
+        <appender-ref ref="unity" />
+    </root>
+
+    <logger name="Tanks.Battle.ClientCore.Impl.PerformanceStatisticsSystem" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="unity" />
+	</logger>
+
+	<logger name="Platform.Library.ClientUnityIntegration.Impl.CrashReporter" additivity="false">
+		<level value="WARN" />
+		<appender-ref ref="unity" />
+	</logger>
+
+	<logger name="Platform.Library.ClientResources.Impl.AssetBundleLoadSystem" additivity="false">
+		<level value="WARN" />
+		<appender-ref ref="unity" />
+	</logger>
+
+	<logger name="Tanks.Lobby.ClientEntrance.Impl.ConnectionReportActivator" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="unity" />
+	</logger>
+</log4net>

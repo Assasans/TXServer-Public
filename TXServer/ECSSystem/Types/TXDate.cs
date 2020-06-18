@@ -9,9 +9,9 @@ namespace TXServer.ECSSystem.Types
             Time = DateTimeOffset.Now.ToUnixTimeMilliseconds();
         }
 
-        public TXDate(DateTimeOffset Time)
+        public TXDate(DateTimeOffset time)
         {
-            this.Time = Time.ToUnixTimeSeconds();
+            Time = time.ToUnixTimeMilliseconds();
         }
 
         public TXDate(TimeSpan span)

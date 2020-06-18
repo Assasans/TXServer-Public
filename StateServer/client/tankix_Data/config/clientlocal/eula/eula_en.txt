@@ -1,0 +1,353 @@
+﻿END USER LICENSE AGREEMENT
+ 
+Last updated: October 09, 2018
+
+
+1. Introduction and Scope
+
+
+1.1 Clicking “Accept” at the registration form means that you are acquainted and agree with the underwritten Agreement, and unconditionally accept all of its terms.
+ 
+If you do not agree with any part of the Agreement, you have no right to use the Game and its services and must leave the site immediately.
+ 
+This End User License Agreement (“EULA”) constitutes and governs the contractual relationship between the parties: AlternativaPlatform Ltd, a company duly registered under the laws of Malta bearing registration number C59773, and having its registered address at 60/2 Melita Street, Valletta VLT 1122 (hereinafter referred to as “Company”); and you, as the user, hereinafter referred to as “You” or “User”.
+ 
+2. Documents forming part of this EULA
+ 
+2.1. The hereunder list of documents form an integral part of this EULA:
+Privacy and Cookies Policy.
+
+
+The documents will permanently be accessible on the website in its actual version for review and print under 
+Game Rules
+The Privacy and Cookies Policy
+ 
+3. Definitions
+ 
+3.1. The following words and terms, should be interpreted as follows, unless the context clearly implies otherwise, and shall apply to all the sections of this EULA and to every document forming part of this EULA:
+ 
+“Account/ User’s Account” shall mean a personal account opened by the User and maintained by the Company, which shall contain Account Information.
+ 
+“Account Information” shall mean the Login and Password, Username and other data that enables User identification in the Game.
+ 
+“Administration” shall mean the persons acting in the name and on behalf of the Company for the provision of operation of the Game.
+ 
+“Agreement” shall refer to this EULA, including all documents forming an integral part of this EULA, the Game Rules, and also other rules and instructions placed by the Company on the Internet Site or sites of the Company’s partners.
+ 
+“Crystals” shall refer to an in-game currency that is free of charge, and is used in the Game, and by means of which the Services can be availed of.
+
+
+ “Digital Content” shall refer to (i) Crystals; (ii) virtual in-game items; (iii) Subscriptions, purchased with “real-world” money on a basis of a limited, simple, non-exclusive, non-transferable, non-sublicensable and revocable license.
+ 
+“EULA” shall refer to this End User License Agreement.
+ 
+“Game” shall refer to the interactive multi-user online game ‘Tanki X’, including all its components, game services, Crystals, X-Crystals, themes, objects, virtual items, characters, character names, stories, catch phrases, concepts, images, sounds, animations, audio-visual effects, client software, sites, computer programs, chat, forum, official communities on social networks, and all materials and any web resources that are placed on the Internet Site`s sub-domain with address /en/ on the domain name http://tankix.com with its game Servers for use by Users.
+ 
+“Identified” or “Identifiable Natural Person” shall mean a person who can be identified, directly or indirectly, in particular by reference to an identification number or to one or more factors specific to his identity.
+ 
+“Internet Site” shall mean the totality of all the Materials and web-resources located at the sub-domain with address /en/ on the domain name http://tankix.com with its game Servers and other websites connected to it and accessible through links or other access paths and the services available through such sites which have been legally and officially recognized by the Company.
+ 
+“License” shall mean a simple non-exclusive and revocable license which the Company grants to the User for the personal and non-commercial use of the Game.
+ 
+“Login and Password” shall mean the login and password details that are chosen by the User upon registering with the Game.
+ 
+“Material(s)” shall mean the different objects in the form of texts, drawings, images, sounds, programs, commands, names, subjects, stories, dialogues, phrases, concepts, illustration, animations, sounds, musical compositions and effects, documentation, game chats or any other form, and include any other derivative material placed in the Game by the User or the Company.
+ 
+“Minor/s” means individuals who are under the age of 18 and/or who have otherwise not yet reached the age of majority as established under the laws of their country of residence, and who have registered with the Game and in whose name an Account has been opened.
+   
+“Parties” shall collectively mean the User and the Company.
+ 
+“Payment Agent” shall mean third parties that are authorized by the Company to receive and process payments from Users in the interests of the Company via the various payment methods provided by such authorized third parties.
+ 
+“Payment” shall mean the fees paid by the User to Payment Agents to avail himself of the Digital Content requested, which order and amount shall be determined and regulated by the Digital Content Purchase Instruction.
+
+
+ 
+“Personal Information” shall mean any information relating to an Identified or Identifiable Natural Person.
+ 
+“User” / “You/r” shall refer to the individual who uses the Game and/or its trial versions.
+ 
+“Privacy Policy” refers to the document covering the privacy of Users and the storage of cookies.
+ 
+“Server” shall mean the hardware-software support of the Company used for the virtual interactive User interaction.
+ 
+“Service” shall mean the granting to a User of the right to use the Game both on free, and on paid basis, on terms of the simple non-exclusive and revocable license, to the extent and under the conditions provided by the EULA.
+ 
+“Software” shall mean the software licensed by the Company including all programs and databases and any other derived content which may require download, whether accessible or otherwise used by the User through the Internet Site and allowing the User to participate in the Game.
+ 
+“Subscription” shall refer to a special User's status and/or improving and/or modification and/or alteration of virtual items, providing  additional benefits to the User for the period established by the Company. 
+
+
+“Use of Game” shall mean all authorized and possible types of use of the Game, which shall include Game initiation by Users and/ or use of technical possibilities of the Game on a free and on a paid basis and/ or Game installation and/ or any other actions necessary for the operation of the Game.
+ 
+“User name” shall mean the nickname chosen by the User on Account registration.
+
+
+“X-Crystals” shall refer to in-game currency which may be availed of by the User on paid basis according to Section 15 of the Agreement, or free of charge by means of conversion of Crystals into X-Crystals at the rate determined by the Company.
+
+
+Other terms, definitions and word combinations used in the Game shall have the meaning and interpretation that established practice has assigned to such terms, definitions and word combinations at work in the field of Internet technologies, digital gaming and according to the Governing Law.
+ 
+4. Registration
+ 
+4.1. By clicking “Accept” at the registration form, You confirm that you have read, understood, agreed and unconditionally accepted this EULA as set out below, and accepted any documents forming an integral part of this EULA, and You hereby guarantee that You are a Person vested with all the powers to use the Game according to the Governing Law and any other applicable law. By registering an Account, You are explicitly stating that You are age 13 or older. If you are between the ages of 13 and under the age of 18, you may use the Game only under the supervision of a parent or legal guardian who agrees to be bound by this EULA and any additional terms contained in related documents.
+4.2. During registration and/or the use/purchase of Digital Content the Company will provide for reasonable, effective and accessible technical means with the aid of which the user may identify and correct input errors prior to making his order (e.g. display of errors, possibility to double check provided information).  Registration and/or the use/purchase of Digital Content will be possible to conduct in English and other languages, which may be offered at sole discretion of the Company.
+4.3. By using the Game in any manner and/or clicking “Accept” at the registration form, the User confirms that he wishes and agrees to receive electronic messages (e-mails), short messaging services (messages about news and/or on updates in the Game, advertising and promotional materials from the Company or partners of the Company) (hereinafter referred to as “Electronic Mailing”) distributed by the Company and/or partners of the Company, including, but not limited to, telecommunication networks, using telephone, facsimile, mobile, radio communications and other means. By providing e-mail address and/or phone number, the User gives additional confirmation of the User's consent to receive electronic mailing by any means and to transfer the User's Personal information to partners of the Company.
+From the moment of the User's consent to receive electronic mailing, the Company and/or partners of the Company have the right to send out to the User messages of any nature (including, but not limited to e-mails and short messaging services).
+4.5. If the User does not want to receive electronic mailing from the Company or its partners, he may refuse to receive electronic mailing at any time by following the link specified in the lower part of the electronic message. If the User does not want to receive electronic mailing from the Company, the User may refuse to receive electronic mailing at any time, by changing the appropriate personal settings in the Game and, thereby, refusing to receive news.
+
+
+5. Grant of a Limited License
+
+
+5.1. Subject to the terms contained herein and your continuing compliance with this EULA, the Company hereby grants You a limited, simple, non-exclusive, non-transferable, non-sublicensable  and revocable license to use of the Game including images, sounds, animations, audio-visual effects, client software for Your personal and noncommercial purposes.
+5.2. The User may obtain the limited nonexclusive and revocable license to use the virtual  in-game items and benefits by means of Crystals and/or X-Crystals in accordance with the Agreement. Crystals or X-Crystals shall be debited from the User Account to the sum corresponding to the designated equivalent value of the virtual item or benefit. 
+5.3. Transfer of the exclusive right to the Game to a new owner is not a cause which shall necessitate the amendment or cancellation of this EULA.
+
+
+6. License Limitations
+6.1.Any use of the Game in violation of this EULA or any other documents forming an integral part of this EULA, and rules of applicable law is strictly prohibited, and can result in the immediate revocation of your limited license and may subject you to liability for violations of the law. 
+6.2. You hereby acknowledge and agree that you will not under any circumstances:
+6.2.1. Copy, adapt, create derivative works of, display, distribute, lease, loan, modify, rent, sublicense, translate and/or transfer the Game without obtaining the Company’s prior written consent.
+6.2.2. Reverse engineer, decompile, disassemble, prepare derivative works based on, derive source code from, reverse engineer and/or attempt to reverse engineer software, make other actions with the object code or source code of the Game, violate any protection system, perform illegal use of the Game and obtaining information about realization of algorithms used in the Game, create derivative software products by using the Game without written consent of the Company to the extent that such actions are not allowed by compelling applicable laws.
+6.2.3. Derive code, nor attempt to derive code from any packet stream transmitted to or from the Game, whether encrypted or not.
+6.2.4. Use cheats, exploits, automation software, bots, hacks, mods or any unauthorized third-party software designed to modify or interfere with the Game or any game experience.
+6.2.5. Disrupt, overburden, or aid or assist in the disruption or overburdening of any computer or server used to offer or support the Service or any game environment.
+6.2.6. Make available through the Game any material or information that infringes any copyright, trademark, patent, trade secret, right of privacy, right of publicity, or other right of any person or entity or impersonates any other person, including without limitation a Company employee
+6.2.7.  Transfer and/or assign this License to any third party.
+6.3. The Company reserves the right to determine what conduct it considers to be in violation of the EULA. Company reserves the right to take action as a result, which may include terminating your Account and prohibiting you from using the Game in whole or in part.
+6.4. The Company shall have the right to display and publish any information relating to User activity on the Internet Site and/or the Game in any list without any notice or compensation to the User whatsoever.
+
+
+7. Company’s Ownership
+
+
+7.1. The Company (or its affiliates as the case may be) owns, has licensed, or otherwise has rights to the Game (including all its components, game services, Crystals, themes, virtual items, objects, characters, character names, stories, catch phrases, concepts,  chat-room, forum, official communities on social networks, and all materials, images, sounds, animations, audio-visual effects, software, sites, computer programs, chat, forum, official communities on social networks, and all materials and any web resources that are placed on the Internet Site), gameplay videos or of all the Material(s) and of all the other property available in or in connection with the Game that is covered by the relevant copyrights, patent rights, know-how, trademarks and other proprietary and intellectual property rights and of any other material generally found in the Game.
+7.2. The Company owns, has licensed, or otherwise has rights to use all of the content that appears in the Game. Notwithstanding any provision to the contrary herein, you agree that you have no right or title in or to any content that appears in the game, including without limitation the ingame items or Crystals appearing or originating in the Game, whether earned in a game or purchased from the Company, gameplay video, an Account or any other attributes associated with an Account or stored in the Game.
+
+
+8. User Materials 
+
+
+8.1. The User may also send User-created Materials to the Company or to its representatives, to place these Material(s) within certain parts of the Game, on the Site and in other game services. The User shall be solely responsible for any Material placed therein, and the User hereby accepts to be solely held liable for any damages which might arise in connection with any of these Material(s) to the extent that such damages are caused by the User. The User confirms that he has all the required rights to such Materials and that he is completely responsible for the placement and use of such Materials. Section 20 relating to the Parties liability under this EULA shall remain unaffected hereby.
+8.2. Placing Materials, site links in the Game by Users or the third parties doesn't mean that the Company has reviewed, verified or approved such placing, nor that it recommends it. The Company doesn't bear any responsibility for the content of such Materials and sites, nor for any direct or indirect damage caused by the usage of such Materials or sites. Section 20 relating to the Parties liability under this EULA shall remain unaffected hereby.
+8.3. The User hereby grants the Company the non-exclusive, royalty-free, unlimited in time and territory right to use the Material(s) that the User has placed in the Game or has sent to the Company or its representatives (including for participation in a contest). The right to use the Materials includes the  right to place, modify, adapt, transfer or sublicense to third parties, create derived Materials, redevelop Materials, distribute, delete, disable access to or reproduce, show publicly, make available to the public and effect any changes, reductions, additions, comments, explanations to the Material, to publish Materials, to use Materials and/or otherwise without specifying the User and without granting any royalty or other compensation. The User undertakes to provide legal grounds for  the transfer of rights to the Company concerning the Materials placed by the User in the Game or on the Site. 
+8.4. The Company provides to the User a non-exclusive and non-transferable right to use the Materials of other Users by viewing, reproduction (including making copies), processing (including printouts of copies) and other rights only for the purpose of personal non-commercial use. You may not use Materials in cases: (i) when  such use can harm the legally protected interests of the Company, (ii) use of the Materials in other products, (iii) use of the Materials for non-personal purposes and etc.
+ 
+9. Amendments to this EULA
+ 
+9.1. The Company hereby reserves the right to suspend, add, end, amend and/or supplement this EULA together with the documents forming an integral part of this EULA at any time as the Company may deem appropriate, provided the prior notice as follows: (i) the Company will post updated version of this EULA on the Internet Site, and/or (ii) the Company will inform you of the particular changes in advance via e-mail or provide other sufficient notice as the Company may elect in its sole discretion no later than the day when such changes shall come into effect. Any changes will enter into force from the moment of making the corresponding changes and the posting of the updated version on the Internet Site. You shall be deemed to have accepted these changes (i) unless you have notified the Company of your objection to such changes within ten (10) calendar days from the moment of receipt the e-mail notification from us, or (ii) if you use the Game or the Internet Site after the changes have entered into force. 
+In case you object to any changes the previous version of the EULA shall continue to apply. However, in that case the Company will  have the right to close your Account and terminate these EULA Terms with fourteen (14) calendar days’ notice. Upon your request, the Company will reimburse payments for purchased Digital Content which by the time the termination comes into effect have (i) been purchased and applied to the account and (ii) have not been debited already  from the User Account.  
+9.2. The Company highly recommends that from time to time the User revises this EULA in order to have knowledge of any modified version of this EULA. 
+9.3. The Company is under no obligation to verify whether the User uses the Game and/ or Internet Site according to the updated version of this EULA. Save for the above, the version posted on the Internet Site is the effective version, and that which the User should use as reference. It is the User’s responsibility to inform himself of this EULA, as well as being familiar with any modifications that affect the User and/or will and/or might affect the User.
+
+
+10. User Communications
+ 
+10.1. The forum, real-game interactive chat (“Chat”)  and/or community services offered by the Company are intended to offer a fun and pleasant experience. As these communication tools do not constitute an electronic communication service (in legal terms), messages sent using them should not be considered private or personal. So that we can provide a fun, safe and lawful environment for all our players, we have a policy of storing and reviewing both sent and received in-game chats and other messages. Therefore, any abusive and obscene language is not tolerated, and Users who insist on using offensive and/or obscene language will have their chat privileges revoked and any Account cancelled.
+10.2. When You post or upload any personal information onto the Internet Site, such content will become public and accessible to other Users. Company does not endorse in any way such content and shall not be responsible for any damages arising from the publicizing of such information. Users should be aware that any information they post on the Internet Site may also affect their life offline.
+10.3. You are solely responsible for your communications with other Users. If you have dispute with one or more users, you release the Company (and its officers, directors, agents, subsidiaries and employees) from claims, demands and damages of every kind and nature, known and unknown, arising out of or in any way connected with such disputes.
+10.4. Chat messages are only available in real time and are no longer available to the User once they are gone from the chat window. 
+10.5. By accepting this agreement, You agree that the Company shall have the right
+(i) to store in-game chats and other messages you send or receive on the Site or through the Game, and
+(ii) to review such in-game chats and other messages to investigate potential violations of the law and the End User License Agreement.
+The Company will only use the information contained in the stored in-game chats and other messages for investigating and acting on such violations.
+Therefore Company may, but is not obliged to maintain backup copies of in-game chats or any information posted on the Internet Site. The Company reserves the right to impose a limit on the maximum storage capacity for each User.
+10.6. The Company reserves the right to delete, move or edit, at its sole discretion, public content that it deems to amount to offensive behaviour or to be in violation of any laws and/or regulations and/or the Game Rules. The User shall remain solely responsible for the content posted on the Internet Site. Failure by the Company to remove particular material shall in no circumstance be constituted as an endorsement or acceptance of it by the Company.
+
+ 11. User’s Accounts
+
+
+11.1. A User’s Account must be registered personally by the User and the Company hereby reserves the right to refuse registration of a User’s Account in the Game to any User for any reason whatsoever and without any explanation.
+11.2. It is the responsibility of the Users to ensure that their records with the Game are kept up to date, especially email address, and to inform the Company immediately of any changes to  personal information.
+11.3. The Company strictly prohibits the User from selling, transferring and/or acquiring Account(s) to or from other Users and third parties. The User is prohibited from transferring Crystals or any type of Digital Content  amongst different User Account(s).
+11.4. The Company reserves the right not to register, and/or to cancel the registration of a User’s Account in the event that the information provided to the Company is found to be false, inaccurate, deceitful or incomplete, whereas the Company is neither required to, nor does it conduct, any such reviews on a regular basis.Without limiting any of the foregoing paragraphs of this section, the User acknowledges and agrees that the Company is not responsible for any Chat messages, and is not liable for any injury or damages that may result from the User’s use of Chat. The User understands that the Company neither claims to, nor does, monitor all Chat messages made on, or in connection to, the Game. The Company does not endorse any Chat messages nor do Chat messages reflect the views or opinions of the Company. The Company cannot guarantee the authenticity of any Chat messages or any data that Users may provide about themselves.
+ 
+12. User Name
+ 
+12.1. Upon registration of an Account a User shall be granted the right to choose a Username. The Company reserves the right to deny and/or retract, for whatever reason deemed necessary by the Company, any Usernames, whether before, during and after these names have been issued or validated.
+12.2. In the event that apart from the Username chosen, the User’s Account is otherwise not in order or in accordance with this EULA, the Company will give the User the opportunity to create a new Username.
+ 
+13. Password Security
+ 
+13.1. The Company is in no way responsible for the eventual access to an Account by a third person and shall not be held responsible for any eventual loss suffered due to the illicit use of a User’s Login and Password by a third person, of unauthorized access, and/or for any transaction in which the Login and Password of a User was registered correctly.
+13.2. The Company is in no way responsible if a User forgets, misplaces, or loses the password, except for in the case where such loss arises as a result of an error on the Company’s part and the Company shall not, at any time during the relationship with the User, be responsible for storing any Login and Password.
+13.3. Section 20 relating to the parties’ liability under this EULA shall remain unaffected by the other stipulations according to this section 13.
+ 
+14. Blocking of Accounts
+ 
+14.1. The User is entitled to ask the Company to block the User’s Account by sending an e-mail on help@tankix.com.
+14.2. Failure to log in to the Game for three (3) consecutive years entitles the Company to block User’s Account and terminate this Agreement immediately on notice (or attempted notice) to User and irrevocably erase all data and information relating to the user and/or its performances in playing the Game stored to the user account.
+14.3. The Company is entitled to terminate this EULA and consequently to block the User’s Account in case of material and/or repeat violation of this EULA, the Game Rules or other documents and provisions governing the relationship between the Company and the User.
+ 
+15. Digital Content
+ 
+15.1. You can participate in the Game after registering for it without paying any registration fee. However, if available, You at your own discretion may avail yourself of Digital Content in the Game by purchasing with “real-world” money of a limited, simple, non-exclusive, not-transferable, non-sublicensable and revocable license to use (i) X-Crystals; (ii) in-game items; (iii) Subscriptions.
+ 
+
+
+15.2. The Company does not allow any transfer of Digital Content inside or outside the Game. Digital Content cannot be exchanged for “real world” money or any goods or services outside the Game.
+
+
+15.3. The User may purchase Digital Content only if
+
+
+(a)        either over the age of eighteen (18) or, if under the age of eighteen (18), that the User’s parent or guardian has agreed to and accepted the respective purchase and these EULAs and additional terms on the User’s behalf; 
+(b)        the User is the authorised Account holder for the User Account from which he is subscribing to the Services;
+(c)        the User is authorised to use the particular credit card or other accepted method of payment; 
+(d)        all information that the User submits is true and accurate (this includes, without limitation, his credit card number and its expiration date, so it is important to keep these details updated); and
+(e)        the User agrees to pay all the fees that he incurs, unless and until he closes his account Account and terminates these EULAs in accordance with the terms of these EULAs.
+
+
+Any applicable fees and other charges on the User’s Account for Digital Content provided by the Company are NOT REFUNDABLE, except as set forth in the terms of these EULAs, or as it is required under the applicable law. The User further acknowledges that purchased Digital Content, including but not limited to X-Crystals, are for use in the Game and that X-Crystals or other Digital Content are not redeemable for money or monetary value from the Company or any other person or entity.  Neither Digital Content nor X-Crystals have an equivalent value in real currency and do not act as a substitute for real currency.  Neither the Company nor any other person or entity has any obligation to exchange Digital Content or X-Crystals for anything of value including, but not limited to, real currency.
+ 
+15.4. Pricing
+ 
+15.4.1. Listing and pricing of any Digital Content is at the Company’s sole discretion and can be changed at any given time. The User acknowledges and agrees that the Company may engage in actions that may impact the perceived value or purchase price, if applicable, of Digital Content or X-Crystals at any time, except as prohibited by applicable law.  
+15.4.2. The Company shall not be liable for the reception and/or processing of the User’s payment(s), including for any delays which may occur or any failure of reception. All payments made by the User are voluntary, definitive, and non-refundable unless otherwise provided herein, or as it is required under the applicable law.
+ 
+15.5. Process of Purchasing Digital Content.
+
+
+Digital Content may be purchased while playing the Game by activating the “Buy” Button. The Button leads the User to the purchase area where the User may select the Digital Content to be purchased and the respective payment method. Details may be described in more detail within the Purchase Instructions. Before you confirm your purchase by clicking on the "Buy Now" button (or equally conspicuously labelled button concluding the purchase process), or by fulfilling another action required (e.g. sending a message, etc.), you will have the opportunity to review your purchase details, i.e. the amount or type of Digital Content and respective total price including all taxes, and to correct any errors. To correct any errors you should go back, e.g. by clicking on the "Back" button (or the equally conspicuously labelled button) of your browser.
+By clicking the "Buy Now" button (or the equally conspicuously labelled button concluding the purchase process), or by fulfilling another action required (e.g. sending a message, etc.), you are sending an order to us to purchase the confirmed amount and type of Digital Content. If you have provided valid payment details within your Account, your order will be processed.  You will be notified of our acceptance or denial of your order by us on your screen within a few minutes from the moment of clicking the “Buy Now” button (or the equally conspicuously labelled button concluding the purchase process) or fulfilling the respective other action required (e.g. sending a message, etc.). In case we accept your order, we will directly thereafter credit the purchased Digital Content to your Account and we will charge you via the selected payment method. The Company will confirm the purchase with a separate confirmation email containing the details of the purchase including the link to this EULA, including the information regarding the right of withdrawal. Digital Content will then be automatically applied to the User Account and may be redeemed within the Game.
+
+
+Important: YOU HEREBY EXPRESSLY CONSENT THAT THE SUPPLY OF DIGITAL CONTENT BEGINS IMMEDIATELY AFTER WE HAVE SENT YOU THE CONFIRMATION EMAIL. 
+
+
+15.6. Payment Methods
+ 
+15.6.1. Digital Content may only be purchased from the Payment Agents offered by the Company by one of the following methods and/or any other method which the Game provides:
+a. Credit cards;
+b. Prepaid cards;
+c. E-wallets;
+d. SMS;
+e. Mobile payments; 
+f. Bank transfers; and
+g. Other.
+15.6.2. The User certifies that the funds used in the Account are not from any illegal source. The User is declaring that he shall in no way use the Game with the purpose of transferring such funds from illegal sources. The User will not use the Game for any illicit or fraudulent activity, or for any unlawful or fraudulent transaction (including money laundering), in accordance to the laws of all the jurisdictions having authority over the User. The Company reserves the right to discontinue or block the User’s Account(s), at any time, and until the matter has been resolved, if the Company has the slightest doubt as to the legality of the source of funds used by the User.
+ 
+15.7. Payment Currency
+ 
+All payments to and from the Account must be paid in the currencies provided by the Payment Agents from time to time and all payments into the Account must be from a payment source for which the User is the named holder of the Account.
+
+
+15.8. Reimbursement of payments
+
+
+Please note that due to technical limitations the Company cannot warrant that payments made by You via the following payment methods will be reimbursed to You via that same payment method:
+a. Credit cards;
+b. Prepaid cards;
+c. E-wallets;
+d. SMS;
+e. Mobile payments. 
+
+
+The User agree that reimbursements for such payments will be facilitated by the Company via another means of payment, e.g. via transfer of money to User’s bank account. In any case, User will not incur any fees as a result of such reimbursement.
+
+
+15.9. The User acknowledges and accepts that the Game is not a game of chance, a game for money, a contest or a bet. The purchase of a Digital Content is the realization of its own will and desire and is not necessary for the use of the Game according to this Agreement.
+
+
+16. Information concerning the exercise of the right of withdrawal 
+
+
+16.1. Right of withdrawal
+
+
+You may withdraw from a purchase (contract) within 14 calendar days without giving any reason. The withdrawal period will expire after 14 calendar days from the day of the conclusion of the contract. To exercise the right of withdrawal, You must inform us, of Your decision to withdraw from a purchase (contract) by an unequivocal statement (e.g. a letter sent by post, fax or e-mail) to the following address:
+
+
+AlternativaPlatform  Ltd, 
+60/2 Melita Street, 
+Valletta VLT 1122
+e-mail: help@tankix.com
+
+
+
+ 
+You may use the model withdrawal form You find here, but it is not obligatory.
+
+
+To meet the withdrawal deadline, it is sufficient for You to send Your communication concerning Your exercise of the right of withdrawal before the withdrawal period has expired.
+
+
+16.2. Effects of withdrawal
+
+
+If You withdraw from a purchase (contract), the Company shall reimburse to You all payments received from You under this purchase (contract), including the costs of delivery (with the exception of the supplementary costs resulting from Your choice of a type of delivery other than the least expensive type of standard delivery offered by us), without undue delay and in any event not later than 14 calendar days from the day on which the Company is  informed about Your decision to withdraw from that purchase (contract). The Company will carry out such reimbursement using the same means of payment as You used for the initial transaction, unless You have expressly agreed otherwise; in any event, You will not incur any fees as a result of such reimbursement.
+
+
+If You requested to begin the performance of services under a contract during the withdrawal period, You shall pay the Company an amount which is in proportion to what has been provided until You have communicated to the Company Your withdrawal from that contract, in comparison with the full coverage of these services under the contract.
+
+
+Special notes:
+You shall have no right of withdrawal in cases where:
+a)        The contract has been fully performed with the Your consent before the expiration of the withdrawal period;
+b)        The service involves a performance which due to its nature cannot be returned.
+
+
+You lose Your right of withdrawal, insofar as the purchase (contract) is a service contract, after the service has been fully performed and if the performance has begun with Your prior express consent, and with the acknowledgement that You will lose Your right of withdrawal once the service has been fully performed by the Company. 
+
+
+You lose Your right of withdrawal, insofar as the purchase (contract) comprises the supply of digital content which is not supplied on a tangible medium if the performance has begun with Your prior express consent and Your acknowledgment that You thereby lose Your right of withdrawal.
+
+
+17. Safety of Minors
+ 
+17.1. The Company warrants that it is committed in ensuring the safety of Minors. The Company advises the parent(s) and/ or legal representative(s) of the Minor to spend more time with their children while they are on the Internet and to keep control on the use of the Game, the Internet Site, the Account, any means of communication and/or any payment for services available.
+17.2. THE GAME IS INTENDED ONLY FOR USERS WHO ARE 13 YEARS OF AGE OR OLDER.  The Game is not targeted towards, nor intended for use by, anyone under the age of 13.  If you are between the ages of 13 and under the age of 18, you may use the Game only under the supervision of a parent or legal guardian who agrees to be bound by this EULA and any additional terms contained in related documents.  By using and access the Game, you hereby acknowledge, represent and warrant to the Company (a) you are at least 18 years of age, that you possess the legal right and ability to consent to this EULA, and that you will use the Game in accordance with this EULA; or (b) that, if you are under 18 years of age, that you are 13 years of age or older, that you have your parent’s or legal guardian’s full consent, agreement and acknowledgement to use and access the Game, and they represent and warrant, on your behalf, that they possess the legal right and ability to consent to these EULA and do so on your behalf.  The Company may delete any User account and terminate access to the Game without warning if the Company believes, in its sole discretion, either that a User is under the age of 18 but does not have a parent’s or legal guardian’s permission to access the Game, or that a User is under the age of 13. 
+17.3. If the User is between the ages of 13 and 18, his parent or legal guardian will need to complete the registration process to register the User’s Account with the Company on his behalf. Provided that in such cases, the User’s parent or legal guardian hereby accepts that s/he is taking full responsibility for all the obligations arising out of this EULA and for any other activities of the such User which are related to the use of the Game, the Internet Site and/or Account, including any indirect use and including any payments which may be effected using the Login and/or the Account.
+17.4. The Company reserves the right to request documentation from the parent or legal guardian of a User between the ages of 13 and 18, requesting any other written confirmation that the Company deems necessary for such User to play the Game or make payments on the Internet Site.
+17.5. If necessary, the parents or legal representatives of the children may use special programs to limit children's access to certain services that will help make the Internet space safer for children.
+ 
+18. Limited Warranties
+ 
+18.1. The Game and all other Material(s) provided in connection therewith, is provided on an ‘as is’ basis, including any faults and without any warranty of any kind. The User shall bear all risks associated with the access and/or playing of the Game as well as with the use of the Game. The Company may at any time, without prior notice to the End User, unilaterally restrict, expand, supplement or modify the Game, any of its elements and parts. Such modification may, in particular, be an improvement or modification of the gameplay or the addition of new data and commands to the Game ("features"), which may lead to the termination or suspension of the rights to use certain game elements and rights to Digital Content.
+18.2. While all efforts are made by the Company to have the Game available at all times, the Company does not warrant and/or guarantee that the Game or any Materials will be always available or that the User will not encounter any faults. Section 19 relating to the parties’ liability under this EULA shall remain unaffected hereby.
+18.3. The Company does not warrant and/or guarantee the unerring and uninterrupted functionality of the Game; nor does it warrant and/or guarantee that the Game will conform to the User’s expectations and also doesn't give any other warranties and/or guarantees that are not specified (fixed) in this EULA. The User hereby accepts that the Company shall not be held responsible for any direct or indirect damage causing impossibility to make use of the Game. Section 19 relating to the parties liability under this EULA shall remain unaffected hereby. 
+
+
+19. Responsibility and Liability of the Parties, Indemnification of the Company
+ 
+19.1. The Company shall be liable as follows: In cases of intentional or gross negligent acts, malicious actions, as well as claims based on damage to life, body or health, the Company’s liability will be determined exclusively in accordance with statutory law. In cases of slight negligence, the Company will only be liable if the Company is in breach of such contractual obligations, the fulfilment of which allows for the due performance of this agreement, the breach of which would endanger the purpose of this agreement and the compliance with which the User may constantly trust in (so-called "cardinal obligations"). In such cases, the Company's liability will be limited to typical and foreseeable damages. In all other cases, the Company shall not be liable for slight negligence.
+19.2. Save for the aforesaid Section 1, the Company shall in no way be responsible for any loss or damage, direct or indirect, that the User or a third party might have suffered as a result of the User’s use or the third party’s use of the Internet Site, the Game including but not limited to damages caused by inability to use the Game, direct or indirect damages arising out of third party actions, including other users of the Game, lack of access to internet, theft, destruction of Materials, loss of information related to the User’s Account and any harm to the User’s honour, dignity and business reputation arising in connection to the Game.
+19.3. Neither party hereto shall be liable to the other in respect of anything which, apart from this provision, may constitute breach of this EULA, save for Section 1 above, arising by reason of force majeure, namely circumstances beyond the control of either party which shall include (but shall not be limited to) acts of God, perils of the sea or air, fire, flood, drought, explosion, sabotage, accident, embargo, riot, civil commotion or civil authority, including acts of local government and parliamentary authority.
+19.4. Residents of California are entitled to the following specific consumer rights information: you may contact the Complaint Assistance Unit of the Division of Consumer Services of the Department of Consumer Affairs by mail at 400 R St., Suite 1080, Sacramento, California, 95814, or by telephone at 916.445.1254. California residents expressly agree to waive California Civil Code Sec. 1542, which states: “A general release does not extend the claims which the creditor does not know or suspect to exist in his favor at the time of executing the release, which if known by him must have materially affected his settlement with the debtor.” 
+
+
+20. Termination of the Agreement
+
+
+20.1.  Unless otherwise expressly required by applicable law, the Company may at any time without notice to you and without giving any reason terminate this Agreement unilaterally and without refund of any expenses, losses or payments obtained under the Agreement, in particular in the case of:
+20.1.1. closing the Game, i.e. termination of its operation by the Company;
+20.1.2. any, including one-time, violation by the End User of the terms of this Agreement or the Game Rules.
+20.2. The End User has the right to terminate this Agreement at any time without notification to the Company by stopping the use of the Game Account.
+
+
+21. Dispute resolution and Governing law
+ 
+21.1. The parties hereby agree that the Agreement, this EULA, together with the other documents forming an integral part of this EULA shall be construed in accordance with the Laws of Malta and shall be subject to the jurisdiction of the Courts of Malta, unless otherwise required by the law of the country where the User has his habitual residence.
+21.2. The Pre-trial dispute resolution procedure is obligatory. The User's claims should be sent to 60/2, Melita Street, Valletta VLT 1122, Malta and e-mail copy to help@tankix.com, and such claim should contain the specific list of violations made by the Company and/or the Company, Account information, contact information and User signature. Non-compliance with the form or content of the claim entails non-compliance with the Pre-trial dispute resolution procedure and the term for claim consideration and for sending the answer may take up to thirty (30) business days from the moment of its acceptance.
+ 
+22. Legal Compliance
+ 
+22.1. The User hereby confirms that he understands and accepts that the Company is unable to provide the User with any legal advice or assurances and that it is the User’s sole responsibility to ensure that at all times the User complies with the laws that govern the User and that the User has the complete legal right to open an Account with the Game and to play the Game. Any participation in the Game is at the User’s sole option, discretion and risk. 
+
+
+23. Waiver
+ 
+23.1. The Company’s failure or neglect to enforce, at any time, any of the provisions hereof shall not be construed nor shall be deemed to be a waiver of its rights herein, nor in any way affect the validity of the whole or any part of this EULA, nor prejudice the Company’s rights to take subsequent action.
+
+
+24. Other conditions
+ 
+24.1. This EULA represents the entire Agreement between the User and the Company in relation to its subject matter and supersedes and voids all prior agreements between such parties relating to such subject matter.
+24.2. The headings contained in this EULA are inserted for convenience of reference only and are not intended to be part of or to affect the meaning or interpretation of any of the terms and conditions. Words in the singular mean and include the plural and vice versa. Words in the masculine mean and include the feminine and vice versa.
+24.3. In the event that any of these terms, conditions or provisions shall be determined by any competent authority to be invalid, unlawful or unenforceable to any extent, such term, condition or provision shall to that extent be severed from the remaining terms, conditions and provisions which shall continue to be valid to the fullest extent permitted by law.
+ 
+25. Contacts with the Company
+ 
+25.1. The User can send any questions, remarks, complaints or comments regarding this Agreement to help@tankix.com. The Company will consider your questions as soon as possible.
+25.2. If the User starts any correspondence with the Company or submits a report about problems with the Game or game services, the Company shall have the right to store all this correspondence.

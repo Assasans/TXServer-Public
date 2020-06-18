@@ -1,0 +1,8 @@
+---
+errorText: |
+  Sunucu şu anda bakımda.
+  Lütfen daha sonra tekrar giriş yapmayı deneyin veya oyuna otomatik olarak bağlanana kadar bekleyin.
+headerText: BAKIM
+reportButtonLabel: FORUM
+reportUrl: http://en.forum.tankix.com/
+reConnectTime: 30

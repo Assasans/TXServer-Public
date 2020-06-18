@@ -1,0 +1,6 @@
+---
+loadScreenLocalizedText:
+  loadFromDiskText: Kaynaklar yükleniyor ama oynamaya başlayabilirsin
+  networkLoadText: Kaynaklar indiriliyor ama oynamaya başlayabilirsin
+  skipLoadingButton: OYNA
+  initializationText: ""

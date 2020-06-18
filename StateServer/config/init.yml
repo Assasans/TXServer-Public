@@ -1,7 +1,7 @@
 host: {0}
 acceptorPort: {1}
-configVersion: master-48606
-bundleDbVersion: master-48606
+configVersion: 1.0
+bundleDbVersion: 1.0
 resourcesUrl: http://{2}/resources
 configsUrl: http://{2}/config
 updateConfigUrl: http://{2}/update/{{BuildTarget}}.yml

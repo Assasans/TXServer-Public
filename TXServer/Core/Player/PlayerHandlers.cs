@@ -33,17 +33,17 @@ namespace TXServer.Core
 
             try
             {
-                Entity ClientSession = ClientSessionTemplate.CreateEntity();
+                Entity clientSession = ClientSessionTemplate.CreateEntity();
 
-                this.ClientSession = ClientSession;
+                ClientSession = clientSession;
 
                 // Server time message
                 CommandManager.SendCommands(Socket, new InitTimeCommand());
 
                 // Session init message
                 CommandManager.SendCommands(Socket,
-                    new EntityShareCommand(ClientSession),
-                    new ComponentAddCommand(ClientSession, new SessionSecurityPublicComponent())
+                    new EntityShareCommand(clientSession),
+                    new ComponentAddCommand(clientSession, new SessionSecurityPublicComponent())
                 );
 
                 while (true)
@@ -61,7 +61,7 @@ namespace TXServer.Core
             }
             catch (Exception e)
             {
-                if (User != null) User.Components.Remove(new UserOnlineComponent());
+                User?.Components.Remove(new UserOnlineComponent());
                 Console.WriteLine(e.ToString());
                 Dispose();
             }
@@ -87,7 +87,7 @@ namespace TXServer.Core
 #if DEBUG
                 Debugger.Launch();
 #endif
-                if (User != null) User.Components.Remove(new UserOnlineComponent());
+                User?.Components.Remove(new UserOnlineComponent());
                 Console.WriteLine(e.ToString());
                 Dispose();
             }
