@@ -60,7 +60,7 @@
     <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -499,8 +499,6 @@
     <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.FxCopAnalyzers.2.9.6\build\Microsoft.CodeAnalysis.FxCopAnalyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.FxCopAnalyzers.2.9.6\build\Microsoft.CodeAnalysis.FxCopAnalyzers.props'))" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>(robocopy "$(SolutionDir)StateServer" "$(TargetDir)StateServer" /mir /xo /nfl /ndl /njs /nc /ns /np
-) ^&amp; IF %25ERRORLEVEL%25 LEQ 1  type nul&gt;nul
-"$(SolutionDir)7-Zip\7z.exe" a -ttar -so -an "$(TargetDir)StateServer\client\*" | "$(SolutionDir)7-Zip\7z.exe" a -si "$(TargetDir)StateServer\resources\StandaloneWindows\tankix.tgz"</PostBuildEvent>
+    <PostBuildEvent>"$(SolutionDir)post_build.bat" "$(SolutionDir)" "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
