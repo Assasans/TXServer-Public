@@ -365,6 +365,7 @@
     <Compile Include="ECSSystem\Events\Entrance\IntroduceUserByUidEvent.cs" />
     <Compile Include="ECSSystem\Events\Entrance\InvalidPasswordEvent.cs" />
     <Compile Include="ECSSystem\Events\Entrance\LoginByPasswordEvent.cs" />
+    <Compile Include="ECSSystem\Events\Entrance\AutoLoginUserEvent.cs" />
     <Compile Include="ECSSystem\Events\Entrance\LoginFailedEvent.cs" />
     <Compile Include="ECSSystem\Events\Entrance\PersonalPasscodeEvent.cs" />
     <Compile Include="Core\Protocol\DataDecoder.cs" />
