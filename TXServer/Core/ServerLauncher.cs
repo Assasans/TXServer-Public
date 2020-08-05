@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
@@ -53,6 +51,8 @@ namespace TXServer.Core
                 IsConsoleAttached = true;
             }
 
+            Console.WriteLine("Starting server...");
+
             ServerLauncher.PoolSize = PoolSize;
             IsStarted = true;
 
@@ -74,6 +74,8 @@ namespace TXServer.Core
         /// </summary>
         public static void StopServer()
         {
+            Console.Write("Stopping server...");
+
             IsStarted = false;
 
             acceptWorker.Abort();
@@ -98,6 +100,8 @@ namespace TXServer.Core
         /// <param name="socket"></param>
         private static void AddPlayer(Socket socket)
         {
+            Console.WriteLine($"{socket.RemoteEndPoint} is trying to connect.");
+
             lock (Pool)
             {
                 int freeIndex = Pool.FindIndex(player => !player.Active);
@@ -113,7 +117,7 @@ namespace TXServer.Core
                 else
                 {
                     socket.Close();
-                    Console.WriteLine("Сервер переполнен!");
+                    Console.WriteLine($"Connection of {socket.RemoteEndPoint} has failed due to server overload.");
                 }
             }
         }
@@ -139,13 +143,14 @@ namespace TXServer.Core
                     return;
                 }
 
+                Console.WriteLine("Acceptor has started.");
+
                 while (true)
                 {
                     Socket socket = null;
                     bool accepted = false;
                     try
                     {
-                        // Асинхронные методы позволяют остановить поток, когда требуется.
                         IAsyncResult result = acceptor.BeginAccept(null, acceptor);
                         socket = acceptor.EndAccept(result);
                         accepted = true;
@@ -154,7 +159,6 @@ namespace TXServer.Core
                     }
                     catch (Exception e)
                     {
-                        // Игнорировать исключение остановки сервера.
                         if (e.GetType() != typeof(ThreadAbortException))
                             Console.WriteLine(e.ToString());
 
@@ -171,7 +175,6 @@ namespace TXServer.Core
         public static void StateServer(IPAddress ip, short serverPort)
         {
             string rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/StateServer";
-            string resourcePath = "/resources";
 
             using (HttpListener listener = new HttpListener())
             {
@@ -187,6 +190,8 @@ namespace TXServer.Core
                     Application.Current.Dispatcher.Invoke(new Action(MainWindow.HandleCriticalError));
                     return;
                 }
+
+                Console.WriteLine("State server has started.");
 
                 while (true)
                 {
@@ -212,7 +217,7 @@ namespace TXServer.Core
                         catch
                         {
                             buffer = Array.Empty<byte>();
-                            response.StatusCode = 400;
+                            response.StatusCode = 404;
                         }
 
                         response.ContentLength64 = buffer.Length;

@@ -15,18 +15,14 @@ namespace TXServer.Core
         [ThreadStatic] private static Random Random;
         public static Int64 GenerateId() => ((long)Random.Next() << 32) + Random.Next();
 
+        public ConcurrentDictionary<Type, ItemList> UserItems { get; } = new ConcurrentDictionary<Type, ItemList>();
         public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
-        /// <summary>
-        /// Use for cross-Entity reference handling.
-        /// </summary>
-        public ConcurrentDictionary<string, Entity> ReferencedEntities { get; } = new ConcurrentDictionary<string, Entity>();
         
         public Entity ClientSession { get; set; }
         public Entity User { get; set; }
-
         public string Uid { get; set; }
 
-        public ConcurrentDictionary<Type, ItemList> UserItems { get; } = new ConcurrentDictionary<Type, ItemList>();
+        public Entity CurrentAvatar { get; set; }
         public PresetEquipmentComponent CurrentPreset { get; set; }
     }
 }

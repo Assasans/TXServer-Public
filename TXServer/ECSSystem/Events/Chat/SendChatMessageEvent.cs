@@ -27,7 +27,7 @@ namespace TXServer.ECSSystem.Events
 				case GeneralChatTemplate _:
 					foreach (Player player in ServerLauncher.Pool)
 					{
-						player.LobbyCommandQueue.Enqueue(() => CommandManager.SendCommands(player.Socket, command));
+						player.LobbyCommandQueue?.Enqueue(() => CommandManager.SendCommands(player.Socket, command));
 					}
 					break;
 				case PersonalChatTemplate _:
@@ -35,7 +35,7 @@ namespace TXServer.ECSSystem.Events
 
 					foreach (Entity user in chat.GetComponent<ChatParticipantsComponent>().Users)
                     {
-						user.Owner.LobbyCommandQueue.Enqueue(() =>
+						user.Owner.LobbyCommandQueue?.Enqueue(() =>
 						{
 							lock (Player.Instance.EntityList)
 							{

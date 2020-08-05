@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.IO;
 #if DEBUG
 using System.Diagnostics;
 #endif
@@ -14,8 +15,8 @@ namespace TXServer.Core
 {
     public partial class Player
     {
-        public ConcurrentQueue<Action> LobbyCommandQueue { get; } = new ConcurrentQueue<Action>();
-        public ConcurrentHashSet<Command> BattleCommandQueue { get; } = new ConcurrentHashSet<Command>();
+        public ConcurrentQueue<Action> LobbyCommandQueue { get; set; } = new ConcurrentQueue<Action>();
+        public ConcurrentHashSet<Command> BattleCommandQueue { get; set; } = new ConcurrentHashSet<Command>();
 
         private void InitThreadLocals()
         {
@@ -30,6 +31,8 @@ namespace TXServer.Core
         public void ServerSideEvents()
         {
             InitThreadLocals();
+
+            Console.WriteLine($"{Socket.RemoteEndPoint}: Server side event thread is ready.");
 
             try
             {
@@ -48,10 +51,15 @@ namespace TXServer.Core
 
                 while (true)
                 {
-                    SpinWait.SpinUntil(() => LobbyCommandQueue.Count + BattleCommandQueue.Count > 0 || !Active);
-                    if (!Active) return;
+                    SpinWait.SpinUntil(() => LobbyCommandQueue?.Count + BattleCommandQueue?.Count > 0 || !Active);
+                    if (!Active)
+                    {
+                        Dispose();
+                        return;
+                    }
 
-                    while (LobbyCommandQueue.TryDequeue(out Action action))
+                    Action action = null;
+                    while (Convert.ToBoolean(LobbyCommandQueue?.TryDequeue(out action)))
                     {
                         action();
                     }
@@ -62,7 +70,7 @@ namespace TXServer.Core
             catch (Exception e)
             {
                 User?.Components.Remove(new UserOnlineComponent());
-                Console.WriteLine(e.ToString());
+                if (!(e is IOException)) Console.WriteLine($"{Socket.RemoteEndPoint}: {e}");
                 Dispose();
             }
         }
@@ -75,6 +83,8 @@ namespace TXServer.Core
         {
             InitThreadLocals();
 
+            Console.WriteLine($"{Socket.RemoteEndPoint}: Client side event thread is ready.");
+
             try
             {
                 while (true)
@@ -84,11 +94,14 @@ namespace TXServer.Core
             }
             catch (Exception e)
             {
-#if DEBUG
-                Debugger.Launch();
-#endif
                 User?.Components.Remove(new UserOnlineComponent());
-                Console.WriteLine(e.ToString());
+                if (!(e is IOException))
+                {
+                    Console.WriteLine($"{Socket.RemoteEndPoint}: {e}");
+#if DEBUG
+                    Debugger.Launch();
+#endif
+                }
                 Dispose();
             }
         }

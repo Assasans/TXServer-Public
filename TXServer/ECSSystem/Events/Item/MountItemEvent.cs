@@ -29,8 +29,8 @@ namespace TXServer.ECSSystem.Events
 					Player.Instance.CurrentPreset.HullItem = item;
 					break;
 				case AvatarUserItemTemplate _:
-					Player.Instance.ReferencedEntities.TryGetValue("CurrentAvatar", out prevItem);
-					Player.Instance.ReferencedEntities["CurrentAvatar"] = item;
+					prevItem = Player.Instance.CurrentAvatar;
+					Player.Instance.CurrentAvatar = item;
 					break;
 				case TankPaintUserItemTemplate _:
 					prevItem = Player.Instance.CurrentPreset.TankPaint;
@@ -142,7 +142,7 @@ namespace TXServer.ECSSystem.Events
 
 		public static ComponentAddCommand MountAvatar(Entity item)
         {
-			Player.Instance.ReferencedEntities["CurrentAvatar"] = item;
+			Player.Instance.CurrentAvatar = item;
 			return new ComponentAddCommand(item, new MountedItemComponent());
 		}
 	}

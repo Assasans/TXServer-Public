@@ -1,4 +1,4 @@
 ---
 initUrl: http://127.0.0.1:8080/config/init.yml
 stateUrl: http://127.0.0.1:8080/state/tankixprod_state.yml
-currentClientVersion: 0.0.1
+currentClientVersion: 0.0.2
