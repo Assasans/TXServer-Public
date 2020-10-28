@@ -10,6 +10,8 @@ namespace TXServer.Core
         
         public ServerConnection Connection { get; }
         public IDatabase Database { get; }
+        
+        public Random Random { get; }
 
         public Server(IPAddress ip, short port, int poolSize, IDatabase database)
         {
@@ -18,6 +20,8 @@ namespace TXServer.Core
             
             Database = database;
             Database.Startup();
+
+            Random = new Random();
         }
 
         public Player FindPlayerById(long entityId)

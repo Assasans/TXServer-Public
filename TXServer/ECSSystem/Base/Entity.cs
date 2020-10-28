@@ -10,6 +10,16 @@ namespace TXServer.ECSSystem.Base
         /// <summary>
         /// Create Entity with random id.
         /// </summary>
+        public Entity(params Component[] components)
+        {
+            EntityId = Player.GenerateId();
+
+            PopulateEntity(null, components);
+        }
+        
+        /// <summary>
+        /// Create Entity with random id.
+        /// </summary>
         public Entity(TemplateAccessor TemplateAccessor, params Component[] components)
         {
             EntityId = Player.GenerateId();

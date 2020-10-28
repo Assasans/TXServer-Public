@@ -44,7 +44,6 @@ namespace TXServer.Core.Commands
         {
             foreach (Command command in commands)
             {
-                Console.WriteLine(command.GetType());
                 command.OnSend(player);
             }
 

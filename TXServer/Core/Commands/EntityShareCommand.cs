@@ -20,9 +20,12 @@ namespace TXServer.Core.Commands
 
             EntityId = Entity.EntityId;
             TemplateAccessor = Entity.TemplateAccessor;
+            
+            // Console.WriteLine("Sending " + EntityId + " (" + TemplateAccessor?.Template.GetType().Name + ")");
 
             foreach (Component component in Entity.Components)
             {
+                // Console.WriteLine(component.GetType().Name);
                 Components.Add(component);
             }
         }

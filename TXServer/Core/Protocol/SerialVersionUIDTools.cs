@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.Core.Protocol
 {
@@ -19,8 +21,12 @@ namespace TXServer.Core.Protocol
             {
                 SerialVersionUIDAttribute attribute = type.GetCustomAttribute<SerialVersionUIDAttribute>();
 
-                if (attribute != null)
+                if (attribute != null && !typeof(IEntityTemplate).IsAssignableFrom(type))
                 {
+                    if (TypeBySerialVersionUID.ContainsKey(attribute.Id))
+                    {
+                        throw new ApplicationException("SerialVersionUID already contains " + attribute.Id);
+                    }
                     TypeBySerialVersionUID.Add(attribute.Id, type);
                 }
             }

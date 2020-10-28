@@ -101,8 +101,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                 MethodInfo info = type.GetMethod("GetUserItems");
                 if (info == null) continue;
                 
-                Console.WriteLine(info.ReflectedType.FullName +" "+ info.GetParameters()[0].ParameterType.FullName);
-                Console.WriteLine(info.GetParameters()[0].ParameterType == typeof(Player));
                 ItemList list = (info.GetParameters()[0].ParameterType.IsAssignableFrom(typeof(Player)) ? 
                     info.Invoke(null, new object[] { player }) : 
                     info.Invoke(null, new object[] { user })) as ItemList;

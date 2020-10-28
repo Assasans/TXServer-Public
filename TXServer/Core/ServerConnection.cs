@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using TXServer.Core.Commands;
+using TXServer.ECSSystem.Events.Ping;
 
 namespace TXServer.Core
 {
@@ -23,13 +27,15 @@ namespace TXServer.Core
         {
             if (IsStarted) return;
             IsStarted = true;
-            
+
             PoolSize = poolSize;
             acceptWorker = new Thread(() => AcceptPlayers(ip, port, PoolSize)) {Name = "Acceptor"};
             acceptWorker.Start();
 
             StateServerWorker = new Thread(() => StateServer(ip)) {Name = "StateServer"};
             StateServerWorker.Start();
+
+            PingWorker = new Thread(PingChecker) {Name = "PingChecker"};
         }
 
         /// <summary>
@@ -42,6 +48,7 @@ namespace TXServer.Core
 
             acceptWorker.Abort();
             StateServerWorker.Abort();
+            PingWorker.Abort();
 
             Pool.ForEach(player => player.Dispose());
             Pool.Clear();
@@ -69,11 +76,12 @@ namespace TXServer.Core
                 Console.WriteLine("Сервер переполнен!");
             }
         }
-        
+
         /// <summary>
         /// Waits for new clients.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов", Justification = "<Ожидание>")]
+        [SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов",
+            Justification = "<Ожидание>")]
         public void AcceptPlayers(IPAddress ip, short port, int PoolSize)
         {
             using (Socket acceptor = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP))
@@ -126,7 +134,7 @@ namespace TXServer.Core
 
             using (HttpListener listener = new HttpListener())
             {
-                listener.Prefixes.Add("http://" + (ip == IPAddress.Any ? "+" : ip.ToString()) + ":8080/");
+                listener.Prefixes.Add($"http://{(Equals(ip, IPAddress.Any) ? "+" : ip.ToString())}:8080/");
 
                 try
                 {
@@ -148,26 +156,68 @@ namespace TXServer.Core
                     {
                         HttpListenerRequest request = context.Request;
                         HttpListenerResponse response = context.Response;
+                        Console.WriteLine(request.Url);
 
-                        byte[] buffer;
+                        byte[] data;
                         try
                         {
-                            buffer = File.ReadAllBytes(rootPath + request.RawUrl.Split('?')[0]);
+                            if (!request.RawUrl.Split('?')[0].EndsWith(".yml"))
+                            {
+                                data = File.ReadAllBytes(rootPath + request.RawUrl.Split('?')[0]);
+                            }
+                            else
+                            {
+                                string[] lines = File.ReadAllLines(rootPath + request.RawUrl.Split('?')[0]);
+
+                                List<byte> buffer = new List<byte>();
+                                for (int i = 0; i < lines.Length; i++)
+                                {
+                                    string line = lines[i];
+                                    // Console.WriteLine(line);
+                                    // Console.WriteLine(line.Replace("*ip*", request.Url.Host));
+                                    buffer.AddRange(Encoding.UTF8.GetBytes(line.Replace("*ip*", request.Url.Host)));
+                                    buffer.AddRange(Encoding.UTF8.GetBytes(Environment.NewLine));
+                                }
+
+                                data = buffer.ToArray();
+                            }
                         }
                         catch
                         {
-                            buffer = Array.Empty<byte>();
+                            data = Array.Empty<byte>();
                             response.StatusCode = 400;
                         }
 
-                        response.ContentLength64 = buffer.Length;
+                        response.ContentLength64 = data.Length;
 
                         Stream output = response.OutputStream;
-                        output.Write(buffer, 0, buffer.Length);
+                        output.Write(data, 0, data.Length);
 
                         output.Close();
                     }).Start();
                 }
+            }
+        }
+
+        public void PingChecker()
+        {
+            sbyte id = 0;
+
+            while (true)
+            {
+                foreach (Player player in Pool)
+                {
+                    CommandManager.SendCommands(player, new SendEventCommand(
+                        new PingEvent(DateTimeOffset.Now.ToUnixTimeMilliseconds(), id)
+                    ));
+                }
+
+                if (id++ == 255)
+                {
+                    id = 0;
+                }
+
+                Thread.Sleep(10000);
             }
         }
 
@@ -181,10 +231,13 @@ namespace TXServer.Core
         // HTTP state server thread.
         private Thread StateServerWorker;
 
+        private Thread PingWorker;
+
         // Server state.
         public bool IsStarted { get; private set; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Поля, не являющиеся константами, не должны быть видимыми", Justification = "<Ожидание>")]
+        [SuppressMessage("Usage",
+            "CA2211:Поля, не являющиеся константами, не должны быть видимыми", Justification = "<Ожидание>")]
         public int PlayerCount = 0;
     }
 }

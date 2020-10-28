@@ -10,8 +10,10 @@ namespace TXServer.Core.Commands
 
         protected override void AddOrChangeComponent()
         {
-            if (!Target.Components.Remove(Component)) throw new ArgumentException("Component " + Component.GetType().FullName + " does not exist.");
-
+            if (!Target.Components.Remove(Component))
+            {
+                throw new ArgumentException("Component " + Component.GetType().FullName + " does not exist.");
+            }
             Target.Components.Add(Component);
         }
     }

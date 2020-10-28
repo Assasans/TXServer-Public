@@ -2,9 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using System.Reflection;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components.Battle;
+using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.Library;
 using static TXServer.Core.Commands.CommandManager;
 
@@ -78,6 +81,13 @@ namespace TXServer.Core.Protocol
             writer.Write((new DateTimeOffset(date).UtcTicks - DateTime.UtcNow.Ticks) / 10000);
         }
 
+        private void EncodeVector3(Vector3 vector3)
+        {
+            writer.Write(vector3.X);
+            writer.Write(vector3.Y);
+            writer.Write(vector3.Z);
+        }
+
         private void EncodeType(Type type)
         {
             writer.Write(SerialVersionUIDTools.GetId(type));
@@ -112,6 +122,12 @@ namespace TXServer.Core.Protocol
                     return;
                 case DateTime date:
                     EncodeDateTime(date);
+                    return;
+                case Vector3 vector3:
+                    EncodeVector3(vector3);
+                    return;
+                case Movement movement:
+                    MovementCodec.Encode(writer, movement);
                     return;
                 case Type type:
                     EncodeType(type);

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
@@ -103,6 +104,11 @@ namespace TXServer.Core.Protocol
             return player.FindById(EntityId);
         }
 
+        private object DecodeVector3()
+        {
+            return new Vector3(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
+        }
+
         private object DecodeCommand(Player player)
         {
             Type objType = FindCommandType(reader.ReadByte());
@@ -131,6 +137,17 @@ namespace TXServer.Core.Protocol
             {
                 return DecodeEntity(player);
             }
+
+            if (objType == typeof(Vector3))
+            {
+                return DecodeVector3();
+            }
+
+            // if (typeof(DateTimeOffset).IsAssignableFrom(objType))
+            // {
+            //     long time = reader.ReadInt64();
+            //     return DateTimeOffset.FromUnixTimeMilliseconds(time + player.Connection.DiffToClient);
+            // }
 
             if (typeof(IDictionary).IsAssignableFrom(objType))
             {

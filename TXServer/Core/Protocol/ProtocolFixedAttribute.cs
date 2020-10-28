@@ -9,9 +9,9 @@ namespace TXServer.Core.Protocol
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public sealed class ProtocolFixedAttribute : Attribute
     {
-        public ProtocolFixedAttribute([CallerLineNumber]int Position = 0)
+        public ProtocolFixedAttribute([CallerLineNumber]int position = 0)
         {
-            this.Position = Position;
+            this.Position = position;
         }
 
         public int Position { get; }

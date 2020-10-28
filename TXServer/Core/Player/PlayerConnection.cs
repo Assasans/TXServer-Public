@@ -108,6 +108,8 @@ namespace TXServer.Core
             return Interlocked.Exchange(ref _Active, 0) == 0;
         }
 
+        public long DiffToClient { get; set; } = 0;
+
         public Socket Socket { get; private set; }
         public Player Player { get; }
         

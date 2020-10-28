@@ -106,12 +106,12 @@ namespace TXServer.Core
 
 			User = user;
 
-			user.Components.Add(new UserGroupComponent(user.EntityId));
+			user.Components.Add(new UserGroupComponent(user));
 
 			List<Command> collectedCommands = new List<Command>
 			{
 				new EntityShareCommand(user),
-				new ComponentAddCommand(ClientSession, new UserGroupComponent(user.EntityId)),
+				new ComponentAddCommand(ClientSession, new UserGroupComponent(user)),
 			};
 			
 			collectedCommands.AddRange(from collectedEntity in ResourceManager.GetEntities(this, user)
@@ -153,7 +153,11 @@ namespace TXServer.Core
 			return true;
         }
 
-        public static Int64 GenerateId() => ((long)PlayerConnection.Random.Next() << 32) + PlayerConnection.Random.Next();
+        public static Int64 GenerateId()
+        {
+	        Random random = PlayerConnection.Random ?? Server.Instance.Random;
+	        return ((long) random.Next() << 32) + random.Next();
+        }
 
         public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
 

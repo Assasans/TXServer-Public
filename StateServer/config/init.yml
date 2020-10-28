@@ -1,8 +1,8 @@
-host: 127.0.0.1
+host: *ip*
 acceptorPort: 5050
-configVersion: visual3-48546
-bundleDbVersion: visual3-48546
-resourcesUrl: http://127.0.0.1:8080/resources
-configsUrl: http://127.0.0.1:8080/config
-updateConfigUrl: http://127.0.0.1:8080/update/{BuildTarget}
-stateFileUrl: http://127.0.0.1:8080/state/_state.yml
+configVersion: master-48606
+bundleDbVersion: master-48606
+resourcesUrl: http://*ip*:8080/resources
+configsUrl: http://*ip*:8080/config
+updateConfigUrl: http://*ip*:8080/update/{BuildTarget}.yml
+stateFileUrl: http://*ip*:8080/state/_state.yml
