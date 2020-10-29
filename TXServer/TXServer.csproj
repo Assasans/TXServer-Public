@@ -116,6 +116,9 @@
         <Compile Include="ECSSystem\Components\Battle\BattleUserComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\Bonus\BonusComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\Bonus\BonusDropTimeComponent.cs" />
+        <Compile Include="ECSSystem\Components\Battle\Chassis\DampingComponent.cs" />
+        <Compile Include="ECSSystem\Components\Battle\Chassis\SpeedComponent.cs" />
+        <Compile Include="ECSSystem\Components\Battle\Chassis\WeightComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\CTFComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\DMComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\Energy\WeaponEnergyComponent.cs" />
@@ -137,6 +140,7 @@
         <Compile Include="ECSSystem\Components\Battle\ScoreLimitComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\SelfBattleUserComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\SelfTankComponent.cs" />
+        <Compile Include="ECSSystem\Components\Battle\Shell\ShellBattleItemComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\Tank\TankActiveStateComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\Tank\TankComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\Tank\TankDeadStateComponent.cs" />
@@ -144,7 +148,9 @@
         <Compile Include="ECSSystem\Components\Battle\Tank\TankMovementComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\Tank\TankPaintBattleItemComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\Tank\TankPartComponent.cs" />
+        <Compile Include="ECSSystem\Components\Battle\Tank\TankSemiActiveStateComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\Tank\TankSpawnStateComponent.cs" />
+        <Compile Include="ECSSystem\Components\Battle\Tank\TankVisibleStateComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\Team\TeamBattleComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\Team\TeamComponent.cs" />
         <Compile Include="ECSSystem\Components\Battle\Team\TeamGroupComponent.cs" />
@@ -200,11 +206,13 @@
         <Compile Include="ECSSystem\EntityTemplates\Matchmaking\BattleLobbyTemplate.cs" />
         <Compile Include="ECSSystem\EntityTemplates\Matchmaking\MatchMakingLobbyTemplate.cs" />
         <Compile Include="ECSSystem\EntityTemplates\Notification\NewItemNotificationTemplate.cs" />
+        <Compile Include="ECSSystem\EntityTemplates\ShellBattleItemTemplate.cs" />
         <Compile Include="ECSSystem\Events\Battle\BattlePingEvent.cs" />
         <Compile Include="ECSSystem\Events\Battle\BattlePingResultEvent.cs" />
         <Compile Include="ECSSystem\Events\Battle\BattlePongEvent.cs" />
         <Compile Include="ECSSystem\Events\Battle\HealthChangedEvent.cs" />
         <Compile Include="ECSSystem\Events\Battle\InitializeTimeCheckerEvent.cs" />
+        <Compile Include="ECSSystem\Events\Battle\MoveCommandEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\OpenContainerEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\EnteredToMatchMakingEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\EnterToMatchMakingEvent.cs" />

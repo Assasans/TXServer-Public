@@ -1,14 +1,6 @@
-﻿using System;
-using System.Numerics;
-using System.Threading;
-using TXServer.Core;
-using TXServer.Core.Commands;
+﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Components.Battle.Round;
-using TXServer.ECSSystem.Components.Battle.Tank;
-using TXServer.ECSSystem.Components.Battle.Time;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -19,21 +11,21 @@ namespace TXServer.ECSSystem.Events.Battle
         {
             Entity tank = player.ReferencedEntities["tank"];
             
-            CommandManager.SendCommands(player,
-                new ComponentAddCommand(tank,
-                    new TankMovementComponent(
-                        new Movement(new Vector3(20, 18, 98), Vector3.Zero, Vector3.Zero, new Quaternion(0, 0, 0, 0)),
-                        new MoveControl(0, 0), 0, 0))
-                // new SendEventCommand(new HealthChangedEvent()),
-                // new ComponentRemoveCommand(player.ReferencedEntities["round"], typeof(RoundWarmingUpStateComponent))
-                );
+            // CommandManager.SendCommands(player,
+            //     new ComponentAddCommand(tank,
+            //         new TankMovementComponent(
+            //             new Movement(new Vector3(20, 18, 98), Vector3.Zero, Vector3.Zero, new Quaternion(0, 0, 0, 0)),
+            //             new MoveControl(0, 0), 0, 0))
+            //     // new SendEventCommand(new HealthChangedEvent()),
+            //     // new ComponentRemoveCommand(player.ReferencedEntities["round"], typeof(RoundWarmingUpStateComponent))
+            //     );
             
-            new Thread(() =>
-            {
-                Thread.Sleep(12000);
-                CommandManager.SendCommands(player,
-                    new SendEventCommand(new HealthChangedEvent()));
-            }).Start();
+            // new Thread(() =>
+            // {
+            //     Thread.Sleep(15000); 
+            //     CommandManager.SendCommands(player,
+            //         new ComponentAddCommand(tank, new TankActiveStateComponent()));
+            // }).Start();
             
             // CommandManager.SendCommands(player, 
             //     new EntityShareCommand(new Entity(

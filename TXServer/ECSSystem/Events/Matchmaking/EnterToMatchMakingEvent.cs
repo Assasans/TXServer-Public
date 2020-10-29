@@ -7,8 +7,8 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
+using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Energy;
-using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Hull;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Location;
@@ -39,7 +39,7 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                         new GravityComponent(1.0F, GravityType.EARTH),
                         new MatchMakingLobbyStartTimeComponent(DateTimeOffset.Now.AddSeconds(5))
                         // new MatchMakingLobbyStartingComponent()
-                        );
+                    );
                     battleLobby.Components.Add(new BattleLobbyGroupComponent(battleLobby));
 
                     Entity fakePlayer = new Entity(new TemplateAccessor(new UserTemplate(), ""),
@@ -68,11 +68,11 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                     new Thread(() =>
                     {
                         Thread.Sleep(5000);
-                        
+
                         Entity battle = new Entity(new TemplateAccessor(new CTFTemplate(), "battle/modes/ctf"),
                             new BattleModeComponent(BattleMode.CTF),
-                        // Entity battle = new Entity(new TemplateAccessor(new DMTemplate(), "battle/modes/dm"),
-                        //     new BattleModeComponent(BattleMode.DM),
+                            // Entity battle = new Entity(new TemplateAccessor(new DMTemplate(), "battle/modes/dm"),
+                            //     new BattleModeComponent(BattleMode.DM),
                             new BattleComponent(),
                             new TeamBattleComponent(),
                             new CTFComponent(),
@@ -87,18 +87,16 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                             new UserCountComponent(4) // from BattleInfoSystem#BattleNode
                         );
                         battle.Components.Add(new BattleGroupComponent(battle));
-                        
+
                         Entity battleUser = new Entity(new TemplateAccessor(new BattleUserTemplate(), "battle/battleuser"),
                             new UserGroupComponent(player.User),
                             new BattleGroupComponent(battle),
-                            
                             new UserInBattleAsTankComponent(),
                             // new UserInBattleAsSpectatorComponent(99L),//todo
-                            
                             new IdleCounterComponent(10000L), //todo this is the kick time after becoming idle
                             new SelfBattleUserComponent()
-                            );
-                        
+                        );
+
                         CommandManager.SendCommands(player, new Command[]
                         {
                             new EntityShareCommand(battle),
@@ -116,9 +114,9 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                                 new TeamScoreComponent(100),
                                 new PositionComponent(new Vector3(100, 200, 100)),
                                 new RotationComponent(new Vector3(0, 0, 0))
-                                );
+                            );
                             redTeam.Components.Add(new TeamGroupComponent(redTeam));
-                            
+
                             Entity blueTeam = new Entity(new TemplateAccessor(new TeamTemplate(), ""),
                                 new TeamComponent(),
                                 new TeamColorComponent(TeamColor.BLUE),
@@ -126,19 +124,19 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                                 new TeamScoreComponent(100),
                                 new PositionComponent(new Vector3(-100, 200, -100)),
                                 new RotationComponent(new Vector3(0, 0, 0))
-                                );
+                            );
                             blueTeam.Components.Add(new TeamGroupComponent(blueTeam));
 
                             Entity round = new Entity(new TemplateAccessor(new RoundTemplate(), ""),
                                 new RoundComponent(),
                                 new BattleGroupComponent(battle),
-                                
+
                                 // WarmingUpTimerSystem
                                 new RoundStopTimeComponent(DateTimeOffset.Now.AddSeconds(40)),
                                 new RoundActiveStateComponent()
                                 // new RoundWarmingUpStateComponent() todo
                             );
-                            
+
                             // Entity tank = new Entity(new TemplateAccessor(new TankTemplate(), ""),
                             //     new SelfTankComponent(),
                             //     // new TankComponent(),
@@ -161,15 +159,19 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                                 new UserGroupComponent(player.User),
                                 // new MarketItemGroupComponent(Hulls.GlobalItems.Hornet),
                                 new TankPartComponent(),
-                                // new TankSpawnStateComponent(), todo this should be in incarnation, see TransitionCameraSystem
-                                new PositionComponent(new Vector3(20, 18, 98)),
-                                new RotationComponent(new Vector3(0, 0, 0))
                                 
+                                new SpeedComponent(2.0F, 2.0F, 2.0F),
+                                new WeightComponent(2.0F), // ChassisInitNode
+                                new DampingComponent(2.0F),
+                                new TankMovableComponent(), // TankMovementSenderSystem:TankInitNode
+                                new TankSemiActiveStateComponent(1F)
+                                // new TankVisibleStateComponent() // moved from incarnation
+
                                 // new HealthComponent(200, 200), //todo test
                                 // new HealthConfigComponent(200),
-                                
+
                                 // new TankMovableComponent() // WeaponRotationSystem todo should be in incarnation as well
-                                );
+                            );
                             tank.Components.Add(new TankGroupComponent(tank));
 
                             Entity roundUser = new Entity(new TemplateAccessor(new RoundUserTemplate(), "battle/round/rounduser"),
@@ -179,45 +181,46 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                                 new TeamGroupComponent(redTeam),
                                 new BattleGroupComponent(battle),
                                 new TankGroupComponent(tank));
-                                
+
                             // new TankIncarnationComponent()); // WeaponRotationSystem, might need to create an incarnation entity
-                            
+
                             Entity incarnation = new Entity(new TemplateAccessor(new TankIncarnationTemplate(), ""),
                                 new TankIncarnationKillStatisticsComponent(0),
 
                                 // TankIncarnationSystem
-                                // new TankIncarnationComponent(), //todo this is already present?
-                                new TankGroupComponent(tank),
-                                
-                                new SelfTankComponent(), //todo check in combination with Tank
-                                new TankSpawnStateComponent(),
-                                new TankMovableComponent()
-                                
+                                new TankIncarnationComponent(), //todo this is already present?
+                                new TankGroupComponent(tank)
+
+                                // new SelfTankComponent(), //todo check in combination with Tank
+
+                                // new TankSpawnStateComponent(), todo this has to be in the tank itself
+                                // new TankMovableComponent()
+
                                 // new HealthComponent(600, 1800) // HealthSystem todo is this added by default?
-                                );
+                            );
 
                             // RoundUserEquipment#HullNode & TurretNode
-                            
+
                             // Entity hull = new Entity(
                             //     new UserGroupComponent(player.User),
                             //     new TankComponent(),
                             //     new MarketItemGroupComponent(Hulls.GlobalItems.Hornet),
                             //     new TankPartComponent(),
                             //     new TankGroupComponent(tank));
-                            
+
                             Entity weapon = new Entity(new TemplateAccessor(new WeaponTemplate(), "battle/weapon/railgun"),
                                 new TankPartComponent(),
                                 new WeaponComponent(),
                                 new WeaponCooldownComponent(2f), //todo remove?
-                                new UserGroupComponent(player.User),
+                                new UserGroupComponent(player.User), // unused according to PaintBuilderSystem, but client crashes without :p
+                                new BattleGroupComponent(battle), //todo required according to PaintBuilderSystem
                                 new TankGroupComponent(tank),
-
                                 new WeaponEnergyComponent(20) //todo test
                                 //
                                 // // WeaponRotationSystem
                                 // new WeaponRotationComponent(1.0F, 1.0F, 1.0F)
                             );
-                            
+
                             Entity weaponSkin = new Entity(new TemplateAccessor(new WeaponSkinBattleItemTemplate(), "garage/skin/weapon/railgun/may2017"),
                                 new WeaponSkinBattleItemComponent(),
                                 new TankGroupComponent(tank));
@@ -225,7 +228,7 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                             Entity hullSkin = new Entity(new TemplateAccessor(new HullSkinBattleItemTemplate(), "garage/skin/tank/hornet/may2017"),
                                 new HullSkinBattleItemComponent(),
                                 new TankGroupComponent(tank));
-                            
+
                             Entity weaponPaint = new Entity(new TemplateAccessor(new WeaponPaintBattleItemTemplate(), "garage/paint/marine"),
                                 new WeaponPaintBattleItemComponent(),
                                 new TankGroupComponent(tank));
@@ -233,8 +236,12 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                             Entity tankPaint = new Entity(new TemplateAccessor(new TankPaintBattleItemTemplate(), "garage/paint/marine"),
                                 new TankPaintBattleItemComponent(),
                                 new TankGroupComponent(tank));
-                            
-                            
+
+                            Entity shell = new Entity(new TemplateAccessor(new ShellBattleItemTemplate(), "garage/shell/railgun/glitch"),
+                                new ShellBattleItemComponent(),
+                                new TankGroupComponent(tank));
+
+
                             player.ReferencedEntities["round"] = round;
                             player.ReferencedEntities["tank"] = tank;
 
@@ -245,24 +252,37 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                                 new EntityShareCommand(blueTeam),
                                 new EntityShareCommand(tank),
                                 new EntityShareCommand(roundUser),
-                                
+
+                                new ComponentAddCommand(tank, new TankMovementComponent(
+                                    new Movement(new Vector3(20, 18, 98), Vector3.Zero, Vector3.Zero,
+                                        new Quaternion(0, 0, 0, 0)),
+                                    new MoveControl(0, 0), 0, 0)),
+
                                 new EntityShareCommand(weapon),
-                                
+
                                 new EntityShareCommand(hullSkin),
                                 new EntityShareCommand(weaponSkin),
                                 new EntityShareCommand(tankPaint),
                                 new EntityShareCommand(weaponPaint),
-                                
+                                new EntityShareCommand(shell),
+
                                 new EntityShareCommand(incarnation), //todo
-                                
+
                                 new ComponentAddCommand(battleUser, new UserReadyToBattleComponent())
                                 // new ComponentAddCommand(player.User, new TankGroupComponent(tank)),
-                                
-                                
+
+
                                 //todo look into this more, TankMovementReceiverSystem
                             });
+
+                            new Thread(() => // figure out an event to send this in lol, maybe after receiving the first Movement?
+                            {
+                                Thread.Sleep(20000);
+                                CommandManager.SendCommands(player,
+                                    new ComponentAddCommand(tank, new TankActiveStateComponent()));
+                            }).Start();
                         }).Start();
-                        
+
                         // TankActiveStateComponent, TankSpawnStateComponent, SelfTankComponent,
                         // TankDeadStateComponent, TankVisibleStateComponent, TankSemiActiveStateComponent
                         // TankNewStateComponent
