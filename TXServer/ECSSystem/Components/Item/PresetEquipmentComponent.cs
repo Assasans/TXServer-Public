@@ -16,6 +16,14 @@ namespace TXServer.ECSSystem.Components
             Player = player;
             Preset = preset;
 
+            WeaponItem = (Player.UserItems["Weapons"] as Weapons.Items).Smoky;
+            HullItem = (Player.UserItems["Hulls"] as Hulls.Items).Hunter;
+
+            WeaponPaint = (Player.UserItems["Covers"] as Covers.Items).None;
+            TankPaint = (Player.UserItems["Paints"] as Paints.Items).Green;
+
+            Graffiti = (Player.UserItems["Graffiti"] as Graffiti.Items).Logo;
+
             Weapons.Items weaponList = player.UserItems["Weapons"] as Weapons.Items;
             Hulls.Items hullList = player.UserItems["Hulls"] as Hulls.Items;
             WeaponSkins.Items weaponSkinList = player.UserItems["WeaponSkins"] as WeaponSkins.Items;
@@ -75,63 +83,63 @@ namespace TXServer.ECSSystem.Components
             };
         }
 
-		public Entity Weapon
-        {
-            get
-            {
-                WeaponItem.Components.TryGetValue(new ParentGroupComponent(0), out Component component);
-                return Player.FindById((component as ParentGroupComponent).Key);
-            }
-        }
+        public Entity Weapon => Player.FindEntityById(WeaponItem.GetComponent<ParentGroupComponent>().Key);
 
-		public Entity Hull
-        {
-            get
-            {
-                HullItem.Components.TryGetValue(new ParentGroupComponent(0), out Component component);
-                return Player.FindById((component as ParentGroupComponent).Key);
-            }
-        }
+        public Entity Hull => Player.FindEntityById(HullItem.GetComponent<ParentGroupComponent>().Key);
 
         [ProtocolIgnore] public Entity Preset { get; set; }
 
-        [ProtocolIgnore] public Entity WeaponItem {
-            get => (Player.UserItems["Weapons"] as Weapons.Items).Smoky;
-            set { /* ignored rn */ }
-        }
+        [ProtocolIgnore] public Entity WeaponItem { get; set; }
+        [ProtocolIgnore] public Entity HullItem { get; set; }
 
+        [ProtocolIgnore] public Entity WeaponPaint { get; set; }
+        [ProtocolIgnore] public Entity TankPaint { get; set; }
+
+        [ProtocolIgnore] public Entity Graffiti { get; set; }
+
+        // commented code below breaks mount item system
+        /*
+        [ProtocolIgnore] public Entity WeaponItem
+        {
+            get => (Player.UserItems["Weapons"] as Weapons.Items).Smoky;
+            set { /* ignored rn / }
+        }
+        
         [ProtocolIgnore]
         public Entity HullItem
         {
             get => (Player.UserItems["Hulls"] as Hulls.Items).Hunter;
-            set { /* ignored rn */ }
+            set { /* ignored rn / }
         }
 
         [ProtocolIgnore]
         public Entity WeaponPaint
         {
             get => (Player.UserItems["Covers"] as Covers.Items).None;
-            set { /* ignored rn */ }
+            set { /* ignored rn / }
         }
 
         [ProtocolIgnore]
         public Entity TankPaint
         {
             get => (Player.UserItems["Paints"] as Paints.Items).Green;
-            set { /* ignored rn */ }
+            set { /* ignored rn / }
         }
+        */
 
         [ProtocolIgnore] public Dictionary<Entity, Entity> WeaponSkins { get; set; }
         [ProtocolIgnore] public Dictionary<Entity, Entity> HullSkins { get; set; }
 
         [ProtocolIgnore] public Dictionary<Entity, Entity> WeaponShells { get; set; }
 
+        /*
         [ProtocolIgnore]
         public Entity Graffiti
         {
             get => (Player.UserItems["Graffiti"] as Graffiti.Items).Logo;
-            set { /* ignored rn */ }
+            set { /* ignored rn / }
         }
+        */
 
         [ProtocolIgnore] public Dictionary<Entity, Entity> Modules { get; set; }
     }

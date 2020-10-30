@@ -1,17 +1,18 @@
 ﻿using System;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Components
 {
     [SerialVersionUID(1496833452921)]
     public class MatchMakingLobbyStartTimeComponent : Component
     {
-        public MatchMakingLobbyStartTimeComponent(DateTimeOffset startTime)
+        public MatchMakingLobbyStartTimeComponent(TimeSpan span)
         {
-            StartTime = startTime.ToUnixTimeMilliseconds();
+            StartTime = new TXDate(span);
         }
         
-        public long StartTime { get; set; }
+        public TXDate StartTime { get; set; }
     }
 }

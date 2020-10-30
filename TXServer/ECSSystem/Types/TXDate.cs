@@ -6,17 +6,17 @@ namespace TXServer.ECSSystem.Types
     {
         public TXDate()
         {
-            Time = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            Time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         }
 
-        public TXDate(DateTimeOffset Time)
+        public TXDate(DateTimeOffset time)
         {
-            this.Time = Time.ToUnixTimeSeconds();
+            Time = time.ToUnixTimeMilliseconds();
         }
 
         public TXDate(TimeSpan span)
         {
-            Time = new DateTimeOffset(DateTimeOffset.Now.Ticks, span).ToUnixTimeMilliseconds();
+            Time = DateTimeOffset.UtcNow.AddTicks(span.Ticks).ToUnixTimeMilliseconds();
         }
 
         public long Time { get; set; }

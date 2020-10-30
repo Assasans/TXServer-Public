@@ -120,7 +120,7 @@ namespace TXServer.Core.Protocol
             WriteFloat(bits, ref position, value.Z * num, size, factor);
         }
 
-        protected void CopyBits(byte[] buffer, BitArray bits)
+        public static void CopyBits(byte[] buffer, BitArray bits)
         {
             for (int index1 = 0; index1 < buffer.Length; ++index1)
             {
@@ -133,7 +133,7 @@ namespace TXServer.Core.Protocol
             }
         }
 
-        private static float ReadFloat(BitArray bits, ref int position, int size, float factor)
+        public static float ReadFloat(BitArray bits, ref int position, int size, float factor)
         {
             float val = (Read(bits, ref position, size) - (1 << size - 1)) * factor;
             if (IsValidFloat(val))

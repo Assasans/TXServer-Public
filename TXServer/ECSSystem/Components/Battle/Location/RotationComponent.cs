@@ -4,6 +4,9 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Components.Battle.Location
 {
+    /// <summary>
+    /// Bonus rotation.
+    /// </summary>
     [SerialVersionUID(-1853333282151870933)]
     public class RotationComponent : Component
     {

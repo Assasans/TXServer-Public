@@ -30,21 +30,19 @@ namespace TXServer.Core
 
         public void Dispose()
         {
-            if (Connection.IsActive()) return;
+            if (!Connection.TryDeactivate()) return;
             
             Connection.Dispose();
             //todo save data?
         }
 
-        public bool IsActive()
-        {
-            return Connection.IsActive();
-        }
+        public bool IsActive => Connection.IsActive;
+		public bool TryDeactivate() => Connection.TryDeactivate();
 
         /// <summary>
         /// Find Entity by id.
         /// </summary>
-        public Entity FindById(Int64 id)
+        public Entity FindEntityById(Int64 id)
         {
             try
             {
@@ -162,7 +160,8 @@ namespace TXServer.Core
         public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
 
         /// <summary>
-        /// Use for cross-Entity reference handling.
+        /// Use for short-timed entity references from unconnected places.
+		/// For long-timed ones consider using properties.
         /// </summary>
         public ConcurrentDictionary<string, Entity> ReferencedEntities { get; } = new ConcurrentDictionary<string, Entity>();
         

@@ -32,7 +32,7 @@ namespace TXServer.Core
 
         public void Dispose()
         {
-            if (IsActive()) return;
+            if (!TryDeactivate()) return;
 
             Socket.Disconnect(false);
 
@@ -103,10 +103,13 @@ namespace TXServer.Core
             }
         }
 
-        public bool IsActive()
-        {
-            return Interlocked.Exchange(ref _Active, 0) == 0;
-        }
+        public bool IsActive => Convert.ToBoolean(_Active);
+
+        /// <summary>
+        /// Tries to deactivate the client.
+        /// </summary>
+        /// <returns>If client was active, true is returned; otherwise false.</returns>
+        public bool TryDeactivate() => Interlocked.Exchange(ref _Active, 0) != 0;
 
         public long DiffToClient { get; set; } = 0;
 

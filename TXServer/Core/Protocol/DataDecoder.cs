@@ -9,6 +9,9 @@ using System.Runtime.Serialization;
 using System.Text;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components.Battle.Tank;
+using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Types;
 using TXServer.Library;
 using static TXServer.Core.Commands.CommandManager;
 
@@ -101,7 +104,7 @@ namespace TXServer.Core.Protocol
         {
             Int64 EntityId = reader.ReadInt64();
 
-            return player.FindById(EntityId);
+            return player.FindEntityById(EntityId);
         }
 
         private object DecodeVector3()
@@ -114,6 +117,58 @@ namespace TXServer.Core.Protocol
             Type objType = FindCommandType(reader.ReadByte());
 
             return DecodeObject(objType, player);
+        }
+
+        private object DecodeMoveCommand()
+        {
+            const int WEAPON_ROTATION_SIZE = 2;
+            byte[] bufferEmpty = Array.Empty<byte>();
+            byte[] bufferForWeaponRotation = new byte[WEAPON_ROTATION_SIZE];
+            BitArray bitsEmpty = new BitArray(bufferEmpty);
+            BitArray bitsForWeaponRotation = new BitArray(bufferForWeaponRotation);
+            const int WEAPON_ROTATION_COMPONENT_BITSIZE = WEAPON_ROTATION_SIZE * 8;
+            const float WEAPON_ROTATION_FACTOR = 360f / (1 << WEAPON_ROTATION_COMPONENT_BITSIZE);
+
+            bool flag = map.Read();
+            bool flag2 = map.Read();
+            bool flag3 = map.Read();
+            MoveCommand moveCommand = default;
+            if (flag3)
+            {
+                DiscreteTankControl discreteTankControl = default;
+                discreteTankControl.Control = reader.ReadByte();
+                moveCommand.TankControlHorizontal = discreteTankControl.TurnAxis;
+                moveCommand.TankControlVertical = discreteTankControl.MoveAxis;
+                moveCommand.WeaponRotationControl = discreteTankControl.WeaponControl;
+            }
+            else
+            {
+                moveCommand.TankControlVertical = reader.ReadSingle();
+                moveCommand.TankControlHorizontal = reader.ReadSingle();
+                moveCommand.WeaponRotationControl = reader.ReadSingle();
+            }
+            if (flag)
+            {
+                moveCommand.Movement = new Movement?((Movement)MovementCodec.Decode(reader));
+            }
+            byte[] buffer = GetBuffer(flag2);
+            BitArray bits = GetBits(flag2);
+            int num = 0;
+            reader.Read(buffer, 0, buffer.Length);
+            MovementCodec.CopyBits(buffer, bits);
+            if (flag2)
+            {
+                moveCommand.WeaponRotation = new float?(MovementCodec.ReadFloat(bits, ref num, WEAPON_ROTATION_COMPONENT_BITSIZE, WEAPON_ROTATION_FACTOR));
+            }
+            if (num != bits.Length)
+            {
+                throw new Exception("Move command unpack mismatch");
+            }
+            moveCommand.ClientTime = reader.ReadInt32();
+            return moveCommand;
+
+            byte[] GetBuffer(bool hasWeaponRotation) => (!hasWeaponRotation) ? bufferEmpty : bufferForWeaponRotation;
+            BitArray GetBits(bool hasWeaponRotation) => (!hasWeaponRotation) ? bitsEmpty : bitsForWeaponRotation;
         }
 
         private object SelectDecode(Type objType, Player player)
@@ -141,6 +196,11 @@ namespace TXServer.Core.Protocol
             if (objType == typeof(Vector3))
             {
                 return DecodeVector3();
+            }
+
+            if (objType == typeof(MoveCommand))
+            {
+                return DecodeMoveCommand();
             }
 
             // if (typeof(DateTimeOffset).IsAssignableFrom(objType))

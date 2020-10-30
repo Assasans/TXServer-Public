@@ -60,7 +60,7 @@ namespace TXServer.Core
         /// <param name="socket"></param>
         private void AddPlayer(Socket socket)
         {
-            int freeIndex = Pool.FindIndex(player => !player.IsActive());
+            int freeIndex = Pool.FindIndex(player => !player.IsActive);
 
             if (freeIndex != -1)
             {

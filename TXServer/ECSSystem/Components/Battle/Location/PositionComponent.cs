@@ -4,6 +4,9 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Components.Battle.Location
 {
+    /// <summary>
+    /// Bonus position.
+    /// </summary>
     [SerialVersionUID(4605414188335188027)]
     public class PositionComponent : Component
     {
