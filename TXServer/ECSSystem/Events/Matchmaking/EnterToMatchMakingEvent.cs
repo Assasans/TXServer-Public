@@ -85,11 +85,7 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                     new TeamGroupComponent(blueTeam)
                 );
 
-                CommandManager.SendCommands(player, new Command[]
-                {
-                    new EntityShareCommand(battle),
-                    new EntityShareCommand(battleUser)
-                });
+                
 
                 new Thread(() =>
                 {
@@ -105,7 +101,17 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                         // new RoundWarmingUpStateComponent() todo
                     );
 
+                    // new TankIncarnationComponent()); // WeaponRotationSystem, might need to create an incarnation entity
+
+                    // RoundUserEquipment#HullNode & TurretNode
+
                     Entity tank = TankTemplate.CreateEntity(player.CurrentPreset.HullItem, battleUser);
+                    Entity weapon = WeaponTemplate.CreateEntity(player.CurrentPreset.WeaponItem, tank);
+                    Entity hullSkin = HullSkinBattleItemTemplate.CreateEntity(player.CurrentPreset.HullSkins[player.CurrentPreset.HullItem], tank);
+                    Entity weaponSkin = WeaponSkinBattleItemTemplate.CreateEntity(player.CurrentPreset.WeaponSkins[player.CurrentPreset.WeaponItem], tank);
+                    Entity weaponPaint = WeaponPaintBattleItemTemplate.CreateEntity(player.CurrentPreset.WeaponPaint, tank);
+                    Entity tankPaint = TankPaintBattleItemTemplate.CreateEntity(player.CurrentPreset.TankPaint, tank);
+                    Entity shell = ShellBattleItemTemplate.CreateEntity(player.CurrentPreset.WeaponShells[player.CurrentPreset.WeaponItem], tank);
 
                     Entity roundUser = new Entity(new TemplateAccessor(new RoundUserTemplate(), "battle/round/rounduser"),
                         new RoundUserStatisticsComponent(1, 100, 1, 0, 1),
@@ -115,43 +121,27 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                         new BattleGroupComponent(battle),
                         new TankGroupComponent(tank));
 
-                    // new TankIncarnationComponent()); // WeaponRotationSystem, might need to create an incarnation entity
-
-                    // RoundUserEquipment#HullNode & TurretNode
-
-                    // Entity hull = new Entity(
-                    //     new UserGroupComponent(player.User),
-                    //     new TankComponent(),
-                    //     new MarketItemGroupComponent(Hulls.GlobalItems.Hornet),
-                    //     new TankPartComponent(),
-                    //     new TankGroupComponent(tank));
-
-                    Entity weapon = WeaponTemplate.CreateEntity(new WeaponTemplate(), "battle/weapon/railgun", tank);
-
-                    Entity hullSkin = HullSkinBattleItemTemplate.CreateEntity(player.CurrentPreset.HullSkins[player.CurrentPreset.HullItem], tank);
-                    Entity weaponSkin = WeaponSkinBattleItemTemplate.CreateEntity(player.CurrentPreset.WeaponSkins[player.CurrentPreset.WeaponItem], tank);
-                    Entity weaponPaint = WeaponPaintBattleItemTemplate.CreateEntity(player.CurrentPreset.WeaponPaint, tank);
-                    Entity tankPaint = TankPaintBattleItemTemplate.CreateEntity(player.CurrentPreset.TankPaint, tank);
-                    Entity shell = ShellBattleItemTemplate.CreateEntity(player.CurrentPreset.WeaponShells[player.CurrentPreset.WeaponItem], tank);
-
                     player.ReferencedEntities["round"] = round;
                     player.ReferencedEntities["tank"] = tank;
 
                     CommandManager.SendCommands(player, new Command[]
                     {
-                        new EntityShareCommand(round),
                         new EntityShareCommand(redTeam),
                         new EntityShareCommand(blueTeam),
+
                         new EntityShareCommand(tank),
-                        new EntityShareCommand(roundUser),
-
                         new EntityShareCommand(weapon),
-
                         new EntityShareCommand(hullSkin),
                         new EntityShareCommand(weaponSkin),
                         new EntityShareCommand(tankPaint),
                         new EntityShareCommand(weaponPaint),
                         new EntityShareCommand(shell),
+
+                        new EntityShareCommand(battle),
+                        new EntityShareCommand(battleUser),
+
+                        new EntityShareCommand(round),
+                        new EntityShareCommand(roundUser)
                         // new ComponentAddCommand(player.User, new TankGroupComponent(tank)),
 
 

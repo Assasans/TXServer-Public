@@ -11,15 +11,22 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(1430285417001)]
     public class WeaponTemplate : IEntityTemplate
     {
-        // Instead of getting template & configPath as parameters, it better should get market/user item entity and convert it to battle item.
-        public static Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank)
+        public static Entity CreateEntity(Entity marketOrUserItem, Entity tank)
+        {
+            // TODO: Select template based on given item template
+
+            return SmokyBattleItemTemplate.CreateEntity(tank);
+        }
+
+        protected static Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank)
         {
             return new Entity(new TemplateAccessor(template, configPath.Replace("garage", "battle")),
                 tank.GetComponent<TankPartComponent>(),
                 new WeaponComponent(),
+                // These components should be gotten from configs.
                 new WeaponCooldownComponent(1.3f),
                 new WeaponRotationComponent(113.667f, 113.333f, 113.333f),
-                new WeaponEnergyComponent(1.0f),
+                new WeaponEnergyComponent(1.3f),
                 tank.GetComponent<UserGroupComponent>(),
                 tank.GetComponent<TankGroupComponent>(),
                 tank.GetComponent<BattleGroupComponent>());

@@ -13,15 +13,15 @@ namespace TXServer.Core.Commands
 
         public override void OnSend(Player player)
         {
-            AddOrChangeComponent(player);
+            AddOrChangeComponent();
         }
 
         public override void OnReceive(Player player)
         {
-            AddOrChangeComponent(player);
+            AddOrChangeComponent();
         }
 
-        protected abstract void AddOrChangeComponent(Player player);
+        protected abstract void AddOrChangeComponent();
 
         [ProtocolFixed] public Entity Target { get; set; }
         [ProtocolFixed] public Component Component { get; set; }

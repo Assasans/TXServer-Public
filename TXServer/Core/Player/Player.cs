@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
+using System.Threading;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -26,7 +27,8 @@ namespace TXServer.Core
         {
             Server = server;
             Connection = new PlayerConnection(this, socket);
-        }
+			Connection.StartPlayerThreads();
+		}
 
         public void Dispose()
         {

@@ -227,9 +227,10 @@ namespace TXServer.Core.Protocol
             if (objType.IsAbstract || objType.IsInterface)
             {
                 objType = SerialVersionUIDTools.FindType(reader.ReadInt64());
+                return UnpackData(player, objType);
             }
 
-            return UnpackData(player, objType);
+            return DecodeObject(objType, player);
         }
 
         private object DecodeObject(Type objType, Player player)
@@ -267,22 +268,18 @@ namespace TXServer.Core.Protocol
                 BinaryReader buffer = new BigEndianBinaryReader(stream);
                 DataDecoder unpacker = new DataDecoder(buffer, map);
 
-                if (objType == null)
-                {
-                    // Deserialize objects.
-                    List<Command> commands = new List<Command>();
-
-                    while (buffer.BaseStream.Position != length)
-                    {
-                        commands.Add(unpacker.SelectDecode(typeof(Command), player) as Command);
-                    }
-
-                    return commands;
-                }
-                else
-                {
+                if (objType != null)
                     return unpacker.DecodeObject(objType, player);
+
+                // Deserialize objects.
+                List<Command> commands = new List<Command>();
+
+                while (buffer.BaseStream.Position != length)
+                {
+                    commands.Add(unpacker.SelectDecode(typeof(Command), player) as Command);
                 }
+
+                return commands;
             }
         }
 

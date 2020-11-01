@@ -19,15 +19,19 @@ namespace TXServer.Core
 
             Interlocked.Increment(ref Server.Instance.Connection.PlayerCount);
             Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
+        }
 
-            // Start player threads.
-            UpWorker = new Thread(ServerSideEvents);
-            UpWorker.Name = "ServerSide #" + socket.Handle;
-            UpWorker.Start();
+        public void StartPlayerThreads()
+        {
+            new Thread(ServerSideEvents)
+            {
+                Name = "ServerSide #" + Socket.Handle
+            }.Start();
 
-            DownWorker = new Thread(ClientSideEvents);
-            DownWorker.Name = "ClientSide #" + socket.Handle;
-            DownWorker.Start();
+            new Thread(ClientSideEvents)
+            {
+                Name = "ClientSide #" + Socket.Handle
+            }.Start();
         }
 
         public void Dispose()
@@ -42,7 +46,7 @@ namespace TXServer.Core
         
         private void InitThreadLocals()
         {
-            Random = new Random(Thread.CurrentThread.ManagedThreadId);
+            _Random = new Random(Thread.CurrentThread.ManagedThreadId);
         }
 
         /// <summary>
@@ -116,11 +120,9 @@ namespace TXServer.Core
         public Socket Socket { get; private set; }
         public Player Player { get; }
         
-        [ThreadStatic] public static Random Random;
+        [ThreadStatic] private static Random _Random;
+        public static Random Random => _Random;
 
         private int _Active = 1;
-
-        private readonly Thread UpWorker;
-        private readonly Thread DownWorker;
     }
 }

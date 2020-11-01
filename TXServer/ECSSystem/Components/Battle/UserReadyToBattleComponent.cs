@@ -14,13 +14,12 @@ namespace TXServer.ECSSystem.Components.Battle
 		public void OnAttached(Player player, Entity battleUser)
 		{
 			CommandManager.SendCommands(player,
-				new ComponentAddCommand(player.ReferencedEntities["tank"], new TankMovementComponent(new Movement(new Vector3(0, 3, 0), Vector3.Zero, Vector3.Zero, Quaternion.Identity), new MoveControl(), 0, 0)),
+				new ComponentAddCommand(player.ReferencedEntities["tank"], new TankMovementComponent(new Movement(new Vector3(0, 100, 0), Vector3.Zero, Vector3.Zero, Quaternion.Identity), new MoveControl(), 0, 0)),
 				new ComponentRemoveCommand(player.ReferencedEntities["tank"], typeof(TankSpawnStateComponent)),
 				new ComponentAddCommand(player.ReferencedEntities["tank"], new TankVisibleStateComponent()),
 				new ComponentAddCommand(player.ReferencedEntities["tank"], new TankSemiActiveStateComponent(1)),
 				new ComponentAddCommand(player.ReferencedEntities["tank"], new TankMovableComponent()),
-				new ComponentAddCommand(player.ReferencedEntities["tank"], new TankActiveStateComponent()),
-				new EntityShareCommand(TankIncarnationTemplate.CreateEntity(player.ReferencedEntities["tank"])));
+				new ComponentAddCommand(player.ReferencedEntities["tank"], new TankActiveStateComponent()));
 		}
 	}
 }
