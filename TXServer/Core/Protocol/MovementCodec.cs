@@ -55,7 +55,6 @@ namespace TXServer.Core.Protocol
             return movement;
         }
         
-
         private static Vector3 ReadVector3(
             BitArray bits,
             ref int position,
@@ -144,7 +143,7 @@ namespace TXServer.Core.Protocol
 
         private static bool IsValidFloat(float val)
         {
-            return (float.IsInfinity(val) ? 1 : (float.IsNaN(val) ? 1 : 0)) == 0;
+            return !(float.IsInfinity(val) || float.IsNaN(val));
         }
 
         private static void WriteFloat(

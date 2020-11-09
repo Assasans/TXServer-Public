@@ -10,7 +10,7 @@ namespace TXServer.Core.Commands
             this.Target = Target;
             this.Component = Component;
         }
-
+        
         public override void OnSend(Player player)
         {
             AddOrChangeComponent();
@@ -21,6 +21,7 @@ namespace TXServer.Core.Commands
             AddOrChangeComponent();
         }
 
+        // TODO: keep track of players entity shared with and broadcast any changes
         protected abstract void AddOrChangeComponent();
 
         [ProtocolFixed] public Entity Target { get; set; }

@@ -11,11 +11,18 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(1430285417001)]
     public class WeaponTemplate : IEntityTemplate
     {
-        public static Entity CreateEntity(Entity marketOrUserItem, Entity tank)
+        public static Entity CreateEntity(Entity userItem, Entity tank)
         {
             // TODO: Select template based on given item template
-
-            return SmokyBattleItemTemplate.CreateEntity(tank);
+            switch (userItem.TemplateAccessor.Template)
+            {
+                case SmokyUserItemTemplate _:
+                    return SmokyBattleItemTemplate.CreateEntity(tank);
+                case FlamethrowerUserItemTemplate _:
+                    return FlamethrowerBattleItemTemplate.CreateEntity(tank);
+                default:
+                    return SmokyBattleItemTemplate.CreateEntity(tank);
+            }
         }
 
         protected static Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank)
@@ -27,6 +34,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 new WeaponCooldownComponent(1.3f),
                 new WeaponRotationComponent(113.667f, 113.333f, 113.333f),
                 new WeaponEnergyComponent(1.3f),
+                new ShootableComponent(),
                 tank.GetComponent<UserGroupComponent>(),
                 tank.GetComponent<TankGroupComponent>(),
                 tank.GetComponent<BattleGroupComponent>());

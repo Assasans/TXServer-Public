@@ -14,17 +14,18 @@ namespace TXServer.Core.Commands
             ComponentType = componentType ?? throw new ArgumentNullException(nameof(componentType));
         }
 
-        public override void OnSend(Player player)
+        public override void OnSend(Player player) => RemoveComponent();
+
+        public override void OnReceive(Player player) => RemoveComponent();
+
+        // TODO: keep track of players entity shared with and broadcast any changes
+
+        private void RemoveComponent()
         {
             if (!Target.Components.Remove(FormatterServices.GetUninitializedObject(ComponentType) as Component))
             {
                 throw new ArgumentException("Component not found", ComponentType.Name);
             }
-        }
-
-        public override void OnReceive(Player player)
-        {
-            throw new NotSupportedException();
         }
 
         [ProtocolFixed] public Entity Target { get; set; }

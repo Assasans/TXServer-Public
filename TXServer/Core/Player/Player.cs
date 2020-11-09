@@ -22,8 +22,13 @@ namespace TXServer.Core
         public Server Server { get; }
         public PlayerConnection Connection { get; }
         public PlayerData Data { get; set; }
-        
-        public Player(Server server, Socket socket)
+
+#if DEBUG
+		public IEnumerable<Command> LastServerPacket { get; set; }
+		public List<Command> LastClientPacket { get; set; }
+#endif
+
+		public Player(Server server, Socket socket)
         {
             Server = server;
             Connection = new PlayerConnection(this, socket);

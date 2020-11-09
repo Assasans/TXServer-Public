@@ -22,14 +22,26 @@ namespace TXServer.Core.Protocol
         private readonly BinaryReader reader;
         private readonly OptionalMap map;
 
-        private DataDecoder() { }
+        private readonly Dictionary<Type, Func<object>> decodeMethods;
 
-        public DataDecoder(BinaryReader reader)
+        private DataDecoder()
+        {
+            decodeMethods = new Dictionary<Type, Func<object>>
+            {
+                { typeof(string), DecodeString },
+                { typeof(Vector3), DecodeVector3 },
+                { typeof(MoveCommand), DecodeMoveCommand },
+                { typeof(Movement), DecodeMovement },
+                { typeof(Type), DecodeType }
+            };
+        }
+
+        public DataDecoder(BinaryReader reader) : this()
         {
             this.reader = reader;
         }
 
-        private DataDecoder(BinaryReader reader, OptionalMap map)
+        private DataDecoder(BinaryReader reader, OptionalMap map) : this()
         {
             this.reader = reader;
             this.map = map;
@@ -171,6 +183,16 @@ namespace TXServer.Core.Protocol
             BitArray GetBits(bool hasWeaponRotation) => (!hasWeaponRotation) ? bitsEmpty : bitsForWeaponRotation;
         }
 
+        private object DecodeMovement()
+        {
+            return MovementCodec.Decode(reader);
+        }
+
+        private object DecodeType()
+        {
+            return SerialVersionUIDTools.FindType(reader.ReadInt64());
+        }
+
         private object SelectDecode(Type objType, Player player)
         {
             if (objType.IsPrimitive || objType == typeof(decimal))
@@ -178,9 +200,9 @@ namespace TXServer.Core.Protocol
                 return DecodePrimitive(objType);
             }
 
-            if (objType == typeof(string))
+            if (decodeMethods.TryGetValue(objType, out Func<object> method))
             {
-                return DecodeString();
+                return method();
             }
 
             if (objType.IsEnum)
@@ -191,16 +213,6 @@ namespace TXServer.Core.Protocol
             if (objType == typeof(Entity))
             {
                 return DecodeEntity(player);
-            }
-
-            if (objType == typeof(Vector3))
-            {
-                return DecodeVector3();
-            }
-
-            if (objType == typeof(MoveCommand))
-            {
-                return DecodeMoveCommand();
             }
 
             // if (typeof(DateTimeOffset).IsAssignableFrom(objType))
@@ -226,7 +238,7 @@ namespace TXServer.Core.Protocol
 
             if (objType.IsAbstract || objType.IsInterface)
             {
-                objType = SerialVersionUIDTools.FindType(reader.ReadInt64());
+                objType = (Type)DecodeType();
                 return UnpackData(player, objType);
             }
 

@@ -144,7 +144,7 @@ namespace TXServer.Core.Protocol
 
             if (Attribute.IsDefined(objType, typeof(SerialVersionUIDAttribute)))
             {
-                writer.Write(SerialVersionUIDTools.GetId(objType));
+                EncodeType(objType);
             }
 
             EncodeObject(obj);

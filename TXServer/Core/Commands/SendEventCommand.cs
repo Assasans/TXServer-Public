@@ -27,36 +27,35 @@ namespace TXServer.Core.Commands
         /// </summary>
         public override void OnReceive(Player player)
         {
-            bool executable = false;
-
+            bool canBeExecuted = false;
             MethodInfo[] methods = Event.GetType().GetMethods();
+
             foreach (MethodInfo method in methods)
             {
-                if (method.Name == "Execute")
+                if (method.Name != "Execute") continue;
+
+                canBeExecuted = true;
+                ParameterInfo[] parameters = method.GetParameters();
+
+                // Player can be passed as first parameter before entities
+                if (parameters.Length == Entities.Count + 1 && parameters[0].ParameterType == typeof(Player))
                 {
-                    executable = true;
-                    if (method.GetParameters().Length == Entities.Count + 1)
-                    {
-                        object[] args = new object[Entities.Count + 1];
-                        args[0] = player;
-                        Array.Copy(Entities.ToArray(), 0, args, 1, Entities.Count);
+                    object[] args = new object[Entities.Count + 1];
+                    args[0] = player;
+                    Array.Copy(Entities.ToArray(), 0, args, 1, Entities.Count);
 
-                        method.Invoke(Event, args);
-                        return;
-                    }
+                    method.Invoke(Event, args);
+                    return;
+                }
 
-                    if (method.GetParameters().Length == Entities.Count)
-                    {
-                        if (method.GetParameters().Length > 0)
-                        {
-                            if (method.GetParameters()[0].ParameterType == typeof(Player))
-                                continue; // not this one
-                        }
-                        method.Invoke(Event, Entities.ToArray());
-                    }
+                // Only entities as parameters
+                if (parameters.Length == Entities.Count && parameters[0].ParameterType != typeof(Player))
+                {
+                    method.Invoke(Event, Entities.ToArray());
+                    return;
                 }
             }
-            if (executable)
+            if (canBeExecuted)
                 throw new MissingMethodException(Event.GetType().Name, string.Format("Execute({0})", Entities.Count));
         }
 

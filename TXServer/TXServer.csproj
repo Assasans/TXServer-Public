@@ -109,7 +109,14 @@
     <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
     <Compile Include="Core\Protocol\MovementCodec.cs" />
-    <Compile Include="ECSSystem\Components\Battle\AnalogMoveCommandServerEvent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\FlamethrowerComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponEnergyComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponIdleComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponWorkingComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponStreamShootingComponent.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\FlamethrowerBattleItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\StreamWeaponTemplate.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleConfiguratedComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleGroupComponent.cs" />

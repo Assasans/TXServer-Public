@@ -24,8 +24,13 @@ namespace TXServer.Core.Commands
             using (NetworkStream stream = new NetworkStream(connection.Socket))
             using (BinaryReader reader = new BigEndianBinaryReader(stream))
             {
-                DataDecoder decoder = new DataDecoder(reader);
-                foreach (Command command in decoder.DecodeCommands(connection.Player))
+                List<Command> commands = new DataDecoder(reader).DecodeCommands(connection.Player);
+
+#if DEBUG
+                connection.Player.LastClientPacket = commands;
+#endif
+
+                foreach (Command command in commands)
                 {
                     command.OnReceive(connection.Player);
                 }
@@ -46,6 +51,10 @@ namespace TXServer.Core.Commands
             {
                 command.OnSend(player);
             }
+
+#if DEBUG
+            player.LastServerPacket = commands;
+#endif
 
             using (MemoryStream buffer = new MemoryStream())
             {

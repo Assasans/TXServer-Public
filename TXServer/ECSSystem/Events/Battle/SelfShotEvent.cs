@@ -13,5 +13,10 @@ namespace TXServer.ECSSystem.Events.Battle
         public int ShotId { get; set; }
 
         public int ClientTime { get; set; }
+
+        public void Execute(Entity tank)
+        {
+
+        }
     }
 }
