@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Protocol;
+﻿using System;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
@@ -20,8 +21,10 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                     return SmokyBattleItemTemplate.CreateEntity(tank);
                 case FlamethrowerUserItemTemplate _:
                     return FlamethrowerBattleItemTemplate.CreateEntity(tank);
+                case FreezeUserItemTemplate _:
+                    return FreezeBattleItemTemplate.CreateEntity(tank);
                 default:
-                    return SmokyBattleItemTemplate.CreateEntity(tank);
+                    throw new NotImplementedException();
             }
         }
 
