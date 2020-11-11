@@ -112,6 +112,7 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\FlamethrowerComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\FreezeComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\IsisComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\RicochetComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\SplashImpactComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\SplashWeaponComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponComponent.cs" />
@@ -119,10 +120,12 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponIdleComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponWorkingComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\ThunderComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponBulletShotComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponStreamShootingComponent.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FlamethrowerBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FreezeBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\IsisBattleItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\RicochetBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\StreamWeaponTemplate.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleConfiguratedComponent.cs" />

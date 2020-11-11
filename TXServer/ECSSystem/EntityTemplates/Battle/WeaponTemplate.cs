@@ -27,6 +27,8 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                     return IsisBattleItemTemplate.CreateEntity(tank);
                 case ThunderUserItemTemplate _:
                     return ThunderBattleItemTemplate.CreateEntity(tank);
+                case RicochetUserItemTemplate _:
+                    return RicochetBattleItemTemplate.CreateEntity(tank);
                 default:
                     throw new NotImplementedException();
             }
