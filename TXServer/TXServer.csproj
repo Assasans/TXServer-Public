@@ -120,6 +120,7 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponIdleComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponWorkingComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\ThunderComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\TwinsComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponBulletShotComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponStreamShootingComponent.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FlamethrowerBattleItemTemplate.cs" />
@@ -221,6 +222,7 @@
     <Compile Include="ECSSystem\EntityTemplates\Battle\TeamBattleTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\TeamTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\ThunderBattleItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\TwinsBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\WeaponPaintBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\WeaponSkinBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\WeaponTemplate.cs" />
@@ -240,6 +242,7 @@
     <Compile Include="ECSSystem\Events\Battle\InitializeTimeCheckerEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\MoveCommand.cs" />
     <Compile Include="ECSSystem\Events\Battle\MoveCommandEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\MuzzlePointSwitchEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ResetIdleKickTimeEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfHitEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfShotEvent.cs" />
