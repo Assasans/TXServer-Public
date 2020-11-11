@@ -23,6 +23,10 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                     return FlamethrowerBattleItemTemplate.CreateEntity(tank);
                 case FreezeUserItemTemplate _:
                     return FreezeBattleItemTemplate.CreateEntity(tank);
+                case IsisUserItemTemplate _:
+                    return IsisBattleItemTemplate.CreateEntity(tank);
+                case ThunderUserItemTemplate _:
+                    return ThunderBattleItemTemplate.CreateEntity(tank);
                 default:
                     throw new NotImplementedException();
             }

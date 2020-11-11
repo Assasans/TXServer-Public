@@ -111,13 +111,18 @@
     <Compile Include="Core\Protocol\MovementCodec.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\FlamethrowerComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\FreezeComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\IsisComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\SplashImpactComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\SplashWeaponComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponEnergyComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponIdleComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponWorkingComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\ThunderComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponStreamShootingComponent.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FlamethrowerBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FreezeBattleItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\IsisBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\StreamWeaponTemplate.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleConfiguratedComponent.cs" />
@@ -212,6 +217,7 @@
     <Compile Include="ECSSystem\EntityTemplates\Battle\TankTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\TeamBattleTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\TeamTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\ThunderBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\WeaponPaintBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\WeaponSkinBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\WeaponTemplate.cs" />
@@ -234,6 +240,7 @@
     <Compile Include="ECSSystem\Events\Battle\ResetIdleKickTimeEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfHitEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfShotEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\SelfSplashHitEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\OpenContainerEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\EnteredToMatchMakingEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\EnterToMatchMakingEvent.cs" />
