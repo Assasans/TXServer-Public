@@ -112,6 +112,8 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\FlamethrowerComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\FreezeComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\IsisComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\RailgunChargingWeaponComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\RailgunComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\RicochetComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\SplashImpactComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\SplashWeaponComponent.cs" />
@@ -126,6 +128,7 @@
     <Compile Include="ECSSystem\EntityTemplates\Battle\FlamethrowerBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FreezeBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\IsisBattleItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\RailgunBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\RicochetBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\StreamWeaponTemplate.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleComponent.cs" />
@@ -245,6 +248,7 @@
     <Compile Include="ECSSystem\Events\Battle\MuzzlePointSwitchEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ResetIdleKickTimeEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfHitEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\SelfRailgunChargingShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfSplashHitEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\OpenContainerEvent.cs" />
