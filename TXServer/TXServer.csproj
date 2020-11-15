@@ -115,6 +115,12 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\RailgunChargingWeaponComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\RailgunComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\RicochetComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\ShaftAimingImpactComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\ShaftComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\ShaftEnergyComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\ShaftIdleStateComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\ShaftStateConfigComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\ShaftWaitingStateComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\SplashImpactComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\SplashWeaponComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponComponent.cs" />
@@ -130,6 +136,7 @@
     <Compile Include="ECSSystem\EntityTemplates\Battle\IsisBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\RailgunBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\RicochetBattleItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\ShaftBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\StreamWeaponTemplate.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleConfiguratedComponent.cs" />
@@ -251,6 +258,7 @@
     <Compile Include="ECSSystem\Events\Battle\SelfRailgunChargingShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfSplashHitEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\ShaftWaitingStateComponent.cs" />
     <Compile Include="ECSSystem\Events\Item\OpenContainerEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\EnteredToMatchMakingEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\EnterToMatchMakingEvent.cs" />

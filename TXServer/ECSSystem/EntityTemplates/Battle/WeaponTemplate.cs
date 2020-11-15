@@ -23,6 +23,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
             { typeof(RicochetUserItemTemplate), RicochetBattleItemTemplate.CreateEntity },
             { typeof(TwinsUserItemTemplate), TwinsBattleItemTemplate.CreateEntity },
             { typeof(RailgunUserItemTemplate), RailgunBattleItemTemplate.CreateEntity },
+            { typeof(ShaftUserItemTemplate), ShaftBattleItemTemplate.CreateEntity },
         };
 
         public static Entity CreateEntity(Entity userItem, Entity tank)
