@@ -131,6 +131,10 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\StreamWeaponWorkingComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\ThunderComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\TwinsComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\VulcanComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\VulcanIdleComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\VulcanSlowDownComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\VulcanSpeedUpComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponBulletShotComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponStreamShootingComponent.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FlamethrowerBattleItemTemplate.cs" />
@@ -236,6 +240,8 @@
     <Compile Include="ECSSystem\EntityTemplates\Battle\TeamTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\ThunderBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\TwinsBattleItemTemplate.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\VulcanWeaponComponent.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\VulcanBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\WeaponPaintBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\WeaponSkinBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\WeaponTemplate.cs" />
