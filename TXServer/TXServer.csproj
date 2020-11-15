@@ -111,6 +111,8 @@
     <Compile Include="Core\Protocol\MovementCodec.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\FlamethrowerComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\FreezeComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\HammerComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\HammerPelletConeComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\IsisComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\RailgunChargingWeaponComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\RailgunComponent.cs" />
@@ -133,6 +135,7 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponStreamShootingComponent.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FlamethrowerBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FreezeBattleItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\HammerBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\IsisBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\RailgunBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\RicochetBattleItemTemplate.cs" />
@@ -254,6 +257,7 @@
     <Compile Include="ECSSystem\Events\Battle\MoveCommandEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\MuzzlePointSwitchEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ResetIdleKickTimeEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\SelfHammerShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfHitEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfRailgunChargingShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfShotEvent.cs" />
