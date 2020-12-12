@@ -8,9 +8,7 @@ namespace TXServer.Core.Commands
     {
         public InitTimeCommand() { }
 
-        public override void OnSend(Player player)
-        {
-        }
+        public override bool OnSend(Player player) => true;
 
         public override void OnReceive(Player player) => throw new NotSupportedException();
 

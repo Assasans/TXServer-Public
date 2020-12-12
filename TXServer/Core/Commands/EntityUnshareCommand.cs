@@ -12,9 +12,24 @@ namespace TXServer.Core.Commands
             this.Entity = Entity ?? throw new ArgumentNullException(nameof(Entity));
         }
 
-        public override void OnSend(Player player)
+        public override bool OnSend(Player player)
         {
             player.EntityList.Remove(Entity);
+
+            lock (Entity.PlayerReferences)
+            {
+                if (Entity.PlayerReferences[player] == 1)
+                {
+                    Entity.PlayerReferences.Remove(player);
+                }
+                else
+                {
+                    Entity.PlayerReferences[player]--;
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public override void OnReceive(Player player)

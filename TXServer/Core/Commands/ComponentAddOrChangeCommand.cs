@@ -1,4 +1,6 @@
-﻿using TXServer.Core.Protocol;
+﻿using System.Linq;
+using System.Threading;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
 namespace TXServer.Core.Commands
@@ -10,21 +12,35 @@ namespace TXServer.Core.Commands
             this.Target = Target;
             this.Component = Component;
         }
-        
-        public override void OnSend(Player player)
+
+        public override bool OnSend(Player player)
         {
-            AddOrChangeComponent();
+            AddOrChangeComponent(player);
+            return true;
         }
 
         public override void OnReceive(Player player)
         {
+            AddOrChangeComponent(player);
+        }
+
+        private void AddOrChangeComponent(Player player)
+        {
+            if (!MarkAsCompleted()) return;
+            CommandManager.BroadcastCommands(Target.PlayerReferences.Keys.Where(x => x != player), this);
             AddOrChangeComponent();
         }
 
-        // TODO: keep track of players entity shared with and broadcast any changes
+        private bool MarkAsCompleted()
+        {
+            return Interlocked.Exchange(ref addOrChangeDone, 1) == 0;
+        }
+
         protected abstract void AddOrChangeComponent();
 
         [ProtocolFixed] public Entity Target { get; set; }
         [ProtocolFixed] public Component Component { get; set; }
+
+        private int addOrChangeDone;
     }
 }

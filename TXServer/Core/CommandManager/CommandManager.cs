@@ -47,10 +47,10 @@ namespace TXServer.Core.Commands
         /// </summary>
         public static void SendCommands(Player player, IEnumerable<Command> commands)
         {
-            foreach (Command command in commands)
-            {
-                command.OnSend(player);
-            }
+            // Filter out cancelled commands
+            IEnumerable<Command> filteredCommands = from command in commands
+                                                    where command.OnSend(player)
+                                                    select command;
 
 #if DEBUG
             player.LastServerPacket = commands;
@@ -61,12 +61,28 @@ namespace TXServer.Core.Commands
                 BinaryWriter writer = new BigEndianBinaryWriter(buffer);
                 DataEncoder encoder = new DataEncoder(writer);
 
-                encoder.EncodeCommands(commands);
+                encoder.EncodeCommands(filteredCommands);
 
                 writer.BaseStream.Position = 0;
 
                 using (NetworkStream stream = new NetworkStream(player.Connection.Socket))
                     writer.BaseStream.CopyTo(stream);
+            }
+        }
+
+        /// <summary>
+        /// Send data to multiple clients.
+        /// </summary>
+        public static void BroadcastCommands(IEnumerable<Player> players, params Command[] commands) => BroadcastCommands(players, (IEnumerable<Command>)commands);
+
+        /// <summary>
+        /// Send data to multiple clients.
+        /// </summary>
+        public static void BroadcastCommands(IEnumerable<Player> players, IEnumerable<Command> commands)
+        {
+            foreach (Player player in players)
+            {
+                SendCommands(player, commands);
             }
         }
 

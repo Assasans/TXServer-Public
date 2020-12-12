@@ -4,7 +4,7 @@ namespace TXServer.Core.Commands
 {
     public abstract class Command
     {
-        public virtual void OnSend(Player player)
+        public virtual bool OnSend(Player player)
         {
             throw new NotImplementedException();
         }

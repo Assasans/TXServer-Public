@@ -1,5 +1,6 @@
 ﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Components
 {
@@ -15,13 +16,5 @@ namespace TXServer.ECSSystem.Components
         public float Gravity { get; set; }
         
         public GravityType GravityType { get; set; }
-    }
-
-    public enum GravityType : byte
-    {
-        EARTH,
-        MOON,
-        MARS,
-        SUPER_EARTH
     }
 }

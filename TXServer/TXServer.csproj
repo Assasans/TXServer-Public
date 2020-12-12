@@ -105,6 +105,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\Battles\Battle.cs" />
     <Compile Include="Core\CommandManager\CommandCodeAttribute.cs" />
     <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
@@ -305,15 +306,19 @@
     <Compile Include="ECSSystem\Components\User\ClosedBetaQuestAchievementComponent.cs" />
     <Compile Include="ECSSystem\Components\User\UserAdminComponent.cs" />
     <Compile Include="ECSSystem\Events\Entrance\AutoLoginUserEvent.cs" />
+    <Compile Include="ECSSystem\Types\BattleMode.cs" />
     <Compile Include="ECSSystem\Types\DiscreteTankControl.cs" />
     <Compile Include="ECSSystem\Types\EndSeasonRewardItem.cs" />
+    <Compile Include="ECSSystem\Types\GravityType.cs" />
     <Compile Include="ECSSystem\Types\HitTarget.cs" />
     <Compile Include="ECSSystem\Types\ModuleBehaviourType.cs" />
     <Compile Include="ECSSystem\Types\ModulePrice.cs" />
     <Compile Include="ECSSystem\Types\NotificationPriority.cs" />
+    <Compile Include="ECSSystem\Types\PaymentStatisticsAction.cs" />
     <Compile Include="ECSSystem\Types\QuestConditionType.cs" />
     <Compile Include="ECSSystem\Types\Slot.cs" />
     <Compile Include="ECSSystem\Types\StaticHit.cs" />
+    <Compile Include="ECSSystem\Types\TeamColor.cs" />
     <Compile Include="ECSSystem\Types\TXDate.cs" />
     <Compile Include="ECSSystem\Components\Quest\BattleCountQuestComponent.cs" />
     <Compile Include="ECSSystem\Components\User\BattleLeaveCounterComponent.cs" />

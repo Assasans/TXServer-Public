@@ -50,7 +50,8 @@ namespace TXServer.Core
             if (Server.Instance == null)
             {
                 // Server.Instance = new Server(ip, port, poolSize, new SqLiteDatabase(@"URI=file:" + Directory.GetCurrentDirectory() + "/tankix.db"));
-                Server.Instance = new Server(ip, port, poolSize, new LocalDatabase());
+                Server.Instance = new Server(new LocalDatabase());
+                Server.Instance.Start(ip, port, poolSize);
             }
         }
 

@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events.Battle
     {
         public void Execute(Player player, Entity incarnation)
         {
-            Entity tank = player.ReferencedEntities["tank"];
+            Entity tank = player.BattlePlayer.Tank;
             
             // CommandManager.SendCommands(player,
             //     new ComponentAddCommand(tank,

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
+using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -37,9 +38,17 @@ namespace TXServer.Core
 
         public void Dispose()
         {
-            if (!Connection.TryDeactivate()) return;
-            
-            Connection.Dispose();
+			if (!Connection.TryDeactivate()) return;
+
+			Connection.Dispose();
+
+			foreach (Entity entity in EntityList)
+            {
+				lock (entity.PlayerReferences)
+					entity.PlayerReferences.Remove(this);
+            }
+			EntityList.Clear();
+
             //todo save data?
         }
 
@@ -179,6 +188,7 @@ namespace TXServer.Core
         public Entity ClientSession { get; set; }
 
         public Entity User { get; set; }
+		public BattlePlayer BattlePlayer { get; set; }
 
         public string GetUniqueId()
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Events.Ping;
 
@@ -28,12 +30,15 @@ namespace TXServer.Core
             if (IsStarted) return;
             IsStarted = true;
 
-            PoolSize = poolSize;
-            acceptWorker = new Thread(() => AcceptPlayers(ip, port, PoolSize)) {Name = "Acceptor"};
+            MaxPoolSize = poolSize;
+            acceptWorker = new Thread(() => AcceptPlayers(ip, port, MaxPoolSize)) {Name = "Acceptor"};
             acceptWorker.Start();
 
             StateServerWorker = new Thread(() => StateServer(ip)) {Name = "StateServer"};
             StateServerWorker.Start();
+
+            BattleWorker = new Thread(() => BattleLoop()) { Name = "BattleWorker" };
+            BattleWorker.Start();
 
             PingWorker = new Thread(PingChecker) {Name = "PingChecker"};
         }
@@ -49,6 +54,7 @@ namespace TXServer.Core
             acceptWorker.Abort();
             StateServerWorker.Abort();
             PingWorker.Abort();
+            BattleWorker.Abort();
 
             Pool.ForEach(player => player.Dispose());
             Pool.Clear();
@@ -66,7 +72,7 @@ namespace TXServer.Core
             {
                 Pool[freeIndex] = new Player(Server, socket);
             }
-            else if (PlayerCount < PoolSize)
+            else if (PlayerCount < MaxPoolSize)
             {
                 Pool.Add(new Player(Server, socket));
             }
@@ -221,9 +227,38 @@ namespace TXServer.Core
             }
         }
 
+        public void BattleLoop()
+        {
+            BattlePool.Add(new Battle());
+            GlobalBattle = BattlePool[0];
+
+            Stopwatch stopwatch = new Stopwatch();
+            double lastDeltaTime = 0;
+
+            while (true)
+            {
+                stopwatch.Restart();
+                foreach (Battle battle in BattlePool)
+                {
+                    battle.Tick(lastDeltaTime);
+                }    
+                stopwatch.Stop();
+
+                if (stopwatch.Elapsed.TotalSeconds < .25)
+                {
+                    lastDeltaTime = .25;
+                    Thread.Sleep(TimeSpan.FromSeconds(.25) - stopwatch.Elapsed);
+                }
+                else
+                {
+                    lastDeltaTime = stopwatch.Elapsed.TotalSeconds;
+                }
+            }
+        }
+
         // Player pool.
         public List<Player> Pool { get; } = new List<Player>();
-        private int PoolSize;
+        private int MaxPoolSize;
 
         // Client accept thread.
         private Thread acceptWorker;
@@ -233,11 +268,13 @@ namespace TXServer.Core
 
         private Thread PingWorker;
 
+        public List<Battle> BattlePool { get; } = new List<Battle>();
+        public static Battle GlobalBattle { get; private set; } // todo replace with proper matchmaker
+        private Thread BattleWorker;
+
         // Server state.
         public bool IsStarted { get; private set; }
 
-        [SuppressMessage("Usage",
-            "CA2211:Поля, не являющиеся константами, не должны быть видимыми", Justification = "<Ожидание>")]
         public int PlayerCount = 0;
     }
 }

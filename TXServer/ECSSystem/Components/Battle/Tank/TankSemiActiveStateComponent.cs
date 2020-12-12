@@ -6,6 +6,11 @@ namespace TXServer.ECSSystem.Components.Battle.Tank
     [SerialVersionUID(5166099393636831290)]
     public class TankSemiActiveStateComponent : Component
     {
+        public TankSemiActiveStateComponent()
+        {
+            ActivationTime = .5f;
+        }
+
         public TankSemiActiveStateComponent(float activationTime)
         {
             ActivationTime = activationTime;

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -14,14 +16,21 @@ namespace TXServer.Core.Commands
             ComponentType = componentType ?? throw new ArgumentNullException(nameof(componentType));
         }
 
-        public override void OnSend(Player player) => RemoveComponent();
+        public override bool OnSend(Player player)
+        {
+            RemoveComponent(player);
+            return true;
+        }
 
-        public override void OnReceive(Player player) => RemoveComponent();
+        public override void OnReceive(Player player) => RemoveComponent(player);
 
         // TODO: keep track of players entity shared with and broadcast any changes
 
-        private void RemoveComponent()
+        private void RemoveComponent(Player player)
         {
+            if (Interlocked.Exchange(ref removeDone, 1) == 1) return;
+            CommandManager.BroadcastCommands(Target.PlayerReferences.Keys.Where(x => x != player), this);
+
             if (!Target.Components.Remove(FormatterServices.GetUninitializedObject(ComponentType) as Component))
             {
                 throw new ArgumentException("Component not found", ComponentType.Name);
@@ -30,5 +39,7 @@ namespace TXServer.Core.Commands
 
         [ProtocolFixed] public Entity Target { get; set; }
         [ProtocolFixed] public Type ComponentType { get; set; }
+
+        private int removeDone;
     }
 }

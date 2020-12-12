@@ -13,21 +13,36 @@ namespace TXServer.Core.Commands
             this.Entity = Entity ?? throw new ArgumentNullException(nameof(Entity));
         }
 
-        public override void OnSend(Player player)
+        public override bool OnSend(Player player)
         {
             // Add Entity to list.
             player.EntityList.Add(Entity);
 
+            lock (Entity.PlayerReferences)
+            {
+                if (Entity.PlayerReferences.ContainsKey(player))
+                {
+                    Entity.PlayerReferences[player]++;
+                    return false;
+                }
+                else
+                {
+                    Entity.PlayerReferences.Add(player, 1);
+                }
+            }
+
             EntityId = Entity.EntityId;
             TemplateAccessor = Entity.TemplateAccessor;
-            
-            // Console.WriteLine("Sending " + EntityId + " (" + TemplateAccessor?.Template.GetType().Name + ")");
 
+            // Console.WriteLine("Sending " + EntityId + " (" + TemplateAccessor?.Template.GetType().Name + ")");
+            
             foreach (Component component in Entity.Components)
             {
                 // Console.WriteLine(component.GetType().Name);
                 Components.Add(component);
             }
+
+            return true;
         }
 
         public override void OnReceive(Player player)

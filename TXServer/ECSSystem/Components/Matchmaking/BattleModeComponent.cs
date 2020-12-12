@@ -1,5 +1,6 @@
 ﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Components
 {
@@ -12,13 +13,5 @@ namespace TXServer.ECSSystem.Components
         }
         
         public BattleMode BattleMode { get; set; }
-    }
-
-    public enum BattleMode : byte
-    {
-        DM,
-        TDM,
-        CTF,
-        CP
     }
 }

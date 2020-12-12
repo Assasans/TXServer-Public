@@ -19,7 +19,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
 				new TankPartComponent(),
 				battleUser.GetComponent<UserGroupComponent>(),
 				battleUser.GetComponent<BattleGroupComponent>(),
-				new TankSpawnStateComponent(),
 				new HealthComponent(2500, 2500),
 				new HealthConfigComponent(2500),
 				new DampingComponent(1500),

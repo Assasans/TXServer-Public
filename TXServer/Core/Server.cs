@@ -8,20 +8,22 @@ namespace TXServer.Core
     {
         public static Server Instance { get; set; }
         
-        public ServerConnection Connection { get; }
+        public ServerConnection Connection { get; private set; }
         public IDatabase Database { get; }
         
         public Random Random { get; }
 
-        public Server(IPAddress ip, short port, int poolSize, IDatabase database)
+        public Server(IDatabase database)
+        {
+            Database = database;
+            Random = new Random();
+        }
+
+        public void Start(IPAddress ip, short port, int poolSize)
         {
             Connection = new ServerConnection(this);
             Connection.Start(ip, port, poolSize);
-            
-            Database = database;
             Database.Startup();
-
-            Random = new Random();
         }
 
         public Player FindPlayerById(long entityId)

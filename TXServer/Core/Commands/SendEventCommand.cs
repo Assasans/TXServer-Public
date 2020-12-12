@@ -18,9 +18,7 @@ namespace TXServer.Core.Commands
             this.Entities = Entities.ToList();
         }
 
-        public override void OnSend(Player player)
-        {
-        }
+        public override bool OnSend(Player player) => true;
 
         /// <summary>
         /// Detects event method with same number of Entity parameters and calls it.
