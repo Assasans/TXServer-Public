@@ -8,6 +8,8 @@ using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Tank;
+using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Types;
 using TXServer.Library;
 using static TXServer.Core.Commands.CommandManager;
 
@@ -15,6 +17,14 @@ namespace TXServer.Core.Protocol
 {
     class DataEncoder
     {
+        private static byte[] bufferEmpty = Array.Empty<byte>();
+        private static BitArray bitsEmpty = new BitArray(bufferEmpty);
+        private const int WEAPON_ROTATION_SIZE = 2;
+        private static byte[] bufferForWeaponRotation = new byte[WEAPON_ROTATION_SIZE];
+        private static BitArray bitsForWeaponRotation = new BitArray(bufferForWeaponRotation);
+        private const int WEAPON_ROTATION_COMPONENT_BITSIZE = WEAPON_ROTATION_SIZE * 8;
+        private const float WEAPON_ROTATION_FACTOR = 360f / (1 << WEAPON_ROTATION_COMPONENT_BITSIZE);
+
         private readonly BinaryWriter writer;
         private readonly OptionalMap map;
 
@@ -88,6 +98,48 @@ namespace TXServer.Core.Protocol
             writer.Write(vector3.Z);
         }
 
+        private void EncodeMoveCommand(MoveCommand moveCommand)
+        {
+            bool flag = moveCommand.Movement != null;
+            bool flag2 = moveCommand.WeaponRotation != null;
+            bool flag3 = moveCommand.IsDiscrete();
+            map.Add(flag);
+            map.Add(flag2);
+            map.Add(flag3);
+            if (flag3)
+            {
+                DiscreteTankControl discreteTankControl = default(DiscreteTankControl);
+                discreteTankControl.MoveAxis = (int)moveCommand.TankControlVertical;
+                discreteTankControl.TurnAxis = (int)moveCommand.TankControlHorizontal;
+                discreteTankControl.WeaponControl = (int)moveCommand.WeaponRotationControl;
+                writer.Write(discreteTankControl.Control);
+            }
+            else
+            {
+                writer.Write(moveCommand.TankControlVertical);
+                writer.Write(moveCommand.TankControlHorizontal);
+                writer.Write(moveCommand.WeaponRotationControl);
+            }
+            if (flag)
+            {
+                MovementCodec.Encode(writer, moveCommand.Movement.Value);
+            }
+            if (flag2)
+            {
+                byte[] buffer = !flag2 ? bufferEmpty : bufferForWeaponRotation;
+                BitArray bits = !flag2 ? bitsEmpty : bitsForWeaponRotation;
+                int num = 0;
+                MovementCodec.WriteFloat(bits, ref num, moveCommand.WeaponRotation.Value, WEAPON_ROTATION_COMPONENT_BITSIZE, WEAPON_ROTATION_FACTOR);
+                bits.CopyTo(buffer, 0);
+                writer.Write(buffer);
+                if (num != bits.Length)
+                {
+                    throw new Exception("Move command pack mismatch");
+                }
+            }
+            writer.Write(moveCommand.ClientTime);
+        }
+
         private void EncodeType(Type type)
         {
             writer.Write(SerialVersionUIDTools.GetId(type));
@@ -128,6 +180,9 @@ namespace TXServer.Core.Protocol
                     return;
                 case Movement movement:
                     MovementCodec.Encode(writer, movement);
+                    return;
+                case MoveCommand moveCommand:
+                    EncodeMoveCommand(moveCommand);
                     return;
                 case Type type:
                     EncodeType(type);

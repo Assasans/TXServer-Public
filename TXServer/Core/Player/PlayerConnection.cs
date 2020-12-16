@@ -43,11 +43,6 @@ namespace TXServer.Core
             Interlocked.Decrement(ref Server.Instance.Connection.PlayerCount);
             Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
         }
-        
-        private void InitThreadLocals()
-        {
-            _Random = new Random(Thread.CurrentThread.ManagedThreadId);
-        }
 
         /// <summary>
         /// Handle server -> client events.
@@ -55,8 +50,6 @@ namespace TXServer.Core
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов", Justification = "<Ожидание>")]
         public void ServerSideEvents()
         {
-            InitThreadLocals();
-
             try
             {
                 Entity ClientSession = new Entity(new TemplateAccessor(new ClientSessionTemplate(), null),
@@ -87,8 +80,6 @@ namespace TXServer.Core
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов", Justification = "<Ожидание>")]
         public void ClientSideEvents()
         {
-            InitThreadLocals();
-
             try
             {
                 while (true)
@@ -119,9 +110,6 @@ namespace TXServer.Core
 
         public Socket Socket { get; private set; }
         public Player Player { get; }
-        
-        [ThreadStatic] private static Random _Random;
-        public static Random Random => _Random;
 
         private int _Active = 1;
     }

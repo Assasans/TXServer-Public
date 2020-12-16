@@ -106,10 +106,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Core\Battles\Battle.cs" />
+    <Compile Include="Core\Battles\BattlePlayer.cs" />
+    <Compile Include="Core\Battles\TankState.cs" />
     <Compile Include="Core\CommandManager\CommandCodeAttribute.cs" />
     <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
     <Compile Include="Core\Protocol\MovementCodec.cs" />
+    <Compile Include="ECSSystem\Components\Battle\BattleTankCollisionsComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Tank\TankStateTimeOutComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\FlamethrowerComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\FreezeComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\HammerComponent.cs" />
@@ -255,14 +259,18 @@
     <Compile Include="ECSSystem\EntityTemplates\Matchmaking\MatchMakingLobbyTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Notification\NewItemNotificationTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\ShellBattleItemTemplate.cs" />
+    <Compile Include="ECSSystem\Events\Battle\ActivateTankEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\BattlePingEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\BattlePingResultEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\BattlePongEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\ExitBattleEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\HealthChangedEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\InitializeTimeCheckerEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\MoveCommand.cs" />
     <Compile Include="ECSSystem\Events\Battle\MoveCommandEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\MoveCommandServerEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\MuzzlePointSwitchEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\PauseEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ResetIdleKickTimeEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfHammerShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfHitEvent.cs" />
@@ -270,6 +278,7 @@
     <Compile Include="ECSSystem\Events\Battle\SelfShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfSplashHitEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ShaftWaitingStateComponent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\UnpauseEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\OpenContainerEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\EnteredToMatchMakingEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\EnterToMatchMakingEvent.cs" />

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Threading;
 using TXServer.Core;
 using TXServer.Library;
 
@@ -8,21 +10,21 @@ namespace TXServer.ECSSystem.Base
     public class Entity
     {
         /// <summary>
-        /// Create Entity with random id.
+        /// Create Entity with unused id.
         /// </summary>
         public Entity(params Component[] components)
         {
-            EntityId = Player.GenerateId();
+            EntityId = GenerateId();
 
             PopulateEntity(null, components);
         }
         
         /// <summary>
-        /// Create Entity with random id.
+        /// Create Entity with unused id.
         /// </summary>
         public Entity(TemplateAccessor TemplateAccessor, params Component[] components)
         {
-            EntityId = Player.GenerateId();
+            EntityId = GenerateId();
 
             PopulateEntity(TemplateAccessor, components);
         }
@@ -45,6 +47,12 @@ namespace TXServer.ECSSystem.Base
 
             Components.UnionWith(components);
         }
+
+        public static Int64 GenerateId()
+        {
+            return Interlocked.Increment(ref LastEntityId);
+        }
+        private static long LastEntityId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         public static Entity EqualValue(long entityId)
         {

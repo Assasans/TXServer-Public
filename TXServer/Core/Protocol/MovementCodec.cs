@@ -146,7 +146,7 @@ namespace TXServer.Core.Protocol
             return !(float.IsInfinity(val) || float.IsNaN(val));
         }
 
-        private static void WriteFloat(
+        public static void WriteFloat(
             BitArray bits,
             ref int position,
             float value,

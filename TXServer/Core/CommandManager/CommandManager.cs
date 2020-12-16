@@ -38,6 +38,26 @@ namespace TXServer.Core.Commands
         }
 
         /// <summary>
+        /// Send data to client, ignoring errors.
+        /// </summary>
+        public static void SendCommandsSafe(Player player, params Command[] commands) => SendCommandsSafe(player, (IEnumerable<Command>)commands);
+
+        /// <summary>
+        /// Send data to client, ignoring errors.
+        /// </summary>
+        public static void SendCommandsSafe(Player player, IEnumerable<Command> commands)
+        {
+            try
+            {
+                if (!player.IsActive) return;
+                SendCommands(player, commands);
+            }
+            catch
+            {
+            }
+        }
+
+        /// <summary>
         /// Send data to client.
         /// </summary>
         public static void SendCommands(Player player, params Command[] commands) => SendCommands(player, (IEnumerable<Command>)commands);
@@ -72,17 +92,19 @@ namespace TXServer.Core.Commands
 
         /// <summary>
         /// Send data to multiple clients.
+        /// Always ignores errors.
         /// </summary>
         public static void BroadcastCommands(IEnumerable<Player> players, params Command[] commands) => BroadcastCommands(players, (IEnumerable<Command>)commands);
 
         /// <summary>
         /// Send data to multiple clients.
+        /// Always ignores errors.
         /// </summary>
         public static void BroadcastCommands(IEnumerable<Player> players, IEnumerable<Command> commands)
         {
             foreach (Player player in players)
             {
-                SendCommands(player, commands);
+                SendCommandsSafe(player, commands);
             }
         }
 

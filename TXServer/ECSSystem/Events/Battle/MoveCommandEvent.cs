@@ -8,13 +8,11 @@ namespace TXServer.ECSSystem.Events.Battle
     [SerialVersionUID(6959116100408127452)]
     public class MoveCommandEvent : ECSEvent
     {
-        public MoveCommandEvent(MoveCommand moveCommand) => MoveCommand = moveCommand;
-
         public MoveCommand MoveCommand { get; set; }
 
-        public void Execute(Player player, Entity entity)
+        public void Execute(Player player, Entity tank)
         {
-            Console.WriteLine(MoveCommand.ToString());
+            player.BattlePlayer.LastMoveCommand = MoveCommand;
         }
     }
 }

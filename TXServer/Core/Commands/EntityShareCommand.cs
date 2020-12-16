@@ -22,6 +22,7 @@ namespace TXServer.Core.Commands
             {
                 if (Entity.PlayerReferences.ContainsKey(player))
                 {
+                    // Player already has this entity
                     Entity.PlayerReferences[player]++;
                     return false;
                 }
@@ -36,11 +37,8 @@ namespace TXServer.Core.Commands
 
             // Console.WriteLine("Sending " + EntityId + " (" + TemplateAccessor?.Template.GetType().Name + ")");
             
-            foreach (Component component in Entity.Components)
-            {
-                // Console.WriteLine(component.GetType().Name);
-                Components.Add(component);
-            }
+            Components = new Component[Entity.Components.Count];
+            Entity.Components.CopyTo((Component[])Components);
 
             return true;
         }
@@ -52,8 +50,8 @@ namespace TXServer.Core.Commands
 
         [ProtocolIgnore] public Entity Entity { get; set; }
 
-        [ProtocolFixed] public Int64 EntityId { get; set; }
-        [ProtocolFixed][OptionalMapped] public TemplateAccessor TemplateAccessor { get; set; }
-        [ProtocolFixed] public List<Component> Components { get; } = new List<Component>();
+        [ProtocolFixed] public Int64 EntityId { get; private set; }
+        [ProtocolFixed][OptionalMapped] public TemplateAccessor TemplateAccessor { get; private set; }
+        [ProtocolFixed] public ICollection<Component> Components { get; private set; }
     }
 }

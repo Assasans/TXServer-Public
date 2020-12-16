@@ -22,7 +22,8 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
 				new BattleConfiguratedComponent(),
 				new VisibleItemComponent(),
 				new UserCountComponent(userLimitComponent.UserLimit),
-				new BattleComponent());
+				new BattleComponent(),
+				new BattleTankCollisionsComponent());
 			entity.Components.Add(new BattleGroupComponent(entity));
 
 			return entity;

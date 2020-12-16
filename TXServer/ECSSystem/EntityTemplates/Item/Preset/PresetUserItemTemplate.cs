@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.EntityTemplates
         public void AddUserItemComponents(Player player, Entity item)
         {
             item.Components.Add(new PresetEquipmentComponent(player, item));
-            item.Components.Add(new PresetNameComponent(Player.GenerateId().ToString()));
+            item.Components.Add(new PresetNameComponent(Entity.GenerateId().ToString()));
         }
     }
 }

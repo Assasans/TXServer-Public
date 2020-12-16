@@ -17,7 +17,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             foreach (PropertyInfo info in typeof(Items).GetProperties())
             {
                 Entity item = info.GetValue(items) as Entity;
-                item.EntityId = Player.GenerateId();
+                item.EntityId = Entity.GenerateId();
 
                 item.TemplateAccessor.Template = new WeaponSkinUserItemTemplate();
 

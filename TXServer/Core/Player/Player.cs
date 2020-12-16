@@ -167,12 +167,6 @@ namespace TXServer.Core
 			return true;
         }
 
-        public static Int64 GenerateId()
-        {
-	        Random random = PlayerConnection.Random ?? Server.Instance.Random;
-	        return ((long) random.Next() << 32) + random.Next();
-        }
-
         public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
 
         /// <summary>

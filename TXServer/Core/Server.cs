@@ -10,13 +10,10 @@ namespace TXServer.Core
         
         public ServerConnection Connection { get; private set; }
         public IDatabase Database { get; }
-        
-        public Random Random { get; }
 
         public Server(IDatabase database)
         {
             Database = database;
-            Random = new Random();
         }
 
         public void Start(IPAddress ip, short port, int poolSize)
