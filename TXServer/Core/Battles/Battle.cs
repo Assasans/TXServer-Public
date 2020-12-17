@@ -94,6 +94,11 @@ namespace TXServer.Core.Battles
 
         private void RemovePlayer(BattlePlayer battlePlayer)
         {
+            if (!RedTeamPlayers.Remove(battlePlayer))
+                BlueTeamPlayers.Remove(battlePlayer);
+            WaitingToJoinPlayers.Remove(battlePlayer);
+            battlePlayer.Player.BattlePlayer = null;
+
             CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
                 new EntityUnshareCommand(battlePlayer.User));
 
@@ -106,10 +111,6 @@ namespace TXServer.Core.Battles
                 new ComponentRemoveCommand(battlePlayer.User, typeof(MatchMakingUserComponent)),
                 new ComponentRemoveCommand(battlePlayer.User, typeof(BattleLobbyGroupComponent))
             };
-
-            if (!RedTeamPlayers.Remove(battlePlayer) && !BlueTeamPlayers.Remove(battlePlayer))
-                WaitingToJoinPlayers.Remove(battlePlayer);
-            battlePlayer.Player.BattlePlayer = null;
 
             foreach (BattlePlayer existingBattlePlayer in RedTeamPlayers.Concat(BlueTeamPlayers))
             {

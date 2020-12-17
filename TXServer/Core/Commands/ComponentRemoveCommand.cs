@@ -29,7 +29,8 @@ namespace TXServer.Core.Commands
         private void RemoveComponent(Player player)
         {
             if (Interlocked.Exchange(ref removeDone, 1) == 1) return;
-            CommandManager.BroadcastCommands(Target.PlayerReferences.Keys.Where(x => x != player), this);
+            lock (Target.PlayerReferences)
+                CommandManager.BroadcastCommands(Target.PlayerReferences.Keys.Where(x => x != player), this);
 
             if (!Target.Components.Remove(FormatterServices.GetUninitializedObject(ComponentType) as Component))
             {

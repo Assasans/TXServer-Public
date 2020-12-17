@@ -24,7 +24,7 @@ namespace TXServer.Core.Commands
         }
 
         /// <summary>
-        /// Получает код команды.
+        /// Gets code of command.
         /// </summary>
         public static byte GetCommandCode(Type type)
         {
@@ -37,7 +37,7 @@ namespace TXServer.Core.Commands
         }
 
         /// <summary>
-        /// Получает команду по коду.
+        /// Gets command by code.
         /// </summary>
         public static Type FindCommandType(byte code)
         {

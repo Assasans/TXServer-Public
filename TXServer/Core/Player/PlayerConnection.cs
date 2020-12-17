@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Windows;
@@ -38,7 +40,7 @@ namespace TXServer.Core
         {
             if (!TryDeactivate()) return;
 
-            Socket.Disconnect(false);
+            Socket.Close();
 
             Interlocked.Decrement(ref Server.Instance.Connection.PlayerCount);
             Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
@@ -65,6 +67,22 @@ namespace TXServer.Core
                     new EntityShareCommand(ClientSession),
                     new ComponentAddCommand(ClientSession, new SessionSecurityPublicComponent())
                 );
+
+                while (!QueuedCommands.IsCompleted)
+                {
+                    Command command = QueuedCommands.Take();
+
+                    int count = QueuedCommands.Count + 1;
+                    Command[] commands = new Command[count];
+
+                    commands[0] = command;
+                    for (int i = 1; i < count; i++)
+                    {
+                        commands[i] = QueuedCommands.Take();
+                    }
+
+                    CommandManager.SendCommands(Player, commands);
+                }
             }
             catch (Exception e)
             {
@@ -90,7 +108,8 @@ namespace TXServer.Core
             catch (Exception e)
             {
 #if DEBUG
-                Debugger.Launch();
+                if (!(e is IOException))
+                    Debugger.Launch();
 #endif
                 Player.User?.Components.Remove(new UserOnlineComponent());
                 Console.WriteLine(e.ToString());
@@ -109,6 +128,7 @@ namespace TXServer.Core
         public long DiffToClient { get; set; } = 0;
 
         public Socket Socket { get; private set; }
+        public BlockingCollection<Command> QueuedCommands { get; } = new BlockingCollection<Command>();
         public Player Player { get; }
 
         private int _Active = 1;

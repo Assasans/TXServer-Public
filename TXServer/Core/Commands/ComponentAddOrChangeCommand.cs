@@ -27,7 +27,8 @@ namespace TXServer.Core.Commands
         private void AddOrChangeComponent(Player player)
         {
             if (!MarkAsCompleted()) return;
-            CommandManager.BroadcastCommands(Target.PlayerReferences.Keys.Where(x => x != player), this);
+            lock (Target.PlayerReferences)
+                CommandManager.BroadcastCommands(Target.PlayerReferences.Keys.Where(x => x != player), this);
             AddOrChangeComponent();
         }
 

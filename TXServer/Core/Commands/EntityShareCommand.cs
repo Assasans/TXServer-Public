@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -32,13 +33,14 @@ namespace TXServer.Core.Commands
                 }
             }
 
-            EntityId = Entity.EntityId;
-            TemplateAccessor = Entity.TemplateAccessor;
+            if (Interlocked.Exchange(ref IsFilled, 1) == 0)
+            {
+                EntityId = Entity.EntityId;
+                TemplateAccessor = Entity.TemplateAccessor;
 
-            // Console.WriteLine("Sending " + EntityId + " (" + TemplateAccessor?.Template.GetType().Name + ")");
-            
-            Components = new Component[Entity.Components.Count];
-            Entity.Components.CopyTo((Component[])Components);
+                Components = new Component[Entity.Components.Count];
+                Entity.Components.CopyTo((Component[])Components);
+            }
 
             return true;
         }
@@ -48,7 +50,8 @@ namespace TXServer.Core.Commands
             throw new NotSupportedException();
         }
 
-        [ProtocolIgnore] public Entity Entity { get; set; }
+        private Entity Entity { get; }
+        private int IsFilled;
 
         [ProtocolFixed] public Int64 EntityId { get; private set; }
         [ProtocolFixed][OptionalMapped] public TemplateAccessor TemplateAccessor { get; private set; }

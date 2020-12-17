@@ -37,6 +37,6 @@ namespace TXServer.Core.Commands
             throw new NotSupportedException();
         }
 
-        [ProtocolFixed] public Entity Entity { get; set; }
+        [ProtocolFixed] public Entity Entity { get; }
     }
 }

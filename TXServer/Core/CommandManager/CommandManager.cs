@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Threading.Tasks;
 using TXServer.Core.Protocol;
 using TXServer.Library;
 
@@ -38,22 +40,20 @@ namespace TXServer.Core.Commands
         }
 
         /// <summary>
-        /// Send data to client, ignoring errors.
+        /// Send data to client from another thread.
         /// </summary>
         public static void SendCommandsSafe(Player player, params Command[] commands) => SendCommandsSafe(player, (IEnumerable<Command>)commands);
 
         /// <summary>
-        /// Send data to client, ignoring errors.
+        /// Send data to client from another thread.
         /// </summary>
         public static void SendCommandsSafe(Player player, IEnumerable<Command> commands)
         {
-            try
+            if (!player.IsActive) return;
+
+            foreach (Command command in commands)
             {
-                if (!player.IsActive) return;
-                SendCommands(player, commands);
-            }
-            catch
-            {
+                player.Connection.QueuedCommands.Add(command);
             }
         }
 
@@ -92,13 +92,11 @@ namespace TXServer.Core.Commands
 
         /// <summary>
         /// Send data to multiple clients.
-        /// Always ignores errors.
         /// </summary>
         public static void BroadcastCommands(IEnumerable<Player> players, params Command[] commands) => BroadcastCommands(players, (IEnumerable<Command>)commands);
 
         /// <summary>
         /// Send data to multiple clients.
-        /// Always ignores errors.
         /// </summary>
         public static void BroadcastCommands(IEnumerable<Player> players, IEnumerable<Command> commands)
         {
