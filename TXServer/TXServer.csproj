@@ -109,6 +109,7 @@
     <Compile Include="Core\Battles\BattlePlayer.cs" />
     <Compile Include="Core\Battles\TankState.cs" />
     <Compile Include="Core\CommandManager\CommandCodeAttribute.cs" />
+    <Compile Include="Core\Commands\ComponentCommand.cs" />
     <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
     <Compile Include="Core\Protocol\MovementCodec.cs" />

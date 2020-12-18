@@ -5,7 +5,7 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.Core.Commands
 {
-    public abstract class ComponentAddOrChangeCommand : Command
+    public abstract class ComponentAddOrChangeCommand : ComponentCommand
     {
         public ComponentAddOrChangeCommand(Entity Target, Component Component)
         {

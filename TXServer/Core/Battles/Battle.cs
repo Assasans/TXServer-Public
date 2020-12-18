@@ -10,11 +10,23 @@ using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Events.Matchmaking;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles
 {
+    public enum BattleState
+    {
+        NotEnoughPlayers,
+        StartCountdown,
+        CustomNotStarted,
+        Starting,
+        WarmingUp,
+        Running,
+        Ended
+    }
+
     public class Battle
     {
         public Battle() : this(20, GravityType.EARTH, null) { }
@@ -66,30 +78,34 @@ namespace TXServer.Core.Battles
             }
 
             BattlePlayer battlePlayer;
+            List<BattlePlayer> selectedTeam;
             if (RedTeamPlayers.Count <= BlueTeamPlayers.Count)
             {
                 battlePlayer = new BattlePlayer(player, BattleEntity, RedTeamEntity);
-                lock (this)
-                    RedTeamPlayers.Add(battlePlayer);
+                selectedTeam = RedTeamPlayers;
                 commands.Add(new ComponentAddCommand(player.User, new TeamColorComponent(TeamColor.RED)));
             }
             else
             {
                 battlePlayer = new BattlePlayer(player, BattleEntity, BlueTeamEntity);
-                lock (this)
-                    BlueTeamPlayers.Add(battlePlayer);
+                selectedTeam = BlueTeamPlayers;
                 commands.Add(new ComponentAddCommand(player.User, new TeamColorComponent(TeamColor.BLUE)));
             }
 
             player.BattlePlayer = battlePlayer;
             CommandManager.SendCommands(player, commands);
 
+            lock (this)
+                selectedTeam.Add(battlePlayer);
+
             // broadcast client to other players
             CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
                 new EntityShareCommand(battlePlayer.User));
 
-            if (IsRunning && IsMatchMaking)
+            if (IsMatchMaking && BattleState == BattleState.WarmingUp || BattleState == BattleState.Running)
+            {
                 WaitingToJoinPlayers.Add(battlePlayer);
+            }
         }
 
         private void RemovePlayer(BattlePlayer battlePlayer)
@@ -99,18 +115,16 @@ namespace TXServer.Core.Battles
             WaitingToJoinPlayers.Remove(battlePlayer);
             battlePlayer.Player.BattlePlayer = null;
 
-            CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
-                new EntityUnshareCommand(battlePlayer.User));
-
             List<Command> commands = new List<Command>
             {
                 new EntityUnshareCommand(BattleLobbyEntity),
                 new EntityUnshareCommand(RedTeamEntity),
                 new EntityUnshareCommand(BlueTeamEntity),
                 new ComponentRemoveCommand(battlePlayer.User, typeof(TeamColorComponent)),
-                new ComponentRemoveCommand(battlePlayer.User, typeof(MatchMakingUserComponent)),
                 new ComponentRemoveCommand(battlePlayer.User, typeof(BattleLobbyGroupComponent))
             };
+            if (IsMatchMaking)
+                commands.Add(new ComponentRemoveCommand(battlePlayer.User, typeof(MatchMakingUserComponent)));
 
             foreach (BattlePlayer existingBattlePlayer in RedTeamPlayers.Concat(BlueTeamPlayers))
             {
@@ -118,6 +132,9 @@ namespace TXServer.Core.Battles
             }
 
             CommandManager.SendCommandsSafe(battlePlayer.Player, commands);
+
+            CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
+                new EntityUnshareCommand(battlePlayer.User));
         }
 
         private void StartBattle()
@@ -139,6 +156,7 @@ namespace TXServer.Core.Battles
             battlePlayer.TankPaint = TankPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.TankPaint, battlePlayer.Tank);
             battlePlayer.Shell = ShellBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponShells[battlePlayer.Player.CurrentPreset.WeaponItem], battlePlayer.Tank);
             battlePlayer.RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, BattleEntity);
+            battlePlayer.Incarnation = TankIncarnationTemplate.CreateEntity(battlePlayer.Tank);
 
             List<Command> commands = new List<Command>
             {
@@ -157,7 +175,8 @@ namespace TXServer.Core.Battles
                     new EntityShareCommand(inBattlePlayer.TankPaint),
                     new EntityShareCommand(inBattlePlayer.WeaponPaint),
                     new EntityShareCommand(inBattlePlayer.Shell),
-                    new EntityShareCommand(inBattlePlayer.RoundUser)});
+                    new EntityShareCommand(inBattlePlayer.RoundUser),
+                    new EntityShareCommand(inBattlePlayer.Incarnation)});
             }
 
             CommandManager.SendCommandsSafe(battlePlayer.Player, commands);
@@ -173,7 +192,8 @@ namespace TXServer.Core.Battles
                 new EntityShareCommand(battlePlayer.TankPaint),
                 new EntityShareCommand(battlePlayer.WeaponPaint),
                 new EntityShareCommand(battlePlayer.Shell),
-                new EntityShareCommand(battlePlayer.RoundUser));
+                new EntityShareCommand(battlePlayer.RoundUser),
+                new EntityShareCommand(battlePlayer.Incarnation));
         }
 
         private void RemoveBattlePlayer(BattlePlayer battlePlayer)
@@ -227,10 +247,8 @@ namespace TXServer.Core.Battles
             battlePlayer.Reset();
         }
 
-        public void Tick(double deltaTime)
+        private void ProcessExitedPlayers()
         {
-            Monitor.Enter(this);
-
             for (int i = 0; i < RedTeamPlayers.Count + BlueTeamPlayers.Count; i++)
             {
                 BattlePlayer battlePlayer = null;
@@ -239,43 +257,93 @@ namespace TXServer.Core.Battles
                 else
                     battlePlayer = BlueTeamPlayers[i - RedTeamPlayers.Count];
 
-                if (!battlePlayer.Player.IsActive)
+                if (!battlePlayer.Player.IsActive || battlePlayer.WaitingForExit)
                 {
-                    RemoveBattlePlayer(battlePlayer);
+                    if (battlePlayer.BattleUser != null)
+                        RemoveBattlePlayer(battlePlayer);
+                    else
+                        RemovePlayer(battlePlayer);
                     i--;
                 }
             }
+        }
 
-            if (!IsRunning)
+        private void ProcessBattleState(double deltaTime)
+        {
+            CountdownTimer -= deltaTime;
+            switch (BattleState)
             {
-                if (RedTeamPlayers.Count + BlueTeamPlayers.Count > 0)// && RedTeamPlayers.Count == BlueTeamPlayers.Count)
-                {
-                    CountdownTimer -= deltaTime;
-                    if (CountdownTimer <= 0)
+                case BattleState.NotEnoughPlayers:
+                    if (RedTeamPlayers.Count + BlueTeamPlayers.Count > 0 && RedTeamPlayers.Count == BlueTeamPlayers.Count)
                     {
-                        StartBattle();
-                        IsRunning = true;
+                        CommandManager.SendCommandsSafe(RedTeamPlayers[0].Player,
+                            new ComponentAddCommand(BattleLobbyEntity, new MatchMakingLobbyStartTimeComponent(new TimeSpan(0, 0, 10))));
+                        CountdownTimer = 10;
+                        BattleState = BattleState.StartCountdown;
                     }
-                }
-                else
-                {
-                    CountdownTimer = 5.0f;
-                }
+                    break;
+                case BattleState.StartCountdown:
+                    if (RedTeamPlayers.Count + BlueTeamPlayers.Count == 0)
+                    {
+                        BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartTimeComponent>();
+                        BattleState = BattleState.NotEnoughPlayers;
+                    }
 
-                Monitor.Exit(this);
-                return;
-            }
-            else if (RedTeamPlayers.Count + BlueTeamPlayers.Count == 0)
-            {
-                IsRunning = false;
-            }
+                    if (RedTeamPlayers.Count != BlueTeamPlayers.Count)
+                    {
+                        CommandManager.SendCommandsSafe(RedTeamPlayers.Concat(BlueTeamPlayers).First().Player,
+                            new ComponentRemoveCommand(BattleLobbyEntity, typeof(MatchMakingLobbyStartTimeComponent)));
+                        BattleState = BattleState.NotEnoughPlayers;
+                    }
 
+                    if (CountdownTimer < 0)
+                    {
+                        CommandManager.SendCommandsSafe(RedTeamPlayers[0].Player,
+                            new ComponentRemoveCommand(BattleLobbyEntity, typeof(MatchMakingLobbyStartTimeComponent)),
+                            new ComponentAddCommand(BattleLobbyEntity, new MatchMakingLobbyStartingComponent()));
+                        CountdownTimer = 3;
+                        BattleState = BattleState.Starting;
+                    }
+                    break;
+                case BattleState.Starting:
+                    if (RedTeamPlayers.Count + BlueTeamPlayers.Count == 0)
+                    {
+                        BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartingComponent>();
+                        BattleState = BattleState.NotEnoughPlayers;
+                    }
+
+                    if (IsMatchMaking && RedTeamPlayers.Count != BlueTeamPlayers.Count)
+                    {
+                        CommandManager.SendCommandsSafe(RedTeamPlayers.Concat(BlueTeamPlayers).First().Player,
+                            new ComponentRemoveCommand(BattleLobbyEntity, typeof(MatchMakingLobbyStartingComponent)));
+                        BattleState = BattleState.NotEnoughPlayers;
+                    }
+
+                    if (CountdownTimer < 0)
+                    {
+                        CommandManager.SendCommandsSafe(RedTeamPlayers[0].Player,
+                            new ComponentRemoveCommand(BattleLobbyEntity, typeof(MatchMakingLobbyStartingComponent)));
+                        StartBattle();
+                        BattleState = BattleState.Running;
+                    }
+
+                    break;
+                case BattleState.WarmingUp:
+                    break;
+                case BattleState.Running:
+                    if (InBattlePlayers.Count + WaitingToJoinPlayers.Count == 0)
+                    {
+                        BattleState = BattleState.NotEnoughPlayers;
+                    }
+                    break;
+            }
+        }
+
+        private void ProcessWaitingPlayers(double deltaTime)
+        {
             for (int i = 0; i < WaitingToJoinPlayers.Count; i++)
             {
                 BattlePlayer battlePlayer = WaitingToJoinPlayers[i];
-
-                if (battlePlayer.WaitingForExit)
-                    RemovePlayer(battlePlayer);
 
                 battlePlayer.MatchMakingJoinCountdown -= deltaTime;
                 if (battlePlayer.MatchMakingJoinCountdown < 0)
@@ -289,17 +357,13 @@ namespace TXServer.Core.Battles
                     i--;
                 }
             }
+        }
 
+        private void ProcessInBattlePlayers(double deltaTime)
+        {
             for (int i = 0; i < InBattlePlayers.Count; i++)
             {
                 BattlePlayer battlePlayer = InBattlePlayers[i];
-
-                if (battlePlayer.WaitingForExit)
-                {
-                    RemoveBattlePlayer(battlePlayer);
-                    i--;
-                    continue;
-                }
 
                 if (battlePlayer.TankState != TankState.Active && battlePlayer.TankState != TankState.New)
                 {
@@ -354,10 +418,19 @@ namespace TXServer.Core.Battles
                     battlePlayer.LastMoveCommand = moveCommand;
                 }
             }
-
-            Monitor.Exit(this);
         }
-        
+
+        public void Tick(double deltaTime)
+        {
+            lock (this)
+            {
+                ProcessExitedPlayers();
+                ProcessBattleState(deltaTime);
+                ProcessWaitingPlayers(deltaTime);
+                ProcessInBattlePlayers(deltaTime);
+            }
+        }
+
         private static readonly Dictionary<BattleMode, Type> BattleEntityCreators = new Dictionary<BattleMode, Type>
         {
             { BattleMode.DM, typeof(DMTemplate) },
@@ -374,10 +447,8 @@ namespace TXServer.Core.Battles
         public BattleMode BattleMode { get; private set; }
 
         public bool IsMatchMaking { get; }
-        public bool IsEnoughPlayers { get; private set; }
-
+        public BattleState BattleState { get; private set; }
         public double CountdownTimer { get; private set; }
-        public bool IsRunning { get; private set; }
 
         private List<BattlePlayer> RedTeamPlayers { get; } = new List<BattlePlayer>();
         private List<BattlePlayer> BlueTeamPlayers { get; } = new List<BattlePlayer>();

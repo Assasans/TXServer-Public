@@ -53,6 +53,9 @@ namespace TXServer.Core.Commands
 
             foreach (Command command in commands)
             {
+                // Prevent other players from waiting in someone else's queue
+                (command as ComponentCommand)?.OnSend(player);
+
                 player.Connection.QueuedCommands.Add(command);
             }
         }

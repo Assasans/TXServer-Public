@@ -16,8 +16,7 @@ namespace TXServer.ECSSystem.EntityTemplates
                 map.GetComponent<MapGroupComponent>(),
                 new BattleModeComponent(mode),
                 new UserLimitComponent(userLimit, userLimit / 2),
-                new GravityComponent(gravity, gravityType),
-                new MatchMakingLobbyStartTimeComponent(new TimeSpan(0, 0, 5))
+                new GravityComponent(gravity, gravityType)
                 // new MatchMakingLobbyStartingComponent()
             );
             entity.Components.Add(new BattleLobbyGroupComponent(entity));

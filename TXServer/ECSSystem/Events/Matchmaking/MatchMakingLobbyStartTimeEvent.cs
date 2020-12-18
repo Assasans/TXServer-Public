@@ -1,17 +1,18 @@
 ﻿using System;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Matchmaking
 {
     [SerialVersionUID(1499762071035)]
     public class MatchMakingLobbyStartTimeEvent : ECSEvent
     {
-        public MatchMakingLobbyStartTimeEvent(DateTimeOffset startTime)
+        public MatchMakingLobbyStartTimeEvent(TimeSpan startTime)
         {
-            StartTime = startTime.ToUnixTimeMilliseconds();
+            StartTime = new TXDate(startTime);
         }
         
-        public long StartTime { get; set; }
+        public TXDate StartTime { get; set; }
     }
 }

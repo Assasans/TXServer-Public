@@ -8,7 +8,7 @@ using TXServer.ECSSystem.Base;
 namespace TXServer.Core.Commands
 {
     [CommandCode(5)]
-    public class ComponentRemoveCommand : Command
+    public class ComponentRemoveCommand : ComponentCommand
     {
         public ComponentRemoveCommand(Entity target, Type componentType)
         {
@@ -32,10 +32,7 @@ namespace TXServer.Core.Commands
             lock (Target.PlayerReferences)
                 CommandManager.BroadcastCommands(Target.PlayerReferences.Keys.Where(x => x != player), this);
 
-            if (!Target.Components.Remove(FormatterServices.GetUninitializedObject(ComponentType) as Component))
-            {
-                throw new ArgumentException("Component not found", ComponentType.Name);
-            }
+            Target.RemoveComponent(ComponentType);
         }
 
         [ProtocolFixed] public Entity Target { get; set; }

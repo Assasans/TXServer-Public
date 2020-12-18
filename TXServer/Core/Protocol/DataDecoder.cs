@@ -251,7 +251,7 @@ namespace TXServer.Core.Protocol
 
             foreach (PropertyInfo info in GetProtocolProperties(objType))
             {
-                if (Attribute.IsDefined(info.PropertyType, typeof(OptionalMappedAttribute)))
+                if (Attribute.IsDefined(info, typeof(OptionalMappedAttribute)))
                     if (map.Read()) continue;
 
                 info.SetValue(obj, SelectDecode(info.PropertyType, player));

@@ -48,6 +48,8 @@ namespace TXServer.ECSSystem.Base
             Components.UnionWith(components);
         }
 
+        
+
         public static Int64 GenerateId()
         {
             return Interlocked.Increment(ref LastEntityId);
@@ -69,6 +71,16 @@ namespace TXServer.ECSSystem.Base
         {
             Components.TryGetValue(FormatterServices.GetUninitializedObject(typeof(T)) as Component, out Component component);
             return component as T;
+        }
+
+        public void RemoveComponent<T>() where T : Component => RemoveComponent(typeof(T));
+
+        public void RemoveComponent(Type componentType)
+        {
+            if (!Components.Remove(FormatterServices.GetUninitializedObject(componentType) as Component))
+            {
+                throw new ArgumentException("Component not found", componentType.Name);
+            }
         }
 
         public override int GetHashCode() => EntityId.GetHashCode();

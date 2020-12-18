@@ -13,15 +13,11 @@ namespace TXServer.ECSSystem.Events.Matchmaking
 
         public void Execute(Player player, Entity lobby)
         {
-            if (typeof(MatchMakingLobbyTemplate) == lobby.TemplateAccessor.Template.GetType())
+            player.BattlePlayer.WaitingForExit = true;
+
+            if (lobby.TemplateAccessor.Template is MatchMakingLobbyTemplate)
             {
-                //todo make lobby system and remove it from there,
-                // and make it work
-                CommandManager.SendCommands(player, new Command[]
-                {
-                    new SendEventCommand(new ExitedFromMatchMakingEvent(true), lobby),
-                    new EntityUnshareCommand(lobby)
-                });
+                CommandManager.SendCommands(player, new SendEventCommand(new ExitedFromMatchMakingEvent(true), lobby));
             }
         }
     }

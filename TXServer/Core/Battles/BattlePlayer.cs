@@ -24,8 +24,6 @@ namespace TXServer.Core.Battles
         {
             Player = player;
             User = player.User;
-
-            BattleUser = BattleUserTemplate.CreateEntity(player, battleEntity, team);
             Team = team;
         }
 
@@ -44,7 +42,7 @@ namespace TXServer.Core.Battles
         public Entity BattleUser { get; set; }
         public Entity RoundUser { get; set; }
 
-        public Entity Incarnation { get; }
+        public Entity Incarnation { get; set; }
         public Entity Tank { get; set; }
         public Entity Weapon { get; set; }
         public Entity HullSkin { get; set; }
