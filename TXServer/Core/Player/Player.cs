@@ -131,29 +131,26 @@ namespace TXServer.Core
 			collectedCommands.AddRange(from collectedEntity in ResourceManager.GetEntities(this, user)
 									   select new EntityShareCommand(collectedEntity));
 
-			CurrentPreset.WeaponItem.Components.Add(new MountedItemComponent());
-			CurrentPreset.HullItem.Components.Add(new MountedItemComponent());
-
-			CurrentPreset.WeaponPaint.Components.Add(new MountedItemComponent());
-			CurrentPreset.TankPaint.Components.Add(new MountedItemComponent());
-
-			foreach (Entity item in CurrentPreset.WeaponSkins.Values)
+			collectedCommands.AddRange(new[]
 			{
-				item.Components.Add(new MountedItemComponent());
-			}
-			foreach (Entity item in CurrentPreset.HullSkins.Values)
+				new ComponentAddCommand(CurrentPreset.WeaponItem, new MountedItemComponent()),
+				new ComponentAddCommand(CurrentPreset.HullItem, new MountedItemComponent()),
+
+				new ComponentAddCommand(CurrentPreset.WeaponPaint, new MountedItemComponent()),
+				new ComponentAddCommand(CurrentPreset.TankPaint, new MountedItemComponent())
+			});
+
+			foreach (Entity item in CurrentPreset.WeaponSkins.Values
+				                    .Concat(CurrentPreset.HullSkins.Values)
+									.Concat(CurrentPreset.WeaponShells.Values))
 			{
-				item.Components.Add(new MountedItemComponent());
+				collectedCommands.Add(new ComponentAddCommand(item, new MountedItemComponent()));
 			}
 
-			foreach (Entity item in CurrentPreset.WeaponShells.Values)
-			{
-				item.Components.Add(new MountedItemComponent());
-			}
-			CurrentPreset.Graffiti.Components.Add(new MountedItemComponent());
+			collectedCommands.Add(new ComponentAddCommand(CurrentPreset.Graffiti, new MountedItemComponent()));
 
 			Entity avatar = (UserItems["Avatars"] as Avatars.Items).Tankist;
-			avatar.Components.Add(new MountedItemComponent());
+			collectedCommands.Add(new ComponentAddCommand(avatar, new MountedItemComponent()));
 			ReferencedEntities.TryAdd("CurrentAvatar", avatar);
 
 			collectedCommands.AddRange(new Command[] {
@@ -182,7 +179,7 @@ namespace TXServer.Core
         public Entity ClientSession { get; set; }
 
         public Entity User { get; set; }
-		public BattlePlayer BattlePlayer { get; set; }
+		public BattleLobbyPlayer BattleLobbyPlayer { get; set; }
 
         public string GetUniqueId()
         {

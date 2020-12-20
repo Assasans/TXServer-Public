@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Tank;
+using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
 
@@ -11,6 +13,28 @@ namespace TXServer.Core.Battles
 {
     public class BattlePlayer
     {
+        public BattlePlayer(BattleLobbyPlayer battlePlayer, Entity battleEntity)
+        {
+            Player = battlePlayer.Player;
+            BattleUser = BattleUserTemplate.CreateEntity(battlePlayer.Player, battleEntity, battlePlayer.Team);
+            Tank = TankTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullItem, BattleUser);
+            Weapon = WeaponTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponItem, Tank);
+            HullSkin = HullSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullSkins[battlePlayer.Player.CurrentPreset.HullItem], Tank);
+            WeaponSkin = WeaponSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponSkins[battlePlayer.Player.CurrentPreset.WeaponItem], Tank);
+            WeaponPaint = WeaponPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponPaint, Tank);
+            TankPaint = TankPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.TankPaint, Tank);
+            Shell = ShellBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponShells[battlePlayer.Player.CurrentPreset.WeaponItem], Tank);
+            RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, Tank);
+            Incarnation = TankIncarnationTemplate.CreateEntity(Tank);
+        }
+
+        public IEnumerable<Entity> GetEntities()
+        {
+            return from property in typeof(BattlePlayer).GetProperties()
+                   where property.PropertyType == typeof(Entity)
+                   select (Entity)property.GetValue(this);
+        }
+
         public static readonly Dictionary<TankState, Type> StateComponents = new Dictionary<TankState, Type>
         {
             //{ TankState.New, typeof(TankNewStateComponent) },
@@ -20,36 +44,18 @@ namespace TXServer.Core.Battles
             { TankState.Dead, typeof(TankDeadStateComponent) },
         };
 
-        public BattlePlayer(Player player, Entity battleEntity, Entity team)
-        {
-            Player = player;
-            User = player.User;
-            Team = team;
-        }
-
-        public void Reset()
-        {
-            TankState = TankState.New;
-            CollisionsPhase = -1;
-            WaitingForTankActivation = false;
-            WaitingForExit = false;
-        }
-
         public Player Player { get; }
-        public Entity User { get; }
-        public Entity Team { get; set; }
-
-        public Entity BattleUser { get; set; }
-        public Entity RoundUser { get; set; }
+        public Entity BattleUser { get; }
+        public Entity RoundUser { get; }
 
         public Entity Incarnation { get; set; }
-        public Entity Tank { get; set; }
-        public Entity Weapon { get; set; }
-        public Entity HullSkin { get; set; }
-        public Entity WeaponSkin { get; set; }
-        public Entity WeaponPaint { get; set; }
-        public Entity TankPaint { get; set; }
-        public Entity Shell { get; set; }
+        public Entity Tank { get; }
+        public Entity Weapon { get; }
+        public Entity HullSkin { get; }
+        public Entity WeaponSkin { get; }
+        public Entity WeaponPaint { get; }
+        public Entity TankPaint { get; }
+        public Entity Shell { get; }
 
         public long CollisionsPhase { get; set; } = -1;
         public TankState TankState
@@ -96,10 +102,6 @@ namespace TXServer.Core.Battles
         public MoveCommand LastMoveCommand { get; set; }
 
         public double TankStateChangeCountdown { get; set; }
-        public double MatchMakingJoinCountdown { get; set; } = 5;
-
         public bool WaitingForTankActivation { get; set; }
-        public bool WaitingForExit { get; set; }
-
     }
 }

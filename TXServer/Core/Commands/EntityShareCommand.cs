@@ -12,36 +12,18 @@ namespace TXServer.Core.Commands
         public EntityShareCommand(Entity Entity)
         {
             this.Entity = Entity ?? throw new ArgumentNullException(nameof(Entity));
+
+            EntityId = Entity.EntityId;
+            TemplateAccessor = Entity.TemplateAccessor;
+
+            Components = new Component[Entity.Components.Count];
+            Entity.Components.CopyTo((Component[])Components);
         }
 
         public override bool OnSend(Player player)
         {
-            // Add Entity to list.
             player.EntityList.Add(Entity);
-
-            lock (Entity.PlayerReferences)
-            {
-                if (Entity.PlayerReferences.ContainsKey(player))
-                {
-                    // Player already has this entity
-                    Entity.PlayerReferences[player]++;
-                    return false;
-                }
-                else
-                {
-                    Entity.PlayerReferences.Add(player, 1);
-                }
-            }
-
-            if (Interlocked.Exchange(ref IsFilled, 1) == 0)
-            {
-                EntityId = Entity.EntityId;
-                TemplateAccessor = Entity.TemplateAccessor;
-
-                Components = new Component[Entity.Components.Count];
-                Entity.Components.CopyTo((Component[])Components);
-            }
-
+            Entity.PlayerReferences.Add(player);
             return true;
         }
 
@@ -51,10 +33,9 @@ namespace TXServer.Core.Commands
         }
 
         private Entity Entity { get; }
-        private int IsFilled;
 
         [ProtocolFixed] public Int64 EntityId { get; private set; }
         [ProtocolFixed][OptionalMapped] public TemplateAccessor TemplateAccessor { get; private set; }
-        [ProtocolFixed] public ICollection<Component> Components { get; private set; }
+        [ProtocolFixed] public IReadOnlyCollection<Component> Components { get; private set; }
     }
 }

@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity battleUser)
         {
-			player.BattlePlayer.WaitingForExit = true;
+			player.BattleLobbyPlayer.WaitingForExit = true;
         }
 	}
 }

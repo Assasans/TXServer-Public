@@ -106,7 +106,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Core\Battles\Battle.cs" />
+    <Compile Include="Core\Battles\BattleLobbyPlayer.cs" />
     <Compile Include="Core\Battles\BattlePlayer.cs" />
+    <Compile Include="Core\Battles\BattleState.cs" />
     <Compile Include="Core\Battles\TankState.cs" />
     <Compile Include="Core\CommandManager\CommandCodeAttribute.cs" />
     <Compile Include="Core\Commands\ComponentCommand.cs" />

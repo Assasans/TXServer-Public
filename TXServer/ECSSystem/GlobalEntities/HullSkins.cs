@@ -22,10 +22,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                 item.TemplateAccessor.Template = new HullSkinUserItemTemplate();
 
                 item.Components.Add(new UserGroupComponent(user.EntityId));
-                if (item.Components.Remove(new DefaultSkinItemComponent()))
-                {
-                    item.Components.Add(new MountedItemComponent());
-                }
             }
 
             return items;

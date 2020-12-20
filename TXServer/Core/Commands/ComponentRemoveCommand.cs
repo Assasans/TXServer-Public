@@ -24,13 +24,11 @@ namespace TXServer.Core.Commands
 
         public override void OnReceive(Player player) => RemoveComponent(player);
 
-        // TODO: keep track of players entity shared with and broadcast any changes
-
         private void RemoveComponent(Player player)
         {
             if (Interlocked.Exchange(ref removeDone, 1) == 1) return;
             lock (Target.PlayerReferences)
-                CommandManager.BroadcastCommands(Target.PlayerReferences.Keys.Where(x => x != player), this);
+                CommandManager.BroadcastCommands(Target.PlayerReferences.Where(x => x != player), this);
 
             Target.RemoveComponent(ComponentType);
         }

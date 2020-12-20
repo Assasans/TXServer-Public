@@ -15,19 +15,7 @@ namespace TXServer.Core.Commands
         public override bool OnSend(Player player)
         {
             player.EntityList.Remove(Entity);
-
-            lock (Entity.PlayerReferences)
-            {
-                if (Entity.PlayerReferences[player] == 1)
-                {
-                    Entity.PlayerReferences.Remove(player);
-                }
-                else
-                {
-                    Entity.PlayerReferences[player]--;
-                    return false;
-                }
-            }
+            Entity.PlayerReferences.Remove(player);
 
             return true;
         }

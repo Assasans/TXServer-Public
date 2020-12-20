@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.Events.Battle
 
         public void Execute(Player player, Entity tank)
         {
-            player.BattlePlayer.LastMoveCommand = MoveCommand;
+            player.BattleLobbyPlayer.BattlePlayer.LastMoveCommand = MoveCommand;
         }
     }
 }

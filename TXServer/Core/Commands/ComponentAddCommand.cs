@@ -23,7 +23,7 @@ namespace TXServer.Core.Commands
         protected override void AddOrChangeComponent()
         {
             if (!Target.Components.Add(Component))
-                throw new ArgumentException("Entity already contains component" + Component.GetType().FullName + ".");
+                throw new ArgumentException("Entity already contains component " + Component.GetType().FullName + ".");
         }
     }
 }

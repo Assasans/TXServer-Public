@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -16,17 +15,6 @@ using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles
 {
-    public enum BattleState
-    {
-        NotEnoughPlayers,
-        StartCountdown,
-        CustomNotStarted,
-        Starting,
-        WarmingUp,
-        Running,
-        Ended
-    }
-
     public class Battle
     {
         public Battle() : this(20, GravityType.EARTH, null) { }
@@ -72,48 +60,49 @@ namespace TXServer.Core.Battles
             if (IsMatchMaking)
                 commands.Add(new ComponentAddCommand(player.User, new MatchMakingUserComponent()));
 
-            foreach (BattlePlayer existingBattlePlayer in RedTeamPlayers.Concat(BlueTeamPlayers))
+            foreach (BattleLobbyPlayer existingBattlePlayer in RedTeamPlayers.Concat(BlueTeamPlayers))
             {
                 commands.Add(new EntityShareCommand(existingBattlePlayer.User));
             }
 
-            BattlePlayer battlePlayer;
-            List<BattlePlayer> selectedTeam;
+            BattleLobbyPlayer battlePlayer;
+            List<BattleLobbyPlayer> selectedTeam;
             if (RedTeamPlayers.Count <= BlueTeamPlayers.Count)
             {
-                battlePlayer = new BattlePlayer(player, BattleEntity, RedTeamEntity);
+                battlePlayer = new BattleLobbyPlayer(player, RedTeamEntity);
                 selectedTeam = RedTeamPlayers;
                 commands.Add(new ComponentAddCommand(player.User, new TeamColorComponent(TeamColor.RED)));
             }
             else
             {
-                battlePlayer = new BattlePlayer(player, BattleEntity, BlueTeamEntity);
+                battlePlayer = new BattleLobbyPlayer(player, BlueTeamEntity);
                 selectedTeam = BlueTeamPlayers;
                 commands.Add(new ComponentAddCommand(player.User, new TeamColorComponent(TeamColor.BLUE)));
             }
 
-            player.BattlePlayer = battlePlayer;
+            player.BattleLobbyPlayer = battlePlayer;
             CommandManager.SendCommands(player, commands);
-
-            lock (this)
-                selectedTeam.Add(battlePlayer);
 
             // broadcast client to other players
             CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
                 new EntityShareCommand(battlePlayer.User));
 
+            lock (this)
+                selectedTeam.Add(battlePlayer);
+
             if (IsMatchMaking && BattleState == BattleState.WarmingUp || BattleState == BattleState.Running)
             {
+                CommandManager.SendCommands(player, new SendEventCommand(new MatchMakingLobbyStartTimeEvent(new TimeSpan(0, 0, 10)), player.User));
                 WaitingToJoinPlayers.Add(battlePlayer);
             }
         }
 
-        private void RemovePlayer(BattlePlayer battlePlayer)
+        private void RemovePlayer(BattleLobbyPlayer battlePlayer)
         {
             if (!RedTeamPlayers.Remove(battlePlayer))
                 BlueTeamPlayers.Remove(battlePlayer);
             WaitingToJoinPlayers.Remove(battlePlayer);
-            battlePlayer.Player.BattlePlayer = null;
+            battlePlayer.Player.BattleLobbyPlayer = null;
 
             List<Command> commands = new List<Command>
             {
@@ -126,7 +115,7 @@ namespace TXServer.Core.Battles
             if (IsMatchMaking)
                 commands.Add(new ComponentRemoveCommand(battlePlayer.User, typeof(MatchMakingUserComponent)));
 
-            foreach (BattlePlayer existingBattlePlayer in RedTeamPlayers.Concat(BlueTeamPlayers))
+            foreach (BattleLobbyPlayer existingBattlePlayer in RedTeamPlayers.Concat(BlueTeamPlayers))
             {
                 commands.Add(new EntityUnshareCommand(existingBattlePlayer.User));
             }
@@ -139,24 +128,15 @@ namespace TXServer.Core.Battles
 
         private void StartBattle()
         {
-            foreach (BattlePlayer battlePlayer in RedTeamPlayers.Concat(BlueTeamPlayers))
+            foreach (BattleLobbyPlayer battleLobbyPlayer in RedTeamPlayers.Concat(BlueTeamPlayers))
             {
-                InitBattlePlayer(battlePlayer);
+                InitBattlePlayer(battleLobbyPlayer);
             }
         }
 
-        private void InitBattlePlayer(BattlePlayer battlePlayer)
+        private void InitBattlePlayer(BattleLobbyPlayer battlePlayer)
         {
-            battlePlayer.BattleUser = BattleUserTemplate.CreateEntity(battlePlayer.Player, BattleEntity, battlePlayer.Team);
-            battlePlayer.Tank = TankTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullItem, battlePlayer.BattleUser);
-            battlePlayer.Weapon = WeaponTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponItem, battlePlayer.Tank);
-            battlePlayer.HullSkin = HullSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullSkins[battlePlayer.Player.CurrentPreset.HullItem], battlePlayer.Tank);
-            battlePlayer.WeaponSkin = WeaponSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponSkins[battlePlayer.Player.CurrentPreset.WeaponItem], battlePlayer.Tank);
-            battlePlayer.WeaponPaint = WeaponPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponPaint, battlePlayer.Tank);
-            battlePlayer.TankPaint = TankPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.TankPaint, battlePlayer.Tank);
-            battlePlayer.Shell = ShellBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponShells[battlePlayer.Player.CurrentPreset.WeaponItem], battlePlayer.Tank);
-            battlePlayer.RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, BattleEntity);
-            battlePlayer.Incarnation = TankIncarnationTemplate.CreateEntity(battlePlayer.Tank);
+            battlePlayer.BattlePlayer = new BattlePlayer(battlePlayer, BattleEntity);
 
             List<Command> commands = new List<Command>
             {
@@ -164,52 +144,23 @@ namespace TXServer.Core.Battles
                 new EntityShareCommand(RoundEntity)
             };
 
-            foreach (BattlePlayer inBattlePlayer in InBattlePlayers)
+            foreach (BattleLobbyPlayer inBattlePlayer in BattlePlayers)
             {
-                commands.AddRange(new[] {
-                    new EntityShareCommand(inBattlePlayer.BattleUser),
-                    new EntityShareCommand(inBattlePlayer.Tank),
-                    new EntityShareCommand(inBattlePlayer.Weapon),
-                    new EntityShareCommand(inBattlePlayer.HullSkin),
-                    new EntityShareCommand(inBattlePlayer.WeaponSkin),
-                    new EntityShareCommand(inBattlePlayer.TankPaint),
-                    new EntityShareCommand(inBattlePlayer.WeaponPaint),
-                    new EntityShareCommand(inBattlePlayer.Shell),
-                    new EntityShareCommand(inBattlePlayer.RoundUser),
-                    new EntityShareCommand(inBattlePlayer.Incarnation)});
+                commands.AddRange(inBattlePlayer.BattlePlayer.GetEntities().Select(x => new EntityShareCommand(x)));
             }
 
             CommandManager.SendCommandsSafe(battlePlayer.Player, commands);
 
-            InBattlePlayers.Add(battlePlayer);
+            BattlePlayers.Add(battlePlayer);
 
-            CommandManager.BroadcastCommands(InBattlePlayers.Select(x => x.Player),
-                new EntityShareCommand(battlePlayer.BattleUser),
-                new EntityShareCommand(battlePlayer.Tank),
-                new EntityShareCommand(battlePlayer.Weapon),
-                new EntityShareCommand(battlePlayer.HullSkin),
-                new EntityShareCommand(battlePlayer.WeaponSkin),
-                new EntityShareCommand(battlePlayer.TankPaint),
-                new EntityShareCommand(battlePlayer.WeaponPaint),
-                new EntityShareCommand(battlePlayer.Shell),
-                new EntityShareCommand(battlePlayer.RoundUser),
-                new EntityShareCommand(battlePlayer.Incarnation));
+            CommandManager.BroadcastCommands(BattlePlayers.Select(x => x.Player), battlePlayer.BattlePlayer.GetEntities().Select(x => new EntityShareCommand(x)));
         }
 
-        private void RemoveBattlePlayer(BattlePlayer battlePlayer)
+        private void RemoveBattlePlayer(BattleLobbyPlayer battlePlayer)
         {
-            CommandManager.BroadcastCommands(InBattlePlayers.Select(x => x.Player),
-                new EntityUnshareCommand(battlePlayer.BattleUser),
-                new EntityUnshareCommand(battlePlayer.Tank),
-                new EntityUnshareCommand(battlePlayer.Weapon),
-                new EntityUnshareCommand(battlePlayer.HullSkin),
-                new EntityUnshareCommand(battlePlayer.WeaponSkin),
-                new EntityUnshareCommand(battlePlayer.TankPaint),
-                new EntityUnshareCommand(battlePlayer.WeaponPaint),
-                new EntityUnshareCommand(battlePlayer.Shell),
-                new EntityUnshareCommand(battlePlayer.RoundUser));
+            CommandManager.BroadcastCommands(BattlePlayers.Select(x => x.Player), battlePlayer.BattlePlayer.GetEntities().Select(x => new EntityUnshareCommand(x)));
 
-            InBattlePlayers.Remove(battlePlayer);
+            BattlePlayers.Remove(battlePlayer);
 
             List<Command> commands = new List<Command>
             {
@@ -217,31 +168,12 @@ namespace TXServer.Core.Battles
                 new EntityUnshareCommand(RoundEntity)
             };
 
-            foreach (BattlePlayer inBattlePlayer in InBattlePlayers)
+            foreach (BattleLobbyPlayer inBattlePlayer in BattlePlayers)
             {
-                commands.AddRange(new[] {
-                    new EntityUnshareCommand(inBattlePlayer.BattleUser),
-                    new EntityUnshareCommand(inBattlePlayer.Tank),
-                    new EntityUnshareCommand(inBattlePlayer.Weapon),
-                    new EntityUnshareCommand(inBattlePlayer.HullSkin),
-                    new EntityUnshareCommand(inBattlePlayer.WeaponSkin),
-                    new EntityUnshareCommand(inBattlePlayer.TankPaint),
-                    new EntityUnshareCommand(inBattlePlayer.WeaponPaint),
-                    new EntityUnshareCommand(inBattlePlayer.Shell),
-                    new EntityUnshareCommand(inBattlePlayer.RoundUser)});
+                commands.AddRange(inBattlePlayer.BattlePlayer.GetEntities().Select(x => new EntityUnshareCommand(x)));
             }
 
             CommandManager.SendCommandsSafe(battlePlayer.Player, commands);
-
-            battlePlayer.BattleUser = null;
-            battlePlayer.Tank = null;
-            battlePlayer.Weapon = null;
-            battlePlayer.HullSkin = null;
-            battlePlayer.WeaponSkin = null;
-            battlePlayer.TankPaint = null;
-            battlePlayer.WeaponPaint = null;
-            battlePlayer.Shell = null;
-            battlePlayer.RoundUser = null;
 
             if (IsMatchMaking) RemovePlayer(battlePlayer);
             battlePlayer.Reset();
@@ -251,18 +183,18 @@ namespace TXServer.Core.Battles
         {
             for (int i = 0; i < RedTeamPlayers.Count + BlueTeamPlayers.Count; i++)
             {
-                BattlePlayer battlePlayer = null;
+                BattleLobbyPlayer battleLobbyPlayer;
                 if (i < RedTeamPlayers.Count)
-                    battlePlayer = RedTeamPlayers[i];
+                    battleLobbyPlayer = RedTeamPlayers[i];
                 else
-                    battlePlayer = BlueTeamPlayers[i - RedTeamPlayers.Count];
+                    battleLobbyPlayer = BlueTeamPlayers[i - RedTeamPlayers.Count];
 
-                if (!battlePlayer.Player.IsActive || battlePlayer.WaitingForExit)
+                if (!battleLobbyPlayer.Player.IsActive || battleLobbyPlayer.WaitingForExit)
                 {
-                    if (battlePlayer.BattleUser != null)
-                        RemoveBattlePlayer(battlePlayer);
+                    if (battleLobbyPlayer.BattlePlayer != null)
+                        RemoveBattlePlayer(battleLobbyPlayer);
                     else
-                        RemovePlayer(battlePlayer);
+                        RemovePlayer(battleLobbyPlayer);
                     i--;
                 }
             }
@@ -326,12 +258,11 @@ namespace TXServer.Core.Battles
                         StartBattle();
                         BattleState = BattleState.Running;
                     }
-
                     break;
                 case BattleState.WarmingUp:
                     break;
                 case BattleState.Running:
-                    if (InBattlePlayers.Count + WaitingToJoinPlayers.Count == 0)
+                    if (BattlePlayers.Count + WaitingToJoinPlayers.Count == 0)
                     {
                         BattleState = BattleState.NotEnoughPlayers;
                     }
@@ -343,15 +274,15 @@ namespace TXServer.Core.Battles
         {
             for (int i = 0; i < WaitingToJoinPlayers.Count; i++)
             {
-                BattlePlayer battlePlayer = WaitingToJoinPlayers[i];
+                BattleLobbyPlayer battleLobbyPlayer = WaitingToJoinPlayers[i];
 
-                battlePlayer.MatchMakingJoinCountdown -= deltaTime;
-                if (battlePlayer.MatchMakingJoinCountdown < 0)
+                battleLobbyPlayer.MatchMakingJoinCountdown -= deltaTime;
+                if (battleLobbyPlayer.MatchMakingJoinCountdown < 0)
                 {
-                    InitBattlePlayer(battlePlayer);
+                    InitBattlePlayer(battleLobbyPlayer);
 
                     // Prevent joining and immediate exiting
-                    battlePlayer.WaitingForExit = false;
+                    battleLobbyPlayer.WaitingForExit = false;
 
                     WaitingToJoinPlayers.RemoveAt(i);
                     i--;
@@ -361,9 +292,9 @@ namespace TXServer.Core.Battles
 
         private void ProcessInBattlePlayers(double deltaTime)
         {
-            for (int i = 0; i < InBattlePlayers.Count; i++)
+            for (int i = 0; i < BattlePlayers.Count; i++)
             {
-                BattlePlayer battlePlayer = InBattlePlayers[i];
+                BattlePlayer battlePlayer = BattlePlayers[i].BattlePlayer;
 
                 if (battlePlayer.TankState != TankState.Active && battlePlayer.TankState != TankState.New)
                 {
@@ -402,15 +333,15 @@ namespace TXServer.Core.Battles
                 {
                     CollisionsComponent.SemiActiveCollisionsPhase++;
                     CommandManager.SendCommandsSafe(battlePlayer.Player,
-                        new ComponentChangeCommand(BattleEntity, CollisionsComponent),
-                        new ComponentRemoveCommand(battlePlayer.Tank, typeof(TankStateTimeOutComponent)));
+                        new ComponentRemoveCommand(battlePlayer.Tank, typeof(TankStateTimeOutComponent)),
+                        new ComponentChangeCommand(BattleEntity, CollisionsComponent));
                     battlePlayer.TankState = TankState.Active;
                     battlePlayer.WaitingForTankActivation = false;
                 }
 
                 if (battlePlayer.LastMoveCommand.ClientTime != 0)
                 {
-                    CommandManager.BroadcastCommands(InBattlePlayers.Where(x => x != battlePlayer).Select(x => x.Player),
+                    CommandManager.BroadcastCommands(BattlePlayers.Where(x => x.BattlePlayer != battlePlayer).Select(x => x.Player),
                         new SendEventCommand(new MoveCommandServerEvent(battlePlayer.LastMoveCommand), battlePlayer.Tank));
 
                     MoveCommand moveCommand = battlePlayer.LastMoveCommand;
@@ -450,11 +381,11 @@ namespace TXServer.Core.Battles
         public BattleState BattleState { get; private set; }
         public double CountdownTimer { get; private set; }
 
-        private List<BattlePlayer> RedTeamPlayers { get; } = new List<BattlePlayer>();
-        private List<BattlePlayer> BlueTeamPlayers { get; } = new List<BattlePlayer>();
+        private List<BattleLobbyPlayer> RedTeamPlayers { get; } = new List<BattleLobbyPlayer>();
+        private List<BattleLobbyPlayer> BlueTeamPlayers { get; } = new List<BattleLobbyPlayer>();
 
-        private List<BattlePlayer> InBattlePlayers { get; } = new List<BattlePlayer>();
-        private List<BattlePlayer> WaitingToJoinPlayers { get; } = new List<BattlePlayer>();
+        private List<BattleLobbyPlayer> BattlePlayers { get; } = new List<BattleLobbyPlayer>();
+        private List<BattleLobbyPlayer> WaitingToJoinPlayers { get; } = new List<BattleLobbyPlayer>();
 
         public Entity BattleEntity { get; }
         public Entity BattleLobbyEntity { get; }

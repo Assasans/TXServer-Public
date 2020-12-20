@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Components.Battle
     {
 		public void OnAttached(Player player, Entity battleUser)
 		{
-			player.BattlePlayer.TankState = TankState.Spawn;
+			player.BattleLobbyPlayer.BattlePlayer.TankState = TankState.Spawn;
 		}
 	}
 }

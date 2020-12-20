@@ -89,6 +89,6 @@ namespace TXServer.ECSSystem.Base
         public TemplateAccessor TemplateAccessor { get; private set; }
         public HashSet<Component> Components { get; } = new HashSet<Component>(new HashCodeEqualityComparer<Component>());
 
-        public Dictionary<Player, int> PlayerReferences { get; } = new Dictionary<Player, int>();
+        public List<Player> PlayerReferences { get; } = new List<Player>();
     }
 }

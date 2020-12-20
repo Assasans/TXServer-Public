@@ -28,7 +28,7 @@ namespace TXServer.Core.Commands
         {
             if (!MarkAsCompleted()) return;
             lock (Target.PlayerReferences)
-                CommandManager.BroadcastCommands(Target.PlayerReferences.Keys.Where(x => x != player), this);
+                CommandManager.BroadcastCommands(Target.PlayerReferences.Where(x => x != player), this);
             AddOrChangeComponent();
         }
 
