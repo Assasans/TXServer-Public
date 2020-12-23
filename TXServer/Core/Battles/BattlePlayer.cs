@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -7,7 +8,6 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
-using TXServer.ECSSystem.Events.Battle;
 
 namespace TXServer.Core.Battles
 {
@@ -99,9 +99,9 @@ namespace TXServer.Core.Battles
             }
         }
         private TankState _TankState;
-        public MoveCommand LastMoveCommand { get; set; }
-
         public double TankStateChangeCountdown { get; set; }
         public bool WaitingForTankActivation { get; set; }
+
+        public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new ConcurrentDictionary<Type, TranslatedEvent>();
     }
 }

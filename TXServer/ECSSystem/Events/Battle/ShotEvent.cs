@@ -1,0 +1,17 @@
+﻿using System.Numerics;
+using TXServer.Core;
+using TXServer.Core.Protocol;
+using TXServer.ECSSystem.Base;
+
+namespace TXServer.ECSSystem.Events.Battle
+{
+    public abstract class ShotEvent : ECSEvent
+    {
+        [OptionalMapped]
+        public Vector3 ShotDirection { get; set; }
+
+        public int ShotId { get; set; }
+
+        public int ClientTime { get; set; }
+    }
+}

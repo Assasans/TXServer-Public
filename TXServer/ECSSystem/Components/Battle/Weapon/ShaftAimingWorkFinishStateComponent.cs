@@ -3,9 +3,10 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Components.Battle.Weapon
 {
-	[SerialVersionUID(-7317457627241247550L)]
-	public class VulcanSpeedUpComponent : Component
+    [SerialVersionUID(-5670596162316552032L)]
+	public class ShaftAimingWorkFinishStateComponent : Component
 	{
+		public float FinishTimer { get; set; }
 		public int ClientTime { get; set; }
 	}
 }

@@ -121,7 +121,7 @@ namespace TXServer.Core.Protocol
 
         private object DecodeVector3()
         {
-            return new Vector3(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
+            return new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
         }
 
         private object DecodeCommand(Player player)

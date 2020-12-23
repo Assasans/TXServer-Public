@@ -339,14 +339,11 @@ namespace TXServer.Core.Battles
                     battlePlayer.WaitingForTankActivation = false;
                 }
 
-                if (battlePlayer.LastMoveCommand.ClientTime != 0)
+                foreach (KeyValuePair<Type, TranslatedEvent> pair in battlePlayer.TranslatedEvents)
                 {
                     CommandManager.BroadcastCommands(BattlePlayers.Where(x => x.BattlePlayer != battlePlayer).Select(x => x.Player),
-                        new SendEventCommand(new MoveCommandServerEvent(battlePlayer.LastMoveCommand), battlePlayer.Tank));
-
-                    MoveCommand moveCommand = battlePlayer.LastMoveCommand;
-                    moveCommand.ClientTime = 0;
-                    battlePlayer.LastMoveCommand = moveCommand;
+                        new SendEventCommand(pair.Value.Event, pair.Value.TankPart));
+                    battlePlayer.TranslatedEvents.TryRemove(pair.Key, out _);
                 }
             }
         }

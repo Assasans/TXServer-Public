@@ -1,21 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
     [SerialVersionUID(8814758840778124785L)]
-    public class SelfHitEvent : ECSEvent
+    public class SelfHitEvent : HitEvent, ISelfEvent
     {
-        public int ShotId { get; set; }
+        public void Execute(Player player, Entity weapon) => SelfEvent.Execute(this, player, weapon);
 
-        [OptionalMapped]
-        public StaticHit StaticHit { get; set; }
-
-        [OptionalMapped]
-        public List<HitTarget> Targets { get; set; }
-
-        public int ClientTime { get; set; }
+        public virtual IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteHitEvent>();
     }
 }

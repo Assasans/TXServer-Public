@@ -6,5 +6,7 @@ namespace TXServer.ECSSystem.Components.Battle.Weapon
 	[SerialVersionUID(-6843896944033144903L)]
 	public class VulcanSlowDownComponent : Component
 	{
+		public bool IsAfterShooting { get; set; }
+		public int ClientTime { get; set; }
 	}
 }
