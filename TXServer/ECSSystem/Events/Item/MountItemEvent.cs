@@ -57,7 +57,7 @@ namespace TXServer.ECSSystem.Events
 					player.CurrentPreset.Graffiti = item;
 					break;
 				case PresetUserItemTemplate _:
-					LinkedList<Command> commands = new LinkedList<Command>();
+					LinkedList<ICommand> commands = new LinkedList<ICommand>();
 
 					// Unmount previous preset items
 					PresetEquipmentComponent preset = player.CurrentPreset;

@@ -58,7 +58,7 @@ namespace TXServer.Core.Protocol
             }
         }
 
-        private void EncodeCommand(Command command)
+        private void EncodeCommand(ICommand command)
         {
             Type type = command.GetType();
 
@@ -166,7 +166,7 @@ namespace TXServer.Core.Protocol
                 case ICollection collection:
                     EncodeCollection(collection);
                     return;
-                case Command command:
+                case ICommand command:
                     EncodeCommand(command);
                     break;
                 case Enum @enum:
@@ -222,7 +222,7 @@ namespace TXServer.Core.Protocol
             }
         }
 
-        public void EncodeCommands(IEnumerable<Command> commands)
+        public void EncodeCommands(IEnumerable<ICommand> commands)
         {
             using (MemoryStream memoryStream = new MemoryStream())
             {
@@ -231,7 +231,7 @@ namespace TXServer.Core.Protocol
                 OptionalMap map = new OptionalMap();
                 DataEncoder encoder = new DataEncoder(writtenCommands, map);
 
-                foreach (Command command in commands)
+                foreach (ICommand command in commands)
                 {
                     encoder.SelectEncode(command);
                 }

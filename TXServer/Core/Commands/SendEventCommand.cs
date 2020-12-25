@@ -8,7 +8,7 @@ using TXServer.ECSSystem.Base;
 namespace TXServer.Core.Commands
 {
     [CommandCode(1)]
-    public class SendEventCommand : Command
+    public class SendEventCommand : ICommand
     {
         public SendEventCommand(ECSEvent Event, params Entity[] Entities)
         {
@@ -18,12 +18,12 @@ namespace TXServer.Core.Commands
             this.Entities = Entities.ToList();
         }
 
-        public override bool OnSend(Player player) => true;
+        public void OnSend(Player player) { }
 
         /// <summary>
         /// Detects event method with same number of Entity parameters and calls it.
         /// </summary>
-        public override void OnReceive(Player player)
+        public void OnReceive(Player player)
         {
             bool canBeExecuted = false;
             MethodInfo[] methods = Event.GetType().GetMethods();

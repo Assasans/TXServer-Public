@@ -244,15 +244,18 @@ namespace TXServer.Core
                 }    
                 stopwatch.Stop();
 
-                if (stopwatch.Elapsed.TotalSeconds < BattleTickLength)
+                if (stopwatch.Elapsed.TotalSeconds < BattleTickDuration)
                 {
-                    lastDeltaTime = BattleTickLength;
-                    Thread.Sleep(TimeSpan.FromSeconds(BattleTickLength) - stopwatch.Elapsed);
+                    lastDeltaTime = BattleTickDuration;
+                    Thread.Sleep(TimeSpan.FromSeconds(BattleTickDuration) - stopwatch.Elapsed);
                 }
                 else
                 {
                     lastDeltaTime = stopwatch.Elapsed.TotalSeconds;
                 }
+
+                LastTickDuration = lastDeltaTime;
+                Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
             }
         }
 
@@ -271,8 +274,10 @@ namespace TXServer.Core
         public List<Battle> BattlePool { get; } = new List<Battle>();
         public static Battle GlobalBattle { get; private set; } // todo replace with proper matchmaker
         private Thread BattleWorker;
+
+        public static double LastTickDuration { get; private set; }
         private const int BattleTickRate = 100;
-        private const double BattleTickLength = 1.0 / BattleTickRate;
+        private const double BattleTickDuration = 1.0 / BattleTickRate;
 
         // Server state.
         public bool IsStarted { get; private set; }

@@ -112,7 +112,7 @@
     <Compile Include="Core\Battles\TankState.cs" />
     <Compile Include="Core\Battles\TranslatedEvent.cs" />
     <Compile Include="Core\CommandManager\CommandCodeAttribute.cs" />
-    <Compile Include="Core\Commands\ComponentCommand.cs" />
+    <Compile Include="Core\Commands\IComponentCommand.cs" />
     <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
     <Compile Include="Core\Protocol\MovementCodec.cs" />
@@ -628,7 +628,7 @@
     <Compile Include="Core\Commands\EntityShareCommand.cs" />
     <Compile Include="Core\Commands\ComponentAddCommand.cs" />
     <Compile Include="Core\Commands\ComponentChangeCommand.cs" />
-    <Compile Include="Core\Commands\Command.cs" />
+    <Compile Include="Core\Commands\ICommand.cs" />
     <Compile Include="Core\Commands\InitTimeCommand.cs" />
     <Compile Include="Core\Commands\SendEventCommand.cs" />
     <Compile Include="Core\Protocol\OptionalMap.cs" />

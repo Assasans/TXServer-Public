@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Threading.Tasks;
+using System.Threading;
 using TXServer.Core.Protocol;
 using TXServer.Library;
 
@@ -26,13 +25,13 @@ namespace TXServer.Core.Commands
             using (NetworkStream stream = new NetworkStream(connection.Socket))
             using (BinaryReader reader = new BigEndianBinaryReader(stream))
             {
-                List<Command> commands = new DataDecoder(reader).DecodeCommands(connection.Player);
+                List<ICommand> commands = new DataDecoder(reader).DecodeCommands(connection.Player);
 
 #if DEBUG
                 connection.Player.LastClientPacket = commands;
 #endif
-
-                foreach (Command command in commands)
+                
+                foreach (ICommand command in commands)
                 {
                     command.OnReceive(connection.Player);
                 }
@@ -42,38 +41,36 @@ namespace TXServer.Core.Commands
         /// <summary>
         /// Send data to client from another thread.
         /// </summary>
-        public static void SendCommandsSafe(Player player, params Command[] commands) => SendCommandsSafe(player, (IEnumerable<Command>)commands);
+        public static void SendCommandsSafe(Player player, params ICommand[] commands) => SendCommandsSafe(player, (IEnumerable<ICommand>)commands);
 
         /// <summary>
         /// Send data to client from another thread.
         /// </summary>
-        public static void SendCommandsSafe(Player player, IEnumerable<Command> commands)
+        public static void SendCommandsSafe(Player player, IEnumerable<ICommand> commands)
         {
             if (!player.IsActive) return;
 
-            foreach (Command command in commands)
+            foreach (ICommand command in commands)
             {
                 // Prevent other players from waiting in someone else's queue
-                (command as ComponentCommand)?.OnSend(player);
+                (command as IComponentCommand)?.OnSend(player);
 
-                player.Connection.QueuedCommands.Add(command);
+                player.Connection.QueuedCommands.TryAdd(command);
             }
         }
 
         /// <summary>
         /// Send data to client.
         /// </summary>
-        public static void SendCommands(Player player, params Command[] commands) => SendCommands(player, (IEnumerable<Command>)commands);
+        public static void SendCommands(Player player, params ICommand[] commands) => SendCommands(player, (IEnumerable<ICommand>)commands);
 
         /// <summary>
         /// Send data to client.
         /// </summary>
-        public static void SendCommands(Player player, IEnumerable<Command> commands)
+        public static void SendCommands(Player player, IEnumerable<ICommand> commands)
         {
-            // Filter out cancelled commands
-            IEnumerable<Command> filteredCommands = from command in commands
-                                                    where command.OnSend(player)
-                                                    select command;
+            foreach (ICommand command in commands)
+                command.OnSend(player);
 
 #if DEBUG
             player.LastServerPacket = commands;
@@ -84,10 +81,9 @@ namespace TXServer.Core.Commands
                 BinaryWriter writer = new BigEndianBinaryWriter(buffer);
                 DataEncoder encoder = new DataEncoder(writer);
 
-                encoder.EncodeCommands(filteredCommands);
+                encoder.EncodeCommands(commands);
 
                 writer.BaseStream.Position = 0;
-
                 using (NetworkStream stream = new NetworkStream(player.Connection.Socket))
                     writer.BaseStream.CopyTo(stream);
             }
@@ -96,12 +92,12 @@ namespace TXServer.Core.Commands
         /// <summary>
         /// Send data to multiple clients.
         /// </summary>
-        public static void BroadcastCommands(IEnumerable<Player> players, params Command[] commands) => BroadcastCommands(players, (IEnumerable<Command>)commands);
+        public static void BroadcastCommands(IEnumerable<Player> players, params ICommand[] commands) => BroadcastCommands(players, (IEnumerable<ICommand>)commands);
 
         /// <summary>
         /// Send data to multiple clients.
         /// </summary>
-        public static void BroadcastCommands(IEnumerable<Player> players, IEnumerable<Command> commands)
+        public static void BroadcastCommands(IEnumerable<Player> players, IEnumerable<ICommand> commands)
         {
             foreach (Player player in players)
             {

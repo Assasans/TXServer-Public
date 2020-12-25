@@ -41,6 +41,7 @@ namespace TXServer.Core
             if (!TryDeactivate()) return;
 
             Socket.Close();
+            QueuedCommands.CompleteAdding();
 
             Interlocked.Decrement(ref Server.Instance.Connection.PlayerCount);
             Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
@@ -70,10 +71,10 @@ namespace TXServer.Core
 
                 while (!QueuedCommands.IsCompleted)
                 {
-                    Command command = QueuedCommands.Take();
+                    ICommand command = QueuedCommands.Take();
 
                     int count = QueuedCommands.Count + 1;
-                    Command[] commands = new Command[count];
+                    ICommand[] commands = new ICommand[count];
 
                     commands[0] = command;
                     for (int i = 1; i < count; i++)
@@ -128,7 +129,7 @@ namespace TXServer.Core
         public long DiffToClient { get; set; } = 0;
 
         public Socket Socket { get; private set; }
-        public BlockingCollection<Command> QueuedCommands { get; } = new BlockingCollection<Command>();
+        public BlockingCollection<ICommand> QueuedCommands { get; } = new BlockingCollection<ICommand>();
         public Player Player { get; }
 
         private int _Active = 1;

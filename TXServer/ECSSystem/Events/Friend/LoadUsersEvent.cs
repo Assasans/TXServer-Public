@@ -16,7 +16,7 @@ namespace TXServer.ECSSystem.Events
     {
         public void Execute(Player player, Entity entity)
         {
-            List<Command> commands = new List<Command>();
+            List<ICommand> commands = new List<ICommand>();
 
             foreach (long id in UsersId)
             {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TXServer.Core.Commands
 {
-    public abstract class ComponentCommand : Command
+    public interface IComponentCommand : ICommand
     {
     }
 }

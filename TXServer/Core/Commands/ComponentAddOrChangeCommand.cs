@@ -5,7 +5,7 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.Core.Commands
 {
-    public abstract class ComponentAddOrChangeCommand : ComponentCommand
+    public abstract class ComponentAddOrChangeCommand : IComponentCommand
     {
         public ComponentAddOrChangeCommand(Entity Target, Component Component)
         {
@@ -13,13 +13,12 @@ namespace TXServer.Core.Commands
             this.Component = Component;
         }
 
-        public override bool OnSend(Player player)
+        public void OnSend(Player player)
         {
             AddOrChangeComponent(player);
-            return true;
         }
 
-        public override void OnReceive(Player player)
+        public virtual void OnReceive(Player player)
         {
             AddOrChangeComponent(player);
         }

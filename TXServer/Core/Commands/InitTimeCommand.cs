@@ -4,13 +4,11 @@ using TXServer.Core.Protocol;
 namespace TXServer.Core.Commands
 {
     [CommandCode(7)]
-    public class InitTimeCommand : Command
+    public class InitTimeCommand : ICommand
     {
-        public InitTimeCommand() { }
+        public void OnSend(Player player) { }
 
-        public override bool OnSend(Player player) => true;
-
-        public override void OnReceive(Player player) => throw new NotSupportedException();
+        public void OnReceive(Player player) => throw new NotSupportedException();
 
         [ProtocolFixed] public Int64 ServerTime { get; set; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
     }

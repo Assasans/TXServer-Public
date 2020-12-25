@@ -50,7 +50,7 @@ namespace TXServer.Core.Battles
         public void AddPlayer(Player player)
         {
             // prepare client
-            List<Command> commands = new List<Command>
+            List<ICommand> commands = new List<ICommand>
             {
                 new EntityShareCommand(BattleLobbyEntity),
                 new EntityShareCommand(RedTeamEntity),
@@ -104,7 +104,7 @@ namespace TXServer.Core.Battles
             WaitingToJoinPlayers.Remove(battlePlayer);
             battlePlayer.Player.BattleLobbyPlayer = null;
 
-            List<Command> commands = new List<Command>
+            List<ICommand> commands = new List<ICommand>
             {
                 new EntityUnshareCommand(BattleLobbyEntity),
                 new EntityUnshareCommand(RedTeamEntity),
@@ -138,7 +138,7 @@ namespace TXServer.Core.Battles
         {
             battlePlayer.BattlePlayer = new BattlePlayer(battlePlayer, BattleEntity);
 
-            List<Command> commands = new List<Command>
+            List<ICommand> commands = new List<ICommand>
             {
                 new EntityShareCommand(BattleEntity),
                 new EntityShareCommand(RoundEntity)
@@ -162,7 +162,7 @@ namespace TXServer.Core.Battles
 
             BattlePlayers.Remove(battlePlayer);
 
-            List<Command> commands = new List<Command>
+            List<ICommand> commands = new List<ICommand>
             {
                 new EntityUnshareCommand(BattleEntity),
                 new EntityUnshareCommand(RoundEntity)

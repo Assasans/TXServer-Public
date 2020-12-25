@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using TXServer.Core;
@@ -95,7 +96,8 @@ namespace TXServer
                 return;
             }
 
-            ServerStateText.Text = "Online players: " + ServerLauncher.GetPlayerCount();
+            ServerStateText.Text = $"Online players: {ServerLauncher.GetPlayerCount()}\n" +
+                $"Last tick duration: {ServerConnection.LastTickDuration}";
         }
     }
 }

@@ -8,7 +8,7 @@ using TXServer.ECSSystem.Base;
 namespace TXServer.Core.Commands
 {
     [CommandCode(5)]
-    public class ComponentRemoveCommand : ComponentCommand
+    public class ComponentRemoveCommand : IComponentCommand
     {
         public ComponentRemoveCommand(Entity target, Type componentType)
         {
@@ -16,13 +16,12 @@ namespace TXServer.Core.Commands
             ComponentType = componentType ?? throw new ArgumentNullException(nameof(componentType));
         }
 
-        public override bool OnSend(Player player)
+        public void OnSend(Player player)
         {
             RemoveComponent(player);
-            return true;
         }
 
-        public override void OnReceive(Player player) => RemoveComponent(player);
+        public void OnReceive(Player player) => RemoveComponent(player);
 
         private void RemoveComponent(Player player)
         {

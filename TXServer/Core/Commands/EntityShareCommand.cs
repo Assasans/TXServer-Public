@@ -7,7 +7,7 @@ using TXServer.ECSSystem.Base;
 namespace TXServer.Core.Commands
 {
     [CommandCode(2)]
-    public class EntityShareCommand : Command
+    public class EntityShareCommand : ICommand
     {
         public EntityShareCommand(Entity Entity)
         {
@@ -20,14 +20,13 @@ namespace TXServer.Core.Commands
             Entity.Components.CopyTo((Component[])Components);
         }
 
-        public override bool OnSend(Player player)
+        public void OnSend(Player player)
         {
             player.EntityList.Add(Entity);
             Entity.PlayerReferences.Add(player);
-            return true;
         }
 
-        public override void OnReceive(Player player)
+        public void OnReceive(Player player)
         {
             throw new NotSupportedException();
         }

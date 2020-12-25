@@ -25,8 +25,8 @@ namespace TXServer.Core
         public PlayerData Data { get; set; }
 
 #if DEBUG
-		public IEnumerable<Command> LastServerPacket { get; set; }
-		public List<Command> LastClientPacket { get; set; }
+		public IEnumerable<ICommand> LastServerPacket { get; set; }
+		public List<ICommand> LastClientPacket { get; set; }
 #endif
 
 		public Player(Server server, Socket socket)
@@ -60,15 +60,9 @@ namespace TXServer.Core
         /// </summary>
         public Entity FindEntityById(Int64 id)
         {
-            try
-            {
-                EntityList.TryGetValue(Entity.EqualValue(id), out Entity found);
-                return found;
-            }
-            catch (KeyNotFoundException)
-            {
-                throw new ArgumentException("Entity with id " + id + "not found.");
-            }
+            EntityList.TryGetValue(Entity.EqualValue(id), out Entity found);
+			// Null is allowed for sending commands with unshared entities.
+			return found;
         }
 
         public bool LogIn(Entity clientSession)
@@ -122,7 +116,7 @@ namespace TXServer.Core
 
 			user.Components.Add(new UserGroupComponent(user));
 
-			List<Command> collectedCommands = new List<Command>
+			List<ICommand> collectedCommands = new List<ICommand>
 			{
 				new EntityShareCommand(user),
 				new ComponentAddCommand(ClientSession, new UserGroupComponent(user)),
@@ -153,7 +147,7 @@ namespace TXServer.Core
 			collectedCommands.Add(new ComponentAddCommand(avatar, new MountedItemComponent()));
 			ReferencedEntities.TryAdd("CurrentAvatar", avatar);
 
-			collectedCommands.AddRange(new Command[] {
+			collectedCommands.AddRange(new ICommand[] {
 				//new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
 				new SendEventCommand(new PaymentSectionLoadedEvent(), user),
 				new ComponentAddCommand(user, new UserOnlineComponent()),

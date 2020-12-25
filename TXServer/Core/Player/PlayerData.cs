@@ -140,7 +140,7 @@ namespace TXServer.Core
         public void Apply()
         {
             Entity user = Player.User;
-            List<Command> commands = new List<Command>();
+            List<ICommand> commands = new List<ICommand>();
             
             foreach (var change in RawChanges(Original))
             {
@@ -157,12 +157,12 @@ namespace TXServer.Core
                     if (component != null)
                     {
                         commands.Add(isNew ? 
-                            (Command) new ComponentChangeCommand(user, component) : 
+                            (ICommand) new ComponentChangeCommand(user, component) : 
                             new ComponentAddCommand(user, component));
                         continue;
                     }
                     commands.Add(isNew ? 
-                        (Command) new ComponentAddCommand(user, component) : 
+                        (ICommand) new ComponentAddCommand(user, component) : 
                         new ComponentRemoveCommand(user, component.GetType())
                     );
                 }

@@ -231,7 +231,7 @@ namespace TXServer.Core.Protocol
                 return DecodeCollection(objType, player);
             }
 
-            if (typeof(Command).IsAssignableFrom(objType))
+            if (typeof(ICommand).IsAssignableFrom(objType))
             {
                 return DecodeCommand(player);
             }
@@ -284,17 +284,17 @@ namespace TXServer.Core.Protocol
                     return unpacker.DecodeObject(objType, player);
 
                 // Deserialize objects.
-                List<Command> commands = new List<Command>();
+                List<ICommand> commands = new List<ICommand>();
 
                 while (buffer.BaseStream.Position != length)
                 {
-                    commands.Add(unpacker.SelectDecode(typeof(Command), player) as Command);
+                    commands.Add(unpacker.SelectDecode(typeof(ICommand), player) as ICommand);
                 }
 
                 return commands;
             }
         }
 
-        public List<Command> DecodeCommands(Player player) => UnpackData(player) as List<Command>;
+        public List<ICommand> DecodeCommands(Player player) => UnpackData(player) as List<ICommand>;
     }
 }
