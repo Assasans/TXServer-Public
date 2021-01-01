@@ -119,6 +119,7 @@
     <Compile Include="ECSSystem\Components\Battle\BattleTankCollisionsComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Graffiti\GraffitiBattleItemComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Graffiti\GraffitiDecalComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\TankJumpComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Tank\TankStateTimeOutComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\DamageWeakeningByDistanceComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\FlamethrowerComponent.cs" />
