@@ -23,6 +23,7 @@ namespace TXServer.Core.Battles
             WeaponSkin = WeaponSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponSkins[battlePlayer.Player.CurrentPreset.WeaponItem], Tank);
             WeaponPaint = WeaponPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponPaint, Tank);
             TankPaint = TankPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.TankPaint, Tank);
+            Graffiti = GraffitiBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.Graffiti, Tank);
             Shell = ShellBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponShells[battlePlayer.Player.CurrentPreset.WeaponItem], Tank);
             RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, Tank);
             Incarnation = TankIncarnationTemplate.CreateEntity(Tank);
@@ -55,6 +56,7 @@ namespace TXServer.Core.Battles
         public Entity WeaponSkin { get; }
         public Entity WeaponPaint { get; }
         public Entity TankPaint { get; }
+        public Entity Graffiti { get; }
         public Entity Shell { get; }
 
         public long CollisionsPhase { get; set; } = -1;

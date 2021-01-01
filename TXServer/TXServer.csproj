@@ -117,6 +117,8 @@
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
     <Compile Include="Core\Protocol\MovementCodec.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleTankCollisionsComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Graffiti\GraffitiBattleItemComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Graffiti\GraffitiDecalComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Tank\TankStateTimeOutComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\DamageWeakeningByDistanceComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\FlamethrowerComponent.cs" />
@@ -153,6 +155,7 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponStreamShootingComponent.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FlamethrowerBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FreezeBattleItemTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\GraffitiBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\HammerBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\IsisBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\RailgunBattleItemTemplate.cs" />
