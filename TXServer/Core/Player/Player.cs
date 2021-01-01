@@ -61,7 +61,6 @@ namespace TXServer.Core
         public Entity FindEntityById(Int64 id)
         {
             EntityList.TryGetValue(Entity.EqualValue(id), out Entity found);
-			// Null is allowed for sending commands with unshared entities.
 			return found;
         }
 

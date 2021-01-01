@@ -19,6 +19,8 @@ namespace TXServer.Core.Protocol
 {
     class DataDecoder
     {
+        public bool IsCommandIgnored { get; private set; }
+
         private readonly BinaryReader reader;
         private readonly OptionalMap map;
 
@@ -90,11 +92,20 @@ namespace TXServer.Core.Protocol
 
             if (objType.IsArray)
             {
-                Array array = Array.CreateInstance(objType.GetElementType(), count);
+                Type elementType = objType.GetElementType();
+                Array array = Array.CreateInstance(elementType, count);
 
                 for (int i = 0; i < count; i++)
                 {
-                    array.SetValue(SelectDecode(objType.GetElementType(), player), i);
+                    object item = SelectDecode(elementType, player);
+
+                    if (elementType == typeof(Entity) && item == null)
+                    {
+                        IsCommandIgnored = true;
+                        continue;
+                    }
+
+                    array.SetValue(item, i);
                 }
 
                 return array;
@@ -105,8 +116,11 @@ namespace TXServer.Core.Protocol
 
             for (int i = 0; i < count; i++)
             {
+                object item = SelectDecode(collectionInnerType, player);
+                if (collectionInnerType == typeof(Entity) && item == null) continue;
+
                 objType.GetMethod("Add", new Type[] { collectionInnerType })
-                    .Invoke(obj, new object[] { SelectDecode(collectionInnerType, player) });
+                    .Invoke(obj, new object[] { item });
             }
 
             return obj;
@@ -254,7 +268,14 @@ namespace TXServer.Core.Protocol
                 if (Attribute.IsDefined(info, typeof(OptionalMappedAttribute)))
                     if (map.Read()) continue;
 
-                info.SetValue(obj, SelectDecode(info.PropertyType, player));
+                object decoded = SelectDecode(info.PropertyType, player);
+                if (info.PropertyType == typeof(Entity) && decoded == null)
+                {
+                    IsCommandIgnored = true;
+                    continue;
+                }
+
+                info.SetValue(obj, decoded);
             }
 
             return obj;
@@ -278,17 +299,20 @@ namespace TXServer.Core.Protocol
             using (MemoryStream stream = new MemoryStream(reader.ReadBytes(length)))
             {
                 BinaryReader buffer = new BigEndianBinaryReader(stream);
-                DataDecoder unpacker = new DataDecoder(buffer, map);
+                DataDecoder decoder = new DataDecoder(buffer, map);
 
                 if (objType != null)
-                    return unpacker.DecodeObject(objType, player);
+                    return decoder.DecodeObject(objType, player);
 
                 // Deserialize objects.
                 List<ICommand> commands = new List<ICommand>();
 
                 while (buffer.BaseStream.Position != length)
                 {
-                    commands.Add(unpacker.SelectDecode(typeof(ICommand), player) as ICommand);
+                    ICommand command = decoder.SelectDecode(typeof(ICommand), player) as ICommand;
+                    if (decoder.IsCommandIgnored) continue;
+
+                    commands.Add(command);
                 }
 
                 return commands;

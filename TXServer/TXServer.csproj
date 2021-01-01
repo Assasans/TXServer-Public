@@ -130,6 +130,7 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\RailgunComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\RicochetComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\ShaftAimingImpactComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Weapon\ShaftAimingSpeedComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\ShaftAimingTargetPointComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\ShaftAimingWorkActivationStateComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\ShaftAimingWorkFinishStateComponent.cs" />

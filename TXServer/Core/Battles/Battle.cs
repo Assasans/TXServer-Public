@@ -67,7 +67,7 @@ namespace TXServer.Core.Battles
 
             BattleLobbyPlayer battlePlayer;
             List<BattleLobbyPlayer> selectedTeam;
-            if (RedTeamPlayers.Count <= BlueTeamPlayers.Count)
+            if (RedTeamPlayers.Count < BlueTeamPlayers.Count)
             {
                 battlePlayer = new BattleLobbyPlayer(player, RedTeamEntity);
                 selectedTeam = RedTeamPlayers;

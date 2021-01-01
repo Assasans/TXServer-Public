@@ -15,7 +15,7 @@ namespace TXServer.Core.Commands
             _ = Entities ?? throw new ArgumentNullException(nameof(Entities));
 
             this.Event = Event;
-            this.Entities = Entities.ToList();
+            this.Entities = Entities;
         }
 
         public void OnSend(Player player) { }
@@ -36,28 +36,28 @@ namespace TXServer.Core.Commands
                 ParameterInfo[] parameters = method.GetParameters();
 
                 // Player can be passed as first parameter before entities
-                if (parameters.Length == Entities.Count + 1 && parameters[0].ParameterType == typeof(Player))
+                if (parameters.Length == Entities.Length + 1 && parameters[0].ParameterType == typeof(Player))
                 {
-                    object[] args = new object[Entities.Count + 1];
+                    object[] args = new object[Entities.Length + 1];
                     args[0] = player;
-                    Array.Copy(Entities.ToArray(), 0, args, 1, Entities.Count);
+                    Array.Copy(Entities.ToArray(), 0, args, 1, Entities.Length);
 
                     method.Invoke(Event, args);
                     return;
                 }
 
                 // Only entities as parameters
-                if (parameters.Length == Entities.Count && parameters[0].ParameterType != typeof(Player))
+                if (parameters.Length == Entities.Length && parameters[0].ParameterType != typeof(Player))
                 {
                     method.Invoke(Event, Entities.ToArray());
                     return;
                 }
             }
             if (canBeExecuted)
-                throw new MissingMethodException(Event.GetType().Name, string.Format("Execute({0})", Entities.Count));
+                throw new MissingMethodException(Event.GetType().Name, string.Format("Execute({0})", Entities.Length));
         }
 
         [ProtocolFixed] public ECSEvent Event { get; set; }
-        [ProtocolFixed] public List<Entity> Entities { get; set; }
+        [ProtocolFixed] public Entity[] Entities { get; set; }
     }
 }

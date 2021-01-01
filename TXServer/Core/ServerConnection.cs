@@ -167,31 +167,20 @@ namespace TXServer.Core
                         byte[] data;
                         try
                         {
-                            if (!request.RawUrl.Split('?')[0].EndsWith(".yml"))
+                            if (Path.GetExtension(request.Url.LocalPath) == ".yml")
                             {
-                                data = File.ReadAllBytes(rootPath + request.RawUrl.Split('?')[0]);
+                                string unformatted = File.ReadAllText(rootPath + request.Url.LocalPath);
+                                data = Encoding.UTF8.GetBytes(unformatted.Replace("*ip*", request.Url.Host));
                             }
                             else
                             {
-                                string[] lines = File.ReadAllLines(rootPath + request.RawUrl.Split('?')[0]);
-
-                                List<byte> buffer = new List<byte>();
-                                for (int i = 0; i < lines.Length; i++)
-                                {
-                                    string line = lines[i];
-                                    // Console.WriteLine(line);
-                                    // Console.WriteLine(line.Replace("*ip*", request.Url.Host));
-                                    buffer.AddRange(Encoding.UTF8.GetBytes(line.Replace("*ip*", request.Url.Host)));
-                                    buffer.AddRange(Encoding.UTF8.GetBytes(Environment.NewLine));
-                                }
-
-                                data = buffer.ToArray();
+                                data = File.ReadAllBytes(rootPath + request.Url.LocalPath);
                             }
                         }
                         catch
                         {
                             data = Array.Empty<byte>();
-                            response.StatusCode = 400;
+                            response.StatusCode = 404;
                         }
 
                         response.ContentLength64 = data.Length;
