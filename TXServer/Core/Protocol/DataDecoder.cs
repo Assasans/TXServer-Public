@@ -302,7 +302,11 @@ namespace TXServer.Core.Protocol
                 DataDecoder decoder = new DataDecoder(buffer, map);
 
                 if (objType != null)
-                    return decoder.DecodeObject(objType, player);
+                {
+                    object obj = decoder.DecodeObject(objType, player);
+                    IsCommandIgnored |= decoder.IsCommandIgnored;
+                    return obj;
+                }
 
                 // Deserialize objects.
                 List<ICommand> commands = new List<ICommand>();
@@ -310,7 +314,11 @@ namespace TXServer.Core.Protocol
                 while (buffer.BaseStream.Position != length)
                 {
                     ICommand command = decoder.SelectDecode(typeof(ICommand), player) as ICommand;
-                    if (decoder.IsCommandIgnored) continue;
+                    if (decoder.IsCommandIgnored)
+                    {
+                        decoder.IsCommandIgnored = false;
+                        continue;
+                    }
 
                     commands.Add(command);
                 }
