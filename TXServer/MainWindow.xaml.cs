@@ -97,6 +97,7 @@ namespace TXServer
             }
 
             ServerStateText.Text = $"Online players: {ServerLauncher.GetPlayerCount()}\n" +
+                $"Active battles: {ServerConnection.BattlePool.Count}\n" +
                 $"Last tick duration: {ServerConnection.LastTickDuration}";
         }
     }

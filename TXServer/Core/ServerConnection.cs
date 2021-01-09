@@ -218,7 +218,8 @@ namespace TXServer.Core
 
         public void BattleLoop()
         {
-            BattlePool.Add(new Battle());
+            BattlePool.Add(new Battle(mapID:null, maxPlayers:null, timeLimit:null, scoreLimit: null, battleMode:null, friendlyFire:null, 
+                gravity: TXServer.ECSSystem.Types.GravityType.EARTH, killZoneEnabled:null, disabledModules:null, isMatchMaking: true, owner:null));
             GlobalBattle = BattlePool[0];
 
             Stopwatch stopwatch = new Stopwatch();
@@ -227,7 +228,7 @@ namespace TXServer.Core
             while (true)
             {
                 stopwatch.Restart();
-                foreach (Battle battle in BattlePool)
+                foreach (Battle battle in BattlePool.ToArray())
                 {
                     battle.Tick(lastDeltaTime);
                 }    
@@ -260,7 +261,7 @@ namespace TXServer.Core
 
         private Thread PingWorker;
 
-        public List<Battle> BattlePool { get; } = new List<Battle>();
+        public static List<Battle> BattlePool { get; } = new List<Battle>();
         public static Battle GlobalBattle { get; private set; } // todo replace with proper matchmaker
         private Thread BattleWorker;
 

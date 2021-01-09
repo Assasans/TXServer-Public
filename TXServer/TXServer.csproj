@@ -117,6 +117,10 @@
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
     <Compile Include="Core\Protocol\MovementCodec.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleTankCollisionsComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Flags\FlagGroundedStateComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Flags\FlagHomeStateComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Flags\FlagPedestalComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Flags\FlagPositionComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Graffiti\GraffitiBattleItemComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Graffiti\GraffitiDecalComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\TankJumpComponent.cs" />
@@ -155,6 +159,10 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\VulcanSpeedUpComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponBulletShotComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponStreamShootingComponent.cs" />
+    <Compile Include="ECSSystem\Components\Matchmaking\ClientBattleParamsComponent.cs" />
+    <Compile Include="ECSSystem\Components\Matchmaking\CustomBattleLobbyComponent.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\Flags\FlagTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\Flags\PedestalTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FlamethrowerBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FreezeBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\GraffitiBattleItemTemplate.cs" />
@@ -270,6 +278,7 @@
     <Compile Include="ECSSystem\EntityTemplates\Item\IUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\Weapons\IWeaponUserItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Matchmaking\BattleLobbyTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Matchmaking\CustomBattleLobbyTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Matchmaking\MatchMakingLobbyTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Notification\NewItemNotificationTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\ShellBattleItemTemplate.cs" />
@@ -310,6 +319,11 @@
     <Compile Include="ECSSystem\Events\Battle\ShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\UnpauseEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\OpenContainerEvent.cs" />
+    <Compile Include="ECSSystem\Events\Matchmaking\ClientExitLobbyEvent.cs" />
+    <Compile Include="ECSSystem\Events\Matchmaking\ConnectToCustomLobbyEvent.cs" />
+    <Compile Include="ECSSystem\Events\Matchmaking\CreateCustomBattleLobbyEvent.cs" />
+    <Compile Include="ECSSystem\Events\Matchmaking\CustomLobbyNotExistsEvent.cs" />
+    <Compile Include="ECSSystem\Events\Matchmaking\EnterBattleLobbyFailedEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\EnteredToMatchMakingEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\EnterToMatchMakingEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\ExitedFromMatchMakingEvent.cs" />
@@ -318,6 +332,7 @@
     <Compile Include="ECSSystem\Events\Matchmaking\MatchMakingLobbyStartTimeEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\MatchMakingUserReadyEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\SetEquipmentEvent.cs" />
+    <Compile Include="ECSSystem\Events\Matchmaking\SwitchTeamEvent.cs" />
     <Compile Include="ECSSystem\Events\Notification\NotificationShownEvent.cs" />
     <Compile Include="ECSSystem\Events\Notification\ShowNotificationGroupEvent.cs" />
     <Compile Include="ECSSystem\Events\Payment\PaymentStatisticsEvent.cs" />
@@ -346,6 +361,7 @@
     <Compile Include="ECSSystem\Components\User\UserAdminComponent.cs" />
     <Compile Include="ECSSystem\Events\Entrance\AutoLoginUserEvent.cs" />
     <Compile Include="ECSSystem\Types\BattleMode.cs" />
+    <Compile Include="ECSSystem\Types\ClientBattleParams.cs" />
     <Compile Include="ECSSystem\Types\DiscreteTankControl.cs" />
     <Compile Include="ECSSystem\Types\EndSeasonRewardItem.cs" />
     <Compile Include="ECSSystem\Types\GravityType.cs" />

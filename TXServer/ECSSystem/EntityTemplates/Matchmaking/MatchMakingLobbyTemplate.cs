@@ -10,12 +10,13 @@ namespace TXServer.ECSSystem.EntityTemplates
     [SerialVersionUID(1495541167479)]
     public class MatchMakingLobbyTemplate : BattleLobbyTemplate
     {
-        public static Entity CreateEntity(Entity map, BattleMode mode, int userLimit, float gravity, GravityType gravityType)
+        public static Entity CreateEntity(Entity map, int maxPlayers, BattleMode battleMode, int timeLimit, int scoreLimit, bool friendlyFire,
+            float gravity, GravityType gravityType, bool killZoneEnabled, bool disabledModules)
         {
             Entity entity = new Entity(new TemplateAccessor(new MatchMakingLobbyTemplate(), null),
                 map.GetComponent<MapGroupComponent>(),
-                new BattleModeComponent(mode),
-                new UserLimitComponent(userLimit, userLimit / 2),
+                new BattleModeComponent(battleMode),
+                new UserLimitComponent(userLimit:maxPlayers, teamLimit:maxPlayers / 2),
                 new GravityComponent(gravity, gravityType)
                 // new MatchMakingLobbyStartingComponent()
             );

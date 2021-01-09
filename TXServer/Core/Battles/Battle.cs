@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -8,43 +9,164 @@ using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
-using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Matchmaking;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
+using System.Threading;
 
 namespace TXServer.Core.Battles
 {
     public class Battle
     {
-        public Battle() : this(20, GravityType.EARTH, null) { }
 
-        public Battle(int userLimit, GravityType gravity, BattleMode? battleMode)
+        public Battle(long? mapID, int? maxPlayers, BattleMode? battleMode, int? timeLimit, int? scoreLimit, bool? friendlyFire, GravityType? gravity, bool? killZoneEnabled, 
+            bool? disabledModules, bool isMatchMaking, Player owner)
         {
+
+            mapID = mapID ?? -1664220274;  // default: Rio
+            MaxPlayers = maxPlayers ?? 20;
+            timeLimit = timeLimit ?? 10;
+            scoreLimit = scoreLimit ?? 100;
+            friendlyFire = friendlyFire ?? false;
+            gravity = gravity ?? TXServer.ECSSystem.Types.GravityType.EARTH;
+            killZoneEnabled = killZoneEnabled ?? true;
+            disabledModules = disabledModules ?? false;
+            IsMatchMaking = isMatchMaking;
+
             if (battleMode == null)
             {
-                IsMatchMaking = true;
-
+                BattleMode = BattleMode.CTF; // todo implement all battle modes + random choice with correct probabilities
                 /*
                 BattleMode[] modes = (BattleMode[])Enum.GetValues(typeof(BattleMode));
                 lock (Random)
                     BattleMode = modes[Random.Next(modes.Length)];
                 */
-                BattleMode = BattleMode.CTF; // todo implement all battle modes
             }
             else
             {
                 BattleMode = battleMode.Value;
             }
 
-            MapEntity = Maps.GlobalItems.Rio;
-            BattleLobbyEntity = MatchMakingLobbyTemplate.CreateEntity(MapEntity, BattleMode, userLimit, GravityTypes[gravity], gravity);
+            if (IsMatchMaking is true)
+            {
+                if (mapID == null)
+                {
+                    var random = new Random();
+                    var matchMakingMaps = new List<Entity> { Maps.GlobalItems.Silence, Maps.GlobalItems.Nightiran, Maps.GlobalItems.Acidlake, Maps.GlobalItems.Sandbox,
+                        Maps.GlobalItems.Iran, Maps.GlobalItems.Area159, Maps.GlobalItems.Repin, Maps.GlobalItems.Westprime, Maps.GlobalItems.Boombox, Maps.GlobalItems.Silencemoon,
+                        Maps.GlobalItems.Rio, Maps.GlobalItems.MassacremarsBG, Maps.GlobalItems.Massacre, Maps.GlobalItems.Kungur };
+                    int index = random.Next(matchMakingMaps.Count);
+                    mapID = matchMakingMaps[index].EntityId;
+                }
+                ConvertMapParams((long)mapID, isMatchMaking);
+                BattleLobbyEntity = MatchMakingLobbyTemplate.CreateEntity(map: MapEntity, maxPlayers:MaxPlayers, BattleMode, timeLimit: (int)timeLimit,
+                    scoreLimit: (int)scoreLimit, friendlyFire: (bool)friendlyFire, gravity: GravityTypes[(GravityType)gravity], gravityType: GravityType.EARTH,
+                    killZoneEnabled: (bool)killZoneEnabled, disabledModules: (bool)disabledModules);
+            }
+            else
+            {
+                ConvertMapParams((long)mapID, isMatchMaking);
+                this.BattleMode = battleMode.Value;
+                Owner = owner;
+                BattleLobbyEntity = CustomBattleLobbyTemplate.CreateEntity(map:MapEntity, mapId:(long)mapID, maxPlayers:MaxPlayers, BattleMode, timeLimit:(int)timeLimit, 
+                    scoreLimit:(int)scoreLimit, friendlyFire:(bool)friendlyFire, gravity:GravityTypes[(GravityType)gravity], gravityType:GravityType.EARTH, 
+                    killZoneEnabled:(bool)killZoneEnabled, disabledModules:(bool)disabledModules);
+            }
+
             BattleEntity = (Entity)BattleEntityCreators[BattleMode].GetMethod("CreateEntity").Invoke(null, new object[] { BattleLobbyEntity, 5, 600, 120 });
             RedTeamEntity = TeamTemplate.CreateEntity(TeamColor.RED, BattleEntity);
             BlueTeamEntity = TeamTemplate.CreateEntity(TeamColor.BLUE, BattleEntity);
             RoundEntity = RoundTemplate.CreateEntity(BattleEntity);
-
             CollisionsComponent = BattleEntity.GetComponent<BattleTankCollisionsComponent>();
+
+            if (BattleMode == BattleMode.CTF)
+            {
+                // Rio pedestals/flags positions
+                // TODO: read specific positions from json
+                PedestalsPositions[0] = new Vector3(-6, 0, -65);
+                PedestalsPositions[1] = new Vector3(13, 0, 65);
+                FlagsPositions[0] = new Vector3(-6, 0, -65);
+                FlagsPositions[1] = new Vector3(13, 0, 65);
+
+                RedPedestalEntity = PedestalTemplate.CreateEntity(TeamColor.RED, PedestalsPositions[0], RedTeamEntity);
+                BluePedestalEntity = PedestalTemplate.CreateEntity(TeamColor.BLUE, PedestalsPositions[1], BlueTeamEntity);
+                RedFlagEntity = FlagTemplate.CreateEntity(TeamColor.RED, FlagsPositions[0], RedTeamEntity, new FlagHomeStateComponent());
+                BlueFlagEntity = FlagTemplate.CreateEntity(TeamColor.BLUE, FlagsPositions[1], BlueTeamEntity, new FlagHomeStateComponent());
+            }      
+        }
+
+        public void ConvertMapParams(long mapID, bool isMatchMaking)
+        {
+            switch (mapID)
+            {
+                case -321842153:
+                    MapEntity = Maps.GlobalItems.Silence;
+                    break;
+                case 343745828:
+                    MapEntity = Maps.GlobalItems.Nightiran;
+                    break;
+                case 485053206:
+                    MapEntity = Maps.GlobalItems.Acidlake;
+                    break;
+                case -820833801:
+                    MapEntity = Maps.GlobalItems.Acidlakehalloween;
+                    break;
+                case 458045295:
+                    MapEntity = Maps.GlobalItems.Testbox;
+                    if (isMatchMaking)
+                    {
+                        MaxPlayers = 8;
+                    }
+                    break;
+                case -549069251:
+                    MapEntity = Maps.GlobalItems.Sandbox;
+                    if (isMatchMaking)
+                    {
+                        MaxPlayers = 8;
+                    }
+                    break;
+                case -51480736:
+                    MapEntity = Maps.GlobalItems.Iran;
+                    break;
+                case 1133979230:
+                    MapEntity = Maps.GlobalItems.Area159;
+                    if (isMatchMaking)
+                    {
+                        MaxPlayers = 8;
+                    }
+                    break;
+                case -1587964040:
+                    MapEntity = Maps.GlobalItems.Repin;
+                    break;
+                case 980475942:
+                    MapEntity = Maps.GlobalItems.Westprime;
+                    break;
+                case 1945237110:
+                    MapEntity = Maps.GlobalItems.Boombox;
+                    if (isMatchMaking)
+                    {
+                        MaxPlayers = 8;
+                    }
+                    break;
+                case 933129112:
+                    MapEntity = Maps.GlobalItems.Silencemoon;
+                    break;
+                case -1664220274:
+                    MapEntity = Maps.GlobalItems.Rio;
+                    break;
+                case 989096365:
+                    MapEntity = Maps.GlobalItems.MassacremarsBG;
+                    break;
+                case -1551247853:
+                    MapEntity = Maps.GlobalItems.Massacre;
+                    break;
+                case 2127033418:
+                    MapEntity = Maps.GlobalItems.Kungur;
+                    break;
+                default:
+                    MapEntity = Maps.GlobalItems.Rio;
+                    break;
+            }
         }
 
         public void AddPlayer(Player player)
@@ -99,6 +221,7 @@ namespace TXServer.Core.Battles
 
         private void RemovePlayer(BattleLobbyPlayer battlePlayer)
         {
+
             if (!RedTeamPlayers.Remove(battlePlayer))
                 BlueTeamPlayers.Remove(battlePlayer);
             WaitingToJoinPlayers.Remove(battlePlayer);
@@ -112,6 +235,7 @@ namespace TXServer.Core.Battles
                 new ComponentRemoveCommand(battlePlayer.User, typeof(TeamColorComponent)),
                 new ComponentRemoveCommand(battlePlayer.User, typeof(BattleLobbyGroupComponent))
             };
+
             if (IsMatchMaking)
                 commands.Add(new ComponentRemoveCommand(battlePlayer.User, typeof(MatchMakingUserComponent)));
 
@@ -121,9 +245,13 @@ namespace TXServer.Core.Battles
             }
 
             CommandManager.SendCommandsSafe(battlePlayer.Player, commands);
-
             CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
                 new EntityUnshareCommand(battlePlayer.User));
+
+            if (!IsMatchMaking && (RedTeamPlayers.Count + BlueTeamPlayers.Count) < 1)
+            {
+                ServerConnection.BattlePool.RemoveAll(p => (p.RedTeamPlayers.Count + p.BlueTeamPlayers.Count) < 1 && p.IsMatchMaking is false);
+            }
         }
 
         private void StartBattle()
@@ -143,6 +271,18 @@ namespace TXServer.Core.Battles
                 new EntityShareCommand(BattleEntity),
                 new EntityShareCommand(RoundEntity)
             };
+
+            if (BattleMode == BattleMode.CTF)
+            {
+                ICommand[] flagsPedestalsICommands =
+                {
+                    new EntityShareCommand(RedPedestalEntity),
+                    new EntityShareCommand(BluePedestalEntity),
+                    new EntityShareCommand(RedFlagEntity),
+                    new EntityShareCommand(BlueFlagEntity)
+                };
+                commands.AddRange(flagsPedestalsICommands);
+            }
 
             foreach (BattleLobbyPlayer inBattlePlayer in BattlePlayers)
             {
@@ -167,6 +307,18 @@ namespace TXServer.Core.Battles
                 new EntityUnshareCommand(BattleEntity),
                 new EntityUnshareCommand(RoundEntity)
             };
+
+            if (BattleMode == BattleMode.CTF)
+            {
+                ICommand[] flagsPedestalsICommands =
+                {
+                    new EntityUnshareCommand(RedPedestalEntity),
+                    new EntityUnshareCommand(BluePedestalEntity),
+                    new EntityUnshareCommand(RedFlagEntity),
+                    new EntityUnshareCommand(BlueFlagEntity)
+                };
+                commands.AddRange(flagsPedestalsICommands);
+            }
 
             foreach (BattleLobbyPlayer inBattlePlayer in BattlePlayers)
             {
@@ -223,8 +375,9 @@ namespace TXServer.Core.Battles
 
                     if (RedTeamPlayers.Count != BlueTeamPlayers.Count)
                     {
+                        Thread.Sleep(1000); // TODO: find a better solution for this (client crash when no delay)
                         CommandManager.SendCommandsSafe(RedTeamPlayers.Concat(BlueTeamPlayers).First().Player,
-                            new ComponentRemoveCommand(BattleLobbyEntity, typeof(MatchMakingLobbyStartTimeComponent)));
+                                                    new ComponentRemoveCommand(BattleLobbyEntity, typeof(MatchMakingLobbyStartTimeComponent)));
                         BattleState = BattleState.NotEnoughPlayers;
                     }
 
@@ -368,31 +521,40 @@ namespace TXServer.Core.Battles
         private static readonly Dictionary<GravityType, float> GravityTypes = new Dictionary<GravityType, float>
         {
             { GravityType.EARTH, 9.81f },
+            { GravityType.SUPER_EARTH, 30 },
+            { GravityType.MOON, 1.62f },
+            { GravityType.MARS, 3.71f }
         };
 
-        private static readonly Random Random = new Random();
-
+        public Entity MapEntity { get; private set; }
         public BattleMode BattleMode { get; private set; }
-
+        public int MaxPlayers { get; private set; }
         public bool IsMatchMaking { get; }
+        public int TimeLimit { get; }
+        public int ScoreLimit { get; }
+        public bool FriendlyFire { get; }
         public BattleState BattleState { get; private set; }
         public double CountdownTimer { get; private set; }
 
-        private List<BattleLobbyPlayer> RedTeamPlayers { get; } = new List<BattleLobbyPlayer>();
-        private List<BattleLobbyPlayer> BlueTeamPlayers { get; } = new List<BattleLobbyPlayer>();
+        public List<BattleLobbyPlayer> RedTeamPlayers { get; } = new List<BattleLobbyPlayer>();
+        public List<BattleLobbyPlayer> BlueTeamPlayers { get; } = new List<BattleLobbyPlayer>();
 
         private List<BattleLobbyPlayer> BattlePlayers { get; } = new List<BattleLobbyPlayer>();
         private List<BattleLobbyPlayer> WaitingToJoinPlayers { get; } = new List<BattleLobbyPlayer>();
 
         public Entity BattleEntity { get; }
         public Entity BattleLobbyEntity { get; }
-        public Entity MapEntity { get; }
         public Entity RoundEntity { get; }
         public BattleTankCollisionsComponent CollisionsComponent { get; }
 
         public Entity RedTeamEntity { get; }
         public Entity BlueTeamEntity { get; }
-
+        public Entity RedPedestalEntity { get; }
+        public Entity BluePedestalEntity { get; }
+        public Entity RedFlagEntity { get; }
+        public Entity BlueFlagEntity { get; }
+        private static readonly Vector3[] PedestalsPositions = new Vector3[2];
+        private static readonly Vector3[] FlagsPositions = new Vector3[2];
         public Player Owner { get; set; }
     }
 }

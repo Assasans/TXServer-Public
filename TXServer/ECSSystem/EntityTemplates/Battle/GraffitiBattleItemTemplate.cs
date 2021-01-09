@@ -15,8 +15,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
             return new Entity(new TemplateAccessor(new GraffitiBattleItemTemplate(), userItem.TemplateAccessor.ConfigPath),
                 new GraffitiBattleItemComponent(),
                 tank.GetComponent<UserGroupComponent>(),
-                tank.GetComponent<BattleGroupComponent>(),
-                tank.GetComponent<TankGroupComponent>(),
                 userItem.GetComponent<MarketItemGroupComponent>());
         }
     }
