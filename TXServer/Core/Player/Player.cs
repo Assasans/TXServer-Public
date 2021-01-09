@@ -11,6 +11,7 @@ using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.GlobalEntities;
+using TXServer.ECSSystem.Types;
 using TXServer.Library;
 
 namespace TXServer.Core
@@ -106,6 +107,7 @@ namespace TXServer.Core
 				new UserSubscribeComponent(),
 				new KillsEquipmentStatisticsComponent(),
 				new BattleLeaveCounterComponent(),
+				new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(6, 0, 0))),
 				new UserReputationComponent(0.0));
 
 			if (Data.Admin) user.Components.Add(new UserAdminComponent());

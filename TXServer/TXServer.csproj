@@ -161,6 +161,7 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponStreamShootingComponent.cs" />
     <Compile Include="ECSSystem\Components\Matchmaking\ClientBattleParamsComponent.cs" />
     <Compile Include="ECSSystem\Components\Matchmaking\CustomBattleLobbyComponent.cs" />
+    <Compile Include="ECSSystem\Components\User\PremiumAccountBoostComponent.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\Flags\FlagTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\Flags\PedestalTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FlamethrowerBattleItemTemplate.cs" />
