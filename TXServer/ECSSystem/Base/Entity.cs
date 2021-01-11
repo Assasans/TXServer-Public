@@ -83,6 +83,11 @@ namespace TXServer.ECSSystem.Base
             }
         }
 
+        public override string ToString()
+        {
+            return $"[Id: {EntityId}, TemplateAccessor: {TemplateAccessor}, Components: {Components.Count}]";
+        }
+
         public override int GetHashCode() => EntityId.GetHashCode();
 
         public long EntityId { get; set; }

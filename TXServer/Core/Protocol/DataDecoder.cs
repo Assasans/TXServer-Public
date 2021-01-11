@@ -286,7 +286,10 @@ namespace TXServer.Core.Protocol
             Int32 mapLength, length;
 
             // Magic.
-            if (!reader.ReadBytes(2).SequenceEqual(Magic))
+            byte[] readMagic = reader.ReadBytes(2);
+            if (readMagic.Length < 2)
+                throw new IOException("Unexpected client error.");
+            else if (!readMagic.SequenceEqual(Magic))
                 throw new FileFormatException();
 
             // Length values.

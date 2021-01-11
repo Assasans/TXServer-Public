@@ -18,7 +18,6 @@ namespace TXServer.Core.Battles
 {
     public class Battle
     {
-
         public Battle(long? mapID, int? maxPlayers, BattleMode? battleMode, int? timeLimit, int? scoreLimit, bool? friendlyFire, GravityType? gravity, bool? killZoneEnabled, 
             bool? disabledModules, bool isMatchMaking, Player owner)
         {
@@ -28,7 +27,7 @@ namespace TXServer.Core.Battles
             timeLimit = timeLimit ?? 10;
             scoreLimit = scoreLimit ?? 100;
             friendlyFire = friendlyFire ?? false;
-            gravity = gravity ?? TXServer.ECSSystem.Types.GravityType.EARTH;
+            gravity = gravity ?? GravityType.EARTH;
             killZoneEnabled = killZoneEnabled ?? true;
             disabledModules = disabledModules ?? false;
             IsMatchMaking = isMatchMaking;
@@ -47,7 +46,7 @@ namespace TXServer.Core.Battles
                 BattleMode = battleMode.Value;
             }
 
-            if (IsMatchMaking is true)
+            if (IsMatchMaking)
             {
                 if (mapID == null)
                 {
@@ -221,7 +220,6 @@ namespace TXServer.Core.Battles
 
         private void RemovePlayer(BattleLobbyPlayer battlePlayer)
         {
-
             if (!RedTeamPlayers.Remove(battlePlayer))
                 BlueTeamPlayers.Remove(battlePlayer);
             WaitingToJoinPlayers.Remove(battlePlayer);
@@ -250,7 +248,7 @@ namespace TXServer.Core.Battles
 
             if (!IsMatchMaking && (RedTeamPlayers.Count + BlueTeamPlayers.Count) < 1)
             {
-                ServerConnection.BattlePool.RemoveAll(p => (p.RedTeamPlayers.Count + p.BlueTeamPlayers.Count) < 1 && p.IsMatchMaking is false);
+                ServerConnection.BattlePool.RemoveAll(p => (p.RedTeamPlayers.Count + p.BlueTeamPlayers.Count) < 1 && !p.IsMatchMaking);
             }
         }
 
@@ -377,7 +375,7 @@ namespace TXServer.Core.Battles
                     {
                         Thread.Sleep(1000); // TODO: find a better solution for this (client crash when no delay)
                         CommandManager.SendCommandsSafe(RedTeamPlayers.Concat(BlueTeamPlayers).First().Player,
-                                                    new ComponentRemoveCommand(BattleLobbyEntity, typeof(MatchMakingLobbyStartTimeComponent)));
+                            new ComponentRemoveCommand(BattleLobbyEntity, typeof(MatchMakingLobbyStartTimeComponent)));
                         BattleState = BattleState.NotEnoughPlayers;
                     }
 

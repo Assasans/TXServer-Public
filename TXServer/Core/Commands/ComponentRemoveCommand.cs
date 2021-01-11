@@ -32,6 +32,11 @@ namespace TXServer.Core.Commands
             Target.RemoveComponent(ComponentType);
         }
 
+        public override string ToString()
+        {
+            return $"ComponentRemoveCommand [Entity: {Target}, Component: {ComponentType.Name}]";
+        }
+
         [ProtocolFixed] public Entity Target { get; set; }
         [ProtocolFixed] public Type ComponentType { get; set; }
 

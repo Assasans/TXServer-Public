@@ -10,6 +10,11 @@ namespace TXServer.Core.Commands
 
         public void OnReceive(Player player) => throw new NotSupportedException();
 
+        public override string ToString()
+        {
+            return $"InitTimeCommand [ServerTime: {ServerTime}]";
+        }
+
         [ProtocolFixed] public Int64 ServerTime { get; set; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
     }
 }

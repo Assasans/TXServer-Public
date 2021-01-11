@@ -17,6 +17,8 @@ namespace TXServer.Core.Commands
         /// </summary>
         public static readonly byte[] Magic = { 0xff, 0x00 };
 
+        public static bool EnableTracing { get; set; }
+
         /// <summary>
         /// Receive data from client.
         /// </summary>
@@ -29,8 +31,10 @@ namespace TXServer.Core.Commands
 
 #if DEBUG
                 connection.Player.LastClientPacket = commands;
+                if (EnableTracing)
+                    Console.WriteLine($"Received from {connection.Socket.RemoteEndPoint}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}");
 #endif
-                
+
                 foreach (ICommand command in commands)
                 {
                     command.OnReceive(connection.Player);
@@ -74,6 +78,8 @@ namespace TXServer.Core.Commands
 
 #if DEBUG
             player.LastServerPacket = commands;
+            if (EnableTracing)
+                Console.WriteLine($"Sent to {player.Connection.Socket.RemoteEndPoint}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}");
 #endif
 
             using (MemoryStream buffer = new MemoryStream())

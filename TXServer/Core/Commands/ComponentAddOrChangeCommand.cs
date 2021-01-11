@@ -36,6 +36,11 @@ namespace TXServer.Core.Commands
             return Interlocked.Exchange(ref addOrChangeDone, 1) == 0;
         }
 
+        public override string ToString()
+        {
+            return $"{GetType().Name} [Entity: {Target}, Component: {Component}]";
+        }
+
         protected abstract void AddOrChangeComponent();
 
         [ProtocolFixed] public Entity Target { get; set; }

@@ -23,6 +23,11 @@ namespace TXServer.Core.Commands
             throw new NotSupportedException();
         }
 
+        public override string ToString()
+        {
+            return $"EntityUnshareCommand [Entity: {Entity}]";
+        }
+
         [ProtocolFixed] public Entity Entity { get; }
     }
 }

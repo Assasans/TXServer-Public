@@ -10,6 +10,11 @@ namespace TXServer.ECSSystem.Base
             this.ConfigPath = ConfigPath;
         }
 
+        public override string ToString()
+        {
+            return $"[{Template.GetType().Name}, \"{ConfigPath}\"]";
+        }
+
         [ProtocolFixed] public IEntityTemplate Template { get; set; }
         [ProtocolFixed][OptionalMapped] public string ConfigPath { get; set; }
     }

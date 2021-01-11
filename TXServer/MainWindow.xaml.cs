@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using TXServer.Core;
@@ -62,6 +61,7 @@ namespace TXServer
                 SettingsGroupBox.IsEnabled = false;
 
                 ServerLauncher.InitServer(IPAddressComboBox.SelectedItem as IPAddress, short.Parse(PortTextBox.Text), int.Parse(MaxPlayersTextBox.Text));
+                Core.Commands.CommandManager.EnableTracing = EnableTracingCheckBox.IsChecked.GetValueOrDefault();
 
                 StartButton.Content = "Stop";
             }

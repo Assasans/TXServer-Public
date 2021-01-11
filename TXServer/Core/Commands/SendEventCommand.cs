@@ -57,6 +57,11 @@ namespace TXServer.Core.Commands
                 throw new MissingMethodException(Event.GetType().Name, string.Format("Execute({0})", Entities.Length));
         }
 
+        public override string ToString()
+        {
+            return $"SendEventCommand [Event: {Event}, Entities: {String.Join(", ", Entities.Select(x => x.ToString()))}]";
+        }
+
         [ProtocolFixed] public ECSEvent Event { get; set; }
         [ProtocolFixed] public Entity[] Entities { get; set; }
     }

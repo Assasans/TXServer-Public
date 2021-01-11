@@ -31,6 +31,11 @@ namespace TXServer.Core.Commands
             throw new NotSupportedException();
         }
 
+        public override string ToString()
+        {
+            return $"EntityShareCommand [Entity: {Entity}]";
+        }
+
         private Entity Entity { get; }
 
         [ProtocolFixed] public Int64 EntityId { get; private set; }
