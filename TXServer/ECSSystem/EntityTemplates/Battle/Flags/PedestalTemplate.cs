@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(1431942342249L)]
     public class PedestalTemplate : IEntityTemplate
     {
-        public static Entity CreateEntity(TeamColor color, Vector3 position, Entity team)
+        public static Entity CreateEntity(Vector3 position, Entity team)
         {
             Entity entity = new Entity(new TemplateAccessor(new PedestalTemplate(), "battle/modes/ctf"),
                 new FlagPedestalComponent(position)

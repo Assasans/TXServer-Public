@@ -17,7 +17,7 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
@@ -58,6 +58,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Tanki-X-Revive-Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -161,6 +164,8 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponStreamShootingComponent.cs" />
     <Compile Include="ECSSystem\Components\Matchmaking\ClientBattleParamsComponent.cs" />
     <Compile Include="ECSSystem\Components\Matchmaking\CustomBattleLobbyComponent.cs" />
+    <Compile Include="ECSSystem\Components\Matchmaking\OpenCustomLobbyPriceComponent.cs" />
+    <Compile Include="ECSSystem\Components\Matchmaking\OpenToConnectLobbyComponent.cs" />
     <Compile Include="ECSSystem\Components\User\PremiumAccountBoostComponent.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\Flags\FlagTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\Flags\PedestalTemplate.cs" />
@@ -332,8 +337,11 @@
     <Compile Include="ECSSystem\Events\Matchmaking\MatchMakingLobbyStartingEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\MatchMakingLobbyStartTimeEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\MatchMakingUserReadyEvent.cs" />
+    <Compile Include="ECSSystem\Events\Matchmaking\OpenCustomLobbyEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\SetEquipmentEvent.cs" />
+    <Compile Include="ECSSystem\Events\Matchmaking\StartBattleEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\SwitchTeamEvent.cs" />
+    <Compile Include="ECSSystem\Events\Matchmaking\UpdateBattleParamsEvent.cs" />
     <Compile Include="ECSSystem\Events\Notification\NotificationShownEvent.cs" />
     <Compile Include="ECSSystem\Events\Notification\ShowNotificationGroupEvent.cs" />
     <Compile Include="ECSSystem\Events\Payment\PaymentStatisticsEvent.cs" />
@@ -745,6 +753,9 @@
     <Analyzer Include="..\packages\Microsoft.NetCore.Analyzers.2.9.6\analyzers\dotnet\cs\Microsoft.NetCore.CSharp.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.2.9.6\analyzers\dotnet\cs\Microsoft.NetFramework.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.2.9.6\analyzers\dotnet\cs\Microsoft.NetFramework.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Tanki-X-Revive-Icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

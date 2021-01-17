@@ -17,12 +17,12 @@ namespace TXServer.ECSSystem.Events.Battle
 			bool found = false;
 			foreach (TXServer.Core.Battles.Battle battle in ServerConnection.BattlePool.ToArray())
 			{
-				// TODO: enable "open lobby" feature in custom battle lobby and let users join to battle with specific battle code
-				if (!battle.IsMatchMaking)
+				// TODO: let users join with battle entity as battle code
+				if (battle.IsOpen)
 			    {
 					var fetchedBattle = ServerConnection.BattlePool[ServerConnection.BattlePool.Count - 1];
 
-					if ((fetchedBattle.RedTeamPlayers.Count + fetchedBattle.BlueTeamPlayers.Count) >= fetchedBattle.MaxPlayers)
+					if ((fetchedBattle.RedTeamPlayers.Count + fetchedBattle.BlueTeamPlayers.Count) >= fetchedBattle.BattleParams.MaxPlayers)
                     {
 						CommandManager.SendCommands(player,
 						new SendEventCommand(new EnterBattleLobbyFailedEvent(alreadyInLobby:false, lobbyIsFull:true), player.User));
@@ -31,7 +31,6 @@ namespace TXServer.ECSSystem.Events.Battle
                     {
 						ServerConnection.BattlePool[ServerConnection.BattlePool.Count - 1].AddPlayer(player);
 					}
-			        
 			        found = true;
 			        break;
 			    }
@@ -41,7 +40,6 @@ namespace TXServer.ECSSystem.Events.Battle
 				CommandManager.SendCommands(player,
 						new SendEventCommand(new CustomLobbyNotExistsEvent(), player.User));
 			}
-
 		}
 		public long LobbyId { get; set; }
 	}

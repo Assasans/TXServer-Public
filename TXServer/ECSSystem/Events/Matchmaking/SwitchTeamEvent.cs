@@ -13,17 +13,18 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity mode)
 		{
-			foreach (TXServer.Core.Battles.Battle battle in ServerConnection.BattlePool)
+			foreach (Core.Battles.Battle battle in ServerConnection.BattlePool)
             {
-				if (battle.BattleMode != BattleMode.DM)
+				if (battle.BattleParams.BattleMode != BattleMode.DM)
                 {
 					if (battle.RedTeamPlayers.Contains(player.BattleLobbyPlayer))
 					{
 						battle.RedTeamPlayers.Remove(player.BattleLobbyPlayer);
 						player.BattleLobbyPlayer = new BattleLobbyPlayer(player, battle.BlueTeamEntity);
 						battle.BlueTeamPlayers.Add(player.BattleLobbyPlayer);
-						CommandManager.SendCommands(player, new ComponentRemoveCommand(player.User, typeof(TeamColorComponent)));
-						CommandManager.SendCommands(player, new ComponentAddCommand(player.User, new TeamColorComponent(TeamColor.BLUE)));
+						CommandManager.SendCommands(player, 
+							new ComponentRemoveCommand(player.User, typeof(TeamColorComponent)),
+							new ComponentAddCommand(player.User, new TeamColorComponent(TeamColor.BLUE)));
 						break;
 					}
 					if (battle.BlueTeamPlayers.Contains(player.BattleLobbyPlayer))
@@ -31,8 +32,9 @@ namespace TXServer.ECSSystem.Events.Battle
 						battle.BlueTeamPlayers.Remove(player.BattleLobbyPlayer);
 						player.BattleLobbyPlayer = new BattleLobbyPlayer(player, battle.RedTeamEntity);
 						battle.RedTeamPlayers.Add(player.BattleLobbyPlayer);
-						CommandManager.SendCommands(player, new ComponentRemoveCommand(player.User, typeof(TeamColorComponent)));
-						CommandManager.SendCommands(player, new ComponentAddCommand(player.User, new TeamColorComponent(TeamColor.RED)));
+						CommandManager.SendCommands(player, 
+							new ComponentRemoveCommand(player.User, typeof(TeamColorComponent)),
+							new ComponentAddCommand(player.User, new TeamColorComponent(TeamColor.RED)));
 						break;
 					}
 				}

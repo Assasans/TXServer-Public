@@ -13,10 +13,6 @@ namespace TXServer.ECSSystem.Events.Battle
 			AlreadyInLobby = alreadyInLobby;
 			LobbyIsFull = lobbyIsFull;
 		}
-		public void Execute(Player player, Entity mode)
-		{
-			LobbyIsFull = true;
-		}
 		public bool AlreadyInLobby { get; set; }
 		public bool LobbyIsFull { get; set; }
 	}

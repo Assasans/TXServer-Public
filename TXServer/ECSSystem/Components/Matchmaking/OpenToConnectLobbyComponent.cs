@@ -3,9 +3,8 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Components
 {
-    [SerialVersionUID(1497442440245)]
-    public class MatchMakingUserReadyComponent : Component
+    [SerialVersionUID(1547721316362L)]
+    public class OpenToConnectLobbyComponent : Component
     {
-
     }
 }

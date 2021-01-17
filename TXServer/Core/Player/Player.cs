@@ -107,10 +107,17 @@ namespace TXServer.Core
 				new UserSubscribeComponent(),
 				new KillsEquipmentStatisticsComponent(),
 				new BattleLeaveCounterComponent(),
-				new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(6, 0, 0))),
-				new UserReputationComponent(0.0));
+				//new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(12, 0, 0))),
+			    new UserReputationComponent(0.0));
 
-			if (Data.Admin) user.Components.Add(new UserAdminComponent());
+			if (Data.Admin)
+			{
+				user.Components.Add(new UserAdminComponent());
+			    if (user.GetComponent<PremiumAccountBoostComponent>() == null)
+                {
+					user.Components.Add(new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(23999976, 0, 0))));
+                }
+			}
 			if (Data.Beta) user.Components.Add(new ClosedBetaQuestAchievementComponent());
 
 			User = user;

@@ -13,6 +13,7 @@ using System.Windows;
 using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Events.Ping;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core
 {
@@ -218,8 +219,10 @@ namespace TXServer.Core
 
         public void BattleLoop()
         {
-            BattlePool.Add(new Battle(mapID:null, maxPlayers:null, timeLimit:null, scoreLimit: null, battleMode:null, friendlyFire:null, 
-                gravity: TXServer.ECSSystem.Types.GravityType.EARTH, killZoneEnabled:null, disabledModules:null, isMatchMaking: true, owner:null));
+            if (BattlePool.Count == 0)
+            {
+                BattlePool.Add(new Battle(battleParams:null, isMatchMaking: true, owner: null));
+            }
             GlobalBattle = BattlePool[0];
 
             Stopwatch stopwatch = new Stopwatch();

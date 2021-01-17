@@ -1,7 +1,5 @@
 ﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Types;
-using TXServer.Core;
 
 namespace TXServer.ECSSystem.Events.Battle
 {

@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Protocol;
+﻿using TXServer.Core;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Types;
@@ -8,20 +9,25 @@ namespace TXServer.ECSSystem.EntityTemplates
     [SerialVersionUID(1498460950985L)]
     public class CustomBattleLobbyTemplate : IEntityTemplate
     {
-        public static Entity CreateEntity(Entity map, long mapId, int maxPlayers, BattleMode battleMode, int timeLimit, int scoreLimit, bool friendlyFire, 
-            float gravity, GravityType gravityType, bool killZoneEnabled,bool disabledModules)
+        public static Entity CreateEntity(ClientBattleParams battleParams, Entity map, float gravity, Player owner)
         {
             Entity entity = new Entity(new TemplateAccessor(new CustomBattleLobbyTemplate(), null),
                 map.GetComponent<MapGroupComponent>(),
-                new BattleModeComponent(battleMode),
-                new UserLimitComponent(userLimit:maxPlayers, teamLimit:maxPlayers / 2),
-                new GravityComponent(gravity, gravityType)
+                new BattleModeComponent(battleParams.BattleMode),
+                new UserLimitComponent(userLimit:battleParams.MaxPlayers, teamLimit:battleParams.MaxPlayers / 2),
+                new GravityComponent(gravity, battleParams.Gravity)
             );
-            entity.Components.Add(new UserGroupComponent(entity));
+            entity.Components.Add(new UserGroupComponent(owner.User));
             entity.Components.Add(new BattleLobbyGroupComponent(entity));
-            ClientBattleParams customParams = new TXServer.ECSSystem.Types.ClientBattleParams(BattleMode:battleMode, MapId:mapId, MaxPlayers:maxPlayers, TimeLimit:timeLimit, 
-                ScoreLimit:scoreLimit, FriendlyFire:friendlyFire, Gravity:gravityType, KillZoneEnabled:killZoneEnabled, DisabledModules:disabledModules);
-            entity.Components.Add(new ClientBattleParamsComponent(customParams));
+            entity.Components.Add(new ClientBattleParamsComponent(battleParams));
+            
+            int price = 1000;  // 1000 Blue-Crystals standard price for opening custom battles
+            if (owner.User.GetComponent<PremiumAccountBoostComponent>() != null)
+            {
+                price = 0;  // official premium pass feature: open custom battles for free
+            }      
+            entity.Components.Add(new OpenCustomLobbyPriceComponent(price));
+
             return entity;
         }
     }

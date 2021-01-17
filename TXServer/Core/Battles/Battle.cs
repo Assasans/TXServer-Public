@@ -13,72 +13,47 @@ using TXServer.ECSSystem.Events.Matchmaking;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 using System.Threading;
+using TXServer.ECSSystem.Components.Battle.Team;
 
 namespace TXServer.Core.Battles
 {
     public class Battle
     {
-        public Battle(long? mapID, int? maxPlayers, BattleMode? battleMode, int? timeLimit, int? scoreLimit, bool? friendlyFire, GravityType? gravity, bool? killZoneEnabled, 
-            bool? disabledModules, bool isMatchMaking, Player owner)
+        public Battle(ClientBattleParams battleParams, bool isMatchMaking, Player owner)
         {
 
-            mapID = mapID ?? -1664220274;  // default: Rio
-            MaxPlayers = maxPlayers ?? 20;
-            timeLimit = timeLimit ?? 10;
-            scoreLimit = scoreLimit ?? 100;
-            friendlyFire = friendlyFire ?? false;
-            gravity = gravity ?? GravityType.EARTH;
-            killZoneEnabled = killZoneEnabled ?? true;
-            disabledModules = disabledModules ?? false;
+            BattleParams = battleParams;
             IsMatchMaking = isMatchMaking;
 
-            if (battleMode == null)
+            if (isMatchMaking)
             {
-                BattleMode = BattleMode.CTF; // todo implement all battle modes + random choice with correct probabilities
-                /*
-                BattleMode[] modes = (BattleMode[])Enum.GetValues(typeof(BattleMode));
-                lock (Random)
-                    BattleMode = modes[Random.Next(modes.Length)];
-                */
-            }
-            else
-            {
-                BattleMode = battleMode.Value;
-            }
-
-            if (IsMatchMaking)
-            {
-                if (mapID == null)
-                {
-                    var random = new Random();
-                    var matchMakingMaps = new List<Entity> { Maps.GlobalItems.Silence, Maps.GlobalItems.Nightiran, Maps.GlobalItems.Acidlake, Maps.GlobalItems.Sandbox,
-                        Maps.GlobalItems.Iran, Maps.GlobalItems.Area159, Maps.GlobalItems.Repin, Maps.GlobalItems.Westprime, Maps.GlobalItems.Boombox, Maps.GlobalItems.Silencemoon,
-                        Maps.GlobalItems.Rio, Maps.GlobalItems.MassacremarsBG, Maps.GlobalItems.Massacre, Maps.GlobalItems.Kungur };
-                    int index = random.Next(matchMakingMaps.Count);
-                    mapID = matchMakingMaps[index].EntityId;
+                int index = new Random().Next(MatchMakingMaps.Count);
+                if (battleParams == null) {
+                    battleParams = new ClientBattleParams(BattleMode: BattleMode.CTF, MapId: MatchMakingMaps[index].EntityId, MaxPlayers: 20, TimeLimit: 10, 
+                        ScoreLimit: 100, FriendlyFire: false, Gravity: GravityType.EARTH, KillZoneEnabled: true, DisabledModules: false);
                 }
-                ConvertMapParams((long)mapID, isMatchMaking);
-                BattleLobbyEntity = MatchMakingLobbyTemplate.CreateEntity(map: MapEntity, maxPlayers:MaxPlayers, BattleMode, timeLimit: (int)timeLimit,
-                    scoreLimit: (int)scoreLimit, friendlyFire: (bool)friendlyFire, gravity: GravityTypes[(GravityType)gravity], gravityType: GravityType.EARTH,
-                    killZoneEnabled: (bool)killZoneEnabled, disabledModules: (bool)disabledModules);
+                var tuple = ConvertMapParams(battleParams, isMatchMaking);
+                MapEntity = tuple.Item1;
+                MapEntity = Maps.GlobalItems.Rio; // our test map
+                battleParams.MaxPlayers = tuple.Item2;
+                BattleParams = battleParams;
+                BattleLobbyEntity = MatchMakingLobbyTemplate.CreateEntity(battleParams, MapEntity, GravityTypes[(GravityType)battleParams.Gravity]);
             }
             else
             {
-                ConvertMapParams((long)mapID, isMatchMaking);
-                this.BattleMode = battleMode.Value;
+                var tuple = ConvertMapParams(battleParams, isMatchMaking);
+                MapEntity = tuple.Item1;
                 Owner = owner;
-                BattleLobbyEntity = CustomBattleLobbyTemplate.CreateEntity(map:MapEntity, mapId:(long)mapID, maxPlayers:MaxPlayers, BattleMode, timeLimit:(int)timeLimit, 
-                    scoreLimit:(int)scoreLimit, friendlyFire:(bool)friendlyFire, gravity:GravityTypes[(GravityType)gravity], gravityType:GravityType.EARTH, 
-                    killZoneEnabled:(bool)killZoneEnabled, disabledModules:(bool)disabledModules);
+                BattleLobbyEntity = CustomBattleLobbyTemplate.CreateEntity(battleParams, MapEntity, GravityTypes[(GravityType)battleParams.Gravity], owner);
             }
 
-            BattleEntity = (Entity)BattleEntityCreators[BattleMode].GetMethod("CreateEntity").Invoke(null, new object[] { BattleLobbyEntity, 5, 600, 120 });
+            BattleEntity = (Entity)BattleEntityCreators[BattleParams.BattleMode].GetMethod("CreateEntity").Invoke(null, new object[] { BattleLobbyEntity, 5, 600, 120 });
             RedTeamEntity = TeamTemplate.CreateEntity(TeamColor.RED, BattleEntity);
             BlueTeamEntity = TeamTemplate.CreateEntity(TeamColor.BLUE, BattleEntity);
             RoundEntity = RoundTemplate.CreateEntity(BattleEntity);
             CollisionsComponent = BattleEntity.GetComponent<BattleTankCollisionsComponent>();
 
-            if (BattleMode == BattleMode.CTF)
+            if (BattleParams.BattleMode == BattleMode.CTF)
             {
                 // Rio pedestals/flags positions
                 // TODO: read specific positions from json
@@ -87,95 +62,133 @@ namespace TXServer.Core.Battles
                 FlagsPositions[0] = new Vector3(-6, 0, -65);
                 FlagsPositions[1] = new Vector3(13, 0, 65);
 
-                RedPedestalEntity = PedestalTemplate.CreateEntity(TeamColor.RED, PedestalsPositions[0], RedTeamEntity);
-                BluePedestalEntity = PedestalTemplate.CreateEntity(TeamColor.BLUE, PedestalsPositions[1], BlueTeamEntity);
-                RedFlagEntity = FlagTemplate.CreateEntity(TeamColor.RED, FlagsPositions[0], RedTeamEntity, new FlagHomeStateComponent());
-                BlueFlagEntity = FlagTemplate.CreateEntity(TeamColor.BLUE, FlagsPositions[1], BlueTeamEntity, new FlagHomeStateComponent());
-            }      
-        }
-
-        public void ConvertMapParams(long mapID, bool isMatchMaking)
-        {
-            switch (mapID)
-            {
-                case -321842153:
-                    MapEntity = Maps.GlobalItems.Silence;
-                    break;
-                case 343745828:
-                    MapEntity = Maps.GlobalItems.Nightiran;
-                    break;
-                case 485053206:
-                    MapEntity = Maps.GlobalItems.Acidlake;
-                    break;
-                case -820833801:
-                    MapEntity = Maps.GlobalItems.Acidlakehalloween;
-                    break;
-                case 458045295:
-                    MapEntity = Maps.GlobalItems.Testbox;
-                    if (isMatchMaking)
-                    {
-                        MaxPlayers = 8;
-                    }
-                    break;
-                case -549069251:
-                    MapEntity = Maps.GlobalItems.Sandbox;
-                    if (isMatchMaking)
-                    {
-                        MaxPlayers = 8;
-                    }
-                    break;
-                case -51480736:
-                    MapEntity = Maps.GlobalItems.Iran;
-                    break;
-                case 1133979230:
-                    MapEntity = Maps.GlobalItems.Area159;
-                    if (isMatchMaking)
-                    {
-                        MaxPlayers = 8;
-                    }
-                    break;
-                case -1587964040:
-                    MapEntity = Maps.GlobalItems.Repin;
-                    break;
-                case 980475942:
-                    MapEntity = Maps.GlobalItems.Westprime;
-                    break;
-                case 1945237110:
-                    MapEntity = Maps.GlobalItems.Boombox;
-                    if (isMatchMaking)
-                    {
-                        MaxPlayers = 8;
-                    }
-                    break;
-                case 933129112:
-                    MapEntity = Maps.GlobalItems.Silencemoon;
-                    break;
-                case -1664220274:
-                    MapEntity = Maps.GlobalItems.Rio;
-                    break;
-                case 989096365:
-                    MapEntity = Maps.GlobalItems.MassacremarsBG;
-                    break;
-                case -1551247853:
-                    MapEntity = Maps.GlobalItems.Massacre;
-                    break;
-                case 2127033418:
-                    MapEntity = Maps.GlobalItems.Kungur;
-                    break;
-                default:
-                    MapEntity = Maps.GlobalItems.Rio;
-                    break;
+                RedPedestalEntity = PedestalTemplate.CreateEntity(PedestalsPositions[0], RedTeamEntity);
+                BluePedestalEntity = PedestalTemplate.CreateEntity(PedestalsPositions[1], BlueTeamEntity);
+                RedFlagEntity = FlagTemplate.CreateEntity(FlagsPositions[0], RedTeamEntity, new FlagHomeStateComponent());
+                BlueFlagEntity = FlagTemplate.CreateEntity(FlagsPositions[1], BlueTeamEntity, new FlagHomeStateComponent());
             }
         }
 
+        public Tuple<Entity, int> ConvertMapParams(ClientBattleParams battleParams, bool isMatchMaking)
+        {
+            Entity mapEntity = Maps.GlobalItems.Rio;
+            int maxPlayers = battleParams.MaxPlayers;
+            switch (battleParams.MapId)
+            {
+                case -321842153:
+                    mapEntity = Maps.GlobalItems.Silence;
+                    break;
+                case 343745828:
+                    mapEntity = Maps.GlobalItems.Nightiran;
+                    break;
+                case 485053206:
+                    mapEntity = Maps.GlobalItems.Acidlake;
+                    break;
+                case -820833801:
+                    mapEntity = Maps.GlobalItems.Acidlakehalloween;
+                    break;
+                case 458045295:
+                    if (isMatchMaking) { maxPlayers = 8; }
+                    mapEntity = Maps.GlobalItems.Testbox;
+                    break;
+                case -549069251:
+                    if (isMatchMaking) { maxPlayers = 8; }
+                    mapEntity = Maps.GlobalItems.Sandbox;
+                    break;
+                case -51480736:
+                    mapEntity = Maps.GlobalItems.Iran;
+                    break;
+                case 1133979230:
+                    if (isMatchMaking) { maxPlayers = 8; }
+                    mapEntity = Maps.GlobalItems.Area159;
+                    break;
+                case -1587964040:
+                    mapEntity = Maps.GlobalItems.Repin;
+                    break;
+                case 980475942:
+                    mapEntity = Maps.GlobalItems.Westprime;
+                    break;
+                case 1945237110:
+                    if (isMatchMaking) { maxPlayers = 8; }
+                    mapEntity = Maps.GlobalItems.Boombox;
+                    break;
+                case 933129112:
+                    mapEntity = Maps.GlobalItems.Silencemoon;
+                    break;
+                case -1664220274:
+                    mapEntity = Maps.GlobalItems.Rio;
+                    break;
+                case 989096365:
+                    mapEntity = Maps.GlobalItems.MassacremarsBG;
+                    break;
+                case -1551247853:
+                    mapEntity = Maps.GlobalItems.Massacre;
+                    break;
+                case 2127033418:
+                    mapEntity = Maps.GlobalItems.Kungur;
+                    break;
+            }
+            return new Tuple<Entity, int>(mapEntity, maxPlayers);
+        }
+
+        public void UpdateBattleParams(Player player, ClientBattleParams battleParams)
+        {
+            BattleParams = battleParams;
+            var tuple = ConvertMapParams(battleParams, IsMatchMaking);
+            MapEntity = tuple.Item1;
+
+            CommandManager.SendCommands(player,
+                new ComponentRemoveCommand(BattleLobbyEntity, typeof(MapGroupComponent)),
+                new ComponentAddCommand(BattleLobbyEntity, new MapGroupComponent(MapEntity)),
+                new ComponentRemoveCommand(BattleLobbyEntity, typeof(BattleModeComponent)),
+                new ComponentAddCommand(BattleLobbyEntity, new BattleModeComponent(battleParams.BattleMode)),
+                new ComponentRemoveCommand(BattleLobbyEntity, typeof(UserLimitComponent)),
+                new ComponentAddCommand(BattleLobbyEntity, new UserLimitComponent(userLimit: battleParams.MaxPlayers, teamLimit: battleParams.MaxPlayers / 2)),
+                new ComponentRemoveCommand(BattleLobbyEntity, typeof(GravityComponent)),
+                new ComponentAddCommand(BattleLobbyEntity, new GravityComponent(gravity: GravityTypes[battleParams.Gravity], gravityType: battleParams.Gravity)),
+                new ComponentRemoveCommand(BattleLobbyEntity, typeof(ClientBattleParamsComponent)),
+                new ComponentAddCommand(BattleLobbyEntity, new ClientBattleParamsComponent(battleParams)));
+
+            BattleEntity = (Entity)BattleEntityCreators[BattleParams.BattleMode].GetMethod("CreateEntity").Invoke(null, new object[] { BattleLobbyEntity, 5, 600, 120 });
+            RedTeamEntity = TeamTemplate.CreateEntity(TeamColor.RED, BattleEntity);
+            BlueTeamEntity = TeamTemplate.CreateEntity(TeamColor.BLUE, BattleEntity);
+            RoundEntity = RoundTemplate.CreateEntity(BattleEntity);
+            CollisionsComponent = BattleEntity.GetComponent<BattleTankCollisionsComponent>();
+
+            if (BattleParams.BattleMode != BattleMode.DM)
+            {    
+                // Rio pedestals/flags positions
+                // TODO: read specific positions from json
+                PedestalsPositions[0] = new Vector3(-6, 0, -65);
+                PedestalsPositions[1] = new Vector3(13, 0, 65);
+                FlagsPositions[0] = new Vector3(-6, 0, -65);
+                FlagsPositions[1] = new Vector3(13, 0, 65);
+
+                RedPedestalEntity = PedestalTemplate.CreateEntity(PedestalsPositions[0], RedTeamEntity);
+                BluePedestalEntity = PedestalTemplate.CreateEntity(PedestalsPositions[1], BlueTeamEntity);
+                RedFlagEntity = FlagTemplate.CreateEntity(FlagsPositions[0], RedTeamEntity, new FlagHomeStateComponent());
+                BlueFlagEntity = FlagTemplate.CreateEntity(FlagsPositions[1], BlueTeamEntity, new FlagHomeStateComponent());
+
+                foreach (BattleLobbyPlayer battleLobbyPlayer in RedTeamPlayers.Concat(BlueTeamPlayers))
+                {
+                    if (battleLobbyPlayer.Team.GetComponent<TeamColorComponent>().TeamColor == TeamColor.RED)
+                    {
+                        battleLobbyPlayer.Team = RedTeamEntity;
+                    }
+                    else
+                    {
+                        battleLobbyPlayer.Team = BlueTeamEntity;
+                    }
+                }
+            }
+        }
+        
         public void AddPlayer(Player player)
         {
             // prepare client
             List<ICommand> commands = new List<ICommand>
             {
                 new EntityShareCommand(BattleLobbyEntity),
-                new EntityShareCommand(RedTeamEntity),
-                new EntityShareCommand(BlueTeamEntity),
                 new ComponentAddCommand(player.User, new BattleLobbyGroupComponent(BattleLobbyEntity)),
             };
             if (IsMatchMaking)
@@ -223,13 +236,25 @@ namespace TXServer.Core.Battles
             if (!RedTeamPlayers.Remove(battlePlayer))
                 BlueTeamPlayers.Remove(battlePlayer);
             WaitingToJoinPlayers.Remove(battlePlayer);
+            
+            // transfers Owner ship to a random player in the lobby
+            if (battlePlayer.Player == Owner)
+            {
+                if (RedTeamPlayers.Concat(BlueTeamPlayers).Any())
+                {
+                    var allBattlePlayers = RedTeamPlayers.Concat(BlueTeamPlayers).ToList();
+                    Owner = allBattlePlayers[new Random().Next(allBattlePlayers.Count)].Player;
+                    CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
+                        new ComponentRemoveCommand(BattleLobbyEntity, typeof(UserGroupComponent)),
+                        new ComponentAddCommand(BattleLobbyEntity, new UserGroupComponent(Owner.User)));
+                }
+            }
+
             battlePlayer.Player.BattleLobbyPlayer = null;
 
             List<ICommand> commands = new List<ICommand>
             {
                 new EntityUnshareCommand(BattleLobbyEntity),
-                new EntityUnshareCommand(RedTeamEntity),
-                new EntityUnshareCommand(BlueTeamEntity),
                 new ComponentRemoveCommand(battlePlayer.User, typeof(TeamColorComponent)),
                 new ComponentRemoveCommand(battlePlayer.User, typeof(BattleLobbyGroupComponent))
             };
@@ -260,37 +285,33 @@ namespace TXServer.Core.Battles
             }
         }
 
-        private void InitBattlePlayer(BattleLobbyPlayer battlePlayer)
+        public void InitBattlePlayer(BattleLobbyPlayer battlePlayer)
         {
             battlePlayer.BattlePlayer = new BattlePlayer(battlePlayer, BattleEntity);
-
             List<ICommand> commands = new List<ICommand>
             {
                 new EntityShareCommand(BattleEntity),
-                new EntityShareCommand(RoundEntity)
+                new EntityShareCommand(RoundEntity),
+                new EntityShareCommand(RedTeamEntity),
+                new EntityShareCommand(BlueTeamEntity)
             };
 
-            if (BattleMode == BattleMode.CTF)
+            if (BattleParams.BattleMode == BattleMode.CTF)
             {
-                ICommand[] flagsPedestalsICommands =
+                commands.AddRange(new List<ICommand>
                 {
                     new EntityShareCommand(RedPedestalEntity),
                     new EntityShareCommand(BluePedestalEntity),
                     new EntityShareCommand(RedFlagEntity),
                     new EntityShareCommand(BlueFlagEntity)
-                };
-                commands.AddRange(flagsPedestalsICommands);
+                });
             }
-
             foreach (BattleLobbyPlayer inBattlePlayer in BattlePlayers)
             {
                 commands.AddRange(inBattlePlayer.BattlePlayer.GetEntities().Select(x => new EntityShareCommand(x)));
             }
-
             CommandManager.SendCommandsSafe(battlePlayer.Player, commands);
-
             BattlePlayers.Add(battlePlayer);
-
             CommandManager.BroadcastCommands(BattlePlayers.Select(x => x.Player), battlePlayer.BattlePlayer.GetEntities().Select(x => new EntityShareCommand(x)));
         }
 
@@ -303,19 +324,20 @@ namespace TXServer.Core.Battles
             List<ICommand> commands = new List<ICommand>
             {
                 new EntityUnshareCommand(BattleEntity),
-                new EntityUnshareCommand(RoundEntity)
+                new EntityUnshareCommand(RoundEntity),
+                new EntityUnshareCommand(RedTeamEntity),
+                new EntityUnshareCommand(BlueTeamEntity)
             };
 
-            if (BattleMode == BattleMode.CTF)
+            if (BattleParams.BattleMode == BattleMode.CTF)
             {
-                ICommand[] flagsPedestalsICommands =
+                commands.AddRange(new List<ICommand>
                 {
                     new EntityUnshareCommand(RedPedestalEntity),
                     new EntityUnshareCommand(BluePedestalEntity),
                     new EntityUnshareCommand(RedFlagEntity),
                     new EntityUnshareCommand(BlueFlagEntity)
-                };
-                commands.AddRange(flagsPedestalsICommands);
+                });
             }
 
             foreach (BattleLobbyPlayer inBattlePlayer in BattlePlayers)
@@ -356,7 +378,7 @@ namespace TXServer.Core.Battles
             switch (BattleState)
             {
                 case BattleState.NotEnoughPlayers:
-                    if (RedTeamPlayers.Count + BlueTeamPlayers.Count > 0 && RedTeamPlayers.Count == BlueTeamPlayers.Count)
+                    if (IsMatchMaking && RedTeamPlayers.Count + BlueTeamPlayers.Count > 0 && RedTeamPlayers.Count == BlueTeamPlayers.Count)
                     {
                         CommandManager.SendCommandsSafe(RedTeamPlayers[0].Player,
                             new ComponentAddCommand(BattleLobbyEntity, new MatchMakingLobbyStartTimeComponent(new TimeSpan(0, 0, 10))));
@@ -389,7 +411,7 @@ namespace TXServer.Core.Battles
                     }
                     break;
                 case BattleState.Starting:
-                    if (RedTeamPlayers.Count + BlueTeamPlayers.Count == 0)
+                    if (!IsMatchMaking && RedTeamPlayers.Count + BlueTeamPlayers.Count == 0)
                     {
                         BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartingComponent>();
                         BattleState = BattleState.NotEnoughPlayers;
@@ -402,10 +424,16 @@ namespace TXServer.Core.Battles
                         BattleState = BattleState.NotEnoughPlayers;
                     }
 
-                    if (CountdownTimer < 0)
+                    if (IsMatchMaking && CountdownTimer < 0)
                     {
                         CommandManager.SendCommandsSafe(RedTeamPlayers[0].Player,
                             new ComponentRemoveCommand(BattleLobbyEntity, typeof(MatchMakingLobbyStartingComponent)));
+                        StartBattle();
+                        BattleState = BattleState.Running;
+                    }
+                    
+                    if (!IsMatchMaking)
+                    {
                         StartBattle();
                         BattleState = BattleState.Running;
                     }
@@ -413,7 +441,7 @@ namespace TXServer.Core.Battles
                 case BattleState.WarmingUp:
                     break;
                 case BattleState.Running:
-                    if (BattlePlayers.Count + WaitingToJoinPlayers.Count == 0)
+                    if (IsMatchMaking && BattlePlayers.Count + WaitingToJoinPlayers.Count == 0)
                     {
                         BattleState = BattleState.NotEnoughPlayers;
                     }
@@ -523,15 +551,15 @@ namespace TXServer.Core.Battles
             { GravityType.MOON, 1.62f },
             { GravityType.MARS, 3.71f }
         };
-
+        private static readonly List<Entity> MatchMakingMaps = new List<Entity> { Maps.GlobalItems.Silence, Maps.GlobalItems.Nightiran, Maps.GlobalItems.Acidlake, 
+            Maps.GlobalItems.Sandbox, Maps.GlobalItems.Iran, Maps.GlobalItems.Area159, Maps.GlobalItems.Repin, Maps.GlobalItems.Westprime, Maps.GlobalItems.Boombox, 
+            Maps.GlobalItems.Silencemoon, Maps.GlobalItems.Rio, Maps.GlobalItems.MassacremarsBG, Maps.GlobalItems.Massacre, Maps.GlobalItems.Kungur
+    };
+        public ClientBattleParams BattleParams { get; set; }
         public Entity MapEntity { get; private set; }
-        public BattleMode BattleMode { get; private set; }
-        public int MaxPlayers { get; private set; }
         public bool IsMatchMaking { get; }
-        public int TimeLimit { get; }
-        public int ScoreLimit { get; }
-        public bool FriendlyFire { get; }
-        public BattleState BattleState { get; private set; }
+        public bool IsOpen { get; set; }
+        public BattleState BattleState { get; set; }
         public double CountdownTimer { get; private set; }
 
         public List<BattleLobbyPlayer> RedTeamPlayers { get; } = new List<BattleLobbyPlayer>();
@@ -540,17 +568,17 @@ namespace TXServer.Core.Battles
         private List<BattleLobbyPlayer> BattlePlayers { get; } = new List<BattleLobbyPlayer>();
         private List<BattleLobbyPlayer> WaitingToJoinPlayers { get; } = new List<BattleLobbyPlayer>();
 
-        public Entity BattleEntity { get; }
-        public Entity BattleLobbyEntity { get; }
-        public Entity RoundEntity { get; }
-        public BattleTankCollisionsComponent CollisionsComponent { get; }
+        public Entity BattleEntity { get; set; }
+        public Entity BattleLobbyEntity { get; set; }
+        public Entity RoundEntity { get; set; }
+        public BattleTankCollisionsComponent CollisionsComponent { get; set; }
 
-        public Entity RedTeamEntity { get; }
-        public Entity BlueTeamEntity { get; }
-        public Entity RedPedestalEntity { get; }
-        public Entity BluePedestalEntity { get; }
-        public Entity RedFlagEntity { get; }
-        public Entity BlueFlagEntity { get; }
+        public Entity RedTeamEntity { get; set; }
+        public Entity BlueTeamEntity { get; set; }
+        public Entity RedPedestalEntity { get; set; }
+        public Entity BluePedestalEntity { get; set; }
+        public Entity RedFlagEntity { get; set; }
+        public Entity BlueFlagEntity { get; set; }
         private static readonly Vector3[] PedestalsPositions = new Vector3[2];
         private static readonly Vector3[] FlagsPositions = new Vector3[2];
         public Player Owner { get; set; }
