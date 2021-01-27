@@ -72,7 +72,7 @@ namespace TXServer.Core.Battles
                     {
                         CommandManager.SendCommandsSafe(Player,
                             new ComponentAddCommand(Tank, (Component)Activator.CreateInstance(StateComponents[value])),
-                            new ComponentAddCommand(Tank, new TankMovementComponent(new Movement(new Vector3(0, 2, 0), Vector3.Zero, Vector3.Zero, Quaternion.Identity), new MoveControl(), 0, 0)));
+                            new ComponentAddCommand(Tank, new TankMovementComponent(new Movement(new Vector3(0, 8, 0), Vector3.Zero, Vector3.Zero, Quaternion.Identity), new MoveControl(), 0, 0)));
                     }
                     else
                     {
@@ -103,7 +103,6 @@ namespace TXServer.Core.Battles
         private TankState _TankState;
         public double TankStateChangeCountdown { get; set; }
         public bool WaitingForTankActivation { get; set; }
-
         public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new ConcurrentDictionary<Type, TranslatedEvent>();
     }
 }

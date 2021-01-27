@@ -2,6 +2,7 @@
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
 using TXServer.Core;
+using System.Linq;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -11,16 +12,7 @@ namespace TXServer.ECSSystem.Events.Battle
 		public void Execute(Player player, Entity mode)
 		{
 			ServerConnection.BattlePool.Add(new Core.Battles.Battle(battleParams:Params, isMatchMaking:false, owner:player));
-			int index = 0;
-			foreach (Core.Battles.Battle battle in ServerConnection.BattlePool)
-            {
-				if (battle.Owner == player)
-                {
-					ServerConnection.BattlePool[index].AddPlayer(player);
-					break;
-				}
-				index++;
-            }
+			ServerConnection.BattlePool.Single(b => b.Owner == player).AddPlayer(player);
 		}
 
 		public ClientBattleParams Params { get; set; }

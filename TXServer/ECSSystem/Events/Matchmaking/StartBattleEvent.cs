@@ -2,7 +2,6 @@
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
 using TXServer.Core;
-using System;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -13,10 +12,10 @@ namespace TXServer.ECSSystem.Events.Battle
 		{
 			foreach (Core.Battles.Battle battle in ServerConnection.BattlePool)
             {
-				if (player == battle.Owner)
+				if (battle.BattleState == Core.Battles.BattleState.CustomNotStarted && player == battle.Owner)
                 {
 					battle.BattleState = Core.Battles.BattleState.Starting;
-                }
+				}
             }
 		}
 	}

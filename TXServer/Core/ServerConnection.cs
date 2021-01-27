@@ -14,6 +14,7 @@ using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Events.Ping;
 using TXServer.ECSSystem.Types;
+using System.Text.Json;
 
 namespace TXServer.Core
 {
@@ -31,6 +32,7 @@ namespace TXServer.Core
             if (IsStarted) return;
             IsStarted = true;
 
+            AllCoordinates = JsonSerializer.Deserialize<Coordinates.maps>(CoordinatesJson);
             MaxPoolSize = poolSize;
             acceptWorker = new Thread(() => AcceptPlayers(ip, port, MaxPoolSize)) {Name = "Acceptor"};
             acceptWorker.Start();
@@ -276,5 +278,8 @@ namespace TXServer.Core
         public bool IsStarted { get; private set; }
 
         public int PlayerCount = 0;
+
+        public string CoordinatesJson = File.ReadAllText("Library\\Coordinates.json");
+        public static Coordinates.maps AllCoordinates { get; set; }
     }
 }

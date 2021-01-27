@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using TXServer.Core;
+using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -15,15 +16,17 @@ namespace TXServer.ECSSystem.Events.Matchmaking
         {
             //todo handle it in the lobby
             CommandManager.SendCommands(player, new ComponentAddCommand(player.User, new MatchMakingUserReadyComponent()));
-            foreach (Core.Battles.Battle Battle in ServerConnection.BattlePool)
+
+            Core.Battles.Battle battle = ServerConnection.BattlePool.SingleOrDefault(b => b.BlueTeamPlayers.Concat(b.RedTeamPlayers).Contains(player.BattleLobbyPlayer));
+            if (battle.BattleState == BattleState.Running)
             {
-                if (Battle.RedTeamPlayers.Concat(Battle.BlueTeamPlayers).Contains(player.BattleLobbyPlayer))
+                BattleLobbyPlayer toRemoveBattleLobbyPlayer = battle.WaitingToJoinPlayers.SingleOrDefault(p => p.BattlePlayer == player.BattleLobbyPlayer.BattlePlayer);
+                if (toRemoveBattleLobbyPlayer != null)
                 {
-                    if (Battle.BattleState == Core.Battles.BattleState.Running)
-                    {
-                        Battle.InitBattlePlayer(player.BattleLobbyPlayer);
-                    }
+                    battle.WaitingToJoinPlayers.Remove(toRemoveBattleLobbyPlayer);
                 }
+
+                battle.InitBattlePlayer(player.BattleLobbyPlayer);
             }
         }
     }

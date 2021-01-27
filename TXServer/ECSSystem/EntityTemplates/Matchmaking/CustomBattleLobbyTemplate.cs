@@ -18,8 +18,8 @@ namespace TXServer.ECSSystem.EntityTemplates
                 new GravityComponent(gravity, battleParams.Gravity)
             );
             entity.Components.Add(new UserGroupComponent(owner.User));
-            entity.Components.Add(new BattleLobbyGroupComponent(entity));
             entity.Components.Add(new ClientBattleParamsComponent(battleParams));
+            entity.Components.Add(new BattleLobbyGroupComponent(entity));
             
             int price = 1000;  // 1000 Blue-Crystals standard price for opening custom battles
             if (owner.User.GetComponent<PremiumAccountBoostComponent>() != null)
