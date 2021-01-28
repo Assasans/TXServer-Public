@@ -130,6 +130,7 @@
     <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
     <Compile Include="Core\Protocol\MovementCodec.cs" />
+    <Compile Include="ECSSystem\Components\Battle\BattleScoreComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleTankCollisionsComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Flag\FlagComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Flag\FlagGroundedStateComponent.cs" />
@@ -138,7 +139,7 @@
     <Compile Include="ECSSystem\Components\Battle\Flag\FlagPositionComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Graffiti\GraffitiBattleItemComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Graffiti\GraffitiDecalComponent.cs" />
-    <Compile Include="ECSSystem\Components\Battle\SelfDestructionComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\RoundDisbalancedComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\TankJumpComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Tank\TankStateTimeOutComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\DamageWeakeningByDistanceComponent.cs" />
@@ -333,6 +334,7 @@
     <Compile Include="ECSSystem\Events\Battle\RemoteSplashHitEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\RemoteUpdateStreamHitEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ResetIdleKickTimeEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\RoundScoreUpdatedEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfHammerShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfHitEvent.cs" />

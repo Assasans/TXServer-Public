@@ -11,6 +11,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
         {
             Entity entity = CreateEntity(battleLobby, new CTFTemplate(), "ctf", scoreLimit, timeLimit, warmingUpTimeLimit);
             entity.Components.Add(new CTFComponent());
+            entity.Components.Add(new BattleScoreComponent(Score:0, ScoreRed:0, ScoreBlue:0));
 
             return entity;
         }

@@ -15,11 +15,21 @@ namespace TXServer.ECSSystem.Events.Battle
 		{
 			// admins can enter with the "last" code the newest custom lobby
 			Core.Battles.Battle battle;
-			if (LobbyId == 1211920 && player.User.GetComponent<UserAdminComponent>() != null)
-			{
-				battle = ServerConnection.BattlePool.LastOrDefault(b => !b.IsMatchMaking && b.IsOpen);
-			} else {
-				battle = ServerConnection.BattlePool.FirstOrDefault(b => b.BattleLobbyEntity.GetComponent<BattleLobbyGroupComponent>().Key == LobbyId && b.IsOpen);
+
+			battle = ServerConnection.BattlePool.LastOrDefault(b => b.BattleLobbyEntity.GetComponent<BattleLobbyGroupComponent>().Key == LobbyId && b.IsOpen);
+
+			if (player.User.GetComponent<UserAdminComponent>() != null) {
+				switch (LobbyId)
+				{
+					// soft join latest open lobby
+					case 1211920:
+						battle = ServerConnection.BattlePool.LastOrDefault(b => !b.IsMatchMaking && b.IsOpen);
+						break;
+					// brute join latest lobby
+					case 21211920:
+						battle = ServerConnection.BattlePool.LastOrDefault(b => !b.IsMatchMaking);
+						break;
+				}
 			}
 
 			if (battle != null)
@@ -31,7 +41,9 @@ namespace TXServer.ECSSystem.Events.Battle
 				} else {
 					battle.AddPlayer(player);
 				}
-			} else {
+			} 
+			else
+			{
 				CommandManager.SendCommands(player,
 				new SendEventCommand(new CustomLobbyNotExistsEvent(), player.User));
 			}

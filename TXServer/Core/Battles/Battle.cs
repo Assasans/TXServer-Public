@@ -48,7 +48,7 @@ namespace TXServer.Core.Battles
                 BattleLobbyEntity = CustomBattleLobbyTemplate.CreateEntity(battleParams, MapEntity, GravityTypes[(GravityType)battleParams.Gravity], owner);
             }
 
-            BattleEntity = (Entity)BattleEntityCreators[BattleParams.BattleMode].GetMethod("CreateEntity").Invoke(null, new object[] { BattleLobbyEntity, 5, 600, 120 });
+            BattleEntity = (Entity)BattleEntityCreators[BattleParams.BattleMode].GetMethod("CreateEntity").Invoke(null, new object[] { BattleLobbyEntity, battleParams.ScoreLimit, battleParams.TimeLimit*60, 120 });
             RedTeamEntity = TeamTemplate.CreateEntity(TeamColor.RED, BattleEntity);
             BlueTeamEntity = TeamTemplate.CreateEntity(TeamColor.BLUE, BattleEntity);
             RoundEntity = RoundTemplate.CreateEntity(BattleEntity);
@@ -159,7 +159,7 @@ namespace TXServer.Core.Battles
                 new ComponentRemoveCommand(BattleLobbyEntity, typeof(ClientBattleParamsComponent)),
                 new ComponentAddCommand(BattleLobbyEntity, new ClientBattleParamsComponent(battleParams)));
 
-            BattleEntity = (Entity)BattleEntityCreators[BattleParams.BattleMode].GetMethod("CreateEntity").Invoke(null, new object[] { BattleLobbyEntity, 5, 600, 120 });
+            BattleEntity = (Entity)BattleEntityCreators[BattleParams.BattleMode].GetMethod("CreateEntity").Invoke(null, new object[] { BattleLobbyEntity, battleParams.ScoreLimit, battleParams.TimeLimit*60, 120 });
             RedTeamEntity = TeamTemplate.CreateEntity(TeamColor.RED, BattleEntity);
             BlueTeamEntity = TeamTemplate.CreateEntity(TeamColor.BLUE, BattleEntity);
             RoundEntity = RoundTemplate.CreateEntity(BattleEntity);
@@ -330,37 +330,6 @@ namespace TXServer.Core.Battles
         private void RemoveBattlePlayer(BattleLobbyPlayer battlePlayer)
         {
 
-            Entity[] flags = { BlueFlagEntity, RedFlagEntity };
-            foreach (Entity flag in flags)
-            {
-                if (flag.GetComponent<TankGroupComponent>() != null && flag.GetComponent<FlagGroundedStateComponent>() == null)
-                {
-                    if (flag.GetComponent<TankGroupComponent>().Key == battlePlayer.BattlePlayer.Tank.GetComponent<TankGroupComponent>().Key)
-                    {
-                        // TODO: drop flag at latest tank position
-                        Entity newFlag;
-                        if (RedFlagEntity.GetComponent<TeamGroupComponent>().Key != battlePlayer.BattlePlayer.Tank.GetComponent<TeamGroupComponent>().Key)
-                        {
-                            RedFlagEntity = FlagTemplate.CreateEntity(MapCoordinates.flags.flagRed.position.V3, team:RedTeamEntity, battle:BattleEntity);
-                            newFlag = RedFlagEntity;
-                        }
-                        else
-                        {
-                            BlueFlagEntity = FlagTemplate.CreateEntity(MapCoordinates.flags.flagBlue.position.V3, team:BlueTeamEntity, battle:BattleEntity);
-                            newFlag = BlueFlagEntity;
-                        }
-                        CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
-                            new SendEventCommand(new FlagDropEvent(IsUserAction: false), flag),
-                            new EntityUnshareCommand(flag),
-                            new EntityShareCommand(newFlag));
-                    }
-                }
-            }
-
-            CommandManager.BroadcastCommands(BattlePlayers.Select(x => x.Player), battlePlayer.BattlePlayer.GetEntities().Select(x => new EntityUnshareCommand(x)));
-
-            BattlePlayers.Remove(battlePlayer);
-
             List<ICommand> commands = new List<ICommand>
             {
                 new EntityUnshareCommand(BattleEntity),
@@ -368,6 +337,27 @@ namespace TXServer.Core.Battles
                 new EntityUnshareCommand(RedTeamEntity),
                 new EntityUnshareCommand(BlueTeamEntity)
             };
+
+            Entity[] flags = { BlueFlagEntity, RedFlagEntity };
+            foreach (Entity flag in flags)
+            {
+                if (flag.GetComponent<TankGroupComponent>() != null && flag.GetComponent<FlagGroundedStateComponent>() == null)
+                {
+                    if (flag.GetComponent<TankGroupComponent>().Key == battlePlayer.BattlePlayer.Tank.GetComponent<TankGroupComponent>().Key)
+                    {
+                        commands.Add(new ComponentAddCommand(flag, new FlagGroundedStateComponent()));
+                        // TODO: drop flag at latest tank position
+                        commands.Add(new ComponentChangeCommand(flag, new FlagPositionComponent(new Vector3(x: 0, y: 3, z: 0))));
+
+                        CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
+                            new SendEventCommand(new FlagDropEvent(IsUserAction: false), flag));
+                    }
+                }
+            }
+
+            CommandManager.BroadcastCommands(BattlePlayers.Select(x => x.Player), battlePlayer.BattlePlayer.GetEntities().Select(x => new EntityUnshareCommand(x)));
+
+            BattlePlayers.Remove(battlePlayer);
 
             if (BattleParams.BattleMode == BattleMode.CTF)
             {
@@ -583,6 +573,46 @@ namespace TXServer.Core.Battles
             }
         }
 
+        public void UpdatedScore(Player player)
+        {
+
+            int? neededDifference = null;
+            if (BattleParams.BattleMode == BattleMode.CTF)
+            {
+                neededDifference = 6;
+            } else
+            {
+                if (BattleParams.BattleMode == BattleMode.TDM)
+                {
+                    neededDifference = 30;
+                }
+            }
+
+            if (neededDifference != null)
+            {
+                if (Math.Abs(BlueTeamEntity.GetComponent<TeamScoreComponent>().Score - RedTeamEntity.GetComponent<TeamScoreComponent>().Score) >= neededDifference)
+                {
+
+                    if (BattleEntity.GetComponent<RoundDisbalancedComponent>() == null)
+                    {
+                        Entity[] teams = { BlueTeamEntity, RedTeamEntity };
+                        Entity loserTeam = teams.Single(t => t.GetComponent<TeamColorComponent>().TeamColor != player.BattleLobbyPlayer.Team.GetComponent<TeamColorComponent>().TeamColor);
+                        TeamColor loserColor = loserTeam.GetComponent<TeamColorComponent>().TeamColor;
+
+                        Component roundDisbalancedComponent = new RoundDisbalancedComponent(Loser: loserColor, InitialDominationTimerSec: 30, FinishTime: new TXDate(new TimeSpan(0, 0, 30)));
+
+                        CommandManager.SendCommands(player,
+                            new ComponentAddCommand(BattleEntity, roundDisbalancedComponent));
+                    }
+                } 
+
+                else if (BattleEntity.GetComponent<RoundDisbalancedComponent>() != null)
+                {
+                    //TODO: restore round balance
+                }
+            }
+        }
+        
         private static readonly Dictionary<BattleMode, Type> BattleEntityCreators = new Dictionary<BattleMode, Type>
         {
             { BattleMode.DM, typeof(DMTemplate) },
