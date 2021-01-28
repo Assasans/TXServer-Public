@@ -15,6 +15,7 @@ using TXServer.ECSSystem.Types;
 using System.Threading;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Components.Battle.Round;
 
 namespace TXServer.Core.Battles
 {
@@ -562,6 +563,36 @@ namespace TXServer.Core.Battles
             }
         }
 
+        private void ProcessDroppedFlags()
+        {
+            DateTime currentTime = DateTime.Now;
+            foreach (KeyValuePair<Entity, DateTime> entry in DroppedFlags.ToList())
+            {
+                if (DateTime.Compare(entry.Value, currentTime) <= 0)
+                {
+                    DroppedFlags.Remove(entry.Key);
+                    CommandManager.SendCommands((BlueTeamPlayers.Concat(RedTeamPlayers)).First().Player,
+                        new ComponentRemoveCommand(entry.Key, typeof(TankGroupComponent)),
+                        new ComponentRemoveCommand(entry.Key, typeof(FlagGroundedStateComponent)));
+                    Entity newFlag;
+                    if (RedFlagEntity.GetComponent<TeamGroupComponent>().Key == entry.Key.GetComponent<TeamGroupComponent>().Key)
+                    {
+                        RedFlagEntity = FlagTemplate.CreateEntity(MapCoordinates.flags.flagRed.position.V3, team: RedTeamEntity, battle: BattleEntity);
+                        newFlag = RedFlagEntity;
+                    }
+                    else
+                    {
+                        BlueFlagEntity = FlagTemplate.CreateEntity(MapCoordinates.flags.flagBlue.position.V3, team: BlueTeamEntity, battle: BattleEntity);
+                        newFlag = BlueFlagEntity;
+                    }
+                    CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
+                        new SendEventCommand(new FlagReturnEvent(), entry.Key),
+                        new EntityUnshareCommand(entry.Key),
+                        new EntityShareCommand(newFlag));
+                }
+            }
+        }
+        
         public void Tick(double deltaTime)
         {
             lock (this)
@@ -570,6 +601,7 @@ namespace TXServer.Core.Battles
                 ProcessBattleState(deltaTime);
                 ProcessWaitingPlayers(deltaTime);
                 ProcessInBattlePlayers(deltaTime);
+                ProcessDroppedFlags();
             }
         }
 
@@ -611,6 +643,27 @@ namespace TXServer.Core.Battles
                     //TODO: restore round balance
                 }
             }
+        }
+        
+        public void UpdateUserStatistics(Player player, int xp, int kills, int killAssists, int death)
+        {
+            // TODO: rank up effect/system
+            RoundUserStatisticsComponent roundUserStatisticsComponent = player.BattleLobbyPlayer.BattlePlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>();
+            UserExperienceComponent userExperienceComponent = player.User.GetComponent<UserExperienceComponent>();
+
+            roundUserStatisticsComponent.ScoreWithoutBonuses += xp;
+            roundUserStatisticsComponent.Kills += kills;
+            roundUserStatisticsComponent.KillAssists += killAssists;
+            roundUserStatisticsComponent.Deaths += death;
+
+            userExperienceComponent.Experience += xp;
+
+            CommandManager.SendCommands(player,
+                new ComponentChangeCommand(player.BattleLobbyPlayer.BattlePlayer.RoundUser, roundUserStatisticsComponent),
+                new ComponentChangeCommand(player.User, userExperienceComponent));
+
+            CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
+                new SendEventCommand(new RoundUserStatisticsUpdatedEvent(), player.BattleLobbyPlayer.BattlePlayer.RoundUser));
         }
         
         private static readonly Dictionary<BattleMode, Type> BattleEntityCreators = new Dictionary<BattleMode, Type>
@@ -655,6 +708,7 @@ namespace TXServer.Core.Battles
         public Entity BluePedestalEntity { get; set; }
         public Entity RedFlagEntity { get; set; }
         public Entity BlueFlagEntity { get; set; }
+        public Dictionary<Entity, DateTime> DroppedFlags = new Dictionary<Entity, DateTime> { };
         public long? FlagBlockedTankKey { get; set; }
         public Player Owner { get; set; }
     }

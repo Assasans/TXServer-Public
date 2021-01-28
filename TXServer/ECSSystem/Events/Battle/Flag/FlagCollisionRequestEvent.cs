@@ -7,6 +7,7 @@ using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle;
+using TXServer.ECSSystem.Components.Battle.Round;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -24,6 +25,7 @@ namespace TXServer.ECSSystem.Events.Battle
                 if (flag.GetComponent<FlagHomeStateComponent>() != null)
                 {
                     battle.FlagBlockedTankKey = tank.GetComponent<TankGroupComponent>().Key;
+                    // TODO: calculate points
                     CommandManager.SendCommands(player,
                         new ComponentAddCommand(flag, new TankGroupComponent(tank)),
                         new ComponentRemoveCommand(flag, typeof(FlagHomeStateComponent)));
@@ -35,6 +37,10 @@ namespace TXServer.ECSSystem.Events.Battle
                 {
                     if (battle.FlagBlockedTankKey != tank.GetComponent<TankGroupComponent>().Key)
                     {
+
+                        battle.DroppedFlags.Remove(flag);
+
+                        // TODO: calculate points
                         CommandManager.SendCommands(battle.BlueTeamPlayers[0].Player,
                             new ComponentRemoveCommand(flag, typeof(TankGroupComponent)),
                             new ComponentAddCommand(flag, new TankGroupComponent(tank)),
@@ -59,6 +65,9 @@ namespace TXServer.ECSSystem.Events.Battle
                 // return allie flag
                 if (allieFlag.GetComponent<TankGroupComponent>() != null)
                 {
+
+                    battle.DroppedFlags.Remove(flag);
+
                     CommandManager.SendCommands(player,
                         new ComponentRemoveCommand(flag, typeof(TankGroupComponent)),
                         new ComponentAddCommand(flag, new TankGroupComponent(tank)),
@@ -75,6 +84,7 @@ namespace TXServer.ECSSystem.Events.Battle
                         battle.BlueFlagEntity = FlagTemplate.CreateEntity(battle.MapCoordinates.flags.flagBlue.position.V3, team: battle.BlueTeamEntity, battle: battle.BattleEntity);
                         newFlag = battle.BlueFlagEntity;
                     }
+                    // TODO: calculate points
                     CommandManager.BroadcastCommands(battle.RedTeamPlayers.Concat(battle.BlueTeamPlayers).Select(x => x.Player),
                         new SendEventCommand(new FlagReturnEvent(), flag),
                         new EntityUnshareCommand(flag),
@@ -91,27 +101,29 @@ namespace TXServer.ECSSystem.Events.Battle
                             Entity alliePedestal = pedestals.Single(p => p.GetComponent<TeamGroupComponent>().Key == tank.GetComponent<TeamGroupComponent>().Key);
 
                             Entity newFlag;
-                            Entity scoredTeam;
-                            int score;
+                            Entity allieTeam;
+                            int enemyPlayers;
                             if (battle.RedFlagEntity.GetComponent<TeamGroupComponent>().Key == tank.GetComponent<TeamGroupComponent>().Key)
                             {
                                 battle.BlueFlagEntity = FlagTemplate.CreateEntity(battle.MapCoordinates.flags.flagBlue.position.V3, team: battle.BlueTeamEntity, battle: battle.BattleEntity);
-                                scoredTeam = battle.RedTeamEntity;
+                                allieTeam = battle.RedTeamEntity;
                                 newFlag = battle.BlueFlagEntity;
-                                
+                                enemyPlayers = battle.BlueTeamPlayers.Count();
                             }
                             else
                             {
                                 battle.RedFlagEntity = FlagTemplate.CreateEntity(battle.MapCoordinates.flags.flagRed.position.V3, team: battle.RedTeamEntity, battle: battle.BattleEntity);
-                                scoredTeam = battle.BlueTeamEntity;
+                                allieTeam = battle.BlueTeamEntity;
                                 newFlag = battle.RedFlagEntity;
+                                enemyPlayers = battle.RedTeamPlayers.Count();
                             }
-                            score = scoredTeam.GetComponent<TeamScoreComponent>().Score;
-                            
+                            int oldScore = allieTeam.GetComponent<TeamScoreComponent>().Score;
+
                             CommandManager.SendCommands(player,
                                 new ComponentChangeCommand(enemyFlag, new FlagPositionComponent(alliePedestal.GetComponent<FlagPedestalComponent>().Position)),
                                 new ComponentAddCommand(enemyFlag, new FlagGroundedStateComponent()),
-                                new ComponentChangeCommand(scoredTeam, new TeamScoreComponent(++score)));
+                                new ComponentChangeCommand(allieTeam, new TeamScoreComponent(++oldScore)));
+                            
                             CommandManager.BroadcastCommands(battle.RedTeamPlayers.Concat(battle.BlueTeamPlayers).Select(x => x.Player),
                                 new SendEventCommand(new FlagDeliveryEvent(), enemyFlag),
                                 new SendEventCommand(new RoundScoreUpdatedEvent(), battle.RoundEntity),
@@ -119,6 +131,7 @@ namespace TXServer.ECSSystem.Events.Battle
                                 new EntityShareCommand(newFlag));
 
                             battle.UpdatedScore(player);
+                            battle.UpdateUserStatistics(player, xp:enemyPlayers*10, kills:0, killAssists:0, death:0);
                         }
                     }
                 }

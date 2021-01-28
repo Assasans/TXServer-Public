@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Numerics;
 using TXServer.Core;
 using TXServer.Core.Commands;
@@ -19,7 +20,8 @@ namespace TXServer.ECSSystem.Events.Battle
             if (flag.GetComponent<FlagGroundedStateComponent>() == null)
             {
 
-                    battle.FlagBlockedTankKey = tank.GetComponent<TankGroupComponent>().Key;
+                battle.FlagBlockedTankKey = tank.GetComponent<TankGroupComponent>().Key;
+                battle.DroppedFlags.Add(flag, DateTime.Now.AddMinutes(1));
 
                 CommandManager.SendCommands(player,
                     new ComponentAddCommand(flag, new FlagGroundedStateComponent()),

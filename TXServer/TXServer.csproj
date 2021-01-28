@@ -335,6 +335,7 @@
     <Compile Include="ECSSystem\Events\Battle\RemoteUpdateStreamHitEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ResetIdleKickTimeEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\RoundScoreUpdatedEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\RoundUserStatisticsUpdatedEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfHammerShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\SelfHitEvent.cs" />
