@@ -139,6 +139,27 @@ namespace TXServer.Core.Battles
                     MapCoordinates = ServerConnection.AllCoordinates.Kungur;
                     break;
             }
+
+            if (battleParams.BattleMode == BattleMode.DM)
+            {
+                DeathmatchSpawnPoints = MapCoordinates.spawnPoints.deathmatch;
+            }
+            else
+            {
+                var teamModesSpawnPoints = new Dictionary<BattleMode, Coordinates.teamBattleSpawnPoints>
+                {
+                    { BattleMode.CTF, MapCoordinates.spawnPoints.captureTheFlag },
+                    { BattleMode.TDM, MapCoordinates.spawnPoints.teamDeathmatch }
+                };
+
+                TeamsSpawnPoints = teamModesSpawnPoints[battleParams.BattleMode];
+                // selects the spawnPoints from another team mode if there are no spawn points for the selected one
+                if (TeamsSpawnPoints == null)
+                {
+                    TeamsSpawnPoints = (Coordinates.teamBattleSpawnPoints)teamModesSpawnPoints.Where(b => b.Key != battleParams.BattleMode);
+                }
+            }
+
             return new Tuple<Entity, int>(mapEntity, maxPlayers);
         }
 
@@ -339,19 +360,22 @@ namespace TXServer.Core.Battles
                 new EntityUnshareCommand(BlueTeamEntity)
             };
 
-            Entity[] flags = { BlueFlagEntity, RedFlagEntity };
-            foreach (Entity flag in flags)
+            if (BattleParams.BattleMode == BattleMode.CTF)
             {
-                if (flag.GetComponent<TankGroupComponent>() != null && flag.GetComponent<FlagGroundedStateComponent>() == null)
+                Entity[] flags = { BlueFlagEntity, RedFlagEntity };
+                foreach (Entity flag in flags)
                 {
-                    if (flag.GetComponent<TankGroupComponent>().Key == battlePlayer.BattlePlayer.Tank.GetComponent<TankGroupComponent>().Key)
+                    if (flag.GetComponent<TankGroupComponent>() != null && flag.GetComponent<FlagGroundedStateComponent>() == null)
                     {
-                        commands.Add(new ComponentAddCommand(flag, new FlagGroundedStateComponent()));
-                        // TODO: drop flag at latest tank position
-                        commands.Add(new ComponentChangeCommand(flag, new FlagPositionComponent(new Vector3(x: 0, y: 3, z: 0))));
+                        if (flag.GetComponent<TankGroupComponent>().Key == battlePlayer.BattlePlayer.Tank.GetComponent<TankGroupComponent>().Key)
+                        {
+                            commands.Add(new ComponentAddCommand(flag, new FlagGroundedStateComponent()));
+                            // TODO: drop flag at latest tank position
+                            commands.Add(new ComponentChangeCommand(flag, new FlagPositionComponent(new Vector3(x: 0, y: 3, z: 0))));
 
-                        CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
-                            new SendEventCommand(new FlagDropEvent(IsUserAction: false), flag));
+                            CommandManager.BroadcastCommands(RedTeamPlayers.Concat(BlueTeamPlayers).Select(x => x.Player),
+                                new SendEventCommand(new FlagDropEvent(IsUserAction: false), flag));
+                        }
                     }
                 }
             }
@@ -669,7 +693,7 @@ namespace TXServer.Core.Battles
         private static readonly Dictionary<BattleMode, Type> BattleEntityCreators = new Dictionary<BattleMode, Type>
         {
             { BattleMode.DM, typeof(DMTemplate) },
-            //{ BattleMode.TDM, typeof(TDMTemplate) },
+            { BattleMode.TDM, typeof(TDMTemplate) },
             { BattleMode.CTF, typeof(CTFTemplate) },
         };
         private static readonly Dictionary<GravityType, float> GravityTypes = new Dictionary<GravityType, float>
@@ -688,6 +712,8 @@ namespace TXServer.Core.Battles
         public bool IsMatchMaking { get; }
         public bool IsOpen { get; set; }
         public Coordinates.map MapCoordinates { get; set; }
+        public IList<Coordinates.spawnCoordinate> DeathmatchSpawnPoints { get; set; }
+        public Coordinates.teamBattleSpawnPoints TeamsSpawnPoints { get; set; }
         public BattleState BattleState { get; set; }
         public double CountdownTimer { get; private set; }
 

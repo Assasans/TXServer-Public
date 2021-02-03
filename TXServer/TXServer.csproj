@@ -142,6 +142,7 @@
     <Compile Include="ECSSystem\Components\Battle\RoundDisbalancedComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\TankJumpComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Tank\TankStateTimeOutComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\TDMComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\DamageWeakeningByDistanceComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\FlamethrowerComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\FreezeComponent.cs" />
@@ -283,6 +284,7 @@
     <Compile Include="ECSSystem\EntityTemplates\Battle\TankIncarnationTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\TankPaintBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\TankTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\TDMTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\TeamBattleTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\TeamTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\ThunderBattleItemTemplate.cs" />

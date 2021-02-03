@@ -88,33 +88,16 @@ namespace Coordinates
 
     public class spawnPoints
     {
-        public IList<deathmatchSpawnPoints> deathmatch { get; set; }
-        public teamDeathmatchSpawnPoints teamDeathmatch { get; set; }
-        public captureTheFlagSpawnPoints captureTheFlag { get; set; }
+        public IList<spawnCoordinate> deathmatch { get; set; }
+        public teamBattleSpawnPoints teamDeathmatch { get; set; }
+        public teamBattleSpawnPoints captureTheFlag { get; set; }
     }
-    public class deathmatchSpawnPoints
+    public class teamBattleSpawnPoints
     {
-        public int number { get; set; }
-        public position position { get; set; }
-        public rotation rotation { get; set; }
+        public IList<spawnCoordinate> blueTeam { get; set; }
+        public IList<spawnCoordinate> redTeam { get; set; }
     }
-    public class teamDeathmatchSpawnPoints
-    {
-        public IList<blueTeam> blueTeam { get; set; }
-        public IList<redTeam> redTeam { get; set; }
-    }
-    public class captureTheFlagSpawnPoints
-    {
-        public IList<blueTeam> blueTeam { get; set; }
-        public IList<redTeam> redTeam { get; set; }
-    }
-    public class blueTeam
-    {
-        public int number { get; set; }
-        public position position { get; set; }
-        public rotation rotation { get; set; }
-    }
-    public class redTeam
+    public class spawnCoordinate
     {
         public int number { get; set; }
         public position position { get; set; }
@@ -132,7 +115,6 @@ namespace Coordinates
             Y = v3.Y;
             Z = v3.Z;
         }
-
         public Vector3 V3 { get { return new Vector3(X, Y, Z); } set { Fill(value); } }
     }
     public class rotation
@@ -141,6 +123,14 @@ namespace Coordinates
         public float Y { get; set; }
         public float Z { get; set; }
         public float W { get; set; }
+        public void Fill(Quaternion quaternion)
+        {
+            X = quaternion.X;
+            Y = quaternion.Y;
+            Z = quaternion.Z;
+            W = quaternion.W;
+        }
+        public Quaternion Quaternion { get { return new Quaternion(X, Y, Z, W); } set { Fill(value); } }
     }
     public class size
     {

@@ -90,7 +90,7 @@ namespace TXServer.Core
 				//new UserDailyBonusCycleComponent(1),
 				new TutorialCompleteIdsComponent(),
 				new RegistrationDateComponent(),
-				new LeagueGroupComponent(Leagues.GlobalItems.Silver),
+				new LeagueGroupComponent(Leagues.GlobalItems.Master),
 				new UserStatisticsComponent(),
 				new PersonalChatOwnerComponent(),
 				new GameplayChestScoreComponent(),

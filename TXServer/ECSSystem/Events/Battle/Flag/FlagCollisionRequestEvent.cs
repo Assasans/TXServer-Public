@@ -16,7 +16,7 @@ namespace TXServer.ECSSystem.Events.Battle
     {
         public static void Execute(Player player, Entity tank, Entity flag)
         {
-            Core.Battles.Battle battle = ServerConnection.BattlePool.First(b => b.BattleEntity.GetComponent<BattleGroupComponent>().Key == tank.GetComponent<BattleGroupComponent>().Key);
+            Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.BattleEntity.GetComponent<BattleGroupComponent>().Key == tank.GetComponent<BattleGroupComponent>().Key);
 
             // enemy team flag
             if (flag.GetComponent<TeamGroupComponent>().Key != tank.GetComponent<TeamGroupComponent>().Key)
