@@ -17,7 +17,7 @@ namespace TXServer.ECSSystem.Events.Matchmaking
             //todo handle it in the lobby
             CommandManager.SendCommands(player, new ComponentAddCommand(player.User, new MatchMakingUserReadyComponent()));
 
-            Core.Battles.Battle battle = ServerConnection.BattlePool.SingleOrDefault(b => b.BlueTeamPlayers.Concat(b.RedTeamPlayers).Contains(player.BattleLobbyPlayer));
+            Core.Battles.Battle battle = ServerConnection.BattlePool.SingleOrDefault(b => b.BlueTeamPlayers.Concat(b.RedTeamPlayers).Concat(b.DMTeamPlayers).Contains(player.BattleLobbyPlayer));
             if (battle.BattleState == BattleState.Running)
             {
                 BattleLobbyPlayer toRemoveBattleLobbyPlayer = battle.WaitingToJoinPlayers.SingleOrDefault(p => p.BattlePlayer == player.BattleLobbyPlayer.BattlePlayer);

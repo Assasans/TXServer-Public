@@ -177,6 +177,8 @@
     <Compile Include="ECSSystem\Components\Battle\Weapon\VulcanSpeedUpComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponBulletShotComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Weapon\WeaponStreamShootingComponent.cs" />
+    <Compile Include="ECSSystem\Components\Chat\GeneralBattleChatComponent.cs" />
+    <Compile Include="ECSSystem\Components\Chat\TeamBattleChatComponent.cs" />
     <Compile Include="ECSSystem\Components\Matchmaking\ClientBattleParamsComponent.cs" />
     <Compile Include="ECSSystem\Components\Matchmaking\CustomBattleLobbyComponent.cs" />
     <Compile Include="ECSSystem\Components\Matchmaking\OpenCustomLobbyPriceComponent.cs" />
@@ -294,7 +296,11 @@
     <Compile Include="ECSSystem\EntityTemplates\Battle\WeaponPaintBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\WeaponSkinBattleItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\WeaponTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Chat\BattleLobbyChatTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Chat\ChatTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Chat\GeneralBattleChatTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Chat\PersonalChatTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Chat\TeamBattleChatTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IMarketItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IMountableItemTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Item\IUserItemTemplate.cs" />

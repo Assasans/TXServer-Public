@@ -14,13 +14,19 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     {
         public static Entity CreateEntity(BattleLobbyPlayer battlePlayer, Entity battle, Entity tank)
         {
-            return new Entity(new TemplateAccessor(new RoundUserTemplate(), "battle/round/rounduser"),
+            Entity entity = new Entity(new TemplateAccessor(new RoundUserTemplate(), "battle/round/rounduser"),
                 new RoundUserStatisticsComponent(place:1, scoreWithoutBonuses:0, kills:0, killAssists:0, deaths:0),
                 new RoundUserComponent(),
                 new UserGroupComponent(battlePlayer.User),
-                new TeamGroupComponent(battlePlayer.Team),
                 new BattleGroupComponent(battle),
                 new TankGroupComponent(tank));
+
+            if (battlePlayer.Team != null)
+            {
+                entity.Components.Add(new TeamGroupComponent(battlePlayer.Team));
+            }
+
+            return entity;
         }
     }
 }

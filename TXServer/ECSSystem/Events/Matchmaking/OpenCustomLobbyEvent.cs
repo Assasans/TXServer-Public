@@ -3,6 +3,7 @@ using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using System.Linq;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -11,23 +12,17 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			PlayerData data = player.Data;
+			Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.Owner == player);
 
-			foreach (Core.Battles.Battle battle in ServerConnection.BattlePool)
-            {
-				if (battle.Owner == player) {
-					battle.IsOpen = true;
-					CommandManager.SendCommands(player, new ComponentAddCommand(battle.BattleLobbyEntity, new OpenToConnectLobbyComponent()));
-					int price = 1000;  // 1000 Blue-Crystals standard price for opening custom battles
-					if (player.User.GetComponent<PremiumAccountBoostComponent>() != null)
-					{
-						price = 0;  // official premium pass feature: open custom battles for free
-					}
-					UserMoneyComponent crystals = data.SetCrystals(data.Crystals - price);
-					CommandManager.SendCommands(player, new ComponentChangeCommand(entity, crystals));
-					break;
-                }
-            }
+			battle.IsOpen = true;
+			CommandManager.SendCommands(player, new ComponentAddCommand(battle.BattleLobbyEntity, new OpenToConnectLobbyComponent()));
+			int price = 1000;  // 1000 Blue-Crystals standard price for opening custom battles
+			if (player.User.GetComponent<PremiumAccountBoostComponent>() != null)
+			{
+				price = 0;  // official premium pass feature: open custom battles for free
+			}
+			UserMoneyComponent crystals = player.Data.SetCrystals(player.Data.Crystals - price);
+			CommandManager.SendCommands(player, new ComponentChangeCommand(player.User, crystals));
 		}
 	}
 }

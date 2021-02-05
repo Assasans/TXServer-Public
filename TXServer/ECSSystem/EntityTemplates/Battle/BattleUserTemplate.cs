@@ -12,14 +12,18 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     {
         public static Entity CreateEntity(Player player, Entity battle, Entity team)
         {
-            return new Entity(new TemplateAccessor(new BattleUserTemplate(), "battle/battleuser"),
+            Entity entity = new Entity(new TemplateAccessor(new BattleUserTemplate(), "battle/battleuser"),
                     new UserGroupComponent(player.User),
                     new BattleGroupComponent(battle),
                     new UserInBattleAsTankComponent(),
                     new BattleUserComponent(),
                     // new UserInBattleAsSpectatorComponent(99L),//todo
-                    new IdleCounterComponent(10000L), //todo this is the kick time after becoming idle
-                    new TeamGroupComponent(team));
+                    new IdleCounterComponent(10000L)); //todo this is the kick time after becoming idle
+            if (team != null)
+            {
+                entity.Components.Add(new TeamGroupComponent(team));
+            }
+            return entity;
         }
     }
 }

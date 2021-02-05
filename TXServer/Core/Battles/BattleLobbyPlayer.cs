@@ -8,7 +8,7 @@ namespace TXServer.Core.Battles
         {
             Player = player;
             User = player.User;
-            Team = team;
+            if (team != null) { Team = team; }
         }
 
         public void Reset()

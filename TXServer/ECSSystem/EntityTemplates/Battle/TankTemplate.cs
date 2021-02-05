@@ -24,9 +24,12 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
 				new DampingComponent(1500),
 				new SpeedComponent(9.967f, 98f, 13.205f),
 				new SpeedConfigComponent(112.854f, 19.96f, 10.719f, 226.333f),
-				new WeightComponent(2986.667f),
-				battleUser.GetComponent<TeamGroupComponent>());
+				new WeightComponent(2986.667f));
 
+			if (battleUser.GetComponent<TeamGroupComponent>() != null)
+            {
+				battleUser.GetComponent<TeamGroupComponent>();
+			}
 			entity.Components.Add(new TankGroupComponent(entity));
 
 			return entity;

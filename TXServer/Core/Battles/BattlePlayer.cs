@@ -75,10 +75,15 @@ namespace TXServer.Core.Battles
                     if (_TankState == TankState.New)
                     {
                         
-                        Battle battle = ServerConnection.BattlePool.Single(b => b.BlueTeamPlayers.Concat(b.RedTeamPlayers).Contains(Player.BattleLobbyPlayer));
+                        Battle battle = ServerConnection.BattlePool.Single(b => b.BlueTeamPlayers.Concat(b.RedTeamPlayers).Concat(b.DMTeamPlayers).Contains(Player.BattleLobbyPlayer));
 
                         IList<Coordinates.spawnCoordinate> coordinates;
-                        TeamColor teamColor = Player.BattleLobbyPlayer.Team.GetComponent<TeamColorComponent>().TeamColor;
+                        TeamColor teamColor;
+                        if (Player.BattleLobbyPlayer.Team == null) { teamColor = TeamColor.NONE; }
+                        else
+                        {
+                            teamColor = Player.BattleLobbyPlayer.Team.GetComponent<TeamColorComponent>().TeamColor;
+                        }
 
                         if (battle.DeathmatchSpawnPoints == null)
                         {
