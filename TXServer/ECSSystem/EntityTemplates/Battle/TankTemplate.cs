@@ -28,7 +28,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
 
 			if (battleUser.GetComponent<TeamGroupComponent>() != null)
             {
-				battleUser.GetComponent<TeamGroupComponent>();
+				entity.Components.Add(battleUser.GetComponent<TeamGroupComponent>());
 			}
 			entity.Components.Add(new TankGroupComponent(entity));
 

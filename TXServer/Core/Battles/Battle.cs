@@ -450,16 +450,16 @@ namespace TXServer.Core.Battles
             for (int i = 0; i < RedTeamPlayers.Count + BlueTeamPlayers.Count + DMTeamPlayers.Count; i++)
             {
                 BattleLobbyPlayer battleLobbyPlayer;
-                if (i < RedTeamPlayers.Count)
+                if (BattleParams.BattleMode == BattleMode.DM)
                 {
-                    battleLobbyPlayer = RedTeamPlayers[i];
+                    battleLobbyPlayer = DMTeamPlayers[i];
                 }
                 else
                 {
-                    if (i < BlueTeamPlayers.Count)
-                        battleLobbyPlayer = BlueTeamPlayers[i - RedTeamPlayers.Count];
+                    if (i < RedTeamPlayers.Count)
+                        battleLobbyPlayer = RedTeamPlayers[i];
                     else
-                        battleLobbyPlayer = DMTeamPlayers[i - RedTeamPlayers.Count - BlueTeamPlayers.Count];
+                        battleLobbyPlayer = BlueTeamPlayers[i - RedTeamPlayers.Count];
                 }
 
                 if (!battleLobbyPlayer.Player.IsActive || battleLobbyPlayer.WaitingForExit)
