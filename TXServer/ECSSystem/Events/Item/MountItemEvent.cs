@@ -127,9 +127,19 @@ namespace TXServer.ECSSystem.Events
 					throw new NotImplementedException();
 			}
 
-			CommandManager.SendCommands(player,
+			List<ICommand> commands2 = new List<ICommand>
+			{
 				new ComponentRemoveCommand(prevItem, typeof(MountedItemComponent)),
-				new ComponentAddCommand(item, new MountedItemComponent()));
+				new ComponentAddCommand(item, new MountedItemComponent())
+			};
+
+			if (player.User.GetComponent<UserEquipmentComponent>() != null)
+            {
+				commands2.Add(new ComponentRemoveCommand(player.User, typeof(UserEquipmentComponent)));
+				commands2.Add(new ComponentAddCommand(player.User, new UserEquipmentComponent(player.CurrentPreset.Weapon.EntityId, player.CurrentPreset.Hull.EntityId)));
+			}
+
+			CommandManager.SendCommands(player, commands2);
 		}
 	}
 }

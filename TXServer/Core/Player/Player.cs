@@ -157,7 +157,7 @@ namespace TXServer.Core
 
 			collectedCommands.AddRange(new ICommand[] {
 				//new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
-				new SendEventCommand(new PaymentSectionLoadedEvent(), user),
+			    new SendEventCommand(new PaymentSectionLoadedEvent(), user),
 				new ComponentAddCommand(user, new UserOnlineComponent()),
 				new SendEventCommand(new FriendsLoadedEvent(), ClientSession)
 			});

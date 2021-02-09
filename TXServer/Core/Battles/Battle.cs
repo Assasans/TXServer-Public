@@ -223,6 +223,7 @@ namespace TXServer.Core.Battles
             // prepare client
             List<ICommand> commands = new List<ICommand>
             {
+                new ComponentAddCommand(player.User, new UserEquipmentComponent(player.CurrentPreset.Weapon.EntityId, player.CurrentPreset.Hull.EntityId)),
                 new EntityShareCommand(BattleLobbyEntity),
                 new EntityShareCommand(BattleLobbyChatEntity),
                 new ComponentAddCommand(player.User, new BattleLobbyGroupComponent(BattleLobbyEntity)),
@@ -302,6 +303,7 @@ namespace TXServer.Core.Battles
 
             List<ICommand> commands = new List<ICommand>
             {
+                new ComponentRemoveCommand(battlePlayer.User, typeof(UserEquipmentComponent)),
                 new EntityUnshareCommand(BattleLobbyEntity),
                 new ComponentRemoveCommand(battlePlayer.User, typeof(BattleLobbyGroupComponent)),
                 new ComponentRemoveCommand(battlePlayer.User, typeof(TeamColorComponent)),
