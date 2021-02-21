@@ -15,14 +15,16 @@ namespace TXServer.ECSSystem.Events.Battle
 			Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.Owner == player);
 
 			battle.IsOpen = true;
-			CommandManager.SendCommands(player, new ComponentAddCommand(battle.BattleLobbyEntity, new OpenToConnectLobbyComponent()));
 			int price = 1000;  // 1000 Blue-Crystals standard price for opening custom battles
 			if (player.User.GetComponent<PremiumAccountBoostComponent>() != null)
 			{
 				price = 0;  // official premium pass feature: open custom battles for free
 			}
-			UserMoneyComponent crystals = player.Data.SetCrystals(player.Data.Crystals - price);
-			CommandManager.SendCommands(player, new ComponentChangeCommand(player.User, crystals));
+			UserMoneyComponent userMoneyComponent = player.Data.SetCrystals(player.Data.Crystals - price);
+
+			CommandManager.SendCommands(player, 
+				new ComponentChangeCommand(player.User, userMoneyComponent),
+				new ComponentAddCommand(battle.BattleLobbyEntity, new OpenToConnectLobbyComponent()));
 		}
 	}
 }

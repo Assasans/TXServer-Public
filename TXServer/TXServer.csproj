@@ -354,6 +354,7 @@
     <Compile Include="ECSSystem\Events\Battle\SelfUpdateStreamHitEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\UnpauseEvent.cs" />
+    <Compile Include="ECSSystem\Events\Entrance\IncrementRegistrationNicksEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\OpenContainerEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\ClientExitLobbyEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\ConnectToCustomLobbyEvent.cs" />
@@ -386,6 +387,19 @@
     <Compile Include="ECSSystem\Events\Ping\PingEvent.cs" />
     <Compile Include="ECSSystem\Events\Ping\PingResultEvent.cs" />
     <Compile Include="ECSSystem\Events\Ping\PongEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\ActivatePromoCodeEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\BuyUIDChangeEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\CheckPromoCodeEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\CheckUserUidEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\CompleteBuyUIDChangeEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\ConfirmUserCountryEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\EmailOccupiedEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\EmailVacantEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\PromoCodeCheckResultEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\RequestChangeUserEmailEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\SubscribeChangeEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\UserUidOccupiedEvent.cs" />
+    <Compile Include="ECSSystem\Events\Settings\UserUidVacantEvent.cs" />
     <Compile Include="ECSSystem\GlobalEntities\Details.cs" />
     <Compile Include="Core\Data\IDatabase.cs" />
     <Compile Include="Core\Data\Impl\LocalDatabase.cs" />
@@ -409,6 +423,7 @@
     <Compile Include="ECSSystem\Types\ModulePrice.cs" />
     <Compile Include="ECSSystem\Types\NotificationPriority.cs" />
     <Compile Include="ECSSystem\Types\PaymentStatisticsAction.cs" />
+    <Compile Include="ECSSystem\Types\PromoCodeCheckResult.cs" />
     <Compile Include="ECSSystem\Types\QuestConditionType.cs" />
     <Compile Include="ECSSystem\Types\Slot.cs" />
     <Compile Include="ECSSystem\Types\StaticHit.cs" />
