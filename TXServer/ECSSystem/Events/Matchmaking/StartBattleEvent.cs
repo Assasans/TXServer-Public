@@ -3,6 +3,7 @@ using TXServer.ECSSystem.Base;
 using TXServer.Core;
 using System.Linq;
 using TXServer.Core.Battles;
+using TXServer.ECSSystem.Components;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -15,6 +16,8 @@ namespace TXServer.ECSSystem.Events.Battle
 
 			if (battle.BattleState == BattleState.CustomNotStarted)
             {
+				battle.CountdownTimer = 3;
+				battle.BattleLobbyEntity.AddComponent(new MatchMakingLobbyStartingComponent());
 				battle.BattleState = BattleState.Starting;
             }
 			else

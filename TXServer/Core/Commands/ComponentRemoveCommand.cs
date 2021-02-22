@@ -16,6 +16,11 @@ namespace TXServer.Core.Commands
             ComponentType = componentType ?? throw new ArgumentNullException(nameof(componentType));
         }
 
+        public ComponentRemoveCommand(Entity target, Type componentType, bool removeDone) : this(target, componentType)
+        {
+            this.removeDone = Convert.ToInt32(removeDone);
+        }
+
         public void OnSend(Player player)
         {
             RemoveComponent(player);
@@ -29,7 +34,7 @@ namespace TXServer.Core.Commands
             lock (Target.PlayerReferences)
                 CommandManager.BroadcastCommands(Target.PlayerReferences.Where(x => x != player), this);
 
-            Target.RemoveComponent(ComponentType);
+            Target.RemoveComponentLocally(ComponentType);
         }
 
         public override string ToString()

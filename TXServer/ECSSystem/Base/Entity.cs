@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading;
 using TXServer.Core;
+using TXServer.Core.Commands;
 using TXServer.Library;
 
 namespace TXServer.ECSSystem.Base
@@ -48,8 +49,6 @@ namespace TXServer.ECSSystem.Base
             Components.UnionWith(components);
         }
 
-        
-
         public static Int64 GenerateId()
         {
             return Interlocked.Increment(ref LastEntityId);
@@ -73,14 +72,56 @@ namespace TXServer.ECSSystem.Base
             return component as T;
         }
 
+        public void AddComponent(Component component)
+        {
+            AddComponentLocally(component);
+            
+            foreach (Player player in PlayerReferences)
+            {
+                CommandManager.SendCommandsSafe(player, new ComponentAddCommand(this, component, addOrChangeDone: true));
+            }
+        }
+
+        public void ChangeComponent(Component component)
+        {
+            ChangeComponentLocally(component);
+
+            foreach (Player player in PlayerReferences)
+            {
+                CommandManager.SendCommandsSafe(player, new ComponentChangeCommand(this, component, addOrChangeDone: true));
+            }
+        }
+
         public void RemoveComponent<T>() where T : Component => RemoveComponent(typeof(T));
 
         public void RemoveComponent(Type componentType)
         {
-            if (!Components.Remove(FormatterServices.GetUninitializedObject(componentType) as Component))
+            RemoveComponentLocally(componentType);
+
+            foreach (Player player in PlayerReferences)
             {
-                throw new ArgumentException("Component not found", componentType.Name);
+                CommandManager.SendCommandsSafe(player, new ComponentRemoveCommand(this, componentType, removeDone: true));
             }
+        }
+
+        public void AddComponentLocally(Component component)
+        {
+            if (!Components.Add(component))
+                throw new ArgumentException("Entity already contains component", component.GetType().FullName);
+        }
+
+        public void ChangeComponentLocally(Component component)
+        {
+            if (!Components.Remove(component))
+                throw new ArgumentException("Component " + component.GetType().FullName + " does not exist.");
+
+            Components.Add(component);
+        }
+
+        public void RemoveComponentLocally(Type componentType)
+        {
+            if (!Components.Remove((Component)FormatterServices.GetUninitializedObject(componentType)))
+                throw new ArgumentException("Component was not found", componentType.Name);
         }
 
         public override string ToString()

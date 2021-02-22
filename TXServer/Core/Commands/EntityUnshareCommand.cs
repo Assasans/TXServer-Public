@@ -7,15 +7,16 @@ namespace TXServer.Core.Commands
     [CommandCode(3)]
     public class EntityUnshareCommand : ICommand
     {
-        public EntityUnshareCommand(Entity Entity)
+        public EntityUnshareCommand(Entity Entity, bool isManual = false)
         {
             this.Entity = Entity ?? throw new ArgumentNullException(nameof(Entity));
+            this.isManual = isManual;
         }
 
         public void OnSend(Player player)
         {
-            player.EntityList.Remove(Entity);
-            Entity.PlayerReferences.Remove(player);
+            if (isManual) return;
+            player.RemoveEntity(Entity);
         }
 
         public void OnReceive(Player player)
@@ -29,5 +30,6 @@ namespace TXServer.Core.Commands
         }
 
         [ProtocolFixed] public Entity Entity { get; }
+        private readonly bool isManual;
     }
 }

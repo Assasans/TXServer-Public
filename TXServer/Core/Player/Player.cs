@@ -166,6 +166,35 @@ namespace TXServer.Core
 			return true;
         }
 
+		public void SendEvent(ECSEvent @event, params Entity[] entities)
+        {
+			CommandManager.SendCommandsSafe(this, new SendEventCommand(@event, entities));
+        }
+
+		public void ShareEntity(Entity entity)
+		{
+			AddEntity(entity);
+			CommandManager.SendCommandsSafe(this, new EntityShareCommand(entity, isManual: true));
+		}
+
+		public void UnshareEntity(Entity entity)
+		{
+			RemoveEntity(entity);
+			CommandManager.SendCommandsSafe(this, new EntityUnshareCommand(entity, isManual: true));
+		}
+
+		public void AddEntity(Entity entity)
+        {
+			EntityList.Add(entity);
+			entity.PlayerReferences.Add(this);
+		}
+
+		public void RemoveEntity(Entity entity)
+        {
+			EntityList.Remove(entity);
+			entity.PlayerReferences.Remove(this);
+		}
+
         public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
 
         /// <summary>

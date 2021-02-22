@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -11,6 +12,11 @@ namespace TXServer.Core.Commands
         {
             this.Target = Target;
             this.Component = Component;
+        }
+
+        public ComponentAddOrChangeCommand(Entity target, Component component, bool addOrChangeDone) : this(target, component)
+        {
+            this.addOrChangeDone = Convert.ToInt32(addOrChangeDone);
         }
 
         public void OnSend(Player player)

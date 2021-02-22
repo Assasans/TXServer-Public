@@ -8,6 +8,7 @@ namespace TXServer.Core.Commands
     public class ComponentAddCommand : ComponentAddOrChangeCommand
     {
         public ComponentAddCommand(Entity Target, Component Component) : base(Target, Component) { }
+        public ComponentAddCommand(Entity Target, Component Component, bool addOrChangeDone) : base(Target, Component, addOrChangeDone) { }
 
         public override void OnReceive(Player player)
         {
@@ -20,10 +21,6 @@ namespace TXServer.Core.Commands
             }
         }
 
-        protected override void AddOrChangeComponent()
-        {
-            if (!Target.Components.Add(Component))
-                throw new ArgumentException("Entity already contains component " + Component.GetType().FullName + ".");
-        }
+        protected override void AddOrChangeComponent() => Target.AddComponentLocally(Component);
     }
 }

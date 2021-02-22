@@ -9,7 +9,7 @@ namespace TXServer.Core.Commands
     [CommandCode(2)]
     public class EntityShareCommand : ICommand
     {
-        public EntityShareCommand(Entity Entity)
+        public EntityShareCommand(Entity Entity, bool isManual = false)
         {
             this.Entity = Entity ?? throw new ArgumentNullException(nameof(Entity));
 
@@ -18,12 +18,14 @@ namespace TXServer.Core.Commands
 
             Components = new Component[Entity.Components.Count];
             Entity.Components.CopyTo((Component[])Components);
+
+            this.isManual = isManual;
         }
 
         public void OnSend(Player player)
         {
-            player.EntityList.Add(Entity);
-            Entity.PlayerReferences.Add(player);
+            if (isManual) return;
+            player.AddEntity(Entity);
         }
 
         public void OnReceive(Player player)
@@ -37,6 +39,7 @@ namespace TXServer.Core.Commands
         }
 
         private Entity Entity { get; }
+        private readonly bool isManual;
 
         [ProtocolFixed] public Int64 EntityId { get; private set; }
         [ProtocolFixed][OptionalMapped] public TemplateAccessor TemplateAccessor { get; private set; }
