@@ -14,7 +14,6 @@ namespace TXServer.ECSSystem.Events
 		public void Execute(Player player, Entity entity)
 		{
 			PlayerData data = player.Data;
-
 			UserXCrystalsComponent xCrystals = data.SetXCrystals(data.XCrystals - XCrystals);
 			UserMoneyComponent crystals = data.SetCrystals(data.Crystals + XCrystals * 50);
 

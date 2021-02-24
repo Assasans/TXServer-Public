@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Threading.Tasks;
 using TXServer.Utils;
 using TXServer.ECSSystem.Components;
@@ -6,6 +7,7 @@ using TXServer.ECSSystem.Types;
 
 using MySql.Data.MySqlClient;
 using System.Net.Sockets;
+using System.Collections.Generic;
 
 namespace TXServer.Core.RemoteDatabase
 {
@@ -35,6 +37,7 @@ namespace TXServer.Core.RemoteDatabase
         public static bool OpenConnection()
         {
             if (!isInitilized) throw new Exception("SQL is not initilized! Use the Initilize function!");
+            if (Socket.State == ConnectionState.Open) return true;
             try
             {
                 Socket.Open();
@@ -90,7 +93,7 @@ namespace TXServer.Core.RemoteDatabase
         public readonly string HashAlg = MD5Util.Compute("tanki-x/users"); // The hash algorithm... I couldn't think of anything so I just made something up
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "I already do filter input via the 'Escape()' function")]
-        public async Task<UserDatabaseRow> GetUserByName(string username)
+        public async Task<PlayerData> GetUserByName(string username)
         {
             if (!StringUtil.isUsernameValid(username)) throw new UserError("Invalid Username");
 
@@ -106,27 +109,26 @@ namespace TXServer.Core.RemoteDatabase
 
                 MySqlDataReader response = request.ExecuteReader(System.Data.CommandBehavior.SingleRow);
 
-                UserDatabaseRow user = UserDatabaseRow.Empty;
+                PlayerData user = null;
                 if (response.HasRows)
                 {
                     await response.ReadAsync();
-                    user = new UserDatabaseRow
-                    {
-                        uid = response.GetInt32("uid"),
-                        username = response.GetString("username"),
-                        hashedPassword = response.GetString("hashedPassword"),
-                        email = response.GetString("email"),
-                        isEmailVerified = response.GetBoolean("isEmailVerified"),
-                        score = response.GetInt64("score"),
-                        crystals = response.GetInt64("crystals"),
-                        xcrystals = response.GetInt64("xcrystals"),
-                        countryCode = response.GetString("countryCode"),
-                        avatar = response.GetString("avatar"),
-                        isAdmin = response.GetBoolean("isAdmin"),
-                        isBeta = response.GetBoolean("isBeta"),
-                        isSubscribed = response.GetBoolean("isSubscribed"),
-                        premiumExpiration = response.GetDateTime("premiumExpiration")
-                    };
+                    user = new UserInfo(
+                        response.GetInt32("uid").ToString(),
+                        response.GetString("username"),
+                        response.GetString("hashedPassword"),
+                        response.GetString("email"),
+                        response.GetBoolean("isEmailVerified"),
+                        response.GetInt64("score"),
+                        response.GetInt64("crystals"),
+                        response.GetInt64("xcrystals"),
+                        response.GetString("countryCode"),
+                        response.GetString("avatar"),
+                        response.GetBoolean("isAdmin"),
+                        response.GetBoolean("isBeta"),
+                        response.GetBoolean("isSubscribed"),
+                        response.GetDateTime("premiumExpiration")
+                    );
                 }
 
                 response.Close();
@@ -137,7 +139,7 @@ namespace TXServer.Core.RemoteDatabase
             else throw new SocketException((int)SocketError.ConnectionRefused);
         }
 
-        public async Task<UserDatabaseRow> GetUserByEmail(string email)
+        public async Task<PlayerData> GetUserByEmail(string email)
         {
             if (!StringUtil.isEmailValid(email)) throw new UserError("Invalid Email");
 
@@ -153,27 +155,26 @@ namespace TXServer.Core.RemoteDatabase
 
                 MySqlDataReader response = request.ExecuteReader(System.Data.CommandBehavior.SingleRow);
 
-                UserDatabaseRow user = UserDatabaseRow.Empty;
+                PlayerData user = null;
                 if (response.HasRows)
                 {
                     await response.ReadAsync();
-                    user = new UserDatabaseRow
-                    {
-                        uid = response.GetInt32("uid"),
-                        username = response.GetString("username"),
-                        hashedPassword = response.GetString("hashedPassword"),
-                        email = response.GetString("email"),
-                        isEmailVerified = response.GetBoolean("isEmailVerified"),
-                        score = response.GetInt64("score"),
-                        crystals = response.GetInt64("crystals"),
-                        xcrystals = response.GetInt64("xcrystals"),
-                        countryCode = response.GetString("countryCode"),
-                        avatar = response.GetString("avatar"),
-                        isAdmin = response.GetBoolean("isAdmin"),
-                        isBeta = response.GetBoolean("isBeta"),
-                        isSubscribed = response.GetBoolean("isSubscribed"),
-                        premiumExpiration = response.GetDateTime("premiumExpiration")
-                    };
+                    user = new UserInfo(
+                        response.GetInt32("uid").ToString(),
+                        response.GetString("username"),
+                        response.GetString("hashedPassword"),
+                        response.GetString("email"),
+                        response.GetBoolean("isEmailVerified"),
+                        response.GetInt64("score"),
+                        response.GetInt64("crystals"),
+                        response.GetInt64("xcrystals"),
+                        response.GetString("countryCode"),
+                        response.GetString("avatar"),
+                        response.GetBoolean("isAdmin"),
+                        response.GetBoolean("isBeta"),
+                        response.GetBoolean("isSubscribed"),
+                        response.GetDateTime("premiumExpiration")
+                    );
                 }
 
                 response.Close();
@@ -198,9 +199,13 @@ namespace TXServer.Core.RemoteDatabase
                     RemoteDatabase.Socket
                 );
 
-                MySqlDataReader response = request.ExecuteReader(System.Data.CommandBehavior.SingleRow);
+                MySqlDataReader response = request.ExecuteReader(CommandBehavior.SingleRow);
 
-                return response.HasRows;
+                bool result = response.HasRows;
+                response.Close();
+                RemoteDatabase.CloseConnection();
+
+                return result;
             }
             else throw new SocketException((int)SocketError.ConnectionRefused);
         }
@@ -219,21 +224,23 @@ namespace TXServer.Core.RemoteDatabase
                     RemoteDatabase.Socket
                 );
 
-                MySqlDataReader response = request.ExecuteReader(System.Data.CommandBehavior.SingleRow);
+                MySqlDataReader response = request.ExecuteReader(CommandBehavior.SingleRow);
+                bool result = response.HasRows;
+                response.Close();
                 RemoteDatabase.CloseConnection();
 
-                return response.HasRows;
+                return result;
             }
             else throw new SocketException((int)SocketError.ConnectionRefused);
         }
 
-        public async Task<UserDatabaseRow> Create(UserDatabaseRow user)
+        public async Task<PlayerData> Create(string username, string hashedPassword, string email = "") 
         {
-            if (user.username == null ||
-                user.hashedPassword == null) throw new UserError("Fill out all the fields");
-            if (!StringUtil.isUsernameValid(user.username))
+            if (username == null ||
+               hashedPassword == null) throw new UserError("Fill out all the fields");
+            if (!StringUtil.isUsernameValid(username))
                 throw new UserError("Invalid username");
-            if (UserExists(user.username))
+            if (UserExists(username))
                 throw new UserError("Username not Available");
 
             if (RemoteDatabase.OpenConnection())
@@ -241,22 +248,51 @@ namespace TXServer.Core.RemoteDatabase
                 try
                 {
                     string _now = DateTime.UtcNow.ToString("yyyy-mm-dd H:mm:ss");
-                    Console.WriteLine("CURRENT TIME: " + _now);
                     MySqlCommand request = new MySqlCommand(
-                        string.Format(
-                            "INSERT INTO users(username, hashedPassword, email) VALUES('{0}', '{1}', '{2}')",
-                            Escape(user.username),
-                            Escape(user.hashedPassword),
-                            Escape(user.email ?? "")
-                        ),
+                        $"INSERT INTO users(username, hashedPassword, email) VALUES('{Escape(username)}', '{Escape(hashedPassword)}', '{email ?? Escape(email)}')",
                         RemoteDatabase.Socket
                     );
-                    Console.WriteLine("FINAL CMD: " + request.CommandText);
                     request.ExecuteNonQuery();
 
                     RemoteDatabase.CloseConnection();
 
-                    return await GetUserByName(user.username);
+                    return await GetUserByName(username);
+                }
+                catch (Exception error)
+                {
+                    Console.WriteLine(error.ToString());
+                    RemoteDatabase.CloseConnection();
+                    throw new UserError("Something unexpected happened");
+                }
+            }
+            else throw new SocketException((int)SocketError.ConnectionRefused);
+        }
+
+        public async Task<string[]> GetSubedEmailList()
+        {
+            if (RemoteDatabase.OpenConnection())
+            {
+                try
+                {
+                    string _now = DateTime.UtcNow.ToString("yyyy-mm-dd H:mm:ss");
+                    Console.WriteLine("CURRENT TIME: " + _now);
+                    MySqlCommand request = new MySqlCommand("SELECT email FROM users WHERE isSubscribed = 1", RemoteDatabase.Socket);
+                    
+                    MySqlDataReader response = request.ExecuteReader();
+
+                    List<string> emails = new List<string>();
+                    if (response.HasRows)
+                    {
+                        while (response.NextResult())
+                        {
+                            await response.ReadAsync();
+                            Console.WriteLine("response.GetString('email') => " + response.GetString("email"));
+                            emails.Add(response.GetString("email"));
+                        }
+                    }
+                    RemoteDatabase.CloseConnection();
+
+                    return emails.ToArray();
                 }
                 catch (Exception error)
                 {
@@ -500,7 +536,7 @@ namespace TXServer.Core.RemoteDatabase
             else throw new SocketException((int)SocketError.ConnectionRefused);
         }
 
-        public void SetIsSubscribed(string username, bool verified)
+        public void SetIsSubscribed(string username, bool value)
         {
             if (!StringUtil.isUsernameValid(username)) throw new UserError("Invalid Username");
 
@@ -510,7 +546,7 @@ namespace TXServer.Core.RemoteDatabase
                     cmdText: string.Format(
                         "UPDATE users SET isSubscribed = {1} WHERE username = '{0}'",
                         Escape(username),
-                        verified ? "1" : "0"
+                        value ? "1" : "0"
                     ),
                     RemoteDatabase.Socket
                 );
@@ -543,25 +579,10 @@ namespace TXServer.Core.RemoteDatabase
             else throw new SocketException((int)SocketError.ConnectionRefused);
         }
     }
-    public struct UserDatabaseRow
+    /*public struct UserDatabaseRow
     {
         //static string Escape(string value) => MySqlHelper.EscapeString(value);
         public static readonly UserDatabaseRow Empty = new UserDatabaseRow(); // An empty instance to compare for mistakes
-        public static readonly UserDatabaseRow OfflineProfile = new UserDatabaseRow
-        {
-            hashedPassword = "abc",
-            email = "none",
-            isEmailVerified = false,
-            score = 0,
-            crystals = 0,
-            xcrystals = 0,
-            countryCode = "EN",
-            avatar = "8b74e6a3-849d-4a8d-a20e-be3c142fd5e8",
-            isAdmin = false,
-            isBeta = false,
-            isSubscribed = false,
-            premiumExpiration = DateTime.Now
-        };
         public int uid;
         public string username;
         public string hashedPassword;
@@ -576,10 +597,40 @@ namespace TXServer.Core.RemoteDatabase
         public bool isAdmin;
         public bool isBeta;
         public DateTimeOffset premiumExpiration;
-    }
+    }*/
     public class UserInfo : PlayerData
     {
-        public UserInfo(string uid) : base(uid) { }
+        public UserInfo(string offlineProfileUid) : base(offlineProfileUid) {
+            Username = offlineProfileUid;
+            HashedPassword = string.Empty;
+            Email = "user@example.com";
+            Score = 0;
+            Crystals = 1000000;
+            XCrystals = 50000;
+            CountryCode = "EN";
+            Avatar = "8b74e6a3-849d-4a8d-a20e-be3c142fd5e8";
+            Admin = true;
+            Beta = false;
+            Subscribed = false;
+            PremiumExpiration = new DateTimeOffset(new DateTime(long.MaxValue));
+        }
+
+        public UserInfo(string uid, string username, string hashedPassword, string email, bool emailVerified, long score, long crystals, long xCrystals, string countryCode, string avatar, bool isAdmin, bool isBeta, bool isSubbed, DateTimeOffset premiumEnd) : base(username)
+        {
+            Username = username;
+            HashedPassword = hashedPassword;
+            Email = email;
+            EmailVerified = emailVerified;
+            Score = score;
+            Crystals = crystals;
+            XCrystals = xCrystals;
+            CountryCode = countryCode;
+            Avatar = avatar;
+            Admin = isAdmin;
+            Beta = isBeta;
+            Subscribed = isSubbed;
+            PremiumExpiration = premiumEnd;
+        }
 
         public override PlayerData From(object dataReader)
         {

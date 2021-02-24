@@ -20,13 +20,11 @@ namespace TXServer.ECSSystem.Events
 	{
 		public async void Execute(Player player, Entity clientSession)
 		{
-			Console.WriteLine("Hashed Password:\t" + PasswordEncipher + 
-							"\nHashed PassOnDB:\t" + player.tempRow.hashedPassword + " => (" + (PasswordEncipher == player.tempRow.hashedPassword) + ")");
 			// If the database is disabled, if not compare the passwords
-			if (!RemoteDatabase.isInitilized || PasswordEncipher == player.tempRow.hashedPassword) {
+			if (!RemoteDatabase.isInitilized || PasswordEncipher == player.Data.HashedPassword) {
 
-				PlayerData data = new UserInfo(player.tempRow.username);
-
+				PlayerData data = player.Data;
+				//PlayerData data = player.Server.Database.FetchPlayerData(Uid);
 				data.Player = player;
 				player.Data = data;
 				player.LogIn(clientSession);

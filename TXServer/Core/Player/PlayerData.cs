@@ -5,6 +5,8 @@ using TXServer.Core.Commands;
 using TXServer.Core.Data.Database;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.Core.RemoteDatabase;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core
 {
@@ -15,6 +17,7 @@ namespace TXServer.Core
 
         public string UniqueId { get; }
         public string Email { get; protected set; }
+        public bool EmailVerified { get; protected set; }
         public bool Subscribed { get; protected set; }
         public string Username { get; protected set; }
         public string HashedPassword { get; protected set; }
@@ -28,6 +31,7 @@ namespace TXServer.Core
         public long Score { get; protected set; }
         public long XCrystals { get; protected set; }
         public long Crystals { get; protected set; }
+        public DateTimeOffset PremiumExpiration { get; protected set; }
 
         public PlayerData(string uid)
         {
@@ -37,19 +41,37 @@ namespace TXServer.Core
         public ConfirmedUserEmailComponent SetEmail(string email)
         {
             var component = SetValue<ConfirmedUserEmailComponent>(email);
+            if (RemoteDatabase.RemoteDatabase.isInitilized)
+                RemoteDatabase.RemoteDatabase.Users.SetEmail(Username, Email);
             Email = email;
+            SetEmailVerified(false);
+            return component;
+        }
+
+        public ConfirmedUserEmailComponent SetEmailVerified(bool value)
+        {
+            var component = SetValue<ConfirmedUserEmailComponent>(Email);
+            if (RemoteDatabase.RemoteDatabase.isInitilized)
+                RemoteDatabase.RemoteDatabase.Users.SetEmailVerified(Username, value);
+            EmailVerified = value;
+            // Set email verified to false, make a field in here and then a function for it and call it here
             return component;
         }
 
         public ConfirmedUserEmailComponent SetSubscribed(bool subscribed)
         {
             var component = SetValue<ConfirmedUserEmailComponent>(subscribed);
+            Console.WriteLine("Settings subscribe to => " + subscribed.ToString());
+            if (RemoteDatabase.RemoteDatabase.isInitilized)
+                RemoteDatabase.RemoteDatabase.Users.SetIsSubscribed(Username, subscribed);
             Subscribed = subscribed;
             return component;
         }
 
         public void SetUsername(string username)
         {
+            if (RemoteDatabase.RemoteDatabase.isInitilized)
+                RemoteDatabase.RemoteDatabase.Users.SetUsername(Username, username);
             Username = username;
         }
 
@@ -61,6 +83,9 @@ namespace TXServer.Core
         public UserCountryComponent SetCountryCode(string countryCode)
         {
             var component = SetValue<UserCountryComponent>(countryCode);
+            if (RemoteDatabase.RemoteDatabase.isInitilized)
+                RemoteDatabase.RemoteDatabase.Users.SetCountryCode(Username, CountryCode);
+
             CountryCode = countryCode;
             return component;
         }
@@ -99,6 +124,11 @@ namespace TXServer.Core
         public UserMoneyComponent SetCrystals(long value)
         {
             var component = SetValue<UserMoneyComponent>(value);
+
+            if (RemoteDatabase.RemoteDatabase.isInitilized)
+                RemoteDatabase.RemoteDatabase.Users.SetCrystals(Player.Data.Username, value);
+            Player.Data.XCrystals = value;
+
             Crystals = value;
             return component;
         }
@@ -121,9 +151,24 @@ namespace TXServer.Core
             // Player.User.Components.TryGetValue(new UserXCrystalsComponent(0), out tmpComponent);
             // UserXCrystalsComponent component = (UserXCrystalsComponent) tmpComponent;
             // component.Money = value;
+            if (RemoteDatabase.RemoteDatabase.isInitilized)
+                RemoteDatabase.RemoteDatabase.Users.SetXCrystals(Username, value);
+            
             XCrystals = value;
             return component;
         }
+
+
+        public PremiumAccountBoostComponent SetPremiumBoost(DateTimeOffset value)
+        {
+            var component = SetValue<PremiumAccountBoostComponent>(new TXDate(value));
+            if (RemoteDatabase.RemoteDatabase.isInitilized)
+                RemoteDatabase.RemoteDatabase.Users.SetPremiumExpiration(Username, value.UtcDateTime);
+
+            PremiumExpiration = value;
+            return component;
+        }
+
 
         private T SetValue<T>(object value) where T : Component
         {

@@ -3,7 +3,6 @@ using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.Core.RemoteDatabase;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -12,9 +11,7 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			if (RemoteDatabase.isInitilized)
-				RemoteDatabase.Users.SetCountryCode(player.tempRow.username, CountryCode);
-			player.tempRow.countryCode = CountryCode;
+			player.Data.SetCountryCode(CountryCode);
 			CommandManager.SendCommands(player,
 				new ComponentChangeCommand(player.User, new UserCountryComponent(CountryCode)));
 		}

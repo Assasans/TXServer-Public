@@ -3,7 +3,6 @@ using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.Core.RemoteDatabase;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -12,19 +11,9 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			if (RemoteDatabase.isInitilized)
-				RemoteDatabase.Users.SetIsSubscribed(player.tempRow.username, Subscribed);
-			player.tempRow.isSubscribed = Subscribed;
-			ICommand command;
-			if (Subscribed)
-            {
-				command = new ComponentAddCommand(player.User, new UserSubscribeComponent());
-			} 
-			else
-            {
-				command = new ComponentRemoveCommand(player.User, typeof(UserSubscribeComponent));
-            }
-			CommandManager.SendCommands(player, command);
+			player.Data.SetSubscribed(Subscribed);
+			
+			CommandManager.SendCommands(player, new ComponentChangeCommand(entity, new UserSubscribeComponent(Subscribed)));
 		}
 		public bool Subscribed { get; set; }
 	}

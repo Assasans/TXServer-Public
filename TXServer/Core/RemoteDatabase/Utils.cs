@@ -29,6 +29,8 @@ namespace TXServer.Utils
         const string EmailAllowedCharsAdditional = "_.+-";
         public static bool isEmailValid(string email)
         {
+            // This function might be picky
+            return true;
             // username must be at least length of 1
             char[] username = email.Substring(0, email.IndexOf('@')).ToCharArray();
             if (username.Length < 2)

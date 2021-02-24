@@ -13,8 +13,7 @@ namespace TXServer.ECSSystem.Events
 		{
 			ICommand command = new SendEventCommand(new UserUidVacantEvent(Uid), entity);
 			// TODO: check if uid is occupied
-			bool emailIsOccupied = RemoteDatabase.isInitilized ? RemoteDatabase.Users.UserExists(Uid) : false;
-			if (emailIsOccupied) 
+			if (RemoteDatabase.isInitilized ? RemoteDatabase.Users.UserExists(Uid) : false) 
 			{
 			    command = new SendEventCommand(new UserUidOccupiedEvent(Uid), entity);
 			}

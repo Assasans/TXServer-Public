@@ -14,21 +14,20 @@ namespace TXServer.ECSSystem.Events
 			// If database mode is disabled
 			if (!RemoteDatabase.isInitilized)
 			{
-				player.tempRow = UserDatabaseRow.OfflineProfile;
-				player.tempRow.username = Uid;
+				player.Data = new UserInfo(Uid);
 				CommandManager.SendCommands(player, new SendEventCommand(new PersonalPasscodeEvent(), entity));
 				return;
 			}
 
-			UserDatabaseRow data = await RemoteDatabase.Users.GetUserByName(Uid);
-			if (data.Equals(UserDatabaseRow.Empty))
+			PlayerData data = await RemoteDatabase.Users.GetUserByName(Uid);
+			if (data == null)
 			{
 				CommandManager.SendCommands(player,
 					new SendEventCommand(new UidInvalidEvent(), entity),
 					new SendEventCommand(new LoginFailedEvent(), entity));
 				return;
 			}
-			player.tempRow = data;
+			player.Data = data;
 
 			CommandManager.SendCommands(player, new SendEventCommand(new PersonalPasscodeEvent(), entity));
 		}

@@ -54,7 +54,7 @@ namespace TXServer.ECSSystem.Events
                         new FavoriteEquipmentStatisticsComponent(),
                         new UserDailyBonusReceivedRewardsComponent(),
                         new ConfirmedUserEmailComponent("none"),
-                        new UserSubscribeComponent(),
+                        new UserSubscribeComponent(false),
                         new KillsEquipmentStatisticsComponent(),
                         new BattleLeaveCounterComponent(),
                         new UserReputationComponent(0.0),

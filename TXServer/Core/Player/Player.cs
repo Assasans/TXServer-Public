@@ -25,13 +25,11 @@ namespace TXServer.Core
         public Server Server { get; }
         public PlayerConnection Connection { get; }
         public PlayerData Data { get; set; }
-		public UserDatabaseRow tempRow;
 
 #if DEBUG
 		public IEnumerable<ICommand> LastServerPacket { get; set; }
 		public List<ICommand> LastClientPacket { get; set; }
 #endif
-		public string tempUsername;
 		public Player(Server server, Socket socket)
         {
             Server = server;
@@ -83,11 +81,11 @@ namespace TXServer.Core
 	        }
 
 			Entity user = new Entity(new TemplateAccessor(new UserTemplate(), ""),
-				new UserXCrystalsComponent(tempRow.xcrystals),
-				new UserCountryComponent(tempRow.countryCode), 
-				new UserAvatarComponent(tempRow.avatar),
+				new UserXCrystalsComponent(Data.XCrystals), 
+				new UserCountryComponent(Data.CountryCode), 
+				new UserAvatarComponent(Data.Avatar),
 				new UserComponent(),
-				new UserMoneyComponent(tempRow.crystals),
+				new UserMoneyComponent(Data.Crystals),
 				//new FractionGroupComponent(Fractions.GlobalItems.Frontier),
 				//new UserDailyBonusCycleComponent(1),
 				new TutorialCompleteIdsComponent(),
@@ -98,21 +96,21 @@ namespace TXServer.Core
 				new GameplayChestScoreComponent(),
 				new UserRankComponent(101),
 				new BlackListComponent(),
-				new UserUidComponent(tempRow.username),
+				new UserUidComponent(Data.UniqueId),
 				//new FractionUserScoreComponent(500),
-				new UserExperienceComponent(tempRow.score), //k
+				new UserExperienceComponent(Data.Score),
 				new QuestReadyComponent(),
 				new UserPublisherComponent(),
 				new FavoriteEquipmentStatisticsComponent(),
 				//new UserDailyBonusReceivedRewardsComponent(),
-				new ConfirmedUserEmailComponent(tempRow.email, tempRow.isSubscribed),
-				new UserSubscribeComponent(),
+				new ConfirmedUserEmailComponent(Data.Email, Data.Subscribed),
+				new UserSubscribeComponent(Data.Subscribed),
 				new KillsEquipmentStatisticsComponent(),
 				new BattleLeaveCounterComponent(),
-				new PremiumAccountBoostComponent(endDate: new TXDate(tempRow.premiumExpiration)),
+				new PremiumAccountBoostComponent(endDate: new TXDate(Data.PremiumExpiration)),
 				new UserReputationComponent(0.0));
 
-			if (tempRow.isAdmin)
+			if (Data.Admin)
 			{
 				user.Components.Add(new UserAdminComponent());
 			    if (user.GetComponent<PremiumAccountBoostComponent>() == null)
@@ -120,7 +118,7 @@ namespace TXServer.Core
 					user.Components.Add(new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(23999976, 0, 0))));
                 }
 			}
-			if (tempRow.isBeta) user.Components.Add(new ClosedBetaQuestAchievementComponent());
+			if (Data.Beta) user.Components.Add(new ClosedBetaQuestAchievementComponent());
 
 			User = user;
 
