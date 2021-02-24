@@ -5,6 +5,7 @@ using TXServer.ECSSystem.Types;
 using System;
 using TXServer.ECSSystem.Components;
 using TXServer.Core.Commands;
+using TXServer.Core.RemoteDatabase;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -13,7 +14,14 @@ namespace TXServer.ECSSystem.Events
     {
         public void Execute(Player player, Entity entity)
         {
-            // TODO: save changed email in database, change confirmation status + send confirmation email to new address 
+            if (RemoteDatabase.isInitilized)
+            {
+                RemoteDatabase.Users.SetEmail(player.tempRow.username, Email);
+                RemoteDatabase.Users.SetEmailVerified(player.tempRow.username, false);
+            }
+            player.tempRow.email = Email;
+            player.tempRow.isEmailVerified = false;
+            // TODO: Send email to recipient to confirm email
             // TODO: what does subscribed boolean in Component below do, there already is another single UserSubscribeComponent
             CommandManager.SendCommands(player,
                 new ComponentChangeCommand(player.User, new ConfirmedUserEmailComponent(Email, false)),

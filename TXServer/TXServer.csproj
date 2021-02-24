@@ -67,6 +67,10 @@
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.5.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="MySql.Data, Version=8.0.23.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libraries\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
@@ -130,6 +134,8 @@
     <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
     <Compile Include="Core\Protocol\MovementCodec.cs" />
+    <Compile Include="Core\RemoteDatabase\RemoteDatabase.cs" />
+    <Compile Include="Core\RemoteDatabase\Utils.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleScoreComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleTankCollisionsComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Flag\FlagComponent.cs" />
@@ -354,7 +360,9 @@
     <Compile Include="ECSSystem\Events\Battle\SelfUpdateStreamHitEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ShotEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\UnpauseEvent.cs" />
+    <Compile Include="ECSSystem\Events\Entrance\EmailNotConfirmedEvent.cs" />
     <Compile Include="ECSSystem\Events\Entrance\IncrementRegistrationNicksEvent.cs" />
+    <Compile Include="ECSSystem\Events\Entrance\UidInvalidEvent.cs" />
     <Compile Include="ECSSystem\Events\Item\OpenContainerEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\ClientExitLobbyEvent.cs" />
     <Compile Include="ECSSystem\Events\Matchmaking\ConnectToCustomLobbyEvent.cs" />

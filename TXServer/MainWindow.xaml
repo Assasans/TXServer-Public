@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:p="clr-namespace:TXServer.Properties" 
         mc:Ignorable="d"
-        Title="TX Server" WindowStartupLocation="CenterScreen" Height="268" Width="608" ResizeMode="CanMinimize" ScrollViewer.VerticalScrollBarVisibility="Disabled" Closing="Window_Closing">
+        Title="TX Server" WindowStartupLocation="CenterScreen" Height="378" Width="608" ResizeMode="CanMinimize" ScrollViewer.VerticalScrollBarVisibility="Disabled" Closing="Window_Closing">
     <!-- TODO: Implement dynamic localization -->
     <Grid Margin="0,0,4,-19" UseLayoutRounding="False">
         <GroupBox Header="Actions" Margin="10,10,0,0" Height="65" VerticalAlignment="Top" HorizontalAlignment="Left" Width="280">
@@ -35,6 +35,24 @@
                 <TextBox x:Name="MaxPlayersTextBox" Height="23" Margin="10,65,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Text="5"/>
 
                 <CheckBox x:Name="EnableTracingCheckBox" Content="Enable tracing" HorizontalAlignment="Left" Margin="10,93,0,0" VerticalAlignment="Top" Width="104"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="DatabaseGroupBox" Header="Database" HorizontalAlignment="Left" Height="115" Margin="10,215,0,0" VerticalAlignment="Top" Width="280">
+            <Grid Margin="0,0,-12,-22">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="31*"/>
+                    <ColumnDefinition Width="39*"/>
+                </Grid.ColumnDefinitions>
+
+
+                <CheckBox x:Name="EnableDatabaseToggle" HorizontalAlignment="Left" Margin="10,13,0,0" Content="Enable" VerticalAlignment="Top" Height="16" Width="70" Checked="UpdateDatabaseActiveState" Unchecked="UpdateDatabaseActiveState" />
+
+
+                <TextBlock HorizontalAlignment="Left" Margin="10,38,0,0" TextWrapping="Wrap" Text="Username:" VerticalAlignment="Top" Height="16" Width="70"/>
+                <TextBox x:Name="DatabaseUsername" Grid.Column="1" Height="23" Margin="10,37,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="root" IsEnabled="False"/>
+
+                <TextBlock HorizontalAlignment="Left" Margin="10,66,0,0" TextWrapping="Wrap" Text="Password:" VerticalAlignment="Top" Height="16" Width="70"/>
+                <PasswordBox x:Name="DatabasePassword" Height="23" Margin="10,65,21,0" VerticalAlignment="Top" Grid.Column="1" IsEnabled="False" />
             </Grid>
         </GroupBox>
         <TextBlock HorizontalAlignment="Left" Height="0" Margin="10,10,0,0" Grid.Row="1" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="25" Grid.Column="1"/>

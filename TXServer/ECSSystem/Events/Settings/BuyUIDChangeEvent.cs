@@ -3,6 +3,7 @@ using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.Core.RemoteDatabase;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -12,7 +13,18 @@ namespace TXServer.ECSSystem.Events.Battle
 		public void Execute(Player player, Entity entity)
 		{
 			UserXCrystalsComponent userXCrystalsComponent = player.Data.SetXCrystals(player.Data.XCrystals - Price);
-			// TODO: update uid in database
+
+			try {
+				if (RemoteDatabase.isInitilized)
+					RemoteDatabase.Users.SetUsername(player.tempRow.username, Uid);
+				player.tempRow.username = Uid;
+			}
+			catch
+			{
+				// TODO: Send invaid username event
+				return;
+			}
+
 			CommandManager.SendCommands(player,
 				new ComponentChangeCommand(player.User, userXCrystalsComponent),
 				new ComponentChangeCommand(player.User, new UserUidComponent(Uid)),

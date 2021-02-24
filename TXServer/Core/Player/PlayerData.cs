@@ -25,6 +25,7 @@ namespace TXServer.Core
         public bool Admin { get; protected set; }
         public bool Beta { get; protected set; }
 
+        public long Score { get; protected set; }
         public long XCrystals { get; protected set; }
         public long Crystals { get; protected set; }
 
@@ -36,7 +37,7 @@ namespace TXServer.Core
         public ConfirmedUserEmailComponent SetEmail(string email)
         {
             var component = SetValue<ConfirmedUserEmailComponent>(email);
-            Email = Email;
+            Email = email;
             return component;
         }
 
@@ -78,9 +79,11 @@ namespace TXServer.Core
                 Player.User.Components.Add(new UserAdminComponent());
                 return;
             }
-            
-            Player.User.Components.Remove(new UserAdminComponent());
-        }
+
+            //Player.User.Components.Remove(new UserAdminComponent());
+            // did you see them get called before? or did you start to try that
+            // The first errors was because of this as well, so we are at square 1 again
+        } 
 
         public void SetBeta(bool beta)
         {
@@ -90,7 +93,7 @@ namespace TXServer.Core
                 return;
             }
 
-            Player.User.Components.Remove(new ClosedBetaQuestAchievementComponent());
+            //Player.User.Components.Remove(new ClosedBetaQuestAchievementComponent());
         }
         
         public UserMoneyComponent SetCrystals(long value)
@@ -99,7 +102,18 @@ namespace TXServer.Core
             Crystals = value;
             return component;
         }
-        
+
+        public UserExperienceComponent SetScore(long value)
+        {
+            var component = SetValue<UserExperienceComponent>(value);
+            // Component tmpComponent;
+            // Player.User.Components.TryGetValue(new UserXCrystalsComponent(0), out tmpComponent);
+            // UserXCrystalsComponent component = (UserXCrystalsComponent) tmpComponent;
+            // component.Money = value;
+            Score = value;
+            return component;
+        }
+
         public UserXCrystalsComponent SetXCrystals(long value)
         {
             var component = SetValue<UserXCrystalsComponent>(value);
@@ -113,8 +127,8 @@ namespace TXServer.Core
 
         private T SetValue<T>(object value) where T : Component
         {
-            T component = Player.User.GetComponent<T>();
-            if (component == null)
+            T component = Player.User.GetComponent<T>(); // This is the error and idk, its because Player.User is null and idk how to change that
+            if (component == null) // Did you se the breakpoint? no
             {
                 component = Activator.CreateInstance<T>();
                 Player.User.Components.Add(component);

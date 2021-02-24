@@ -2,6 +2,7 @@
 using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.Core.RemoteDatabase;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -12,7 +13,7 @@ namespace TXServer.ECSSystem.Events
 		{
 			ICommand command = new SendEventCommand(new UserUidVacantEvent(Uid), entity);
 			// TODO: check if uid is occupied
-			bool emailIsOccupied = false;
+			bool emailIsOccupied = RemoteDatabase.isInitilized ? RemoteDatabase.Users.UserExists(Uid) : false;
 			if (emailIsOccupied) 
 			{
 			    command = new SendEventCommand(new UserUidOccupiedEvent(Uid), entity);

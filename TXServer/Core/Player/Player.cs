@@ -13,6 +13,7 @@ using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 using TXServer.Library;
+using TXServer.Core.RemoteDatabase;
 
 namespace TXServer.Core
 {
@@ -24,12 +25,13 @@ namespace TXServer.Core
         public Server Server { get; }
         public PlayerConnection Connection { get; }
         public PlayerData Data { get; set; }
+		public UserDatabaseRow tempRow;
 
 #if DEBUG
 		public IEnumerable<ICommand> LastServerPacket { get; set; }
 		public List<ICommand> LastClientPacket { get; set; }
 #endif
-
+		public string tempUsername;
 		public Player(Server server, Socket socket)
         {
             Server = server;
@@ -67,25 +69,25 @@ namespace TXServer.Core
 
         public bool LogIn(Entity clientSession)
         {
-	        if (GetUniqueId() == null)
+	        /*if (GetUniqueId() == null)
 			{
 				CommandManager.SendCommands(this,
 					new SendEventCommand(new LoginFailedEvent(), ClientSession),
 					new SendEventCommand(new InvalidPasswordEvent(), ClientSession));
 				return false;
-			}
+			}*/
 
 	        if (ClientSession.EntityId != clientSession?.EntityId)
 	        {
 		        throw new ArgumentException("ClientSession Entity doesn't match Player ClientSession Entity");
 	        }
-			
+
 			Entity user = new Entity(new TemplateAccessor(new UserTemplate(), ""),
-				new UserXCrystalsComponent(Data.XCrystals),
-				new UserCountryComponent(Data.CountryCode),
-				new UserAvatarComponent(Data.Avatar),
+				new UserXCrystalsComponent(tempRow.xcrystals),
+				new UserCountryComponent(tempRow.countryCode), 
+				new UserAvatarComponent(tempRow.avatar),
 				new UserComponent(),
-				new UserMoneyComponent(Data.Crystals),
+				new UserMoneyComponent(tempRow.crystals),
 				//new FractionGroupComponent(Fractions.GlobalItems.Frontier),
 				//new UserDailyBonusCycleComponent(1),
 				new TutorialCompleteIdsComponent(),
@@ -96,21 +98,21 @@ namespace TXServer.Core
 				new GameplayChestScoreComponent(),
 				new UserRankComponent(101),
 				new BlackListComponent(),
-				new UserUidComponent(Data.UniqueId),
+				new UserUidComponent(tempRow.username),
 				//new FractionUserScoreComponent(500),
-				new UserExperienceComponent(2000000),
+				new UserExperienceComponent(tempRow.score), //k
 				new QuestReadyComponent(),
 				new UserPublisherComponent(),
 				new FavoriteEquipmentStatisticsComponent(),
 				//new UserDailyBonusReceivedRewardsComponent(),
-				new ConfirmedUserEmailComponent(Data.Email, Data.Subscribed),
+				new ConfirmedUserEmailComponent(tempRow.email, tempRow.isSubscribed),
 				new UserSubscribeComponent(),
 				new KillsEquipmentStatisticsComponent(),
 				new BattleLeaveCounterComponent(),
-				//new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(12, 0, 0))),
-			    new UserReputationComponent(0.0));
+				new PremiumAccountBoostComponent(endDate: new TXDate(tempRow.premiumExpiration)),
+				new UserReputationComponent(0.0));
 
-			if (Data.Admin)
+			if (tempRow.isAdmin)
 			{
 				user.Components.Add(new UserAdminComponent());
 			    if (user.GetComponent<PremiumAccountBoostComponent>() == null)
@@ -118,7 +120,7 @@ namespace TXServer.Core
 					user.Components.Add(new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(23999976, 0, 0))));
                 }
 			}
-			if (Data.Beta) user.Components.Add(new ClosedBetaQuestAchievementComponent());
+			if (tempRow.isBeta) user.Components.Add(new ClosedBetaQuestAchievementComponent());
 
 			User = user;
 

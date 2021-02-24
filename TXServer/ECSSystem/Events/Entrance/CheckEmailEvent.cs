@@ -2,6 +2,7 @@
 using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.Core.RemoteDatabase;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -13,14 +14,14 @@ namespace TXServer.ECSSystem.Events
 			Email = email;
 		}
 
-		public void Execute(Player player, Entity entity)
+		public async void Execute(Player player, Entity entity)
 		{
 			try
 			{
 				var addr = new System.Net.Mail.MailAddress(Email);
 				ICommand command = new SendEventCommand(new EmailVacantEvent(Email), entity);
-				// TODO: check if email is occupied
-				bool emailIsOccupied = false;
+
+				bool emailIsOccupied = RemoteDatabase.isInitilized ? await RemoteDatabase.Users.EmailAvailable(addr.ToString()) : false;
 				if (emailIsOccupied)
 				{
 					command = new SendEventCommand(new EmailOccupiedEvent(Email), entity);
