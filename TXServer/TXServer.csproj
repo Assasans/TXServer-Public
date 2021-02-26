@@ -125,6 +125,7 @@
     <Compile Include="Core\Battles\BattleState.cs" />
     <Compile Include="Core\Battles\TankState.cs" />
     <Compile Include="Core\Battles\TranslatedEvent.cs" />
+    <Compile Include="Core\Battles\WarmUpState.cs" />
     <Compile Include="Core\CommandManager\CommandCodeAttribute.cs" />
     <Compile Include="Core\Commands\IComponentCommand.cs" />
     <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />

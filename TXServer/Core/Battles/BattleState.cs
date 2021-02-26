@@ -7,6 +7,7 @@
         CustomNotStarted,
         Starting,
         WarmingUp,
+        MatchBegins,
         Running,
         Ended
     }

@@ -19,7 +19,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 // WarmingUpTimerSystem
                 new RoundStopTimeComponent(DateTimeOffset.Now.AddSeconds(40)),
                 new RoundActiveStateComponent()
-            // new RoundWarmingUpStateComponent() todo
             );
         }
     }

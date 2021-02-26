@@ -16,6 +16,9 @@ using System.Threading;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Components.Battle.Round;
+using TXServer.ECSSystem.Components.Battle.Time;
+using TXServer.ECSSystem.Components.Battle.Incarnation;
+using TXServer.ECSSystem.Components.Battle.Weapon;
 
 namespace TXServer.Core.Battles
 {
@@ -38,6 +41,7 @@ namespace TXServer.Core.Battles
                 MapEntity = tuple.Item1;
                 battleParams.MaxPlayers = tuple.Item2;
                 BattleParams = battleParams;
+                WarmUpSeconds = 60; // TODO: 1min in Bronze league, 1,5min in Silver, Gold & Master leagues
                 BattleLobbyEntity = MatchMakingLobbyTemplate.CreateEntity(battleParams, MapEntity, GravityTypes[(GravityType)battleParams.Gravity]);
             }
             else
@@ -342,8 +346,11 @@ namespace TXServer.Core.Battles
                 {
                     battlePlayer.Player.ShareEntity(RedPedestalEntity);
                     battlePlayer.Player.ShareEntity(BluePedestalEntity);
-                    battlePlayer.Player.ShareEntity(RedFlagEntity);
-                    battlePlayer.Player.ShareEntity(BlueFlagEntity);
+                    if (!IsMatchMaking || BattleState == BattleState.Running)
+                    {
+                        battlePlayer.Player.ShareEntity(RedFlagEntity);
+                        battlePlayer.Player.ShareEntity(BlueFlagEntity);
+                    }
                 }
             }
 
@@ -403,8 +410,11 @@ namespace TXServer.Core.Battles
             {
                 battlePlayer.Player.UnshareEntity(RedPedestalEntity);
                 battlePlayer.Player.UnshareEntity(BluePedestalEntity);
-                battlePlayer.Player.UnshareEntity(RedFlagEntity);
-                battlePlayer.Player.UnshareEntity(BlueFlagEntity);
+                if (BattleState != BattleState.WarmingUp)
+                {
+                    battlePlayer.Player.UnshareEntity(RedFlagEntity);
+                    battlePlayer.Player.UnshareEntity(BlueFlagEntity);
+                }
             }
 
             foreach (BattleLobbyPlayer inBattlePlayer in MatchPlayers)
@@ -464,7 +474,7 @@ namespace TXServer.Core.Battles
                 case BattleState.StartCountdown:
                     // Matchmaking only
 
-                    if (RedTeamPlayers.Count != BlueTeamPlayers.Count || DMTeamPlayers.Count < 2)
+                    if (RedTeamPlayers.Count != BlueTeamPlayers.Count || DMTeamPlayers.Count >= 2)
                     {
                         Thread.Sleep(1000); // TODO: find a better solution for this (client crash when no delay)
                         BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartTimeComponent>();
@@ -483,7 +493,7 @@ namespace TXServer.Core.Battles
                 case BattleState.Starting:
                     if (IsMatchMaking)
                     {
-                        if (RedTeamPlayers.Count != BlueTeamPlayers.Count || DMTeamPlayers.Count < 2)
+                        if (RedTeamPlayers.Count != BlueTeamPlayers.Count || DMTeamPlayers.Count >= 2)
                         {
                             BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartingComponent>();
                             BattleState = BattleState.NotEnoughPlayers;
@@ -493,8 +503,12 @@ namespace TXServer.Core.Battles
                         if (CountdownTimer < 0)
                         {
                             BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartingComponent>();
+                            RoundEntity.AddComponent(new RoundWarmingUpStateComponent());
+                            BattleEntity.ChangeComponent(new BattleStartTimeComponent(new DateTimeOffset(DateTime.Now.AddSeconds(WarmUpSeconds))));
                             StartBattle();
-                            BattleState = BattleState.Running;
+                            CountdownTimer = WarmUpSeconds;
+                            BattleState = BattleState.WarmingUp;
+                            WarmUpState = WarmUpState.WarmingUp;
                         }
                     }
                     else
@@ -517,6 +531,54 @@ namespace TXServer.Core.Battles
                     break;
                 case BattleState.WarmingUp:
                     // Matchmaking only
+                    switch (WarmUpState)
+                    {
+                        case WarmUpState.WarmingUp:
+                            {
+                                if (CountdownTimer <= 4)
+                                {
+                                    foreach (BattleLobbyPlayer battleLobbyPlayer in MatchPlayers)
+                                    {
+                                        battleLobbyPlayer.BattlePlayer.Tank.RemoveComponent<TankMovableComponent>();
+                                        battleLobbyPlayer.BattlePlayer.Weapon.RemoveComponent<ShootableComponent>();
+                                    }
+                                    CommandManager.BroadcastCommands(MatchPlayers.Select(x => x.Player),
+                                        new EntityShareCommand(RedFlagEntity),
+                                        new EntityShareCommand(BlueFlagEntity));
+                                    WarmUpState = WarmUpState.MatchBegins;
+                                }
+                                break;
+                            }
+                        case WarmUpState.MatchBegins:
+                            if (CountdownTimer <= 0)
+                            {
+                                foreach (BattleLobbyPlayer battleLobbyPlayer in MatchPlayers)
+                                {
+                                    battleLobbyPlayer.BattlePlayer.Tank.RemoveComponent<TankVisibleStateComponent>();
+                                    battleLobbyPlayer.BattlePlayer.Tank.RemoveComponent<TankActiveStateComponent>();
+                                    battleLobbyPlayer.BattlePlayer.TankState = TankState.New;
+                                    battleLobbyPlayer.BattlePlayer.Tank.RemoveComponent<TankMovementComponent>();
+                                    battleLobbyPlayer.BattlePlayer.Incarnation.RemoveComponent<TankIncarnationComponent>();
+                                    battleLobbyPlayer.BattlePlayer.TankState = TankState.Spawn;
+                                }
+                                WarmUpState = WarmUpState.Respawning;
+                                CountdownTimer = 1;
+                            }
+                            break;
+                        case WarmUpState.Respawning:
+                            if (CountdownTimer <= 0)
+                            {
+                                foreach (BattleLobbyPlayer battleLobbyPlayer in MatchPlayers)
+                                {
+                                    battleLobbyPlayer.BattlePlayer.Weapon.AddComponent(new ShootableComponent());
+                                }
+                                RoundEntity.RemoveComponent(typeof(RoundWarmingUpStateComponent));
+                                BattleEntity.ChangeComponent(new BattleStartTimeComponent(new DateTimeOffset(DateTime.Now)));
+                                BattleState = BattleState.Running;
+                                CountdownTimer = 60*BattleParams.TimeLimit;
+                            }
+                            break;
+                    }
                     break;
                 case BattleState.Running:
                     if (IsMatchMaking)
@@ -744,6 +806,7 @@ namespace TXServer.Core.Battles
         };
 
         public ClientBattleParams BattleParams { get; set; }
+        public int WarmUpSeconds { get; set; }
         public Entity MapEntity { get; private set; }
         public bool IsMatchMaking { get; }
         public bool IsOpen { get; set; }
@@ -753,6 +816,7 @@ namespace TXServer.Core.Battles
         public Coordinates.teamBattleSpawnPoints TeamsSpawnPoints { get; set; }
 
         public BattleState BattleState { get; set; }
+        public WarmUpState WarmUpState { get; set; }
         public double CountdownTimer { get; set; }
 
         // All players (not only in match)

@@ -1,13 +1,12 @@
 ﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.Core;
-using TXServer.Core.Commands;
 using System.Linq;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle;
-using TXServer.ECSSystem.Components.Battle.Round;
+using TXServer.Core.Battles;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -17,6 +16,10 @@ namespace TXServer.ECSSystem.Events.Battle
         public static void Execute(Player player, Entity tank, Entity flag)
         {
             Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.BattleEntity.GetComponent<BattleGroupComponent>().Key == tank.GetComponent<BattleGroupComponent>().Key);
+            if (battle.BattleState == BattleState.WarmingUp)
+            {
+                return;
+            }
 
             // enemy team flag
             if (flag.GetComponent<TeamGroupComponent>().Key != tank.GetComponent<TeamGroupComponent>().Key)

@@ -12,6 +12,6 @@ namespace TXServer.ECSSystem.Components.Battle.Time
             RoundStartTime = roundStartTime.ToUnixTimeMilliseconds();
         }
 
-        public long RoundStartTime { get; set; }
+        [OptionalMapped] public long RoundStartTime { get; set; }
     }
 }

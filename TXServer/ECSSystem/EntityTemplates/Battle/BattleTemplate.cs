@@ -3,6 +3,7 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Time;
+using System;
 
 namespace TXServer.ECSSystem.EntityTemplates.Battle
 {
@@ -15,6 +16,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
 			Entity entity = new Entity(new TemplateAccessor(template, "battle/modes/" + modeName),
 				new ScoreLimitComponent(scoreLimit),
 				new TimeLimitComponent(timeLimit, warmingUpTimeLimit),
+				new BattleStartTimeComponent(new DateTimeOffset(DateTime.Now)),
 				userLimitComponent,
 				battleLobby.GetComponent<MapGroupComponent>(),
 				battleLobby.GetComponent<GravityComponent>(),
