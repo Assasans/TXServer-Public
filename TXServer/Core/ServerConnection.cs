@@ -7,14 +7,14 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using TXServer.Core.Battles;
 using TXServer.Core.Commands;
+using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Events.Ping;
-using TXServer.ECSSystem.Types;
-using System.Text.Json;
 
 namespace TXServer.Core
 {
@@ -32,8 +32,14 @@ namespace TXServer.Core
             if (IsStarted) return;
             IsStarted = true;
 
-            AllCoordinates = JsonSerializer.Deserialize<Coordinates.maps>(CoordinatesJson);
+            ServerMapInfo = JsonSerializer.Deserialize<Dictionary<string, MapInfo>>(File.ReadAllText(ServerMapInfoLocation), new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                IncludeFields = true
+            });
+
             MaxPoolSize = poolSize;
+
             acceptWorker = new Thread(() => AcceptPlayers(ip, port, MaxPoolSize)) {Name = "Acceptor"};
             acceptWorker.Start();
 
@@ -279,7 +285,7 @@ namespace TXServer.Core
 
         public int PlayerCount = 0;
 
-        public string CoordinatesJson = File.ReadAllText("Library\\Coordinates.json");
-        public static Coordinates.maps AllCoordinates { get; set; }
+        public static string ServerMapInfoLocation { get; } = "Library/Coordinates.json";
+        public static Dictionary<string, MapInfo> ServerMapInfo { get; private set; }
     }
 }

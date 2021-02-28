@@ -130,6 +130,17 @@
     <Compile Include="Core\Commands\IComponentCommand.cs" />
     <Compile Include="Core\Commands\ComponentRemoveCommand.cs" />
     <Compile Include="Core\Commands\EntityUnshareCommand.cs" />
+    <Compile Include="Core\ServerMapInformarion\Bonus.cs" />
+    <Compile Include="Core\ServerMapInformarion\BonusList.cs" />
+    <Compile Include="Core\ServerMapInformarion\MapBonusInfo.cs" />
+    <Compile Include="Core\ServerMapInformarion\Flag.cs" />
+    <Compile Include="Core\ServerMapInformarion\MapFlags.cs" />
+    <Compile Include="Core\ServerMapInformarion\MapInfo.cs" />
+    <Compile Include="Core\ServerMapInformarion\PuntativeGeometry.cs" />
+    <Compile Include="Core\ServerMapInformarion\SpawnPoint.cs" />
+    <Compile Include="Core\ServerMapInformarion\MapSpawnPointInfo.cs" />
+    <Compile Include="Core\ServerMapInformarion\TeamSpawnPointList.cs" />
+    <Compile Include="Core\Player\PlayerEnumerable.cs" />
     <Compile Include="Core\Protocol\MovementCodec.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleScoreComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleTankCollisionsComponent.cs" />
@@ -723,7 +734,6 @@
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Library\ConcurrentHashSet.cs" />
-    <Compile Include="Library\Coordinates_Deserializer.cs" />
     <Compile Include="Library\HashCodeEqualityComparer.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -769,7 +779,7 @@
     <None Include="..\.editorconfig">
       <Link>.editorconfig</Link>
     </None>
-    <None Include="Library\Coordinates.json">
+    <None Include="Library\ServerMapInfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

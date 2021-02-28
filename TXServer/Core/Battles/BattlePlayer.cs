@@ -12,6 +12,7 @@ using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Types;
 using System.Text.Json;
 using System.IO;
+using TXServer.Core.ServerMapInformation;
 
 namespace TXServer.Core.Battles
 {
@@ -77,7 +78,7 @@ namespace TXServer.Core.Battles
                         
                         Battle battle = ServerConnection.BattlePool.Single(b => b.BlueTeamPlayers.Concat(b.RedTeamPlayers).Concat(b.DMTeamPlayers).Contains(Player.BattleLobbyPlayer));
 
-                        IList<Coordinates.spawnCoordinate> coordinates;
+                        IList<SpawnPoint> coordinates;
                         TeamColor teamColor;
                         if (Player.BattleLobbyPlayer.Team == null) { teamColor = TeamColor.NONE; }
                         else
@@ -87,8 +88,8 @@ namespace TXServer.Core.Battles
 
                         if (battle.DeathmatchSpawnPoints == null)
                         {
-                            if (teamColor == TeamColor.BLUE) { coordinates = battle.TeamsSpawnPoints.blueTeam; } 
-                            else { coordinates = battle.TeamsSpawnPoints.redTeam; }
+                            if (teamColor == TeamColor.BLUE) { coordinates = battle.TeamSpawnPoints.BlueTeam; } 
+                            else { coordinates = battle.TeamSpawnPoints.RedTeam; }
                         } 
                         else
                         {
@@ -96,7 +97,7 @@ namespace TXServer.Core.Battles
                         } 
 
                         int index = new Random().Next(coordinates.Count);
-                        Coordinates.spawnCoordinate coordinate = coordinates[index];
+                        SpawnPoint coordinate = coordinates[index];
 
                         /* in case you want to set another json for testing a SINGLE spawn coordinate  
                         string CoordinatesJson = File.ReadAllText("YourPath\\test.json");
@@ -105,7 +106,7 @@ namespace TXServer.Core.Battles
 
                         CommandManager.SendCommandsSafe(Player,
                             new ComponentAddCommand(Tank, (Component)Activator.CreateInstance(StateComponents[value])),
-                            new ComponentAddCommand(Tank, new TankMovementComponent(new Movement(coordinate.position.V3, Vector3.Zero, Vector3.Zero, coordinate.rotation.Quaternion), new MoveControl(), 0, 0)));
+                            new ComponentAddCommand(Tank, new TankMovementComponent(new Movement(coordinate.Position, Vector3.Zero, Vector3.Zero, coordinate.Rotation), new MoveControl(), 0, 0)));
                     
                     }
                     else

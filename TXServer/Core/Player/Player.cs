@@ -177,10 +177,24 @@ namespace TXServer.Core
 			CommandManager.SendCommandsSafe(this, new EntityShareCommand(entity, isManual: true));
 		}
 
+		public void ShareEntities(params Entity[] entities) => ShareEntities((IEnumerable<Entity>)entities);
+		public void ShareEntities(IEnumerable<Entity> entities)
+        {
+			foreach (Entity entity in entities)
+				ShareEntity(entity);
+        }
+
 		public void UnshareEntity(Entity entity)
 		{
 			RemoveEntity(entity);
 			CommandManager.SendCommandsSafe(this, new EntityUnshareCommand(entity, isManual: true));
+		}
+
+		public void UnshareEntities(params Entity[] entities) => UnshareEntities((IEnumerable<Entity>)entities);
+		public void UnshareEntities(IEnumerable<Entity> entities)
+		{
+			foreach (Entity entity in entities)
+				UnshareEntity(entity);
 		}
 
 		public void AddEntity(Entity entity)

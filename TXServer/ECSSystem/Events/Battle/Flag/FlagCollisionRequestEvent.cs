@@ -77,12 +77,12 @@ namespace TXServer.ECSSystem.Events.Battle
                     Entity newFlag;
                     if (battle.RedFlagEntity.GetComponent<TeamGroupComponent>().Key == tank.GetComponent<TeamGroupComponent>().Key)
                     {
-                        battle.RedFlagEntity = FlagTemplate.CreateEntity(battle.MapCoordinates.flags.flagRed.position.V3, team: battle.RedTeamEntity, battle: battle.BattleEntity);
+                        battle.RedFlagEntity = FlagTemplate.CreateEntity(battle.CurrentMapInfo.Flags.Red.Position, team: battle.RedTeamEntity, battle: battle.BattleEntity);
                         newFlag = battle.RedFlagEntity;
                     }
                     else
                     {
-                        battle.BlueFlagEntity = FlagTemplate.CreateEntity(battle.MapCoordinates.flags.flagBlue.position.V3, team: battle.BlueTeamEntity, battle: battle.BattleEntity);
+                        battle.BlueFlagEntity = FlagTemplate.CreateEntity(battle.CurrentMapInfo.Flags.Blue.Position, team: battle.BlueTeamEntity, battle: battle.BattleEntity);
                         newFlag = battle.BlueFlagEntity;
                     }
 
@@ -109,14 +109,14 @@ namespace TXServer.ECSSystem.Events.Battle
                             int enemyPlayers;
                             if (battle.RedFlagEntity.GetComponent<TeamGroupComponent>().Key == tank.GetComponent<TeamGroupComponent>().Key)
                             {
-                                battle.BlueFlagEntity = FlagTemplate.CreateEntity(battle.MapCoordinates.flags.flagBlue.position.V3, team: battle.BlueTeamEntity, battle: battle.BattleEntity);
+                                battle.BlueFlagEntity = FlagTemplate.CreateEntity(battle.CurrentMapInfo.Flags.Blue.Position, team: battle.BlueTeamEntity, battle: battle.BattleEntity);
                                 allieTeam = battle.RedTeamEntity;
                                 newFlag = battle.BlueFlagEntity;
                                 enemyPlayers = battle.BlueTeamPlayers.Count;
                             }
                             else
                             {
-                                battle.RedFlagEntity = FlagTemplate.CreateEntity(battle.MapCoordinates.flags.flagRed.position.V3, team: battle.RedTeamEntity, battle: battle.BattleEntity);
+                                battle.RedFlagEntity = FlagTemplate.CreateEntity(battle.CurrentMapInfo.Flags.Red.Position, team: battle.RedTeamEntity, battle: battle.BattleEntity);
                                 allieTeam = battle.BlueTeamEntity;
                                 newFlag = battle.RedFlagEntity;
                                 enemyPlayers = battle.RedTeamPlayers.Count;
