@@ -419,49 +419,35 @@ namespace TXServer.Core.Battles
                 case BattleState.NotEnoughPlayers:
                     // Matchmaking only
 
-                    if (IsMatchMaking && AllBattlePlayers.Any() && (RedTeamPlayers.Count == BlueTeamPlayers.Count || DMTeamPlayers.Count >= 2))
-                    {
-                        BattleLobbyEntity.AddComponent(new MatchMakingLobbyStartTimeComponent(new TimeSpan(0, 0, 10)));
-                        CountdownTimer = 10;
+                    if (AllBattlePlayers.Any() && (RedTeamPlayers.Count == BlueTeamPlayers.Count || DMTeamPlayers.Count >= 2))
                         BattleState = BattleState.StartCountdown;
-                    }
+
                     break;
                 case BattleState.StartCountdown:
                     // Matchmaking only
 
-                    if (RedTeamPlayers.Count != BlueTeamPlayers.Count || DMTeamPlayers.Count >= 2)
+                    if (RedTeamPlayers.Count != BlueTeamPlayers.Count || (DMTeamPlayers.Any() && DMTeamPlayers.Count < 2))
                     {
                         Thread.Sleep(1000); // TODO: find a better solution for this (client crash when no delay)
-                        BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartTimeComponent>();
                         BattleState = BattleState.NotEnoughPlayers;
                     }
 
                     if (CountdownTimer < 0)
-                    {
-                        BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartTimeComponent>();
-                        BattleLobbyEntity.AddComponent(new MatchMakingLobbyStartingComponent());
-                        CountdownTimer = 3;
                         BattleState = BattleState.Starting;
-                    }
 
                     break;
                 case BattleState.Starting:
                     if (IsMatchMaking)
                     {
-                        if (RedTeamPlayers.Count != BlueTeamPlayers.Count || DMTeamPlayers.Count >= 2)
+                        if (RedTeamPlayers.Count != BlueTeamPlayers.Count || (DMTeamPlayers.Any() && DMTeamPlayers.Count < 2))
                         {
-                            BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartingComponent>();
                             BattleState = BattleState.NotEnoughPlayers;
                             break;
                         }
 
                         if (CountdownTimer < 0)
                         {
-                            BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartingComponent>();
-                            RoundEntity.AddComponent(new RoundWarmingUpStateComponent());
-                            BattleEntity.ChangeComponent(new BattleStartTimeComponent(new DateTimeOffset(DateTime.Now.AddSeconds(WarmUpSeconds))));
                             StartBattle();
-                            CountdownTimer = WarmUpSeconds;
                             BattleState = BattleState.WarmingUp;
                             WarmUpState = WarmUpState.WarmingUp;
                         }
@@ -471,14 +457,12 @@ namespace TXServer.Core.Battles
                         // todo replace matchmaking component with custom battle one
                         if (!AllBattlePlayers.Any())
                         {
-                            BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartingComponent>();
                             BattleState = BattleState.CustomNotStarted;
                             break;
                         }
 
                         if (CountdownTimer < 0)
                         {
-                            BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartingComponent>();
                             StartBattle();
                             BattleState = BattleState.Running;
                         }
@@ -526,10 +510,7 @@ namespace TXServer.Core.Battles
                                 foreach (BattleLobbyPlayer battleLobbyPlayer in MatchPlayers)
                                     battleLobbyPlayer.BattlePlayer.Weapon.AddComponent(new ShootableComponent());
 
-                                RoundEntity.RemoveComponent(typeof(RoundWarmingUpStateComponent));
-                                BattleEntity.ChangeComponent(new BattleStartTimeComponent(new DateTimeOffset(DateTime.Now)));
                                 BattleState = BattleState.Running;
-                                CountdownTimer = 60*BattleParams.TimeLimit;
                             }
                             break;
                     }
@@ -623,6 +604,7 @@ namespace TXServer.Core.Battles
                 }
             }
         }
+        
         private void ProcessBonuses(double deltaTime)
         {
             foreach (BattleBonus battleBonus in BattleBonuses)
@@ -645,6 +627,7 @@ namespace TXServer.Core.Battles
                 }
             }
         }
+        
         private void ProcessDroppedFlags()
         {
             DateTime currentTime = DateTime.Now;
@@ -774,7 +757,49 @@ namespace TXServer.Core.Battles
         public TeamSpawnPointList TeamSpawnPoints { get; set; }
         public List<BattleBonus> BattleBonuses { get; set; } = new List<BattleBonus>();
 
-        public BattleState BattleState { get; set; }
+        public BattleState BattleState
+        {
+            get => _BattleState;
+            set
+            {
+                switch (_BattleState)
+                {
+                    case BattleState.StartCountdown:
+                        BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartTimeComponent>();
+                        break;
+                    case BattleState.Starting:
+                        BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartingComponent>();
+                        break;
+                    case BattleState.WarmingUp:
+                        RoundEntity.RemoveComponent<RoundWarmingUpStateComponent>();
+                        break;
+                }
+
+                switch (value)
+                {
+                    case BattleState.StartCountdown:
+                        BattleLobbyEntity.AddComponent(new MatchMakingLobbyStartTimeComponent(new TimeSpan(0, 0, 10)));
+                        CountdownTimer = 10;
+                        break;
+                    case BattleState.Starting:
+                        BattleLobbyEntity.AddComponent(new MatchMakingLobbyStartingComponent());
+                        CountdownTimer = 3;
+                        break;
+                    case BattleState.WarmingUp:
+                        BattleEntity.ChangeComponent(new BattleStartTimeComponent(new DateTimeOffset(DateTime.Now.AddSeconds(WarmUpSeconds))));
+                        RoundEntity.AddComponent(new RoundWarmingUpStateComponent());
+                        CountdownTimer = WarmUpSeconds;
+                        break;
+                    case BattleState.Running:
+                        CountdownTimer = 60 * BattleParams.TimeLimit;
+                        break;
+                }
+
+                _BattleState = value;
+            }
+        }
+        private BattleState _BattleState;
+
         public WarmUpState WarmUpState { get; set; }
         public double CountdownTimer { get; set; }
 

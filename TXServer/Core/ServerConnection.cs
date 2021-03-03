@@ -241,22 +241,20 @@ namespace TXServer.Core
                 stopwatch.Restart();
                 foreach (Battle battle in BattlePool.ToArray())
                 {
-                    battle.Tick(lastDeltaTime);
+                    battle.Tick(LastTickDuration);
                 }    
                 stopwatch.Stop();
 
-                if (stopwatch.Elapsed.TotalSeconds < BattleTickDuration)
-                {
-                    lastDeltaTime = BattleTickDuration;
-                    Thread.Sleep(TimeSpan.FromSeconds(BattleTickDuration) - stopwatch.Elapsed);
-                }
-                else
-                {
-                    lastDeltaTime = stopwatch.Elapsed.TotalSeconds;
-                }
+                TimeSpan spentOnBattles = stopwatch.Elapsed;
 
-                LastTickDuration = lastDeltaTime;
+                stopwatch.Start();
+                if (spentOnBattles.TotalSeconds < BattleTickDuration)
+                    Thread.Sleep(TimeSpan.FromSeconds(BattleTickDuration) - spentOnBattles);
+
                 Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
+
+                stopwatch.Stop();
+                LastTickDuration = stopwatch.Elapsed.TotalSeconds;
             }
         }
 

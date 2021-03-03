@@ -16,8 +16,6 @@ namespace TXServer.ECSSystem.Events.Battle
 
 			if (battle.BattleState == BattleState.CustomNotStarted)
             {
-				battle.CountdownTimer = 3;
-				battle.BattleLobbyEntity.AddComponent(new MatchMakingLobbyStartingComponent());
 				battle.BattleState = BattleState.Starting;
             }
 			else
