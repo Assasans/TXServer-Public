@@ -120,9 +120,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Core\Battles\Battle.cs" />
+    <Compile Include="Core\Battles\BattleBonus.cs" />
     <Compile Include="Core\Battles\BattleLobbyPlayer.cs" />
     <Compile Include="Core\Battles\BattlePlayer.cs" />
     <Compile Include="Core\Battles\BattleState.cs" />
+    <Compile Include="Core\Battles\BonusState.cs" />
     <Compile Include="Core\Battles\TankState.cs" />
     <Compile Include="Core\Battles\TranslatedEvent.cs" />
     <Compile Include="Core\Battles\WarmUpState.cs" />
@@ -144,6 +146,15 @@
     <Compile Include="Core\Protocol\MovementCodec.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleScoreComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\BattleTankCollisionsComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Bonus\ArmorEffectComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Bonus\BonusRegionComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Bonus\BonusRegionGroupComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Bonus\DamageEffectComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Bonus\GoldBonusRegionComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Bonus\HealingEffectComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Bonus\SpatialGeometryComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Bonus\SupplyBonusRegionComponent.cs" />
+    <Compile Include="ECSSystem\Components\Battle\Bonus\TurboSpeedEffectComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Flag\FlagComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Flag\FlagGroundedStateComponent.cs" />
     <Compile Include="ECSSystem\Components\Battle\Flag\FlagHomeStateComponent.cs" />
@@ -196,6 +207,11 @@
     <Compile Include="ECSSystem\Components\Matchmaking\OpenCustomLobbyPriceComponent.cs" />
     <Compile Include="ECSSystem\Components\Matchmaking\OpenToConnectLobbyComponent.cs" />
     <Compile Include="ECSSystem\Components\User\PremiumAccountBoostComponent.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\Bonus\BonusRegionTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\Bonus\BonusTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\Bonus\GoldBonusTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\Bonus\GoldBonusWithTeleportTemplate.cs" />
+    <Compile Include="ECSSystem\EntityTemplates\Battle\Bonus\SupplyBonusTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\Flags\FlagTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\Flags\PedestalTemplate.cs" />
     <Compile Include="ECSSystem\EntityTemplates\Battle\FlamethrowerBattleItemTemplate.cs" />
@@ -328,6 +344,12 @@
     <Compile Include="ECSSystem\Events\Battle\BattlePingEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\BattlePingResultEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\BattlePongEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\Bonus\BonusTakenEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\Bonus\BonusTakingRequestEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\ElevatedAccess\ElevatedAccessUserDropSupplyEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\Bonus\GoldScheduleNotificationEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\Bonus\GoldTakenNotificationEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\ElevatedAccess\ElevatedAccessUserDropSupplyGoldEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ExitBattleEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\Flag\FlagCollisionRequestEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\Flag\FlagDeliveryEvent.cs" />
@@ -426,9 +448,11 @@
     <Compile Include="ECSSystem\Components\User\UserAdminComponent.cs" />
     <Compile Include="ECSSystem\Events\Entrance\AutoLoginUserEvent.cs" />
     <Compile Include="ECSSystem\Types\BattleMode.cs" />
+    <Compile Include="ECSSystem\Types\BonusType.cs" />
     <Compile Include="ECSSystem\Types\ClientBattleParams.cs" />
     <Compile Include="ECSSystem\Types\DiscreteTankControl.cs" />
     <Compile Include="ECSSystem\Types\EndSeasonRewardItem.cs" />
+    <Compile Include="ECSSystem\Types\GoldType.cs" />
     <Compile Include="ECSSystem\Types\GravityType.cs" />
     <Compile Include="ECSSystem\Types\HitTarget.cs" />
     <Compile Include="ECSSystem\Types\ModuleBehaviourType.cs" />

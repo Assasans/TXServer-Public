@@ -8,9 +8,9 @@ namespace TXServer.ECSSystem.Components.Battle.Chassis
     {
         public SpeedComponent(float speed, float turnSpeed, float acceleration)
         {
-            Speed = speed;
+            Speed = float.MaxValue;
             TurnSpeed = turnSpeed;
-            Acceleration = acceleration;
+            Acceleration = 13;
         }
 
         public float Speed { get; set; }

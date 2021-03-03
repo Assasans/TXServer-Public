@@ -9,6 +9,7 @@ using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
+using TXServer.ECSSystem.Components.Battle.Bonus;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
@@ -33,9 +34,11 @@ namespace TXServer.Core.Battles
 
             if (isMatchMaking)
             {
-                int index = new Random().Next(MatchMakingMaps.Count);
                 if (battleParams == null) {
-                    battleParams = new ClientBattleParams(BattleMode: BattleMode.CTF, MapId: MatchMakingMaps[index].EntityId, MaxPlayers: 20, TimeLimit: 10, 
+                    List<MapInfo> matchMakingMaps = new List<MapInfo>();
+                    matchMakingMaps.AddRange(ServerConnection.ServerMapInfo.Where(p => p.Value.MatchMaking is true).Select(m => m.Value));
+                    int index = new Random().Next(matchMakingMaps.Count);
+                    battleParams = new ClientBattleParams(BattleMode: BattleMode.CTF, MapId: matchMakingMaps[index].MapId, MaxPlayers: 20, TimeLimit: 10, 
                         ScoreLimit: 100, FriendlyFire: false, Gravity: GravityType.EARTH, KillZoneEnabled: true, DisabledModules: false);
                 }
 
@@ -79,13 +82,6 @@ namespace TXServer.Core.Battles
 
         public (Entity, int) ConvertMapParams(ClientBattleParams battleParams, bool isMatchMaking)
         {
-            Entity[] lowMaxPlayersMaps = new Entity[]
-            {
-                Maps.GlobalItems.Testbox,
-                Maps.GlobalItems.Sandbox,
-                Maps.GlobalItems.Area159,
-                Maps.GlobalItems.Boombox
-            };
 
             Entity mapEntity = Maps.GlobalItems.Rio;
             int maxPlayers = battleParams.MaxPlayers;
@@ -100,8 +96,8 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            if (isMatchMaking && lowMaxPlayersMaps.Contains(mapEntity))
-                maxPlayers = 8;
+            if (isMatchMaking)
+                maxPlayers = CurrentMapInfo.MaxPlayers;
 
             if (battleParams.BattleMode == BattleMode.DM)
             {
@@ -225,7 +221,6 @@ namespace TXServer.Core.Battles
                 BlueTeamPlayers.Remove(battlePlayer);
             WaitingToJoinPlayers.Remove(battlePlayer);
             
-            // transfers owner ship to a random player in the lobby
             if (battlePlayer.Player == Owner)
             {
                 if (AllBattlePlayers.Any())
@@ -254,11 +249,43 @@ namespace TXServer.Core.Battles
             battlePlayer.Player.UnshareEntities(AllBattlePlayers.Select(x => x.User));
             AllBattlePlayers.Select(x => x.Player).UnshareEntity(battlePlayer.User);
 
-            ServerConnection.BattlePool.RemoveAll(p => !AllBattlePlayers.Any() && !p.IsMatchMaking);
+            ServerConnection.BattlePool.RemoveAll(p => !p.AllBattlePlayers.Any() && !p.IsMatchMaking);
         }
 
         private void StartBattle()
         {
+            if (!BattleParams.DisabledModules)
+            {
+                var battleModesBonusRegionsSpawnPoints = new Dictionary<BattleMode, BonusList> {
+                    { BattleMode.DM, CurrentMapInfo.BonusRegions.Deathmatch },
+                    { BattleMode.CTF, CurrentMapInfo.BonusRegions.CaptureTheFlag },
+                    { BattleMode.TDM, CurrentMapInfo.BonusRegions.TeamDeathmatch }};
+                var bonusTypeSpawnPoints = new Dictionary<BonusType, IList<Bonus>> {
+                    { BonusType.ARMOR,  battleModesBonusRegionsSpawnPoints[BattleParams.BattleMode].Armor },
+                    { BonusType.DAMAGE,  battleModesBonusRegionsSpawnPoints[BattleParams.BattleMode].Damage },
+                    { BonusType.GOLD,  battleModesBonusRegionsSpawnPoints[BattleParams.BattleMode].Gold },
+                    { BonusType.REPAIR,  battleModesBonusRegionsSpawnPoints[BattleParams.BattleMode].Repair },
+                    { BonusType.SPEED,  battleModesBonusRegionsSpawnPoints[BattleParams.BattleMode].Speed }};
+
+                BattleBonuses.Clear();
+                foreach (BonusType bonusType in Enum.GetValues(typeof(BonusType)))
+                {
+                    foreach (Bonus bonus in bonusTypeSpawnPoints[bonusType])
+                    {
+                        BattleBonus battleBonus = new BattleBonus(bonusType, bonus.Position);
+                        BattleBonuses.Add(battleBonus);
+                    }
+                }
+
+                Random random = new Random();
+                List<BattleBonus> supplyBonuses = new List<BattleBonus>(BattleBonuses.Where(b => b.BattleBonusType != BonusType.GOLD).OrderBy(b => random.Next()));
+                foreach (BattleBonus battleBonus in supplyBonuses.ToList())
+                {
+                    battleBonus.BonusState = BonusState.New;
+                    battleBonus.BonusStateChangeCountdown = random.Next(10, 120);
+                }
+            }
+
             foreach (BattleLobbyPlayer battleLobbyPlayer in AllBattlePlayers)
                 InitBattlePlayer(battleLobbyPlayer);
         }
@@ -269,6 +296,16 @@ namespace TXServer.Core.Battles
 
             battlePlayer.Player.ShareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
 
+            if (!BattleParams.DisabledModules)
+            {
+                foreach (BattleBonus battleBonus in BattleBonuses)
+                {
+                    battlePlayer.Player.ShareEntity(battleBonus.BonusRegion);
+                    if (battleBonus.BonusState == BonusState.Spawned)
+                        battlePlayer.Player.ShareEntity(battleBonus.Bonus);
+                }
+            }
+
             if (BattleParams.BattleMode != BattleMode.DM)
             {
                 battlePlayer.Player.ShareEntities(RedTeamEntity, BlueTeamEntity, TeamBattleChatEntity);
@@ -276,7 +313,7 @@ namespace TXServer.Core.Battles
                 if (BattleParams.BattleMode == BattleMode.CTF)
                 {
                     battlePlayer.Player.ShareEntities(RedPedestalEntity, BluePedestalEntity);
-                    if (!IsMatchMaking || BattleState == BattleState.Running)
+                    if (!IsMatchMaking || WarmUpState == WarmUpState.Respawning)
                     {
                         battlePlayer.Player.ShareEntities(RedFlagEntity, BlueFlagEntity);
                     }
@@ -295,6 +332,13 @@ namespace TXServer.Core.Battles
         {
             battlePlayer.Player.UnshareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
 
+            if (!BattleParams.DisabledModules)
+                foreach (BattleBonus battleBonus in BattleBonuses)
+                {
+                    battlePlayer.Player.UnshareEntity(battleBonus.BonusRegion);
+                    if (battleBonus.BonusState == BonusState.Spawned)
+                        battlePlayer.Player.UnshareEntity(battleBonus.Bonus);
+                }
             if (BattleParams.BattleMode != BattleMode.DM)
             {
                 battlePlayer.Player.UnshareEntities(BlueTeamEntity, RedTeamEntity, TeamBattleChatEntity);
@@ -579,7 +623,28 @@ namespace TXServer.Core.Battles
                 }
             }
         }
+        private void ProcessBonuses(double deltaTime)
+        {
+            foreach (BattleBonus battleBonus in BattleBonuses)
+            {
+                if (battleBonus.BonusState != BonusState.Unused || battleBonus.BonusState == BonusState.Spawned)
+                {
+                    battleBonus.BonusStateChangeCountdown -= deltaTime;
+                }
 
+                if (battleBonus.BonusStateChangeCountdown < 0)
+                {
+                    if (battleBonus.BonusState == BonusState.Redrop || battleBonus.BonusState == BonusState.New)
+                    {
+                        battleBonus.BonusState = BonusState.Spawned;
+                        battleBonus.CreateBonus(BattleEntity);
+                        MatchPlayers.Select(x => x.Player).ShareEntity(battleBonus.Bonus);
+                        break;
+                    }
+                    
+                }
+            }
+        }
         private void ProcessDroppedFlags()
         {
             DateTime currentTime = DateTime.Now;
@@ -621,6 +686,7 @@ namespace TXServer.Core.Battles
                 ProcessBattleState(deltaTime);
                 ProcessWaitingPlayers(deltaTime);
                 ProcessMatchPlayers(deltaTime);
+                ProcessBonuses(deltaTime);
                 ProcessDroppedFlags();
             }
         }
@@ -697,24 +763,6 @@ namespace TXServer.Core.Battles
             { GravityType.MARS, 3.71f }
         };
 
-        private static readonly List<Entity> MatchMakingMaps = new List<Entity>
-        {
-            Maps.GlobalItems.Silence,
-            Maps.GlobalItems.Nightiran,
-            Maps.GlobalItems.Acidlake, 
-            Maps.GlobalItems.Sandbox,
-            Maps.GlobalItems.Iran,
-            Maps.GlobalItems.Area159,
-            Maps.GlobalItems.Repin,
-            Maps.GlobalItems.Westprime,
-            Maps.GlobalItems.Boombox, 
-            Maps.GlobalItems.Silencemoon,
-            Maps.GlobalItems.Rio,
-            Maps.GlobalItems.MassacremarsBG,
-            Maps.GlobalItems.Massacre,
-            Maps.GlobalItems.Kungur
-        };
-
         public ClientBattleParams BattleParams { get; set; }
         public int WarmUpSeconds { get; set; }
         public Entity MapEntity { get; private set; }
@@ -724,6 +772,7 @@ namespace TXServer.Core.Battles
         public MapInfo CurrentMapInfo { get; set; }
         public IList<SpawnPoint> DeathmatchSpawnPoints { get; set; }
         public TeamSpawnPointList TeamSpawnPoints { get; set; }
+        public List<BattleBonus> BattleBonuses { get; set; } = new List<BattleBonus>();
 
         public BattleState BattleState { get; set; }
         public WarmUpState WarmUpState { get; set; }

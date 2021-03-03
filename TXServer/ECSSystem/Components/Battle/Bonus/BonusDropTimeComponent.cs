@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Components.Battle.Bonus
         {
             DropTime = dropTime.ToUnixTimeMilliseconds();
         }
-        
+
         public long DropTime { get; set; }
     }
 }

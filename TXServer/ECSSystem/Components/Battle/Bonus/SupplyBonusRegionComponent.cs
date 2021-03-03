@@ -3,8 +3,8 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Components.Battle.Bonus
 {
-    [SerialVersionUID(8101904939955946870)]
-    public class BonusComponent : Component
+    [SerialVersionUID(-4617088084931480326L)]
+    public class SupplyBonusRegionComponent : Component
     {
 
     }

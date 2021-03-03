@@ -285,7 +285,7 @@ namespace TXServer.Core
 
         public int PlayerCount = 0;
 
-        public static string ServerMapInfoLocation { get; } = "Library/Coordinates.json";
+        public static string ServerMapInfoLocation { get; } = "Library/ServerMapInfo.json";
         public static Dictionary<string, MapInfo> ServerMapInfo { get; private set; }
     }
 }

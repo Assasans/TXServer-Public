@@ -326,7 +326,7 @@
             "hasParachute": true,
             "position": {
               "x": -71,
-              "y": 9,
+              "y": 0.5,
               "z": 110
             }
           },
@@ -335,7 +335,7 @@
             "hasParachute": true,
             "position": {
               "x": 58,
-              "y": 9,
+              "y": 0.5,
               "z": 121
             }
           }
@@ -1279,7 +1279,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": 485053206,
+    "maxPlayers": 20,
+    "matchMaking": true
   },
   "Acidlakehalloween": {
     "bonusRegions": {
@@ -2573,7 +2576,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": -820833801,
+    "maxPlayers": 20,
+    "matchMaking": false
   },
   "Area159": {
     "bonusRegions": {
@@ -3530,7 +3536,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": 1133979230,
+    "maxPlayers": 8,
+    "matchMaking": true
   },
   "Boombox": {
     "bonusRegions": {
@@ -4754,7 +4763,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": 1945237110,
+    "maxPlayers": 8,
+    "matchMaking": true
   },
   "Iran": {
     "bonusRegions": {
@@ -7485,7 +7497,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": -51480736,
+    "maxPlayers": 12,
+    "matchMaking": true
   },
   "Kungur": {
     "bonusRegions": {
@@ -10147,7 +10162,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": 2127033418,
+    "maxPlayers": 20,
+    "matchMaking": true
   },
   "Massacre": {
     "bonusRegions": {
@@ -11758,7 +11776,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": -1551247853,
+    "maxPlayers": 12,
+    "matchMaking": true
   },
   "MassacremarsBG": {
     "bonusRegions": {
@@ -14778,7 +14799,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": 989096365,
+    "maxPlayers": 16,
+    "matchMaking": true
   },
   "Nightiran": {
     "bonusRegions": {
@@ -17469,7 +17493,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": 343745828,
+    "maxPlayers": 8,
+    "matchMaking": true
   },
   "Repin": {
     "bonusRegions": {
@@ -18905,7 +18932,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": -1587964040,
+    "maxPlayers": 16,
+    "matchMaking": true
   },
   "Rio": {
     "bonusRegions": {
@@ -21290,7 +21320,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": -1664220274,
+    "maxPlayers": 16,
+    "matchMaking": true
   },
   "Sandbox": {
     "bonusRegions": {
@@ -22709,7 +22742,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": -549069251,
+    "maxPlayers": 8,
+    "matchMaking": true
   },
   "Silence": {
     "bonusRegions": {
@@ -24491,7 +24527,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": -321842153,
+    "maxPlayers": 16,
+    "matchMaking": true
   },
   "Silencemoon": {
     "bonusRegions": {
@@ -26227,7 +26266,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": 933129112,
+    "maxPlayers": 16,
+    "matchMaking": true
   },
   "Testbox": {
     "bonusRegions": {
@@ -26862,7 +26904,10 @@
           }
         ]
       }
-    }
+    },
+    "mapId": 458045295,
+    "maxPlayers": 8,
+    "matchMaking": false
   },
   "Westprime": {
     "bonusRegions": {
@@ -28568,6 +28613,9 @@
           }
         ]
       }
-    }
+    },
+    "mapId": 980475942,
+    "maxPlayers": 20,
+    "matchMaking": true
   }
 }
