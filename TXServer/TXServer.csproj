@@ -346,10 +346,16 @@
     <Compile Include="ECSSystem\Events\Battle\BattlePongEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\Bonus\BonusTakenEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\Bonus\BonusTakingRequestEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\ElevatedAccess\ElevatedAccessUserAddKillsEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\ElevatedAccess\ElevatedAccessUserAddScoreEventcs.cs" />
+    <Compile Include="ECSSystem\Events\Battle\ElevatedAccess\ElevatedAccessUserBanUserEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\ElevatedAccess\ElevatedAccessUserBasePunishEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\ElevatedAccess\ElevatedAccessUserChangeEnergyEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ElevatedAccess\ElevatedAccessUserDropSupplyEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\Bonus\GoldScheduleNotificationEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\Bonus\GoldTakenNotificationEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ElevatedAccess\ElevatedAccessUserDropSupplyGoldEvent.cs" />
+    <Compile Include="ECSSystem\Events\Battle\ElevatedAccess\ElevatedAccessUserIncreaseScoreEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\ExitBattleEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\Flag\FlagCollisionRequestEvent.cs" />
     <Compile Include="ECSSystem\Events\Battle\Flag\FlagDeliveryEvent.cs" />

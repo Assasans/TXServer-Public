@@ -196,7 +196,10 @@ namespace TXServer.Core.Battles
                 teamPlayerList = BlueTeamPlayers;
             }
 
-            player.User.AddComponent(teamEntity.GetComponent<TeamColorComponent>() ?? new TeamColorComponent(TeamColor.NONE));
+            TeamColorComponent teamColorComponent = new TeamColorComponent(TeamColor.NONE);
+            if (teamEntity != null)
+                teamColorComponent = teamEntity.GetComponent<TeamColorComponent>();
+            player.User.AddComponent(teamColorComponent);
 
             BattleLobbyPlayer battlePlayer = new BattleLobbyPlayer(player, teamEntity);
             player.BattleLobbyPlayer = battlePlayer;
@@ -207,7 +210,7 @@ namespace TXServer.Core.Battles
             lock (this)
                 teamPlayerList.Add(battlePlayer);
 
-            if (IsMatchMaking && BattleState == BattleState.WarmingUp || IsMatchMaking && BattleState == BattleState.Running)
+            if (IsMatchMaking && BattleState == BattleState.WarmUp || IsMatchMaking && BattleState == BattleState.Running)
             {
                 player.SendEvent(new MatchMakingLobbyStartTimeEvent(new TimeSpan(0, 0, 10)), player.User);
                 WaitingToJoinPlayers.Add(battlePlayer);
@@ -272,7 +275,7 @@ namespace TXServer.Core.Battles
                 {
                     foreach (Bonus bonus in bonusTypeSpawnPoints[bonusType])
                     {
-                        BattleBonus battleBonus = new BattleBonus(bonusType, bonus.Position);
+                        BattleBonus battleBonus = new BattleBonus(bonusType, bonus);
                         BattleBonuses.Add(battleBonus);
                     }
                 }
@@ -370,7 +373,7 @@ namespace TXServer.Core.Battles
             if (BattleParams.BattleMode == BattleMode.CTF)
             {
                 battlePlayer.Player.UnshareEntities(RedPedestalEntity, BluePedestalEntity);
-                if (BattleState != BattleState.WarmingUp)
+                if (BattleState != BattleState.WarmUp)
                 {
                     battlePlayer.Player.UnshareEntities(RedFlagEntity, BlueFlagEntity);
                 }
@@ -448,7 +451,7 @@ namespace TXServer.Core.Battles
                         if (CountdownTimer < 0)
                         {
                             StartBattle();
-                            BattleState = BattleState.WarmingUp;
+                            BattleState = BattleState.WarmUp;
                             WarmUpState = WarmUpState.WarmingUp;
                         }
                     }
@@ -468,7 +471,7 @@ namespace TXServer.Core.Battles
                         }
                     }
                     break;
-                case BattleState.WarmingUp:
+                case BattleState.WarmUp:
                     // Matchmaking only
                     switch (WarmUpState)
                     {
@@ -674,8 +677,12 @@ namespace TXServer.Core.Battles
             }
         }
 
-        public void UpdatedScore(Player player)
+        public void UpdateScore(Player player, Entity team, int additiveScore)
         {
+            int oldScore = team.GetComponent<TeamScoreComponent>().Score;
+            team.ChangeComponent(new TeamScoreComponent(oldScore + additiveScore));
+            MatchPlayers.Select(x => x.Player).SendEvent(new RoundScoreUpdatedEvent(), RoundEntity);
+
             int? neededDifference = null;
             if (BattleParams.BattleMode == BattleMode.CTF)
             {
@@ -712,21 +719,18 @@ namespace TXServer.Core.Battles
             }
         }
         
-        public void UpdateUserStatistics(Player player, int xp, int kills, int killAssists, int death)
+        public void UpdateUserStatistics(Player player, int additiveScore, int additiveKills, int additiveKillAssists, int additiveDeath)
         {
             // TODO: rank up effect/system
             RoundUserStatisticsComponent roundUserStatisticsComponent = player.BattleLobbyPlayer.BattlePlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>();
             UserExperienceComponent userExperienceComponent = player.User.GetComponent<UserExperienceComponent>();
 
-            roundUserStatisticsComponent.ScoreWithoutBonuses += xp;
-            roundUserStatisticsComponent.Kills += kills;
-            roundUserStatisticsComponent.KillAssists += killAssists;
-            roundUserStatisticsComponent.Deaths += death;
-
-            userExperienceComponent.Experience += xp;
+            roundUserStatisticsComponent.ScoreWithoutBonuses += additiveScore;
+            roundUserStatisticsComponent.Kills += additiveKills;
+            roundUserStatisticsComponent.KillAssists += additiveKillAssists;
+            roundUserStatisticsComponent.Deaths += additiveDeath;
 
             player.BattleLobbyPlayer.BattlePlayer.RoundUser.ChangeComponent(roundUserStatisticsComponent);
-            player.User.ChangeComponent(userExperienceComponent);
 
             MatchPlayers.Select(x => x.Player).SendEvent(new RoundUserStatisticsUpdatedEvent(), player.BattleLobbyPlayer.BattlePlayer.RoundUser);
         }
@@ -770,7 +774,7 @@ namespace TXServer.Core.Battles
                     case BattleState.Starting:
                         BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartingComponent>();
                         break;
-                    case BattleState.WarmingUp:
+                    case BattleState.WarmUp:
                         RoundEntity.RemoveComponent<RoundWarmingUpStateComponent>();
                         break;
                 }
@@ -785,7 +789,7 @@ namespace TXServer.Core.Battles
                         BattleLobbyEntity.AddComponent(new MatchMakingLobbyStartingComponent());
                         CountdownTimer = 3;
                         break;
-                    case BattleState.WarmingUp:
+                    case BattleState.WarmUp:
                         BattleEntity.ChangeComponent(new BattleStartTimeComponent(new DateTimeOffset(DateTime.Now.AddSeconds(WarmUpSeconds))));
                         RoundEntity.AddComponent(new RoundWarmingUpStateComponent());
                         CountdownTimer = WarmUpSeconds;

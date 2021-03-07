@@ -6,7 +6,7 @@
         StartCountdown,
         CustomNotStarted,
         Starting,
-        WarmingUp,
+        WarmUp,
         MatchBegins,
         Running,
         Ended

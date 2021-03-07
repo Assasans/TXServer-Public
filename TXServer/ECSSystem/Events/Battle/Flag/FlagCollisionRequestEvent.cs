@@ -16,7 +16,7 @@ namespace TXServer.ECSSystem.Events.Battle
         public static void Execute(Player player, Entity tank, Entity flag)
         {
             Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.BattleEntity.GetComponent<BattleGroupComponent>().Key == tank.GetComponent<BattleGroupComponent>().Key);
-            if (battle.BattleState == BattleState.WarmingUp)
+            if (battle.BattleState == BattleState.WarmUp)
             {
                 return;
             }
@@ -125,18 +125,16 @@ namespace TXServer.ECSSystem.Events.Battle
 
                             enemyFlag.ChangeComponent(new FlagPositionComponent(alliePedestal.GetComponent<FlagPedestalComponent>().Position));
                             enemyFlag.AddComponent(new FlagGroundedStateComponent());
-                            allieTeam.ChangeComponent(new TeamScoreComponent(++oldScore));
 
                             foreach (Player player2 in battle.MatchPlayers.Select(x => x.Player))
                             {
                                 player2.SendEvent(new FlagDeliveryEvent(), enemyFlag);
-                                player2.SendEvent(new RoundScoreUpdatedEvent(), battle.RoundEntity);
                                 player2.UnshareEntity(enemyFlag);
                                 player2.ShareEntity(newFlag);
                             }
 
-                            battle.UpdatedScore(player);
-                            battle.UpdateUserStatistics(player, xp:enemyPlayers*10, kills:0, killAssists:0, death:0);
+                            battle.UpdateScore(player, allieTeam, 1);
+                            battle.UpdateUserStatistics(player, additiveScore:enemyPlayers*10, additiveKills:0, additiveKillAssists:0, additiveDeath:0);
                         }
                     }
                 }

@@ -1,57 +1,44 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using TXServer.Core.Commands;
+﻿using System.Numerics;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle.Tank;
-using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Types;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.EntityTemplates.Battle.Bonus;
+using System.Text.Json;
+using System.IO;
 
 namespace TXServer.Core.Battles
 {
     public class BattleBonus
     {
-        public BattleBonus(BonusType bonusType, Vector3 position)
+        public BattleBonus(BonusType bonusType, Bonus bonus)
         {
-            BonusRegion = BonusRegionTemplate.CreateEntity(bonusType, position);
             BattleBonusType = bonusType;
-            Position = position;
+            Position = bonus.Position;
+            Number = bonus.Number;
+            HasParachute = bonus.HasParachute;
             BonusState = BonusState.Unused;
+
+            BonusRegion = BonusRegionTemplate.CreateEntity(bonusType, Position);
         }
         public void CreateBonus(Entity battleEntity)
         {
-            if (BattleBonusType != BonusType.GOLD)
-                Bonus = SupplyBonusTemplate.CreateEntity(BattleBonusType, BonusRegion, new Vector3(Position.X, Position.Y + 30, Position.Z), battleEntity);
-            else
-                Bonus = GoldBonusWithCrystalsTemplate.CreateEntity(BattleBonusType, BonusRegion, new Vector3(Position.X, Position.Y + 30, Position.Z), battleEntity);
-        }
-        
-        public IEnumerable<Entity> GetEntities()
-        {
-            return from property in typeof(BattlePlayer).GetProperties()
-                   where property.PropertyType == typeof(Entity)
-                   select (Entity)property.GetValue(this);
-        }
+            int spawnHeight = 30;
+            if (!HasParachute)
+                spawnHeight = 0;
 
-        public static readonly Dictionary<TankState, Type> StateComponents = new Dictionary<TankState, Type>
-        {
-            //{ TankState.New, typeof(TankNewStateComponent) },
-            { TankState.Spawn, typeof(TankSpawnStateComponent) },
-            { TankState.SemiActive, typeof(TankSemiActiveStateComponent) },
-            { TankState.Active, typeof(TankActiveStateComponent) },
-            { TankState.Dead, typeof(TankDeadStateComponent) },
-        };
+            if (BattleBonusType != BonusType.GOLD)
+                Bonus = SupplyBonusTemplate.CreateEntity(BattleBonusType, BonusRegion, new Vector3(Position.X, Position.Y + spawnHeight, Position.Z), battleEntity);
+            else
+                Bonus = GoldBonusWithCrystalsTemplate.CreateEntity(BattleBonusType, BonusRegion, new Vector3(Position.X, Position.Y + spawnHeight, Position.Z), battleEntity);
+        }
 
         public Entity BonusRegion { get; set; }
         public Entity Bonus { get; set; }
         public BonusType BattleBonusType { get; set; }
         public Vector3 Position { get; set; }
+        public bool HasParachute { get; set; }
+        public int Number { get; set; }
         public int GoldboxCrystals { get; } = 1000;
 
         public BonusState BonusState
@@ -74,7 +61,7 @@ namespace TXServer.Core.Battles
                 {
                     case BonusState.New:
                         if (BattleBonusType == BonusType.GOLD)
-                            BonusStateChangeCountdown = 10;
+                            BonusStateChangeCountdown = 20;
                         break;
                     case BonusState.Redrop:
                         BonusStateChangeCountdown = 180;
