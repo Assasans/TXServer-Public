@@ -60,10 +60,8 @@ namespace TXServer.Core
             if (!IsStarted) return;
             IsStarted = false;
 
-            acceptWorker.Abort();
-            StateServerWorker.Abort();
-            PingWorker.Abort();
-            BattleWorker.Abort();
+            acceptorSocket.Close();
+            httpListener.Close();
 
             Pool.ForEach(player => player.Dispose());
             Pool.Clear();
@@ -99,38 +97,36 @@ namespace TXServer.Core
             Justification = "<Ожидание>")]
         public void AcceptPlayers(IPAddress ip, short port, int PoolSize)
         {
-            using (Socket acceptor = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP))
+            using (acceptorSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP))
             {
                 try
                 {
-                    acceptor.Bind(new IPEndPoint(ip, port));
-                    acceptor.Listen(PoolSize);
+                    acceptorSocket.Bind(new IPEndPoint(ip, port));
+                    acceptorSocket.Listen(PoolSize);
                 }
                 catch (SocketException e)
                 {
                     Console.WriteLine(e);
-                    Application.Current.Dispatcher.Invoke(MainWindow.HandleCriticalError);
+                    IsError = true;
                     return;
                 }
 
                 while (true)
                 {
+                    if (!IsStarted) return;
+
                     Socket socket = null;
                     bool accepted = false;
                     try
                     {
-                        // Асинхронные методы позволяют остановить поток, когда требуется.
-                        IAsyncResult result = acceptor.BeginAccept(null, acceptor);
-                        socket = acceptor.EndAccept(result);
+                        socket = acceptorSocket.Accept();
                         accepted = true;
 
                         AddPlayer(socket);
                     }
                     catch (Exception e)
                     {
-                        // Игнорировать исключение остановки сервера.
-                        if (e.GetType() != typeof(ThreadAbortException))
-                            Console.WriteLine(e.ToString());
+                        Console.WriteLine(e.ToString());
 
                         if (accepted) socket.Close();
                     }
@@ -147,25 +143,35 @@ namespace TXServer.Core
             string rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/StateServer";
             string resourcePath = "/resources";
 
-            using (HttpListener listener = new HttpListener())
+            using (httpListener = new HttpListener())
             {
-                listener.Prefixes.Add($"http://{(Equals(ip, IPAddress.Any) ? "+" : ip.ToString())}:8080/");
+                httpListener.Prefixes.Add($"http://{(Equals(ip, IPAddress.Any) ? "+" : ip.ToString())}:8080/");
 
                 try
                 {
-                    listener.Start();
+                    httpListener.Start();
                 }
                 catch (HttpListenerException e)
                 {
                     Console.WriteLine(e);
-                    Application.Current.Dispatcher.Invoke(MainWindow.HandleCriticalError);
+                    IsError = true;
                     return;
                 }
 
                 while (true)
                 {
-                    IAsyncResult result = listener.BeginGetContext(null, listener);
-                    HttpListenerContext context = listener.EndGetContext(result);
+                    if (!IsStarted) return;
+                    HttpListenerContext context;
+
+                    try
+                    {
+                        context = httpListener.GetContext();
+                    }
+                    catch (HttpListenerException e)
+                    {
+                        Console.WriteLine(e.ToString());
+                        return;
+                    }
 
                     new Task(() =>
                     {
@@ -209,11 +215,11 @@ namespace TXServer.Core
 
             while (true)
             {
+                if (!IsStarted) return;
+
                 foreach (Player player in Pool)
                 {
-                    CommandManager.SendCommands(player, new SendEventCommand(
-                        new PingEvent(DateTimeOffset.Now.ToUnixTimeMilliseconds(), id)
-                    ));
+                    player.SendEvent(new PingEvent(DateTimeOffset.Now.ToUnixTimeMilliseconds(), id));
                 }
 
                 if (id++ == 255)
@@ -234,10 +240,11 @@ namespace TXServer.Core
             GlobalBattle = BattlePool[0];
 
             Stopwatch stopwatch = new Stopwatch();
-            double lastDeltaTime = 0;
 
             while (true)
             {
+                if (!IsStarted) return;
+
                 stopwatch.Restart();
                 foreach (Battle battle in BattlePool.ToArray())
                 {
@@ -251,7 +258,7 @@ namespace TXServer.Core
                 if (spentOnBattles.TotalSeconds < BattleTickDuration)
                     Thread.Sleep(TimeSpan.FromSeconds(BattleTickDuration) - spentOnBattles);
 
-                Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
+                //Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
 
                 stopwatch.Stop();
                 LastTickDuration = stopwatch.Elapsed.TotalSeconds;
@@ -264,9 +271,11 @@ namespace TXServer.Core
 
         // Client accept thread.
         private Thread acceptWorker;
+        private Socket acceptorSocket;
 
         // HTTP state server thread.
         private Thread StateServerWorker;
+        private HttpListener httpListener;
 
         private Thread PingWorker;
 
@@ -280,6 +289,7 @@ namespace TXServer.Core
 
         // Server state.
         public bool IsStarted { get; private set; }
+        public bool IsError { get; set; }
 
         public int PlayerCount = 0;
 

@@ -290,7 +290,7 @@ namespace TXServer.Core.Protocol
             if (readMagic.Length < 2)
                 throw new IOException("Unexpected client error.");
             else if (!readMagic.SequenceEqual(Magic))
-                throw new FileFormatException();
+                throw new Exception();
 
             // Length values.
             mapLength = reader.ReadInt32();

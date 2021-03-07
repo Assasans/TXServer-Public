@@ -1,4 +1,4 @@
-﻿using System.Data.SQLite;
+﻿using Microsoft.Data.Sqlite;
 
 namespace TXServer.Core.Data.Database.Impl
 {
@@ -8,14 +8,14 @@ namespace TXServer.Core.Data.Database.Impl
 
         public override PlayerData From(object dataReader)
         {
-            SQLiteDataReader data = dataReader as SQLiteDataReader;
+            SqliteDataReader data = dataReader as SqliteDataReader;
             
             for (var i = 0; i < data.FieldCount; i++)
             {
                 SetValue(data.GetName(i), data.GetValue(i));
             }
 
-            Original = (PlayerData) Clone();
+            Original = (PlayerData)Clone();
             return this;
         }
     }

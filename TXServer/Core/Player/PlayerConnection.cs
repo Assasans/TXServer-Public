@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
-using System.Windows;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -20,7 +19,7 @@ namespace TXServer.Core
             Player = player;
 
             Interlocked.Increment(ref Server.Instance.Connection.PlayerCount);
-            Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
+            //Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
         }
 
         public void StartPlayerThreads()
@@ -44,7 +43,7 @@ namespace TXServer.Core
             QueuedCommands.CompleteAdding();
 
             Interlocked.Decrement(ref Server.Instance.Connection.PlayerCount);
-            Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
+            //Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
         }
 
         /// <summary>

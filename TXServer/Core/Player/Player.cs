@@ -39,7 +39,7 @@ namespace TXServer.Core
 
         public void Dispose()
         {
-			if (!Connection.TryDeactivate()) return;
+			if (!Connection.IsActive) return;
 
 			Connection.Dispose();
 

@@ -1,10 +1,11 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using TXServer.Core;
 
-namespace TXServer
+namespace TXServerUI
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
@@ -15,8 +16,6 @@ namespace TXServer
         
         public MainWindow()
         {
-            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("ru");
-
             InitializeComponent();
 
             // Заполнение списка IP-адресов.
@@ -36,15 +35,14 @@ namespace TXServer
             UpdateStateText();
         }
 
-        public static void HandleCriticalError()
+        public void HandleCriticalError()
         {
             if (errorState) return;
             errorState = true;
 
             MessageBox.Show("An error occured while starting server. Try running application as administrator.", "", MessageBoxButton.OK, MessageBoxImage.Error);
-            (Application.Current.MainWindow as MainWindow).ChangeServerState();
+            StopServer();
         }
-
 
         // Кнопка запуска сервера.
         private void StartServer_Click(object sender, RoutedEventArgs e)
@@ -57,26 +55,33 @@ namespace TXServer
         {
             Cursor = Cursors.Wait;
             if (!ServerLauncher.IsStarted())
-            {
-                SettingsGroupBox.IsEnabled = false;
-
-                ServerLauncher.InitServer(IPAddressComboBox.SelectedItem as IPAddress, short.Parse(PortTextBox.Text), int.Parse(MaxPlayersTextBox.Text));
-                Core.Commands.CommandManager.EnableTracing = EnableTracingCheckBox.IsChecked.GetValueOrDefault();
-
-                StartButton.Content = "Stop";
-            }
+                StartServer();
             else
-            {
-                SettingsGroupBox.IsEnabled = true;
+                StopServer();
+            
+            Cursor = Cursors.Arrow;
+        }
 
-                ServerLauncher.StopServer();
+        private void StartServer()
+        {
+            SettingsGroupBox.IsEnabled = false;
 
-                StartButton.Content = "Start";
-            }
+            ServerLauncher.InitServer((IPAddress)IPAddressComboBox.SelectedItem, short.Parse(PortTextBox.Text), int.Parse(MaxPlayersTextBox.Text));
+            TXServer.Core.Commands.CommandManager.EnableTracing = EnableTracingCheckBox.IsChecked.GetValueOrDefault();
+
+            StartButton.Content = "Stop";
 
             Activate();
-            UpdateStateText();
-            Cursor = Cursors.Arrow;
+            new Thread(UpdateStateText).Start();
+        }
+
+        private void StopServer()
+        {
+            SettingsGroupBox.IsEnabled = true;
+
+            ServerLauncher.StopServer();
+
+            StartButton.Content = "Start";
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -90,15 +95,24 @@ namespace TXServer
         
         public void UpdateStateText()
         {
-            if (!ServerLauncher.IsStarted())
+            while (ServerLauncher.IsStarted())
             {
-                ServerStateText.Text = "Server is stopped.";
-                return;
-            }
+                if (Server.Instance.Connection.IsError)
+                {
+                    ServerLauncher.StopServer(false);
+                    Application.Current.Dispatcher.Invoke(HandleCriticalError);
+                    break;
+                }
 
-            ServerStateText.Text = $"Online players: {ServerLauncher.GetPlayerCount()}\n" +
-                $"Active battles: {ServerConnection.BattlePool.Count}\n" +
-                $"Last tick duration: {ServerConnection.LastTickDuration}";
+                Application.Current.Dispatcher.Invoke(() =>
+                    ServerStateText.Text = $"Connected players: {ServerLauncher.GetPlayerCount()}\n" +
+                        $"Active battles: {ServerConnection.BattlePool.Count}\n" +
+                        $"Last tick duration: {ServerConnection.LastTickDuration}");
+                Thread.Sleep(1000);
+            }
+            
+            Application.Current.Dispatcher.Invoke(() => ServerStateText.Text = "Server is stopped.");
+            return;
         }
     }
 }

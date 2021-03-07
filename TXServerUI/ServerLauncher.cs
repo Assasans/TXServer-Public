@@ -43,7 +43,7 @@ namespace TXServer.Core
             {
                 NativeMethods.AllocConsole();
                 _ = NativeMethods.DeleteMenu(NativeMethods.GetSystemMenu(NativeMethods.GetConsoleWindow(), false), 0xF060, 0);
-                Console.OutputEncoding = Encoding.GetEncoding(1251);
+                Console.OutputEncoding = Encoding.UTF8;
                 IsConsoleAttached = true;
             }
 
@@ -55,7 +55,7 @@ namespace TXServer.Core
             }
         }
 
-        public static void StopServer()
+        public static void StopServer(bool disableConsole = true)
         {
             if (Server.Instance != null)
             { 
@@ -63,7 +63,7 @@ namespace TXServer.Core
                 Server.Instance = null;
             }
 
-            if (IsConsoleAttached)
+            if (disableConsole && IsConsoleAttached)
             {
                 NativeMethods.FreeConsole();
                 IsConsoleAttached = false;

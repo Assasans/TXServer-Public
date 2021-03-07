@@ -1,9 +1,8 @@
-﻿<Window x:Class="TXServer.MainWindow"
+﻿<Window x:Class="TXServerUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:p="clr-namespace:TXServer.Properties" 
         mc:Ignorable="d"
         Title="TX Server" WindowStartupLocation="CenterScreen" Height="268" Width="608" ResizeMode="CanMinimize" ScrollViewer.VerticalScrollBarVisibility="Disabled" Closing="Window_Closing">
     <!-- TODO: Implement dynamic localization -->
@@ -14,7 +13,7 @@
                     <ColumnDefinition Width="87*"/>
                     <ColumnDefinition Width="53*"/>
                 </Grid.ColumnDefinitions>
-                <Label Content="Start server:" HorizontalAlignment="Left" Margin="10,7,0,0" VerticalAlignment="Top" Height="26" Width="95"/>
+                <Label Content="Start Server:" HorizontalAlignment="Left" Margin="10,7,0,0" VerticalAlignment="Top" Height="26" Width="95"/>
                 <Button x:Name="StartButton" Content="Start" Margin="10,10,21,0" VerticalAlignment="Top" Grid.Column="1" Height="20" Click="StartServer_Click"/>
             </Grid>
         </GroupBox>

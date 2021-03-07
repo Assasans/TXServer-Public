@@ -1,25 +1,25 @@
-﻿using System.Data.SQLite;
+﻿using Microsoft.Data.Sqlite;
 
 namespace TXServer.Core.Data.Database.Impl
 {
     public class SqLiteDatabase : IDatabase
     {
-        private SQLiteConnection connection;
+        private SqliteConnection connection;
 
         public SqLiteDatabase(string connectionString)
         {
-            connection = new SQLiteConnection(connectionString);
+            connection = new SqliteConnection(connectionString);
         }
 
         public PlayerData FetchPlayerData(string uid)
         {
             //todo impl this
-            using (var cmd = new SQLiteCommand(connection))
+            using (var cmd = new SqliteCommand(connection.ConnectionString))
             {
                 cmd.CommandText = "SELECT * FROM Players WHERE UniqueId=@id";
                 cmd.Parameters.AddWithValue("@id", uid);
                 cmd.Prepare();
-                SQLiteDataReader reader = cmd.ExecuteReader();
+                SqliteDataReader reader = cmd.ExecuteReader();
                 
                 if (!reader.Read()) return null;
                 return new SqLitePlayer(uid).From(reader);
@@ -28,12 +28,12 @@ namespace TXServer.Core.Data.Database.Impl
 
         public PlayerData FetchPlayerDataByEmail(string email)
         {
-            using (var cmd = new SQLiteCommand(connection))
+            using (var cmd = new SqliteCommand(connection.ConnectionString))
             {
                 cmd.CommandText = "SELECT * FROM Players WHERE Email=@email";
                 cmd.Parameters.AddWithValue("@email", email);
                 cmd.Prepare();
-                SQLiteDataReader reader = cmd.ExecuteReader();
+                SqliteDataReader reader = cmd.ExecuteReader();
 
                 if (!reader.Read()) return null;
                 return new SqLitePlayer(reader.GetString(reader.GetOrdinal("UniqueId"))).From(reader);
@@ -42,7 +42,7 @@ namespace TXServer.Core.Data.Database.Impl
 
         public bool SavePlayerData(PlayerData data)
         {
-            using (var cmd = new SQLiteCommand(connection))
+            using (var cmd = new SqliteCommand(connection.ConnectionString))
             {
                 cmd.CommandText = @"UPDATE Players SET ";
                 cmd.Parameters.AddWithValue("@key", data.UniqueId);
