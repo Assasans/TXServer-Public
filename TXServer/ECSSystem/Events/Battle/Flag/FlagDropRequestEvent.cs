@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Numerics;
 using TXServer.Core;
+using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Components.Battle.Tank;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -17,19 +17,21 @@ namespace TXServer.ECSSystem.Events.Battle
         {
             Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.BattleEntity.GetComponent<BattleGroupComponent>().Key == tank.GetComponent<BattleGroupComponent>().Key);
 
-            if (flag.GetComponent<FlagGroundedStateComponent>() == null)
-            {
-
-                battle.FlagBlockedTankKey = tank.GetComponent<TankGroupComponent>().Key;
-                battle.DroppedFlags.Add(flag, DateTime.Now.AddMinutes(1));
-
-                CommandManager.SendCommands(player,
-                    new ComponentAddCommand(flag, new FlagGroundedStateComponent()),
-                    // TODO: drop flag at latest tank position
-                    new ComponentChangeCommand(flag, new FlagPositionComponent(new Vector3(x: 0, y: 3, z: 0))));
-                CommandManager.BroadcastCommands(battle.RedTeamPlayers.Concat(battle.BlueTeamPlayers).Select(x => x.Player),
-                    new SendEventCommand(new FlagDropEvent(IsUserAction: true), flag));
-            }  
+            if (battle.FlagStates[flag] == FlagState.Captured)
+                battle.FlagStates[flag] = FlagState.Dropped;
+            else
+                return;
+            battle.DroppedFlags.Add(flag, DateTime.Now.AddMinutes(1));
+            player.BattleLobbyPlayer.BattlePlayer.FlagBlocks = 3;
+            Vector3 flagPosition = new(player.BattleLobbyPlayer.BattlePlayer.TankPosition.X, player.BattleLobbyPlayer.BattlePlayer.TankPosition.Y - 1, 
+                player.BattleLobbyPlayer.BattlePlayer.TankPosition.Z);
+            
+            CommandManager.SendCommands(player,
+                new ComponentAddCommand(flag, new FlagGroundedStateComponent()),
+                new ComponentChangeCommand(flag, new FlagPositionComponent(flagPosition)));
+            CommandManager.BroadcastCommands(battle.RedTeamPlayers.Concat(battle.BlueTeamPlayers).Select(x => x.Player),
+                new SendEventCommand(new FlagDropEvent(IsUserAction: true), flag));
+             
         }
     }
 }

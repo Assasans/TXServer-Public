@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
@@ -9,6 +8,7 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Bonus;
+using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Battle.Bonus
@@ -36,30 +36,37 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 			else 
 				battleBonus.BonusState = BonusState.Redrop;
 
-			switch (bonusType)
+			if (!player.BattleLobbyPlayer.BattlePlayer.SupplyEffects.ContainsKey(bonusType))
             {
-				case BonusType.ARMOR:
-					if (tank.GetComponent<ArmorEffectComponent>() == null)
+				switch (bonusType)
+				{
+					case BonusType.ARMOR:
 						tank.AddComponent(new ArmorEffectComponent());
-					break;
-				case BonusType.DAMAGE:
-					if (tank.GetComponent<DamageEffectComponent>() == null)
+						break;
+					case BonusType.DAMAGE:
 						tank.AddComponent(new DamageEffectComponent());
-					break;
-				case BonusType.GOLD:
-					UserMoneyComponent userMoneyComponent = player.Data.SetCrystals(player.Data.Crystals + battleBonus.GoldboxCrystals);
-					player.User.ChangeComponent(userMoneyComponent);
-					battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), player.BattleLobbyPlayer.BattlePlayer.BattleUser);
-					break;
-				case BonusType.REPAIR:
-					if (tank.GetComponent<HealingEffectComponent>() == null)
-						tank.AddComponent(new HealingEffectComponent());
-					break;
-				case BonusType.SPEED:
-					if (tank.GetComponent<TurboSpeedEffectComponent>() == null)
+						break;
+					case BonusType.GOLD:
+						UserMoneyComponent userMoneyComponent = player.Data.SetCrystals(player.Data.Crystals + battleBonus.GoldboxCrystals);
+						player.User.ChangeComponent(userMoneyComponent);
+						battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), player.BattleLobbyPlayer.BattlePlayer.BattleUser);
+						break;
+					case BonusType.REPAIR:
+						if (tank.GetComponent<HealingEffectComponent>() == null)
+						    tank.AddComponent(new HealingEffectComponent());
+						break;
+					case BonusType.SPEED:
 						tank.AddComponent(new TurboSpeedEffectComponent());
-					break;
-            }
+						tank.ChangeComponent(new SpeedComponent(float.MaxValue, 98f, 13));
+						break;
+				}
+			}
+
+			if (bonusType != BonusType.REPAIR && bonusType != BonusType.GOLD)
+			{
+				player.BattleLobbyPlayer.BattlePlayer.SupplyEffects.Remove(bonusType);
+				player.BattleLobbyPlayer.BattlePlayer.SupplyEffects.Add(bonusType, 30);
+			}
 
 			battle.MatchPlayers.Select(x => x.Player).UnshareEntity(battleBonus.Bonus);
 		}

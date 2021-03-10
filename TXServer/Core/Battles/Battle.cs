@@ -10,6 +10,7 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Bonus;
+using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
@@ -76,6 +77,7 @@ namespace TXServer.Core.Battles
                     BluePedestalEntity = PedestalTemplate.CreateEntity(CurrentMapInfo.Flags.Blue.Position, BlueTeamEntity, battle: BattleEntity);
                     RedFlagEntity = FlagTemplate.CreateEntity(CurrentMapInfo.Flags.Red.Position, team: RedTeamEntity, battle: BattleEntity);
                     BlueFlagEntity = FlagTemplate.CreateEntity(CurrentMapInfo.Flags.Blue.Position, team: BlueTeamEntity, battle: BattleEntity);
+                    FlagStates = new Dictionary<Entity, FlagState> {{ RedFlagEntity, FlagState.Home }, { BlueFlagEntity, FlagState.Home }};
                 }
             }
         }
@@ -348,20 +350,28 @@ namespace TXServer.Core.Battles
 
                 if (BattleParams.BattleMode == BattleMode.CTF)
                 {
-                    Entity[] flags = { BlueFlagEntity, RedFlagEntity };
-                    foreach (Entity flag in flags)
+                    battlePlayer.Player.UnshareEntities(RedPedestalEntity, BluePedestalEntity);
+                    if (BattleState != BattleState.WarmUp)
                     {
-                        if (flag.GetComponent<TankGroupComponent>() != null && flag.GetComponent<FlagGroundedStateComponent>() == null)
+                        Entity[] flags = { BlueFlagEntity, RedFlagEntity };
+                        foreach (Entity flag in flags)
                         {
-                            if (flag.GetComponent<TankGroupComponent>().Key == battlePlayer.BattlePlayer.Tank.GetComponent<TankGroupComponent>().Key)
+                            if (FlagStates[flag] == FlagState.Captured)
                             {
-                                flag.AddComponent(new FlagGroundedStateComponent());
-                                // TODO: drop flag at latest tank position
-                                flag.ChangeComponent(new FlagPositionComponent(new Vector3(x: 0, y: 3, z: 0)));
-
-                                MatchPlayers.Select(x => x.Player).SendEvent(new FlagDropEvent(IsUserAction: false), flag);
+                                if (flag.GetComponent<TankGroupComponent>().Key == battlePlayer.BattlePlayer.Tank.GetComponent<TankGroupComponent>().Key)
+                                {
+                                    FlagStates[flag] = FlagState.Dropped;
+                                    flag.PlayerReferences.Remove(battlePlayer.Player);
+                                    DroppedFlags.Add(flag, DateTime.Now.AddMinutes(1));
+                                    Vector3 flagPosition = new(battlePlayer.BattlePlayer.TankPosition.X, battlePlayer.BattlePlayer.TankPosition.Y - 1,
+                                        battlePlayer.BattlePlayer.TankPosition.Z);
+                                    flag.AddComponent(new FlagGroundedStateComponent());
+                                    flag.ChangeComponent(new FlagPositionComponent(flagPosition));
+                                    MatchPlayers.Select(x => x.Player).SendEvent(new FlagDropEvent(IsUserAction: false), flag);
+                                }
                             }
                         }
+                        battlePlayer.Player.UnshareEntities(RedFlagEntity, BlueFlagEntity);
                     }
                 }
             }
@@ -369,15 +379,6 @@ namespace TXServer.Core.Battles
             MatchPlayers.Select(x => x.Player).UnshareEntities(battlePlayer.BattlePlayer.GetEntities());
 
             MatchPlayers.Remove(battlePlayer);
-
-            if (BattleParams.BattleMode == BattleMode.CTF)
-            {
-                battlePlayer.Player.UnshareEntities(RedPedestalEntity, BluePedestalEntity);
-                if (BattleState != BattleState.WarmUp)
-                {
-                    battlePlayer.Player.UnshareEntities(RedFlagEntity, BlueFlagEntity);
-                }
-            }
 
             foreach (BattleLobbyPlayer inBattlePlayer in MatchPlayers)
                 battlePlayer.Player.UnshareEntities(inBattlePlayer.BattlePlayer.GetEntities());
@@ -605,6 +606,31 @@ namespace TXServer.Core.Battles
                      select matchPlayer.Player).SendEvent(pair.Value.Event, pair.Value.TankPart);
                     battlePlayer.TranslatedEvents.TryRemove(pair.Key, out _);
                 }
+            
+            
+                // supply effects
+                foreach (KeyValuePair<BonusType, double> entry in battlePlayer.SupplyEffects.ToArray())
+                {
+                    battlePlayer.SupplyEffects[entry.Key] -= deltaTime;
+
+                    if (entry.Value < 0)
+                    {
+                        switch (entry.Key)
+                        {
+                            case BonusType.ARMOR:
+                                battlePlayer.Tank.RemoveComponent<ArmorEffectComponent>();
+                                break;
+                            case BonusType.DAMAGE:
+                                battlePlayer.Tank.RemoveComponent<DamageEffectComponent>();
+                                break;
+                            case BonusType.SPEED:
+                                battlePlayer.Tank.RemoveComponent<TurboSpeedEffectComponent>();
+                                battlePlayer.Tank.ChangeComponent(new SpeedComponent(9.967f, 98f, 13.205f));
+                                break;
+                        }
+                        battlePlayer.SupplyEffects.Remove(entry.Key);
+                    }
+                }
             }
         }
         
@@ -634,16 +660,16 @@ namespace TXServer.Core.Battles
         private void ProcessDroppedFlags()
         {
             DateTime currentTime = DateTime.Now;
-            foreach (KeyValuePair<Entity, DateTime> entry in DroppedFlags.ToList())
+            foreach (KeyValuePair<Entity, DateTime> droppedFlag in DroppedFlags.ToList())
             {
-                if (DateTime.Compare(entry.Value, currentTime) <= 0 || BattleState != BattleState.Running)
+                if (DateTime.Compare(droppedFlag.Value, currentTime) <= 0 || BattleState != BattleState.Running)
                 {
-                    DroppedFlags.Remove(entry.Key);
-                    entry.Key.RemoveComponent<TankGroupComponent>();
-                    entry.Key.RemoveComponent<FlagGroundedStateComponent>();
+                    DroppedFlags.Remove(droppedFlag.Key);
+                    droppedFlag.Key.RemoveComponent<TankGroupComponent>();
+                    droppedFlag.Key.RemoveComponent<FlagGroundedStateComponent>();
 
                     Entity newFlag;
-                    if (RedFlagEntity.GetComponent<TeamGroupComponent>().Key == entry.Key.GetComponent<TeamGroupComponent>().Key)
+                    if (RedFlagEntity.GetComponent<TeamGroupComponent>().Key == droppedFlag.Key.GetComponent<TeamGroupComponent>().Key)
                     {
                         RedFlagEntity = FlagTemplate.CreateEntity(CurrentMapInfo.Flags.Red.Position, team: RedTeamEntity, battle: BattleEntity);
                         newFlag = RedFlagEntity;
@@ -653,13 +679,13 @@ namespace TXServer.Core.Battles
                         BlueFlagEntity = FlagTemplate.CreateEntity(CurrentMapInfo.Flags.Blue.Position, team: BlueTeamEntity, battle: BattleEntity);
                         newFlag = BlueFlagEntity;
                     }
+                    
+                    FlagStates.Remove(droppedFlag.Key);
+                    FlagStates.Add(newFlag, FlagState.Home);
+                    MatchPlayers.Select(x => x.Player).SendEvent(new FlagReturnEvent(), droppedFlag.Key);
+                    MatchPlayers.Select(x => x.Player).UnshareEntity(droppedFlag.Key);
+                    MatchPlayers.Select(x => x.Player).ShareEntity(newFlag);
 
-                    foreach (Player player in MatchPlayers.Select(x => x.Player))
-                    {
-                        player.SendEvent(new FlagReturnEvent(), entry.Key);
-                        player.UnshareEntity(entry.Key);
-                        player.ShareEntity(newFlag);
-                    }
                 }
             }
         }
@@ -831,8 +857,8 @@ namespace TXServer.Core.Battles
         public Entity BluePedestalEntity { get; set; }
         public Entity RedFlagEntity { get; set; }
         public Entity BlueFlagEntity { get; set; }
+        public Dictionary<Entity, FlagState> FlagStates { get; set; }
         public Dictionary<Entity, DateTime> DroppedFlags { get; } = new Dictionary<Entity, DateTime> { };
-        public long? FlagBlockedTankKey { get; set; }
         public Player Owner { get; set; }
     }
 }

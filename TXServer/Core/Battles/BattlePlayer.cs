@@ -139,5 +139,8 @@ namespace TXServer.Core.Battles
         public double TankStateChangeCountdown { get; set; }
         public bool WaitingForTankActivation { get; set; }
         public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new ConcurrentDictionary<Type, TranslatedEvent>();
+        public Vector3 TankPosition { get; set; }
+        public int FlagBlocks;
+        public Dictionary<BonusType, double> SupplyEffects = new();
     }
 }
