@@ -15,10 +15,10 @@ namespace TXServer.ECSSystem.Events
 
 		public void Execute(Player player, Entity entity)
 		{
+			ICommand command = new SendEventCommand(new EmailVacantEvent(Email), entity);
 			try
 			{
 				var addr = new System.Net.Mail.MailAddress(Email);
-				ICommand command = new SendEventCommand(new EmailVacantEvent(Email), entity);
 				// TODO: check if email is occupied
 				bool emailIsOccupied = false;
 				if (emailIsOccupied)

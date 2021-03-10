@@ -26,6 +26,8 @@ namespace TXServer.ECSSystem.Events
 				UserAvatarId = player.User.GetComponent<UserAvatarComponent>().Id
 			}, chat);
 
+			// todo: return if user has chat ban
+
 			switch (chat.TemplateAccessor.Template)
 			{
 				case GeneralChatTemplate _:
