@@ -140,6 +140,7 @@ namespace TXServer.Core.Battles
         public bool WaitingForTankActivation { get; set; }
         public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new ConcurrentDictionary<Type, TranslatedEvent>();
         public Vector3 TankPosition { get; set; }
+        public bool Paused { get; set; } = false;
         public int FlagBlocks;
         public Dictionary<BonusType, double> SupplyEffects = new();
     }

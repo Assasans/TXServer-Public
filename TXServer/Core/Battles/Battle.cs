@@ -20,6 +20,7 @@ using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.Events.Matchmaking;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
@@ -711,15 +712,9 @@ namespace TXServer.Core.Battles
 
             int? neededDifference = null;
             if (BattleParams.BattleMode == BattleMode.CTF)
-            {
                 neededDifference = 6;
-            } else
-            {
-                if (BattleParams.BattleMode == BattleMode.TDM)
-                {
-                    neededDifference = 30;
-                }
-            }
+            else if (BattleParams.BattleMode == BattleMode.TDM)
+                neededDifference = 30;
 
             if (neededDifference != null)
             {
@@ -729,18 +724,19 @@ namespace TXServer.Core.Battles
                     if (BattleEntity.GetComponent<RoundDisbalancedComponent>() == null)
                     {
                         Entity[] teams = { BlueTeamEntity, RedTeamEntity };
-                        Entity loserTeam = teams.Single(t => t.GetComponent<TeamColorComponent>().TeamColor != player.BattleLobbyPlayer.Team.GetComponent<TeamColorComponent>().TeamColor);
+                        Entity loserTeam = teams.OrderBy(t => t.GetComponent<TeamScoreComponent>().Score).First();
                         TeamColor loserColor = loserTeam.GetComponent<TeamColorComponent>().TeamColor;
-
                         Component roundDisbalancedComponent = new RoundDisbalancedComponent(Loser: loserColor, InitialDominationTimerSec: 30, FinishTime: new TXDate(new TimeSpan(0, 0, 30)));
 
                         BattleEntity.AddComponent(roundDisbalancedComponent);
+                        BattleEntity.AddComponent(new RoundComponent());
                     }
                 } 
-
                 else if (BattleEntity.GetComponent<RoundDisbalancedComponent>() != null)
                 {
-                    //TODO: restore round balance
+                    MatchPlayers.Select(x => x.Player).SendEvent(new RoundBalanceRestoredEvent(), BattleEntity);
+                    BattleEntity.RemoveComponent<RoundComponent>();
+                    BattleEntity.RemoveComponent<RoundDisbalancedComponent>();
                 }
             }
         }

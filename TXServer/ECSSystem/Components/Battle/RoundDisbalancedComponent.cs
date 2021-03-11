@@ -7,8 +7,6 @@ namespace TXServer.ECSSystem.Components.Battle
     [SerialVersionUID(3051892485776042754L)]
     public class RoundDisbalancedComponent : Component
     {
-        private object finishTime;
-
         public RoundDisbalancedComponent(TeamColor Loser, int InitialDominationTimerSec, TXDate FinishTime)
         {
             this.Loser = Loser;

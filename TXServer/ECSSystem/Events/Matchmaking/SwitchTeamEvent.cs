@@ -3,8 +3,8 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
 using TXServer.Core;
 using TXServer.Core.Battles;
-using TXServer.Core.Commands;
 using TXServer.ECSSystem.Components;
+using System.Linq;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -13,34 +13,28 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity mode)
 		{
-			foreach (Core.Battles.Battle battle in ServerConnection.BattlePool)
+			Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.AllBattlePlayers.Contains(player.BattleLobbyPlayer));
+			TeamColor newTeamColor;
+
+			if (battle.BattleParams.BattleMode == BattleMode.DM)
+				return;
+
+			if (battle.RedTeamPlayers.Contains(player.BattleLobbyPlayer))
+			{
+				newTeamColor = TeamColor.BLUE;
+				battle.RedTeamPlayers.Remove(player.BattleLobbyPlayer);
+				player.BattleLobbyPlayer = new BattleLobbyPlayer(player, battle.BlueTeamEntity);
+				battle.BlueTeamPlayers.Add(player.BattleLobbyPlayer);
+			}
+			else
             {
-				if (battle.BattleParams.BattleMode != BattleMode.DM)
-                {
-					if (battle.RedTeamPlayers.Contains(player.BattleLobbyPlayer))
-					{
-						battle.RedTeamPlayers.Remove(player.BattleLobbyPlayer);
-						player.BattleLobbyPlayer = new BattleLobbyPlayer(player, battle.BlueTeamEntity);
-						battle.BlueTeamPlayers.Add(player.BattleLobbyPlayer);
-						CommandManager.SendCommands(player, 
-							new ComponentRemoveCommand(player.User, typeof(TeamColorComponent)),
-							new ComponentAddCommand(player.User, new TeamColorComponent(TeamColor.BLUE)));
-						break;
-					}
-					if (battle.BlueTeamPlayers.Contains(player.BattleLobbyPlayer))
-					{
-						battle.BlueTeamPlayers.Remove(player.BattleLobbyPlayer);
-						player.BattleLobbyPlayer = new BattleLobbyPlayer(player, battle.RedTeamEntity);
-						battle.RedTeamPlayers.Add(player.BattleLobbyPlayer);
-						CommandManager.SendCommands(player, 
-							new ComponentRemoveCommand(player.User, typeof(TeamColorComponent)),
-							new ComponentAddCommand(player.User, new TeamColorComponent(TeamColor.RED)));
-						break;
-					}
-				}
-            }
-			
+				newTeamColor = TeamColor.RED;
+				battle.BlueTeamPlayers.Remove(player.BattleLobbyPlayer);
+				player.BattleLobbyPlayer = new BattleLobbyPlayer(player, battle.RedTeamEntity);
+				battle.RedTeamPlayers.Add(player.BattleLobbyPlayer);
+			}
+			player.User.RemoveComponent<TeamColorComponent>();
+			player.User.AddComponent(new TeamColorComponent(newTeamColor));
 		}
-		
 	}
 }

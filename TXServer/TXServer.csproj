@@ -46,4 +46,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.3" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ECSSystem\Components\Battle\Score\" />
+  </ItemGroup>
 </Project>

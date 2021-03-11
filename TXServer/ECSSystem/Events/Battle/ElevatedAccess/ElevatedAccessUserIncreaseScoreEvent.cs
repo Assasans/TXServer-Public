@@ -14,7 +14,12 @@ namespace TXServer.ECSSystem.Events.Battle
 		{
 			Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.MatchPlayers.Contains(player.BattleLobbyPlayer));
 			Entity[] teams = { battle.RedTeamEntity, battle.BlueTeamEntity };
-			Entity team = teams.Single(t => t.GetComponent<TeamColorComponent>().TeamColor == TeamColor);
+			Entity team;
+
+			if (TeamColor == TeamColor.BLUE)
+			    team = teams.Single(t => t.GetComponent<TeamColorComponent>().TeamColor == player.User.GetComponent<TeamColorComponent>().TeamColor);
+			else
+				team = teams.Single(t => t.GetComponent<TeamColorComponent>().TeamColor != player.User.GetComponent<TeamColorComponent>().TeamColor);
 
 			battle.UpdateScore(player, team, Amount);
 		}
