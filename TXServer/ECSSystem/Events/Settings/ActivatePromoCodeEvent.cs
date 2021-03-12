@@ -8,6 +8,7 @@ using TXServer.ECSSystem.Types;
 using TXServer.ECSSystem.GlobalEntities;
 using System.Collections.Generic;
 using System;
+using TXServer.Core.Logging;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -31,18 +32,18 @@ namespace TXServer.ECSSystem.Events
 				int var;
 				if (currencieCodes.ContainsKey(Convert.ToString(Code[0])))
                 {
-					if (int.TryParse(Code.Substring(1, Code.Length - 1), out var))
+					if (int.TryParse(Code[1..], out var))
 					{
-						rewards.Add(currencieCodes[Convert.ToString(Code[0])], Convert.ToInt32(Code.Substring(1, Code.Length - 1)));
+						rewards.Add(currencieCodes[Convert.ToString(Code[0])], Convert.ToInt32(Code[1..]));
 					}
                 }
 				if (Code.StartsWith("xp"))
 				{
-					if (int.TryParse(Code.Substring(2, Code.Length - 2), out var))
+					if (int.TryParse(Code[2..], out var))
 					{
 						UserExperienceComponent userExperienceComponent = player.User.GetComponent<UserExperienceComponent>();
-						userExperienceComponent.Experience += Convert.ToInt32(Code.Substring(2, Code.Length - 2));
-						Console.WriteLine(userExperienceComponent.Experience);
+						userExperienceComponent.Experience += Convert.ToInt32(Code[2..]);
+						Logger.Debug($"{player}: Changed experience to {userExperienceComponent.Experience}");
 						commands.Add(new ComponentChangeCommand(player.User, userExperienceComponent));
 					}
 				}

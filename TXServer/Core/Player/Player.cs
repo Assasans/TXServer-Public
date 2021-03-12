@@ -2,10 +2,12 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using TXServer.Core.Battles;
 using TXServer.Core.Commands;
+using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
@@ -35,6 +37,8 @@ namespace TXServer.Core
             Server = server;
             Connection = new PlayerConnection(this, socket);
 			Connection.StartPlayerThreads();
+
+			Logger.Log($"{this} has connected.");
 		}
 
         public void Dispose()
@@ -50,8 +54,10 @@ namespace TXServer.Core
             }
 			EntityList.Clear();
 
-            //todo save data?
-        }
+			Logger.Log($"{this} has disconnected.");
+
+			//todo save data?
+		}
 
         public bool IsActive => Connection.IsActive;
 		public bool TryDeactivate() => Connection.TryDeactivate();
@@ -79,7 +85,9 @@ namespace TXServer.Core
 	        {
 		        throw new ArgumentException("ClientSession Entity doesn't match Player ClientSession Entity");
 	        }
-			
+
+			Logger.Log($"{this}: Logged in as {Data.UniqueId}.");
+
 			Entity user = new Entity(new TemplateAccessor(new UserTemplate(), ""),
 				new UserXCrystalsComponent(Data.XCrystals),
 				new UserCountryComponent(Data.CountryCode),
@@ -230,5 +238,11 @@ namespace TXServer.Core
         {
             return Data?.UniqueId;
         }
+
+        public override string ToString()
+        {
+            return (_EndPoint ??= Connection.Socket.RemoteEndPoint).ToString();
+        }
+		private static EndPoint _EndPoint;
     }
 }

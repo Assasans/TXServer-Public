@@ -11,11 +11,5 @@ namespace TXServer.ECSSystem.EntityTemplates
         public long WeaponId { get; set; }
         
         public long HullId { get; set; }
-
-        public void Execute(Player player, Entity lobby)
-        {
-            Console.WriteLine(lobby.EntityId + " is used as lobby id for player " + player.User.EntityId);
-            //todo show this to other players in the lobby
-        }
     }
 }

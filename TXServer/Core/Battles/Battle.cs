@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Threading;
 using TXServer.Core.Commands;
+using TXServer.Core.Logging;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -171,6 +172,8 @@ namespace TXServer.Core.Battles
         
         public void AddPlayer(Player player)
         {
+            Logger.Log($"{player}: Joined battle {BattleEntity.EntityId}");
+
             // prepare client
             player.User.AddComponent(new UserEquipmentComponent(player.CurrentPreset.Weapon.EntityId, player.CurrentPreset.Hull.EntityId));
             player.ShareEntities(BattleLobbyEntity, BattleLobbyChatEntity);
@@ -254,6 +257,8 @@ namespace TXServer.Core.Battles
 
             battlePlayer.Player.UnshareEntities(AllBattlePlayers.Select(x => x.User));
             AllBattlePlayers.Select(x => x.Player).UnshareEntity(battlePlayer.User);
+
+            Logger.Log($"{battlePlayer.Player}: Left battle {BattleEntity.EntityId}");
 
             ServerConnection.BattlePool.RemoveAll(p => !p.AllBattlePlayers.Any() && !p.IsMatchMaking);
         }

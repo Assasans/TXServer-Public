@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Net;
 using TXServer.Core.Data.Database;
+using TXServer.Core.Logging;
 
 namespace TXServer.Core
 {
@@ -9,17 +9,17 @@ namespace TXServer.Core
         public static Server Instance { get; set; }
         
         public ServerConnection Connection { get; private set; }
-        public IDatabase Database { get; }
 
-        public Server(IDatabase database)
-        {
-            Database = database;
-        }
+        public ServerSettings Settings { get; init; }
+        public IDatabase Database { get; init; }
+        public Action UserErrorHandler { get; init; }
 
-        public void Start(IPAddress ip, short port, int poolSize)
+        public void Start()
         {
+            Logger.Log("Starting server...");
+
             Connection = new ServerConnection(this);
-            Connection.Start(ip, port, poolSize);
+            Connection.Start(Settings.IPAddress, Settings.Port, Settings.MaxPlayers);
             Database.Startup();
         }
 
@@ -39,9 +39,20 @@ namespace TXServer.Core
         public void Stop()
         {
             if (!Connection.IsStarted) return;
+
+            Logger.Log("Stopping server...");
             
             Connection.StopServer();
             Database.Shutdown();
+
+            Logger.Log("Server is stopped.");
+        }
+
+        internal void HandleError()
+        {
+            Logger.Error("Fatal error!");
+            Stop();
+            UserErrorHandler?.Invoke();
         }
     }
 }

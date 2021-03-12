@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
+using TXServer.Core.Logging;
 using TXServer.Core.Protocol;
 using TXServer.Library;
 
@@ -16,8 +17,6 @@ namespace TXServer.Core.Commands
         /// Packet start sequence.
         /// </summary>
         public static readonly byte[] Magic = { 0xff, 0x00 };
-
-        public static bool EnableTracing { get; set; }
 
         /// <summary>
         /// Receive data from client.
@@ -31,8 +30,7 @@ namespace TXServer.Core.Commands
 
 #if DEBUG
                 connection.Player.LastClientPacket = commands;
-                if (EnableTracing)
-                    Console.WriteLine($"Received from {connection.Socket.RemoteEndPoint}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}");
+                Logger.Trace($"Received from {connection.Player}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}");
 #endif
 
                 foreach (ICommand command in commands)
@@ -78,8 +76,7 @@ namespace TXServer.Core.Commands
 
 #if DEBUG
             player.LastServerPacket = commands;
-            if (EnableTracing)
-                Console.WriteLine($"Sent to {player.Connection.Socket.RemoteEndPoint}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}");
+            Logger.Trace($"Sent to {player}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}");
 #endif
 
             using (MemoryStream buffer = new MemoryStream())

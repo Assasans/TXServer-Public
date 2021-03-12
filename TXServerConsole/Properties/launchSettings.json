@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TXServerConsole": {
+      "commandName": "Project",
+      "commandLineArgs": "--run 127.0.0.1 5050 5 --enable-tracing"
+    }
+  }
+}

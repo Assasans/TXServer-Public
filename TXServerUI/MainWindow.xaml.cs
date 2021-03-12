@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Net.NetworkInformation;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using TXServer.Core;
@@ -32,7 +32,7 @@ namespace TXServerUI
 
             IPAddressComboBox.Items.Add(IPAddress.Any);
 
-            UpdateStateText();
+            _ = UpdateStateText();
         }
 
         public void HandleCriticalError()
@@ -40,8 +40,11 @@ namespace TXServerUI
             if (errorState) return;
             errorState = true;
 
-            MessageBox.Show("An error occured while starting server. Try running application as administrator.", "", MessageBoxButton.OK, MessageBoxImage.Error);
-            StopServer();
+            Dispatcher.Invoke(() =>
+            {
+                MessageBox.Show("An error occured while starting server. Try running application as administrator.", "", MessageBoxButton.OK, MessageBoxImage.Error);
+                StopServer();
+            });
         }
 
         // Кнопка запуска сервера.
@@ -66,13 +69,20 @@ namespace TXServerUI
         {
             SettingsGroupBox.IsEnabled = false;
 
-            ServerLauncher.InitServer((IPAddress)IPAddressComboBox.SelectedItem, short.Parse(PortTextBox.Text), int.Parse(MaxPlayersTextBox.Text));
-            TXServer.Core.Commands.CommandManager.EnableTracing = EnableTracingCheckBox.IsChecked.GetValueOrDefault();
+            ServerSettings settings = new()
+            {
+                IPAddress = (IPAddress)IPAddressComboBox.SelectedItem,
+                Port = short.Parse(PortTextBox.Text),
+                MaxPlayers = int.Parse(MaxPlayersTextBox.Text),
+                TraceModeEnabled = EnableTracingCheckBox.IsChecked.GetValueOrDefault()
+            };
+
+            ServerLauncher.InitServer(settings);
 
             StartButton.Content = "Stop";
 
             Activate();
-            new Thread(UpdateStateText).Start();
+            _ = UpdateStateText();
         }
 
         private void StopServer()
@@ -93,25 +103,17 @@ namespace TXServerUI
             }
         }
         
-        public void UpdateStateText()
+        public async Task UpdateStateText()
         {
             while (ServerLauncher.IsStarted())
             {
-                if (Server.Instance.Connection.IsError)
-                {
-                    ServerLauncher.StopServer(false);
-                    Application.Current.Dispatcher.Invoke(HandleCriticalError);
-                    break;
-                }
-
-                Application.Current.Dispatcher.Invoke(() =>
-                    ServerStateText.Text = $"Connected players: {ServerLauncher.GetPlayerCount()}\n" +
-                        $"Active battles: {ServerConnection.BattlePool.Count}\n" +
-                        $"Last tick duration: {ServerConnection.LastTickDuration}");
-                Thread.Sleep(1000);
+                ServerStateText.Text = $"Connected players: {ServerLauncher.GetPlayerCount()}\n" +
+                    $"Active battles: {ServerConnection.BattlePool.Count}\n" +
+                    $"Last tick duration: {ServerConnection.LastTickDuration}";
+                await Task.Delay(1000);
             }
             
-            Application.Current.Dispatcher.Invoke(() => ServerStateText.Text = "Server is stopped.");
+            ServerStateText.Text = "Server is stopped.";
             return;
         }
     }

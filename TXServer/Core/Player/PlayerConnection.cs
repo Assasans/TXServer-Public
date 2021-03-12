@@ -5,9 +5,9 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using TXServer.Core.Commands;
+using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Entrance;
 using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.Core
@@ -44,13 +44,11 @@ namespace TXServer.Core
             QueuedCommands.CompleteAdding();
 
             Interlocked.Decrement(ref Server.Instance.Connection.PlayerCount);
-            //Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
         }
 
         /// <summary>
         /// Handle server -> client events.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов", Justification = "<Ожидание>")]
         public void ServerSideEvents()
         {
             try
@@ -70,9 +68,17 @@ namespace TXServer.Core
                     //new ComponentAddCommand(ClientSession, new InviteComponent(true, ""))
                 );
 
-                while (!QueuedCommands.IsCompleted)
+                while (IsActive)
                 {
-                    ICommand command = QueuedCommands.Take();
+                    ICommand command;
+                    try
+                    {
+                        command = QueuedCommands.Take();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        return;
+                    }
 
                     int count = QueuedCommands.Count + 1;
                     ICommand[] commands = new ICommand[count];
@@ -83,21 +89,22 @@ namespace TXServer.Core
                         commands[i] = QueuedCommands.Take();
                     }
 
+                    if (!IsActive) return;
                     CommandManager.SendCommands(Player, commands);
                 }
             }
             catch (Exception e)
             {
-                Player.User?.Components.Remove(new UserOnlineComponent());
-                Console.WriteLine(e.ToString());
-                Dispose();
+                Logger.Error($"{Player}: {e}");
+                Player.Dispose();
+                if (Player.User?.GetComponent<UserOnlineComponent>() != null)
+                    Player.User?.RemoveComponent<UserOnlineComponent>();
             }
         }
 
         /// <summary>
         /// Handle client -> server events.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов", Justification = "<Ожидание>")]
         public void ClientSideEvents()
         {
             try
@@ -109,13 +116,21 @@ namespace TXServer.Core
             }
             catch (Exception e)
             {
+                if (e is IOException)
+                {
+                    Logger.Debug($"{Player}: {e.InnerException?.Message ?? e.Message}");
+                }
+                else
+                {
+                    Logger.Error($"{Player}: {e}");
 #if DEBUG
-                if (!(e is IOException))
                     Debugger.Launch();
 #endif
-                Player.User?.Components.Remove(new UserOnlineComponent());
-                Console.WriteLine(e.ToString());
-                Dispose();
+                }
+
+                Player.Dispose();
+                if (Player.User?.GetComponent<UserOnlineComponent>() != null)
+                    Player.User?.RemoveComponent<UserOnlineComponent>();
             }
         }
 

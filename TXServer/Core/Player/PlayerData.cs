@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using TXServer.Core.Commands;
 using TXServer.Core.Data.Database;
+using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 
@@ -123,7 +124,7 @@ namespace TXServer.Core
             foreach (PropertyInfo info in typeof(T).GetProperties())
             {
                 if (info.PropertyType != value.GetType()) continue;
-                Console.WriteLine(info.Name);
+                Logger.Debug($"Updated user value \"{info.Name}\"");
                 info.SetValue(component, value);
             }
             

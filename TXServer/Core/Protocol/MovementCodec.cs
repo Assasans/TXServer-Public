@@ -2,6 +2,7 @@
 using System.Collections;
 using System.IO;
 using System.Numerics;
+using TXServer.Core.Logging;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Tank;
 
@@ -137,7 +138,7 @@ namespace TXServer.Core.Protocol
             float val = (Read(bits, ref position, size) - (1 << size - 1)) * factor;
             if (IsValidFloat(val))
                 return val;
-            Console.WriteLine($"AbstractMoveCodec.ReadFloat: invalid float: {val}");
+            Logger.Warn($"AbstractMoveCodec.ReadFloat: invalid float: {val}");
             return 0.0f;
         }
 
@@ -162,12 +163,12 @@ namespace TXServer.Core.Protocol
             int num1 = (int) (val / (double) factor);
             int num2 = 0;
             if (num1 < -offset)
-                Console.WriteLine($"Value too small {val} offset={offset} factor={factor}");
+                Logger.Warn($"Value too small {val} offset={offset} factor={factor}");
             else
                 num2 = num1 - offset;
             if (num2 >= offset)
             {
-                Console.WriteLine($"Value too big {val} offset={offset} factor={factor}");
+                Logger.Warn($"Value too big {val} offset={offset} factor={factor}");
                 num2 = offset;
             }
 

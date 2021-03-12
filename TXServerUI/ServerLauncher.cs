@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows;
 using TXServer.Core.Data.Database.Impl;
+using TXServerUI;
 
 namespace TXServer.Core
 {
@@ -37,7 +38,7 @@ namespace TXServer.Core
         /// <param name="ip">IP address.</param>
         /// <param name="port">Port.</param>
         /// <param name="poolSize">Max players.</param>
-        public static void InitServer(IPAddress ip, short port, int poolSize)
+        public static void InitServer(ServerSettings settings)
         {
             if (!Debugger.IsAttached)
             {
@@ -49,9 +50,14 @@ namespace TXServer.Core
 
             if (Server.Instance == null)
             {
-                // Server.Instance = new Server(ip, port, poolSize, new SqLiteDatabase(@"URI=file:" + Directory.GetCurrentDirectory() + "/tankix.db"));
-                Server.Instance = new Server(new LocalDatabase());
-                Server.Instance.Start(ip, port, poolSize);
+                // Server.Instance = new Server(settings, new SqLiteDatabase(@"URI=file:" + Directory.GetCurrentDirectory() + "/tankix.db"));
+                Server.Instance = new Server
+                {
+                    Settings = settings,
+                    Database = new LocalDatabase(),
+                    UserErrorHandler = ((MainWindow)Application.Current.MainWindow).HandleCriticalError
+                };
+                Server.Instance.Start();
             }
         }
 

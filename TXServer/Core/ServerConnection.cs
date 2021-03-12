@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -10,9 +9,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using TXServer.Core.Battles;
-using TXServer.Core.Commands;
+using TXServer.Core.Logging;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Events.Ping;
 
@@ -40,16 +38,13 @@ namespace TXServer.Core
 
             MaxPoolSize = poolSize;
 
-            acceptWorker = new Thread(() => AcceptPlayers(ip, port, MaxPoolSize)) {Name = "Acceptor"};
-            acceptWorker.Start();
+            new Thread(() => AcceptPlayers(ip, port, MaxPoolSize)) { Name = "Acceptor" }.Start();
+            new Thread(() => StateServer(ip)) { Name = "State Server" }.Start();
 
-            StateServerWorker = new Thread(() => StateServer(ip)) {Name = "StateServer"};
-            StateServerWorker.Start();
+            new Thread(BattleLoop) { Name = "Battle Thread" }.Start();
+            new Thread(PingChecker) { Name = "Ping Checker" };
 
-            BattleWorker = new Thread(() => BattleLoop()) { Name = "BattleWorker" };
-            BattleWorker.Start();
-
-            PingWorker = new Thread(PingChecker) {Name = "PingChecker"};
+            Logger.Log("Server is started.");
         }
 
         /// <summary>
@@ -86,18 +81,16 @@ namespace TXServer.Core
             else
             {
                 socket.Close();
-                Console.WriteLine("Сервер переполнен!");
+                Logger.Warn("Server is full!");
             }
         }
 
         /// <summary>
         /// Waits for new clients.
         /// </summary>
-        [SuppressMessage("Design", "CA1031:Не перехватывать исключения общих типов",
-            Justification = "<Ожидание>")]
         public void AcceptPlayers(IPAddress ip, short port, int PoolSize)
         {
-            using (acceptorSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP))
+            using (acceptorSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {
                 try
                 {
@@ -106,8 +99,8 @@ namespace TXServer.Core
                 }
                 catch (SocketException e)
                 {
-                    Console.WriteLine(e);
-                    IsError = true;
+                    Logger.Error(e);
+                    HandleError();
                     return;
                 }
 
@@ -126,7 +119,7 @@ namespace TXServer.Core
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.ToString());
+                        Logger.Error(e);
 
                         if (accepted) socket.Close();
                     }
@@ -141,7 +134,6 @@ namespace TXServer.Core
         public void StateServer(IPAddress ip)
         {
             string rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/StateServer";
-            string resourcePath = "/resources";
 
             using (httpListener = new HttpListener())
             {
@@ -153,8 +145,8 @@ namespace TXServer.Core
                 }
                 catch (HttpListenerException e)
                 {
-                    Console.WriteLine(e);
-                    IsError = true;
+                    Logger.Error(e);
+                    HandleError();
                     return;
                 }
 
@@ -169,7 +161,7 @@ namespace TXServer.Core
                     }
                     catch (HttpListenerException e)
                     {
-                        Console.WriteLine(e.ToString());
+                        Logger.Error(e);
                         return;
                     }
 
@@ -177,7 +169,14 @@ namespace TXServer.Core
                     {
                         HttpListenerRequest request = context.Request;
                         HttpListenerResponse response = context.Response;
-                        Console.WriteLine(request.Url);
+
+                        Logger.Debug($"Request from {request.RemoteEndPoint}: {request.HttpMethod} {request.Url.PathAndQuery}");
+                        if (request.HttpMethod != "GET")
+                        {
+                            response.StatusCode = 405;
+                            response.OutputStream.Close();
+                            return;
+                        }
 
                         byte[] data;
                         try
@@ -235,53 +234,58 @@ namespace TXServer.Core
         {
             if (BattlePool.Count == 0)
             {
-                BattlePool.Add(new Battle(battleParams:null, isMatchMaking: true, owner: null));
+                BattlePool.Add(new Battle(battleParams: null, isMatchMaking: true, owner: null));
             }
             GlobalBattle = BattlePool[0];
 
-            Stopwatch stopwatch = new Stopwatch();
+            Stopwatch stopwatch = new();
 
-            while (true)
+            try
             {
-                if (!IsStarted) return;
-
-                stopwatch.Restart();
-                foreach (Battle battle in BattlePool.ToArray())
+                while (true)
                 {
-                    battle.Tick(LastTickDuration);
-                }    
-                stopwatch.Stop();
+                    if (!IsStarted) return;
 
-                TimeSpan spentOnBattles = stopwatch.Elapsed;
+                    stopwatch.Restart();
+                    foreach (Battle battle in BattlePool.ToArray())
+                    {
+                        battle.Tick(LastTickDuration);
+                    }
+                    stopwatch.Stop();
 
-                stopwatch.Start();
-                if (spentOnBattles.TotalSeconds < BattleTickDuration)
-                    Thread.Sleep(TimeSpan.FromSeconds(BattleTickDuration) - spentOnBattles);
+                    TimeSpan spentOnBattles = stopwatch.Elapsed;
 
-                //Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
+                    stopwatch.Start();
+                    if (spentOnBattles.TotalSeconds < BattleTickDuration)
+                        Thread.Sleep(TimeSpan.FromSeconds(BattleTickDuration) - spentOnBattles);
 
-                stopwatch.Stop();
-                LastTickDuration = stopwatch.Elapsed.TotalSeconds;
+                    stopwatch.Stop();
+                    LastTickDuration = stopwatch.Elapsed.TotalSeconds;
+                }
+            }
+            catch (Exception e)
+            {
+#if DEBUG
+                Debugger.Launch();
+#endif
+                HandleError();
             }
         }
+
+        private static void HandleError() => Server.Instance.HandleError();
 
         // Player pool.
         public List<Player> Pool { get; } = new List<Player>();
         private int MaxPoolSize;
 
         // Client accept thread.
-        private Thread acceptWorker;
         private Socket acceptorSocket;
 
         // HTTP state server thread.
-        private Thread StateServerWorker;
         private HttpListener httpListener;
-
-        private Thread PingWorker;
 
         public static List<Battle> BattlePool { get; } = new List<Battle>();
         public static Battle GlobalBattle { get; private set; } // todo replace with proper matchmaker
-        private Thread BattleWorker;
 
         public static double LastTickDuration { get; private set; }
         private const int BattleTickRate = 100;
@@ -289,7 +293,6 @@ namespace TXServer.Core
 
         // Server state.
         public bool IsStarted { get; private set; }
-        public bool IsError { get; set; }
 
         public int PlayerCount = 0;
 
