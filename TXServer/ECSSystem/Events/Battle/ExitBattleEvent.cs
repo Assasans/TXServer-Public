@@ -1,6 +1,4 @@
-﻿using System;
-using TXServer.Core;
-using TXServer.Core.Commands;
+﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -14,9 +12,7 @@ namespace TXServer.ECSSystem.Events.Battle
         {
 			player.BattleLobbyPlayer.WaitingForExit = true;
 			if (player.User.GetComponent<MatchMakingUserReadyComponent>() != null)
-            {
-				CommandManager.SendCommands(player, new ComponentRemoveCommand(player.User, typeof(MatchMakingUserReadyComponent)));
-			}
+				player.User.RemoveComponent<MatchMakingUserReadyComponent>();
         }
 	}
 }

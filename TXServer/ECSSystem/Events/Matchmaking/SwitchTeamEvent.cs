@@ -25,6 +25,9 @@ namespace TXServer.ECSSystem.Events.Battle
 				battle.RedTeamPlayers.Remove(player.BattleLobbyPlayer);
 				player.BattleLobbyPlayer = new BattleLobbyPlayer(player, battle.BlueTeamEntity);
 				battle.BlueTeamPlayers.Add(player.BattleLobbyPlayer);
+				UserResult userResult = battle.RedTeamResults.Single(r => r.UserId == player.User.EntityId);
+				battle.RedTeamResults.Remove(userResult);
+				battle.BlueTeamResults.Add(userResult);
 			}
 			else
             {
@@ -32,6 +35,9 @@ namespace TXServer.ECSSystem.Events.Battle
 				battle.BlueTeamPlayers.Remove(player.BattleLobbyPlayer);
 				player.BattleLobbyPlayer = new BattleLobbyPlayer(player, battle.RedTeamEntity);
 				battle.RedTeamPlayers.Add(player.BattleLobbyPlayer);
+				UserResult userResult = battle.BlueTeamResults.Single(r => r.UserId == player.User.EntityId);
+				battle.BlueTeamResults.Remove(userResult);
+				battle.RedTeamResults.Add(userResult);
 			}
 			player.User.RemoveComponent<TeamColorComponent>();
 			player.User.AddComponent(new TeamColorComponent(newTeamColor));

@@ -44,9 +44,11 @@
 	</None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.3" />
+    <Compile Remove="ECSSystem\Components\Battle\Score\**" />
+    <EmbeddedResource Remove="ECSSystem\Components\Battle\Score\**" />
+    <None Remove="ECSSystem\Components\Battle\Score\**" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ECSSystem\Components\Battle\Score\" />
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.3" />
   </ItemGroup>
 </Project>

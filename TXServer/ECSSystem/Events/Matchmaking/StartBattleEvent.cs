@@ -3,7 +3,6 @@ using TXServer.ECSSystem.Base;
 using TXServer.Core;
 using System.Linq;
 using TXServer.Core.Battles;
-using TXServer.ECSSystem.Components;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -15,13 +14,14 @@ namespace TXServer.ECSSystem.Events.Battle
 		    Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.Owner == player);
 
 			if (battle.BattleState == BattleState.CustomNotStarted)
-            {
 				battle.BattleState = BattleState.Starting;
-            }
-			else
+			else if (battle.BattleState == BattleState.Ended)
             {
-				battle.InitBattlePlayer(player.BattleLobbyPlayer);
+				battle.CreateBattle();
+				battle.BattleState = BattleState.Starting;
 			}
+			else
+				battle.InitBattlePlayer(player.BattleLobbyPlayer);
 		}
 	}
 }

@@ -114,7 +114,7 @@ namespace TXServer.Core
 				new ConfirmedUserEmailComponent(Data.Email, Data.Subscribed),
 				new UserSubscribeComponent(),
 				new KillsEquipmentStatisticsComponent(),
-				new BattleLeaveCounterComponent(),
+				new BattleLeaveCounterComponent(0, 0),
 				//new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(12, 0, 0))),
 			    new UserReputationComponent(0.0));
 

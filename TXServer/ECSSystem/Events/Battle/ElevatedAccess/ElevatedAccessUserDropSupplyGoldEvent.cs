@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
-using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -34,8 +33,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 			int goldboxIndex = goldboxesIndex[new Random().Next(goldboxesIndex.Count)];
 			battle.BattleBonuses[goldboxIndex].BonusState = BonusState.New;
 
-			CommandManager.BroadcastCommands(battle.MatchPlayers.Select(x => x.Player),
-			    new SendEventCommand(new GoldScheduleNotificationEvent(player.User.GetComponent<UserUidComponent>().Uid), entity));
+			battle.AllBattlePlayers.Select(x => x.Player).SendEvent(new GoldScheduleNotificationEvent(player.User.GetComponent<UserUidComponent>().Uid), entity);
 		}
 		public GoldType GoldType { get; set; }
 	}

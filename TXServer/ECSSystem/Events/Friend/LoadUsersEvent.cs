@@ -56,7 +56,7 @@ namespace TXServer.ECSSystem.Events
                         new ConfirmedUserEmailComponent("none"),
                         new UserSubscribeComponent(),
                         new KillsEquipmentStatisticsComponent(),
-                        new BattleLeaveCounterComponent(),
+                        new BattleLeaveCounterComponent(0, 0),
                         new UserReputationComponent(0.0),
                         new UserGroupComponent(id));
                 }
