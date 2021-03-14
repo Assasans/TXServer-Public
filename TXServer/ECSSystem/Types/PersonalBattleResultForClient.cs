@@ -12,9 +12,13 @@ namespace TXServer.ECSSystem.Types
         {
 			UserTeamColor = player.User.GetComponent<TeamColorComponent>().TeamColor;
 			TeamBattleResult = teamBattleResult;
+			//CurrentBattleSeries = player.Data.SetBattleSeries(player.Data.BattleSeries + 1);
+			//if (CurrentBattleSeries > MaxBattleSeries)
+				//CurrentBattleSeries = 1;
 			League = Leagues.GlobalItems.Silver;
 			PrevLeague = Leagues.GlobalItems.Silver;
 			Reward = BattleRewards.GlobalItems.XCrystalBonus;
+			// todo: save results to database
 		}
 
         public TeamColor UserTeamColor { get; set; }
@@ -23,7 +27,7 @@ namespace TXServer.ECSSystem.Types
 		public int EnergyDelta { get; set; } = 0;
 		public int CrystalsForExtraEnergy { get; set; } = 0;
 		[OptionalMapped]
-		public EnergySource MaxEnergySource { get; set; } = EnergySource.BONUS;
+		public EnergySource MaxEnergySource { get; set; } = EnergySource.MVP_BONUS;
 		public int CurrentBattleSeries { get; set; } = 0;
 		public int MaxBattleSeries { get; set; } = 0;
 		public float ScoreBattleSeriesMultiplier { get; set; } = 0;

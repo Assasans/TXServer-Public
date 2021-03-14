@@ -3,8 +3,6 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Team;
-using TXServer.ECSSystem.Types;
-using TXServer.Core;
 
 namespace TXServer.ECSSystem.EntityTemplates.Battle
 {

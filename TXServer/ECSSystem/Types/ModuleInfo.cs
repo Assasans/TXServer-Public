@@ -2,7 +2,13 @@
 {
 	public class ModuleInfo
 	{
-		public long ModuleId { get; set; }
+        public ModuleInfo(long moduleId, long upgradeLevel)
+        {
+            ModuleId = moduleId;
+            UpgradeLevel = upgradeLevel;
+        }
+
+        public long ModuleId { get; set; }
 		public long UpgradeLevel { get; set; }
-	}
+    }
 }

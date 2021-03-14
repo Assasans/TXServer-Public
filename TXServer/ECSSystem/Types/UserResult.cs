@@ -17,6 +17,11 @@ namespace TXServer.ECSSystem.Types
 			AvatarId = player.User.GetComponent<UserAvatarComponent>().Id;
 			EnterTime = DateTime.Now.Ticks;
 			Place = teamUserResults.Count;
+			foreach (Entity module in player.CurrentPreset.Modules.Values)
+            {
+				if (module != null)
+					Modules.Add(new ModuleInfo(module.GetComponent<MarketItemGroupComponent>().Key, module.GetComponent<ModuleUpgradeLevelComponent>().Level));
+			}
 			League = Leagues.GlobalItems.Silver;
 		}
 
@@ -34,21 +39,21 @@ namespace TXServer.ECSSystem.Types
 		public int Deaths { get; set; } = 0;
 		public int Damage { get; set; } = 0;
 		public int Score { get; set; } = 0;
-		public int ScoreWithoutPremium { get; set; } = 0;
+		public int ScoreWithoutPremium { get; set; }
 		public int ScoreToExperience { get; set; } = 0;
 		public int RankExpDelta { get; set; } = 0;
 		public int ItemsExpDelta { get; set; } = 0;
-		public int Flags { get; set; } = 0;
-		public int FlagAssists { get; set; } = 0;
-		public int FlagReturns { get; set; } = 0;
+		public int Flags { get; set; }
+		public int FlagAssists { get; set; }
+		public int FlagReturns { get; set; }
 		public long WeaponId { get; set; }
 		public long HullId { get; set; }
 		public long PaintId { get; set; }
 		public long CoatingId { get; set; }
 		public long HullSkinId { get; set; }
 		public long WeaponSkinId { get; set; }
-		public List<ModuleInfo> Modules { get; set; } = new List<ModuleInfo>() { };
-		public int BonusesTaken { get; set; } = 0;
+		public List<ModuleInfo> Modules { get; set; } = new();
+		public int BonusesTaken { get; set; }
 		public bool UnfairMatching { get; set; }
 		public bool Deserted { get; set; }
 		public Entity League { get; set; }

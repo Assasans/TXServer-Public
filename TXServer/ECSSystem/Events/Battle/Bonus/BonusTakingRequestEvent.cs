@@ -68,6 +68,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 				player.BattleLobbyPlayer.BattlePlayer.SupplyEffects.Add(bonusType, 30);
 			}
 
+			battle.AllUserResults.Single(r => r.BattleUserId == player.BattleLobbyPlayer.BattlePlayer.BattleUser.EntityId).BonusesTaken += 1;
 			battle.MatchPlayers.Select(x => x.Player).UnshareEntity(battleBonus.Bonus);
 		}
 	}
