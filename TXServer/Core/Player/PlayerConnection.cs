@@ -20,7 +20,6 @@ namespace TXServer.Core
             Player = player;
 
             Interlocked.Increment(ref Server.Instance.Connection.PlayerCount);
-            //Application.Current.Dispatcher.Invoke(() => { (Application.Current.MainWindow as MainWindow).UpdateStateText(); });
         }
 
         public void StartPlayerThreads()

@@ -16,7 +16,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.MatchPlayers.Contains(player.BattleLobbyPlayer));
+			Core.Battles.Battle battle = player.BattlePlayer.Battle;
 			Random random = new Random();
 
 			List<int> suppliesIndex = new List<int>();

@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events.Battle
     {
         public void Execute(Player player, Entity tank)
         {
-            player.BattleLobbyPlayer.BattlePlayer.TankPosition = MoveCommand.Movement.GetValueOrDefault().Position;
+            player.BattlePlayer.MatchPlayer.TankPosition = MoveCommand.Movement.GetValueOrDefault().Position;
             SelfEvent.Execute(this, player, tank);
         }
 

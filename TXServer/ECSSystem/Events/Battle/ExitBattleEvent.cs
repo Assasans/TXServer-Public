@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity battleUser)
         {
-			player.BattleLobbyPlayer.WaitingForExit = true;
+			player.BattlePlayer.WaitingForExit = true;
 			if (player.User.GetComponent<MatchMakingUserReadyComponent>() != null)
 				player.User.RemoveComponent<MatchMakingUserReadyComponent>();
         }

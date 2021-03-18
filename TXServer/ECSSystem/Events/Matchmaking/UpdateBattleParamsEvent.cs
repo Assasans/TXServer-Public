@@ -10,15 +10,9 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity mode)
 		{
-			foreach (Core.Battles.Battle battle in ServerConnection.BattlePool)
-            {
-				if (battle.Owner == player)
-                {
-					battle.UpdateBattleParams(player, Params);
-					break;
-                }
-            }
+			player.BattlePlayer.Battle.UpdateParams(player, Params);
 		}
+
 		public ClientBattleParams Params { get; set; }
 	}
 }

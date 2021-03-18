@@ -1,9 +1,11 @@
 ﻿using System.Linq;
 using TXServer.Core;
+using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Types;
+using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -12,14 +14,12 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.MatchPlayers.Contains(player.BattleLobbyPlayer));
-			Entity[] teams = { battle.RedTeamEntity, battle.BlueTeamEntity };
-			Entity team;
+			Core.Battles.Battle battle = player.BattlePlayer.Battle;
 
-			if (TeamColor == TeamColor.BLUE)
-			    team = teams.Single(t => t.GetComponent<TeamColorComponent>().TeamColor == player.User.GetComponent<TeamColorComponent>().TeamColor);
-			else
-				team = teams.Single(t => t.GetComponent<TeamColorComponent>().TeamColor != player.User.GetComponent<TeamColorComponent>().TeamColor);
+            if (battle.ModeHandler is not TeamBattleHandler handler) return;
+
+            BattleView teamView = handler.BattleViewFor(player.BattlePlayer);
+			Entity team = TeamColor == TeamColor.BLUE ? teamView.AllyTeamEntity : teamView.EnemyTeamEntity;
 
 			battle.UpdateScore(player, team, Amount);
 		}

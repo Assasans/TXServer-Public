@@ -19,7 +19,7 @@ namespace TXServer.ECSSystem.Events.Battle
 
 		public static void Execute(this ISelfEvent selfEvent, Player player, Entity tankPart)
         {
-			player.BattleLobbyPlayer.BattlePlayer.TranslatedEvents[selfEvent.GetType()] = new TranslatedEvent(selfEvent.ToRemoteEvent(), tankPart);
+			player.BattlePlayer.MatchPlayer.TranslatedEvents[selfEvent.GetType()] = new TranslatedEvent(selfEvent.ToRemoteEvent(), tankPart);
         }
 	}
 }

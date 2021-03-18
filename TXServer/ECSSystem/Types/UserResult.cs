@@ -1,23 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using TXServer.Core;
+using System.Linq;
+using TXServer.Core.Battles;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.ECSSystem.Types
 {
-	public class UserResult
+    public class UserResult
 	{
-		public UserResult(Player player, List<UserResult> teamUserResults)
+		public UserResult(BattlePlayer battlePlayer, IEnumerable<UserResult> userResults)
 		{
-			UserId = player.User.EntityId;
-			Uid = player.User.GetComponent<UserUidComponent>().Uid;
-			Rank = player.User.GetComponent<UserRankComponent>().Rank;
-			AvatarId = player.User.GetComponent<UserAvatarComponent>().Id;
-			EnterTime = DateTime.Now.Ticks;
-			Place = teamUserResults.Count;
-			foreach (Entity module in player.CurrentPreset.Modules.Values)
+			BattlePlayer = battlePlayer;
+			UserResults = userResults;
+
+			Entity user = BattlePlayer.User;
+			UserId = user.EntityId;
+			Uid = user.GetComponent<UserUidComponent>().Uid;
+			Rank = user.GetComponent<UserRankComponent>().Rank;
+			AvatarId = user.GetComponent<UserAvatarComponent>().Id;
+			EnterTime = DateTime.UtcNow.Ticks;
+			foreach (Entity module in battlePlayer.Player.CurrentPreset.Modules.Values)
             {
 				if (module != null)
 					Modules.Add(new ModuleInfo(module.GetComponent<MarketItemGroupComponent>().Key, module.GetComponent<ModuleUpgradeLevelComponent>().Level));
@@ -25,14 +29,17 @@ namespace TXServer.ECSSystem.Types
 			League = Leagues.GlobalItems.Silver;
 		}
 
+		private readonly IEnumerable<UserResult> UserResults;
+		private readonly BattlePlayer BattlePlayer;
+
 		public long UserId { get; set; }
 		public string Uid { get; set; }
 		public int Rank { get; set; }
 		public string AvatarId { get; set; }
-		public long BattleUserId { get; set; } = 0;
+		public long BattleUserId => BattlePlayer.MatchPlayer.BattleUser.EntityId;
 		public double ReputationInBattle { get; set; } = 0;
 		public long EnterTime { get; set; }
-		public int Place { get; set; }
+		public int Place => UserResults.OrderBy(x => x.ScoreWithoutPremium).ToList().IndexOf(this);
 		public int Kills { get; set; } = 0;
 		public int KillAssists { get; set; } = 0;
 		public int KillStrike { get; set; } = 0;
@@ -43,17 +50,17 @@ namespace TXServer.ECSSystem.Types
 		public int ScoreToExperience { get; set; } = 0;
 		public int RankExpDelta { get; set; } = 0;
 		public int ItemsExpDelta { get; set; } = 0;
-		public int Flags { get; set; }
-		public int FlagAssists { get; set; }
-		public int FlagReturns { get; set; }
-		public long WeaponId { get; set; }
-		public long HullId { get; set; }
-		public long PaintId { get; set; }
-		public long CoatingId { get; set; }
-		public long HullSkinId { get; set; }
-		public long WeaponSkinId { get; set; }
-		public List<ModuleInfo> Modules { get; set; } = new();
-		public int BonusesTaken { get; set; }
+		public int Flags { get; set; } = 0;
+		public int FlagAssists { get; set; } = 0;
+		public int FlagReturns { get; set; } = 0;
+		public long WeaponId => BattlePlayer.Player.CurrentPreset.Weapon.GetComponent<MarketItemGroupComponent>().Key;
+		public long HullId => BattlePlayer.Player.CurrentPreset.Hull.GetComponent<MarketItemGroupComponent>().Key;
+		public long PaintId => BattlePlayer.Player.CurrentPreset.TankPaint.GetComponent<MarketItemGroupComponent>().Key;
+		public long CoatingId => BattlePlayer.Player.CurrentPreset.WeaponPaint.GetComponent<MarketItemGroupComponent>().Key;
+		public long HullSkinId => BattlePlayer.Player.CurrentPreset.HullSkins[BattlePlayer.Player.CurrentPreset.HullItem].GetComponent<MarketItemGroupComponent>().Key;
+		public long WeaponSkinId => BattlePlayer.Player.CurrentPreset.WeaponSkins[BattlePlayer.Player.CurrentPreset.WeaponItem].GetComponent<MarketItemGroupComponent>().Key;
+		public List<ModuleInfo> Modules { get; set; } = new List<ModuleInfo>() { };
+		public int BonusesTaken { get; set; } = 0;
 		public bool UnfairMatching { get; set; }
 		public bool Deserted { get; set; }
 		public Entity League { get; set; }

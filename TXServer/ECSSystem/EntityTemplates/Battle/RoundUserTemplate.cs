@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(140335313420508312)]
     public class RoundUserTemplate : IEntityTemplate
     {
-        public static Entity CreateEntity(BattleLobbyPlayer battlePlayer, Entity battle, Entity tank)
+        public static Entity CreateEntity(BattlePlayer battlePlayer, Entity battle, Entity tank)
         {
             Entity entity = new Entity(new TemplateAccessor(new RoundUserTemplate(), "battle/round/rounduser"),
                 new RoundUserStatisticsComponent(place:1, scoreWithoutBonuses:0, kills:0, killAssists:0, deaths:0),

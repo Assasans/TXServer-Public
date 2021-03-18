@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			Core.Battles.Battle battle = GetBattle(player);
+			Core.Battles.Battle battle = player.BattlePlayer.Battle;
 			Player punishedPlayer = GetPunishedPlayer(battle, Uid);
 
 			if (punishedPlayer == null)
@@ -27,7 +27,7 @@ namespace TXServer.ECSSystem.Events.Battle
 				return;
 			}
 
-			foreach (BattleLobbyPlayer battleLobbyPlayer in battle.MatchPlayers)
+			foreach (BattlePlayer battleLobbyPlayer in battle.MatchPlayers)
             {
 				string playerLanguage = battleLobbyPlayer.User.GetComponent<UserCountryComponent>().CountryCode;
 				string message = playerLanguage switch

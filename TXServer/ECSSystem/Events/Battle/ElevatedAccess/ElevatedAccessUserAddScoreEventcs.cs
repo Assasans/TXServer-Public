@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.MatchPlayers.Contains(player.BattleLobbyPlayer));
+			Core.Battles.Battle battle = player.BattlePlayer.Battle;
 
 			battle.UpdateUserStatistics(player, additiveScore:Count, additiveKills:0, additiveKillAssists:0, additiveDeath:0);
 		}

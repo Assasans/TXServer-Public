@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity tank)
         {
-			player.BattleLobbyPlayer.BattlePlayer.CollisionsPhase = Phase;
+			player.BattlePlayer.MatchPlayer.CollisionsPhase = Phase;
         }
 
 		public long Phase { get; set; }

@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events.Matchmaking
 
         public void Execute(Player player, Entity lobby)
         {
-            player.BattleLobbyPlayer.WaitingForExit = true;
+            player.BattlePlayer.WaitingForExit = true;
 
             if (lobby.TemplateAccessor.Template is MatchMakingLobbyTemplate)
             {

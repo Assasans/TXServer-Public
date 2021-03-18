@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			Core.Battles.Battle battle = ServerConnection.BattlePool.SingleOrDefault(b => b.MatchPlayers.Contains(player.BattleLobbyPlayer));
+			Core.Battles.Battle battle = player.BattlePlayer.Battle;
 			if (battle != null)
 			    battle.FinishBattle();
 			else

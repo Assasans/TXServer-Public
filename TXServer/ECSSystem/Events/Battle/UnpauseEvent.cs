@@ -14,7 +14,7 @@ namespace TXServer.ECSSystem.Events.Battle
 			if (entity.GetComponent<PauseComponent>() != null)
 				entity.RemoveComponent<PauseComponent>();
 
-			player.BattleLobbyPlayer.BattlePlayer.Paused = false;
+			player.BattlePlayer.MatchPlayer.Paused = false;
 		}
 	}
 }

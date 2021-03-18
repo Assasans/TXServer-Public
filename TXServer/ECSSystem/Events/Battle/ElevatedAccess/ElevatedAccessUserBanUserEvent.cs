@@ -121,7 +121,7 @@ namespace TXServer.ECSSystem.Events.Battle
                 };
             }
             
-            foreach (BattleLobbyPlayer battleLobbyPlayer in battle.MatchPlayers)
+            foreach (BattlePlayer battleLobbyPlayer in battle.MatchPlayers)
             {
                 SendMessage(battleLobbyPlayer.Player, languages[battleLobbyPlayer.User.GetComponent<UserCountryComponent>().CountryCode], battle);
             }

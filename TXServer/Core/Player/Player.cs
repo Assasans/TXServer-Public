@@ -232,7 +232,7 @@ namespace TXServer.Core
         public Entity ClientSession { get; set; }
 
         public Entity User { get; set; }
-		public BattleLobbyPlayer BattleLobbyPlayer { get; set; }
+		public BattlePlayer BattlePlayer { get; set; }
 
         public string GetUniqueId()
         {

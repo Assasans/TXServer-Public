@@ -11,11 +11,11 @@ namespace TXServer.ECSSystem.Events.Battle
 		public void Execute(Player player, Entity entity)
 		{
 			//TODO: pause counter + kick user after given time
-			if (!player.BattleLobbyPlayer.BattlePlayer.Paused)
+			if (!player.BattlePlayer.MatchPlayer.Paused)
 				entity.AddComponent(new PauseComponent());
 			else
 				entity.RemoveComponent<PauseComponent>();
-			player.BattleLobbyPlayer.BattlePlayer.Paused = !player.BattleLobbyPlayer.BattlePlayer.Paused;
+			player.BattlePlayer.MatchPlayer.Paused = !player.BattlePlayer.MatchPlayer.Paused;
 		}
 	}
 }

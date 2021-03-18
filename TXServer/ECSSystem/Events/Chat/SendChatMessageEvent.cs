@@ -9,6 +9,7 @@ using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -17,24 +18,23 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity chat)
         {
-			SendEventCommand command = new SendEventCommand(new ChatMessageReceivedEvent
+			Core.Battles.Battle battle = player.BattlePlayer?.Battle;
+
+			ChatMessageReceivedEvent evt = new()
 			{
-				Message = this.Message,
+				Message = Message,
 				SystemMessage = false,
 				UserId = player.User.EntityId,
 				UserUid = player.User.GetComponent<UserUidComponent>().Uid,
 				UserAvatarId = player.User.GetComponent<UserAvatarComponent>().Id
-			}, chat);
+			};
 
 			// todo: return if user has chat ban
 
 			switch (chat.TemplateAccessor.Template)
 			{
 				case GeneralChatTemplate _:
-					foreach (Player p in player.Server.Connection.Pool)
-					{
-						CommandManager.SendCommands(p, command);
-					}
+					player.Server.Connection.Pool.SendEvent(evt, chat);
 					break;
 				case PersonalChatTemplate _:
 					foreach (Player p in chat.GetComponent<ChatParticipantsComponent>().GetPlayers())
@@ -44,51 +44,24 @@ namespace TXServer.ECSSystem.Events
                         {
 							if (!p.EntityList.Contains(player.User))
 							{
-								CommandManager.SendCommands(p, new EntityShareCommand(player.User));
+								p.ShareEntity(player.User);
 								isShared = true;
 							}
 
-							CommandManager.SendCommands(p, new EntityShareCommand(chat));
+							p.ShareEntity(chat);
                         }
-						CommandManager.SendCommands(p, command);
+						p.SendEvent(evt, chat);
 
 						if (isShared)
-							CommandManager.SendCommands(p, new EntityUnshareCommand(player.User));
+							p.UnshareEntity(player.User);
 					}
 					break;
 				case BattleLobbyChatTemplate _:
-					Core.Battles.Battle battleLobby = ServerConnection.BattlePool.Single(b => b.BlueTeamPlayers.Concat(b.RedTeamPlayers).Concat(b.DMTeamPlayers).Contains(player.BattleLobbyPlayer));
-					
-					foreach (BattleLobbyPlayer p in battleLobby.BlueTeamPlayers.Concat(battleLobby.RedTeamPlayers).Concat(battleLobby.DMTeamPlayers))
-                    {
-						CommandManager.SendCommands(p.Player, command);
-					}
-					break;
 				case GeneralBattleChatTemplate _:
-					Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.BlueTeamPlayers.Concat(b.RedTeamPlayers).Concat(b.DMTeamPlayers).Contains(player.BattleLobbyPlayer));
-
-					foreach (BattleLobbyPlayer p in battle.BlueTeamPlayers.Concat(battle.RedTeamPlayers).Concat(battle.DMTeamPlayers))
-                    {
-						CommandManager.SendCommands(p.Player, command);
-					}
+					battle.AllBattlePlayers.Select(p => p.Player).SendEvent(evt, chat);
 					break;
 				case TeamBattleChatTemplate _:
-					Core.Battles.Battle teamBattle = ServerConnection.BattlePool.Single(b => b.BlueTeamPlayers.Concat(b.RedTeamPlayers).Contains(player.BattleLobbyPlayer));
-					List<BattleLobbyPlayer> team;
-
-					if (player.BattleLobbyPlayer.Team.GetComponent<TeamGroupComponent>().Key == teamBattle.BlueTeamEntity.GetComponent<TeamGroupComponent>().Key)
-                    {
-						team = teamBattle.BlueTeamPlayers;
-                    } 
-					else
-                    {
-						team = teamBattle.RedTeamPlayers;
-					}
-					
-					foreach (BattleLobbyPlayer p in team)
-					{
-						CommandManager.SendCommands(p.Player, command);
-					}
+					battle.AllBattlePlayers.Where(x => x.Team == player.BattlePlayer.Team).Select(p => p.Player).SendEvent(evt, chat);
 					break;
 			}
 		}

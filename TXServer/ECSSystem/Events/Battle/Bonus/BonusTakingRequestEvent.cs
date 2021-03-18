@@ -18,7 +18,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 	{
 		public void Execute(Player player, Entity bonus, Entity tank)
 		{
-			Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.BattleEntity.GetComponent<BattleGroupComponent>().Key == tank.GetComponent<BattleGroupComponent>().Key);
+			Core.Battles.Battle battle = player.BattlePlayer.Battle;
 
 			CommandManager.BroadcastCommands(battle.MatchPlayers.Select(x => x.Player),
 				new SendEventCommand(new BonusTakenEvent(), bonus));
@@ -36,7 +36,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 			else 
 				battleBonus.BonusState = BonusState.Redrop;
 
-			if (!player.BattleLobbyPlayer.BattlePlayer.SupplyEffects.ContainsKey(bonusType))
+			if (!player.BattlePlayer.MatchPlayer.SupplyEffects.ContainsKey(bonusType))
             {
 				switch (bonusType)
 				{
@@ -49,7 +49,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 					case BonusType.GOLD:
 						UserMoneyComponent userMoneyComponent = player.Data.SetCrystals(player.Data.Crystals + battleBonus.GoldboxCrystals);
 						player.User.ChangeComponent(userMoneyComponent);
-						battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), player.BattleLobbyPlayer.BattlePlayer.BattleUser);
+						battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
 						break;
 					case BonusType.REPAIR:
 						if (tank.GetComponent<HealingEffectComponent>() == null)
@@ -64,11 +64,11 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 
 			if (bonusType != BonusType.REPAIR && bonusType != BonusType.GOLD)
 			{
-				player.BattleLobbyPlayer.BattlePlayer.SupplyEffects.Remove(bonusType);
-				player.BattleLobbyPlayer.BattlePlayer.SupplyEffects.Add(bonusType, 30);
+				player.BattlePlayer.MatchPlayer.SupplyEffects.Remove(bonusType);
+				player.BattlePlayer.MatchPlayer.SupplyEffects.Add(bonusType, 30);
 			}
 
-			battle.AllUserResults.Single(r => r.BattleUserId == player.BattleLobbyPlayer.BattlePlayer.BattleUser.EntityId).BonusesTaken += 1;
+			player.BattlePlayer.MatchPlayer.UserResult.BonusesTaken += 1;
 			battle.MatchPlayers.Select(x => x.Player).UnshareEntity(battleBonus.Bonus);
 		}
 	}

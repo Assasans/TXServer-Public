@@ -11,12 +11,12 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public static Core.Battles.Battle GetBattle(Player player)
         {
-			return ServerConnection.BattlePool.Single(b => b.MatchPlayers.Contains(player.BattleLobbyPlayer));
+			return player.BattlePlayer.Battle;
 		}
 		public static Player GetPunishedPlayer(Core.Battles.Battle battle, string punishedPlayerUid)
         {
 			string uid = "";
-			foreach (BattleLobbyPlayer battleLobbyPlayer in battle.MatchPlayers)
+			foreach (BattlePlayer battleLobbyPlayer in battle.MatchPlayers)
 			{
 				try { uid = battleLobbyPlayer.User.GetComponent<UserUidComponent>().Uid; }
 				catch { }

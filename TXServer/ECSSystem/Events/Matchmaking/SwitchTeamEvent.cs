@@ -1,46 +1,32 @@
-﻿using TXServer.Core.Protocol;
-using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Types;
+﻿using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
+using TXServer.Core.Protocol;
+using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using System.Linq;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
-	[SerialVersionUID(1499172594697L)]
+    [SerialVersionUID(1499172594697L)]
 	public class SwitchTeamEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity mode)
 		{
-			Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.AllBattlePlayers.Contains(player.BattleLobbyPlayer));
-			TeamColor newTeamColor;
-
-			if (battle.BattleParams.BattleMode == BattleMode.DM)
+			Core.Battles.Battle battle = player.BattlePlayer.Battle;
+			
+			if (battle.Params.BattleMode == BattleMode.DM)
 				return;
 
-			if (battle.RedTeamPlayers.Contains(player.BattleLobbyPlayer))
-			{
-				newTeamColor = TeamColor.BLUE;
-				battle.RedTeamPlayers.Remove(player.BattleLobbyPlayer);
-				player.BattleLobbyPlayer = new BattleLobbyPlayer(player, battle.BlueTeamEntity);
-				battle.BlueTeamPlayers.Add(player.BattleLobbyPlayer);
-				UserResult userResult = battle.RedTeamResults.Single(r => r.UserId == player.User.EntityId);
-				battle.RedTeamResults.Remove(userResult);
-				battle.BlueTeamResults.Add(userResult);
-			}
-			else
-            {
-				newTeamColor = TeamColor.RED;
-				battle.BlueTeamPlayers.Remove(player.BattleLobbyPlayer);
-				player.BattleLobbyPlayer = new BattleLobbyPlayer(player, battle.RedTeamEntity);
-				battle.RedTeamPlayers.Add(player.BattleLobbyPlayer);
-				UserResult userResult = battle.BlueTeamResults.Single(r => r.UserId == player.User.EntityId);
-				battle.BlueTeamResults.Remove(userResult);
-				battle.RedTeamResults.Add(userResult);
-			}
+			var handler = (Core.Battles.Battle.TeamBattleHandler)battle.ModeHandler;
+			BattleView view = handler.BattleViewFor(player.BattlePlayer);
+
 			player.User.RemoveComponent<TeamColorComponent>();
-			player.User.AddComponent(new TeamColorComponent(newTeamColor));
+			player.User.AddComponent(new TeamColorComponent(view.EnemyTeamColor));
+
+			view.AllyTeamPlayers.Remove(player.BattlePlayer);
+			player.BattlePlayer = new BattlePlayer(battle, player, view.EnemyTeamEntity);
+			view.EnemyTeamPlayers.Add(player.BattlePlayer);
 		}
 	}
 }

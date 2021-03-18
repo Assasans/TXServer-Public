@@ -12,15 +12,17 @@ namespace TXServer.ECSSystem.Events.Battle
     {
         public static void Execute(Player player, Entity flagEntity, Entity tank)
         {
-            Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.BattleEntity.GetComponent<BattleGroupComponent>().Key == tank.GetComponent<BattleGroupComponent>().Key);
-            Flag enemyFlag = battle.Flags.Values.Single(f => f.FlagEntity == flagEntity);
+            Core.Battles.Battle battle = player.BattlePlayer.Battle;
+            var handler = (Core.Battles.Battle.CTFHandler)battle.ModeHandler;
+
+            Flag enemyFlag = handler.BattleViewFor(player.BattlePlayer).EnemyTeamFlag;
 
             if (enemyFlag.FlagState == FlagState.Captured)
                 enemyFlag.FlagState = FlagState.Dropped;
             else
                 return;
 
-            enemyFlag.DropFlag(player, isUserAction:true);
+            enemyFlag.Drop(player, isUserAction:true);
         }
     }
 }

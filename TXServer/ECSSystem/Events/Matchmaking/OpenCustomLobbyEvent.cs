@@ -4,6 +4,7 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using System.Linq;
+using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -12,19 +13,17 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.Owner == player);
+			Core.Battles.Battle battle = player.BattlePlayer.Battle;
 
-			battle.IsOpen = true;
 			int price = 1000;  // 1000 Blue-Crystals standard price for opening custom battles
 			if (player.User.GetComponent<PremiumAccountBoostComponent>() != null)
 			{
 				price = 0;  // official premium pass feature: open custom battles for free
 			}
 			UserMoneyComponent userMoneyComponent = player.Data.SetCrystals(player.Data.Crystals - price);
+			player.User.ChangeComponent(userMoneyComponent);
 
-			CommandManager.SendCommands(player, 
-				new ComponentChangeCommand(player.User, userMoneyComponent),
-				new ComponentAddCommand(battle.BattleLobbyEntity, new OpenToConnectLobbyComponent()));
+			((CustomBattleHandler)battle.TypeHandler).OpenBattle();
 		}
 	}
 }

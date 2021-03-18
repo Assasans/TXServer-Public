@@ -15,7 +15,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			Core.Battles.Battle battle = ServerConnection.BattlePool.Single(b => b.MatchPlayers.Contains(player.BattleLobbyPlayer));
+			Core.Battles.Battle battle = player.BattlePlayer.Battle;
 
 			List<int> goldboxesIndex = new List<int>();
 			int index = 0;
