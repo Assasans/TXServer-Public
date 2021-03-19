@@ -9,6 +9,8 @@ using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Bonus;
 using TXServer.ECSSystem.Components.Battle.Chassis;
+using TXServer.ECSSystem.Components.Battle.Health;
+using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Battle.Bonus
@@ -30,9 +32,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 				return;
 
 			if (battleBonus.BattleBonusType == BonusType.GOLD)
-            {
 				battleBonus.BonusState = BonusState.Unused;
-			}
 			else 
 				battleBonus.BonusState = BonusState.Redrop;
 
@@ -52,6 +52,14 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 						battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
 						break;
 					case BonusType.REPAIR:
+						player.BattlePlayer.MatchPlayer.Tank.ChangeComponent(new TemperatureComponent(0));
+
+						HealthComponent healthComponent = player.BattlePlayer.MatchPlayer.Tank.GetComponent<HealthComponent>();
+						healthComponent.CurrentHealth = healthComponent.MaxHealth;
+						player.BattlePlayer.MatchPlayer.Tank.ChangeComponent(healthComponent);
+						player.SendEvent(new HealthChangedEvent(), player.BattlePlayer.MatchPlayer.Tank);
+
+						// todo: research healing effect animation trigger
 						if (tank.GetComponent<HealingEffectComponent>() == null)
 						    tank.AddComponent(new HealingEffectComponent());
 						break;

@@ -15,7 +15,7 @@ namespace TXServer.Core.Battles
                 _ => LastLosingTeam
             };
 
-            private const int DifferenceToRestoreBalance = 25;
+            private const int DifferenceToRestoreBalance = 26;
 
             private TeamColor LastLosingTeam;
         }

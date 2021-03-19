@@ -6,9 +6,11 @@ using System.Numerics;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
+using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles
@@ -47,6 +49,30 @@ namespace TXServer.Core.Battles
             { TankState.Active, typeof(TankActiveStateComponent) },
             { TankState.Dead, typeof(TankDeadStateComponent) },
         };
+
+        public void IsisHeal()
+        {
+            TemperatureComponent temperatureComponent = Tank.GetComponent<TemperatureComponent>();
+            if (temperatureComponent.Temperature.CompareTo(0) < 0)
+                temperatureComponent.Temperature = 0;
+            else if (temperatureComponent.Temperature > 0)
+                temperatureComponent.Temperature -= 2;
+            else if (temperatureComponent.Temperature < 0)
+                temperatureComponent.Temperature += 2;
+            Tank.ChangeComponent(temperatureComponent);
+
+            HealthComponent healthComponent = Tank.GetComponent<HealthComponent>();
+            int healingPerSecod = 415;
+            if (healthComponent.CurrentHealth != healthComponent.MaxHealth)
+            {
+                if (healthComponent.MaxHealth - healthComponent.CurrentHealth > healingPerSecod)
+                    healthComponent.CurrentHealth -= healingPerSecod;
+                else
+                    healthComponent.CurrentHealth = healthComponent.MaxHealth;
+            }
+            Tank.ChangeComponent(healthComponent);
+            Player.BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), Tank);
+        }
 
         public Player Player { get; }
         public Entity BattleUser { get; }
