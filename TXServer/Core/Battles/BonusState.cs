@@ -4,6 +4,7 @@
     {
         Unused,
         New,
+        RegionShared,
         Spawned,
         Redrop
     }

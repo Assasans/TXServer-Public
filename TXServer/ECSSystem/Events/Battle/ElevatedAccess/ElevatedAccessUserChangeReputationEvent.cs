@@ -10,9 +10,8 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			if (player.User.GetComponent<UserAdminComponent>() == null)
-				return;
-			player.User.ChangeComponent(new UserReputationComponent(Count));
+			if (player.User.GetComponent<UserAdminComponent>() != null)
+				player.User.ChangeComponent(new UserReputationComponent(Count));
 			// TODO: save new reputation
 		}
 		public int Count { get; set; }

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Linq;
 using TXServer.Core;
+using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components.Battle.Time;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.ECSSystem.Events.MatchMaking
@@ -28,10 +31,27 @@ namespace TXServer.ECSSystem.Events.MatchMaking
             CommandManager.SendCommands(player,
                 new SendEventCommand(new EnteredToMatchMakingEvent(), mode));
 
-            ServerConnection.GlobalBattle.AddPlayer(player);
+            Core.Battles.Battle battle = ServerConnection.BattlePool.OrderBy(b => b.AllBattlePlayers).LastOrDefault(b => isValidToEnter(b));
+            if (battle == null)
+            {
+                battle = new Core.Battles.Battle(battleParams: null, isMatchMaking: true, owner: null);
+                ServerConnection.BattlePool.Add(battle);
+            }
+            battle.AddPlayer(player);
+        }
 
-            //todo MatchMakingLobbySystem & MatchMakingEntranceSystem.
-            // how does setStarting for example work (Lobby)
+        private static bool isValidToEnter(Core.Battles.Battle battle)
+        {
+            if (!battle.IsMatchMaking || battle.AllBattlePlayers.Count() == battle.Params.MaxPlayers || battle.BattleState == BattleState.Ended)
+                return false;
+            else if (battle.BattleState == BattleState.Running)
+            {
+                if (battle.CountdownTimer >= battle.BattleEntity.GetComponent<TimeLimitComponent>().TimeLimitSec - 180)
+                    return true;
+                else
+                    return false;
+            }
+            return true;
         }
     }
 }

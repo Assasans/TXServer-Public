@@ -15,6 +15,7 @@ using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Time;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Events.Battle.Bonus;
 using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
@@ -140,7 +141,7 @@ namespace TXServer.Core.Battles
 
             Logger.Log($"{battlePlayer.Player}: Left battle {BattleEntity.EntityId}");
 
-            ServerConnection.BattlePool.RemoveAll(p => !p.AllBattlePlayers.Any() && !p.IsMatchMaking);
+            ServerConnection.BattlePool.RemoveAll(p => !p.AllBattlePlayers.Any());
         }
 
         private void StartBattle()
@@ -163,7 +164,7 @@ namespace TXServer.Core.Battles
                 {
                     foreach (Bonus bonus in bonusTypeSpawnPoints[bonusType])
                     {
-                        BattleBonus battleBonus = new(bonusType, bonus);
+                        BattleBonus battleBonus = new(bonusType, bonus, this);
                         BattleBonuses.Add(battleBonus);
                     }
                 }
@@ -172,8 +173,8 @@ namespace TXServer.Core.Battles
                 List<BattleBonus> supplyBonuses = new(BattleBonuses.Where(b => b.BattleBonusType != BonusType.GOLD).OrderBy(b => random.Next()));
                 foreach (BattleBonus battleBonus in supplyBonuses.ToList())
                 {
-                    battleBonus.BonusState = BonusState.New;
                     battleBonus.BonusStateChangeCountdown = random.Next(10, 120);
+                    battleBonus.BonusState = BonusState.New;
                 }
             }
 
@@ -230,7 +231,7 @@ namespace TXServer.Core.Battles
 
             if (!Params.DisabledModules)
             {
-                foreach (BattleBonus battleBonus in BattleBonuses)
+                foreach (BattleBonus battleBonus in BattleBonuses.Where(b => b.BonusState != BonusState.Unused && b.BonusState != BonusState.New))
                 {
                     battlePlayer.Player.ShareEntity(battleBonus.BonusRegion);
                     if (battleBonus.BonusState == BonusState.Spawned)
@@ -256,7 +257,7 @@ namespace TXServer.Core.Battles
 
             if (!Params.DisabledModules)
             {
-                foreach (BattleBonus battleBonus in BattleBonuses)
+                foreach (BattleBonus battleBonus in BattleBonuses.Where(b => b.BonusState != BonusState.Unused && b.BonusState != BonusState.New))
                 {
                     player.UnshareEntity(battleBonus.BonusRegion);
                     if (battleBonus.BonusState == BonusState.Spawned)
@@ -303,20 +304,19 @@ namespace TXServer.Core.Battles
         {
             foreach (BattleBonus battleBonus in BattleBonuses)
             {
-                if (battleBonus.BonusState != BonusState.Unused || battleBonus.BonusState == BonusState.Spawned)
-                {
+                if (battleBonus.BonusState != BonusState.Unused)
                     battleBonus.BonusStateChangeCountdown -= deltaTime;
-                }
 
-                if (battleBonus.BonusStateChangeCountdown < 0)
+                if (battleBonus.BonusStateChangeCountdown < 0 || battleBonus.BonusState == BonusState.New)
                 {
-                    if (battleBonus.BonusState == BonusState.Redrop || battleBonus.BonusState == BonusState.New)
+                    if (battleBonus.BonusState == BonusState.New)
                     {
-                        battleBonus.BonusState = BonusState.Spawned;
-                        battleBonus.CreateBonus(BattleEntity);
-                        MatchPlayers.Select(x => x.Player).ShareEntity(battleBonus.Bonus);
-                        break;
+                        battleBonus.CreateRegion();
+
+                        continue;
                     }
+                    if (battleBonus.BonusState == BonusState.Redrop || battleBonus.BonusState == BonusState.RegionShared)
+                        battleBonus.CreateBonus(BattleEntity);
                 }
             }
         }
@@ -361,6 +361,34 @@ namespace TXServer.Core.Battles
             MatchPlayers.Select(x => x.Player).SendEvent(new RoundUserStatisticsUpdatedEvent(), player.BattlePlayer.MatchPlayer.RoundUser);
 
             ModeHandler.SortRoundUsers();
+        }
+
+        public void DropSpecificBonusType(BonusType bonusType, string sender)
+        {
+            List<int> suppliesIndex = new();
+            int index = 0;
+            foreach (BattleBonus battleBonus in BattleBonuses)
+            {
+                if (battleBonus.BattleBonusType == bonusType)
+                {
+                    if ((bonusType != BonusType.GOLD && battleBonus.BonusState != BonusState.Spawned) || (bonusType == BonusType.GOLD && battleBonus.BonusState == BonusState.Unused))
+                        suppliesIndex.Add(index);
+                        
+                }
+                ++index;
+            }
+
+            if (!suppliesIndex.Any()) return;
+
+            int supplyIndex = suppliesIndex[new Random().Next(suppliesIndex.Count)];
+            if (BattleBonuses[supplyIndex].BattleBonusType != BonusType.GOLD)
+                BattleBonuses[supplyIndex].BonusStateChangeCountdown = 0;
+            else
+            {
+                BattleBonuses[supplyIndex].BonusState = BonusState.New;
+                if (String.IsNullOrWhiteSpace(sender)) sender = "";
+                AllBattlePlayers.Select(x => x.Player).SendEvent(new GoldScheduleNotificationEvent(sender), RoundEntity);
+            }
         }
 
         private void SortRoundUsers() => ModeHandler.SortRoundUsers();

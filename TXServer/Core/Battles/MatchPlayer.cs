@@ -286,7 +286,6 @@ namespace TXServer.Core.Battles
         public Vector3 TankPosition { get; set; }
         public bool Paused { get; set; } = false;
         public Dictionary<BonusType, DateTime> SupplyEffects { get; } = new();
-
         private IList<SpawnPoint> SpawnCoordinates;
     }
 }

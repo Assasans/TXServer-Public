@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using TXServer.Core;
+﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -10,9 +9,8 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			Core.Battles.Battle battle = player.BattlePlayer.Battle;
-			if (battle != null)
-			    battle.FinishBattle();
+			if (player.BattlePlayer != null)
+			    player.BattlePlayer.Battle.FinishBattle();
 			else
             {
 				foreach (Core.Battles.Battle loopedBattle in ServerConnection.BattlePool)

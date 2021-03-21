@@ -230,12 +230,6 @@ namespace TXServer.Core
 
         public void BattleLoop()
         {
-            if (BattlePool.Count == 0)
-            {
-                BattlePool.Add(new Battle(battleParams: null, isMatchMaking: true, owner: null));
-            }
-            GlobalBattle = BattlePool[0];
-
             Stopwatch stopwatch = new();
 
             try
@@ -283,7 +277,6 @@ namespace TXServer.Core
         private HttpListener httpListener;
 
         public static List<Battle> BattlePool { get; } = new List<Battle>();
-        public static Battle GlobalBattle { get; private set; } // todo replace with proper matchmaker
 
         public static double LastTickDuration { get; private set; }
         private const int BattleTickRate = 100;

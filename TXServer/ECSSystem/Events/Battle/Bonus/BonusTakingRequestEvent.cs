@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
-using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Bonus;
 using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Health;
@@ -55,7 +52,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 						player.BattlePlayer.MatchPlayer.Tank.ChangeComponent(new TemperatureComponent(0));
 
 						player.BattlePlayer.MatchPlayer.Tank.ChangeComponent<HealthComponent>(component => component.CurrentHealth = component.MaxHealth);
-						player.SendEvent(new HealthChangedEvent(), player.BattlePlayer.MatchPlayer.Tank);
+						player.BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), player.BattlePlayer.MatchPlayer.Tank);
 
 						// todo: research healing effect animation trigger
 						if (tank.GetComponent<HealingEffectComponent>() == null)
