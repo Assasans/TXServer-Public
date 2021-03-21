@@ -56,10 +56,6 @@ namespace TXServer.ECSSystem.Events.Battle
                     {
                         hitPlayer.MatchPlayer.TankState = TankState.Dead;
 
-                        Flag flag = (battle.ModeHandler as CTFHandler)?.Flags[player.BattlePlayer.Team];
-                        if (flag != null && flag.State == FlagState.Captured && flag.FlagEntity.GetComponent<TankGroupComponent>().Key == hitPlayer.MatchPlayer.Tank.EntityId)
-                            flag.Drop(false);
-
                         battle.MatchPlayers.Select(x => x.Player).SendEvent(new KillEvent(player.CurrentPreset.Weapon, hitTarget.Entity), player.BattlePlayer.MatchPlayer.BattleUser);
                         battle.UpdateUserStatistics(player, 10, 1, 0, 0);
                         battle.UpdateUserStatistics(hitPlayer.Player, 0, 0, 0, 1);

@@ -5,7 +5,7 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
-	[SerialVersionUID(1515485268330L)]
+    [SerialVersionUID(1515485268330L)]
 	public class ElevatedAccessUserAddKillsEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity entity)

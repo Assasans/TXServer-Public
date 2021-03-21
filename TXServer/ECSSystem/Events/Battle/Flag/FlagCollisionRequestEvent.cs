@@ -1,10 +1,13 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Team;
+using TXServer.ECSSystem.Types;
+using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -16,46 +19,43 @@ namespace TXServer.ECSSystem.Events.Battle
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
             var handler = (Core.Battles.Battle.CTFHandler)battle.ModeHandler;
 
-            Flag collisedFlag = handler.Flags.Values.Single(x => x.FlagEntity == flagEntity);
+            Flag flag = handler.Flags.Values.First(x => x.FlagEntity == flagEntity);
 
             BattleView view = handler.BattleViewFor(player.BattlePlayer);
-            Flag enemyFlag = view.EnemyTeamFlag;
-            Flag allieFlag = view.AllyTeamFlag;
             
             if (battle.BattleState == BattleState.WarmUp)
                 return;
 
-            switch (collisedFlag.State)
+            switch (flag.State)
             {
                 case FlagState.Home:
                     if (flagEntity.GetComponent<TeamGroupComponent>().Key == tank.GetComponent<TeamGroupComponent>().Key)
                     {
-                        if (enemyFlag.FlagEntity.GetComponent<TankGroupComponent>() == null)
-                            return;
-                        if (enemyFlag.State == FlagState.Captured)
-                        {
-                            if (enemyFlag.FlagEntity.GetComponent<TankGroupComponent>().Key != tank.GetComponent<TankGroupComponent>().Key)
-                                return;
-                        }
-                        else return;
-                        enemyFlag.Deliver();
+                        Flag carriedFlag = handler.Flags.Values.First(x => x != flag);
+
+                        if (carriedFlag.State != FlagState.Captured) return;
+                        if (carriedFlag.FlagEntity.GetComponent<TankGroupComponent>()?.Key != tank.EntityId) return;
+
+                        (BattlePlayer carrier, IEnumerable<UserResult> assistResults) = carriedFlag.Deliver();
+                        battle.UpdateScore(carrier.Team, 1);
+                        battle.UpdateUserStatistics(carrier.Player, additiveScore: view.EnemyTeamPlayers.Count * 10, 0, 0, 0);
+
+                        UserResult carrierResult = carrier.MatchPlayer.UserResult;
+                        carrierResult.Flags += 1;
+
+                        foreach (UserResult assistResult in assistResults)
+                            assistResult.FlagAssists += 1;
                     }
                     else
-                        enemyFlag.Capture(player.BattlePlayer);
+                    {
+                        flag.Capture(player.BattlePlayer);
+                    }
                     break;
                 case FlagState.Dropped:
                     if (flagEntity.GetComponent<TeamGroupComponent>().Key == tank.GetComponent<TeamGroupComponent>().Key)
-                        allieFlag.Return(player.BattlePlayer);
+                        flag.Return(player.BattlePlayer);
                     else
-                    {
-                        // pickup flag
-                        if (player.BattlePlayer.MatchPlayer.FlagBlocks > 0)
-                        {
-                            player.BattlePlayer.MatchPlayer.FlagBlocks -= 1;
-                            return;
-                        }
-                        enemyFlag.Pickup(player.BattlePlayer);
-                    }
+                        flag.Pickup(player.BattlePlayer);
                     break;
             }
         }

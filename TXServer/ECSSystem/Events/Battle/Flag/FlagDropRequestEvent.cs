@@ -15,9 +15,8 @@ namespace TXServer.ECSSystem.Events.Battle
 
             Flag enemyFlag = handler.BattleViewFor(player.BattlePlayer).EnemyTeamFlag;
 
-            if (enemyFlag.State != FlagState.Captured) return;
-
-            enemyFlag.Drop(true);
+            if (enemyFlag.State == FlagState.Captured)
+                enemyFlag.Drop(true);
         }
     }
 }

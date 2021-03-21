@@ -15,12 +15,11 @@ namespace TXServer.Core.Battles
 {
     public class Flag
     {
-        public Flag(Vector3 position, Entity team, List<BattlePlayer> enemyPlayers, Battle battle)
+        public Flag(Vector3 position, Entity team, Battle battle)
         {
             Team = team;
             TeamColor = team.GetComponent<TeamColorComponent>().TeamColor;
-            Position = position;
-            EnemyPlayers = enemyPlayers;
+            BasePosition = position;
             Battle = battle;
 
             PedestalEntity = PedestalTemplate.CreateEntity(position, team, battle.BattleEntity);
@@ -52,6 +51,8 @@ namespace TXServer.Core.Battles
 
         public void Pickup(BattlePlayer battlePlayer)
         {
+            if (battlePlayer == LastCarrier && LastCarrierMinTime > DateTime.Now) return;
+
             State = FlagState.Captured;
             Carrier = battlePlayer;
             Entity tank = Carrier.MatchPlayer.Tank;
@@ -67,18 +68,19 @@ namespace TXServer.Core.Battles
 
         public void Drop(bool isUserAction)
         {
+            LastCarrier = Carrier;
+            LastCarrierMinTime = DateTime.Now.AddSeconds(3);
+
             ReturnStartTime = DateTime.Now.AddSeconds(60);
             State = FlagState.Dropped;
 
-            Carrier.MatchPlayer.FlagBlocks = 3;
-            Vector3 flagPosition = Carrier.MatchPlayer.TankPosition;
+            Vector3 flagPosition = Carrier.MatchPlayer.TankPosition - Vector3.UnitY;
             Carrier = null;
 
             Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
             FlagEntity.RemoveComponent<TankGroupComponent>();
 
             FlagEntity.ChangeComponent(new FlagPositionComponent(flagPosition));
-            Reshare();
             FlagEntity.AddComponent(new FlagGroundedStateComponent());
         }
 
@@ -96,56 +98,69 @@ namespace TXServer.Core.Battles
                 FlagEntity.RemoveComponent<TankGroupComponent>();
             }
 
-            FlagEntity.ChangeComponent(new FlagPositionComponent(Position));
+            FlagEntity.ChangeComponent(new FlagPositionComponent(BasePosition));
             FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
             FlagEntity.AddComponent(new FlagHomeStateComponent());
             Reshare();
+
+            LastCarrier = null;
         }
 
-        public void Deliver()
+        public (BattlePlayer, IEnumerable<UserResult>) Deliver()
         {
             State = FlagState.Home;
 
             Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), FlagEntity);
             FlagEntity.RemoveComponent<TankGroupComponent>();
 
-            FlagEntity.ChangeComponent(new FlagPositionComponent(Position));
+            FlagEntity.ChangeComponent(new FlagPositionComponent(BasePosition));
             FlagEntity.AddComponent(new FlagGroundedStateComponent());
             FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
             
             FlagEntity.AddComponent(new FlagHomeStateComponent());
 
-            Battle.UpdateScore(Carrier.Team, 1);
-            Battle.UpdateUserStatistics(Carrier.Player, additiveScore: EnemyPlayers.Count * 10, 0, 0, 0);
-            CurrentAssists.Remove(Carrier);
-
-            UserResult carrierResult = Carrier.MatchPlayer.UserResult;
-            carrierResult.Flags += 1;
-
             foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(Carrier).AllyTeamResults)
             {
+                if (assistResult.UserId != Carrier.User.EntityId) continue;
                 if (CurrentAssists.Select(p => p.User.EntityId).Contains(assistResult.UserId))
                     assistResult.FlagAssists += 1;
             }
-            CurrentAssists.Clear();
 
+            var carrier = Carrier;
             Carrier = null;
+
+            LastCarrier = null;
+
+            return (carrier, getAndClearAssistResults());
+
+            IEnumerable<UserResult> getAndClearAssistResults()
+            {
+                foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(carrier).AllyTeamResults)
+                {
+                    if (assistResult.UserId != carrier.User.EntityId) continue;
+                    if (CurrentAssists.Select(p => p.User.EntityId).Contains(assistResult.UserId))
+                        yield return assistResult;
+                }
+                CurrentAssists.Clear();
+            }
         }
 
+        private readonly Battle Battle;
         public Entity PedestalEntity { get; }
         public Entity FlagEntity { get; }
+        private readonly Vector3 BasePosition;
 
         public Entity Team { get; }
         public TeamColor TeamColor { get; }
-
-        private readonly Vector3 Position;
+        
         public FlagState State { get; private set; }
-
-        private readonly Battle Battle;
-        private readonly IReadOnlyCollection<BattlePlayer> EnemyPlayers;
-
         public DateTime ReturnStartTime { get; set; }
-        private readonly List<BattlePlayer> CurrentAssists = new();
+
+        
         private BattlePlayer Carrier;
+        private readonly List<BattlePlayer> CurrentAssists = new();
+
+        private BattlePlayer LastCarrier;
+        private DateTime LastCarrierMinTime;
     }
 }

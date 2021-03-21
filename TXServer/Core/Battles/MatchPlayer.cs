@@ -15,6 +15,7 @@ using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Types;
+using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.Core.Battles
 {
@@ -124,6 +125,10 @@ namespace TXServer.Core.Battles
 
         public void DisableTank()
         {
+            if (KeepDisabled)
+                Tank.RemoveComponent(StateComponents[_TankState]);
+            if (Tank.GetComponent<SelfDestructionComponent>() != null)
+                Tank.RemoveComponent<SelfDestructionComponent>();
             if (Tank.GetComponent<TankMovableComponent>() == null) return;
             Tank.RemoveComponent<TankMovableComponent>();
             Weapon.RemoveComponent<ShootableComponent>();
@@ -131,6 +136,13 @@ namespace TXServer.Core.Battles
 
         public void Tick()
         {
+            if (SelfDestructionTime != null && DateTime.Now > SelfDestructionTime)
+            {
+                TankState = TankState.Dead;
+                Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
+                SelfDestructionTime = null;
+            }
+
             // switch state after it's ended
             if (DateTime.Now > TankStateChangeTime)
             {
@@ -138,9 +150,6 @@ namespace TXServer.Core.Battles
                 {
                     case TankState.Spawn:
                         TankState = TankState.SemiActive;
-                        Tank.AddComponent(new TankVisibleStateComponent());
-                        Tank.ChangeComponent(new TemperatureComponent(0));
-                        EnableTank();
                         break;
                     case TankState.SemiActive:
                         if (!WaitingForTankActivation)
@@ -225,21 +234,37 @@ namespace TXServer.Core.Battles
             get => _TankState;
             set
             {
-                if (value == TankState.Spawn)
+                switch (value)
                 {
-                    DisableTank();
-                    PrepareForRespawning();
+                    case TankState.Spawn:
+                        DisableTank();
+                        PrepareForRespawning();
+                        foreach (BonusType bonusType in SupplyEffects.Keys.ToArray())
+                            SupplyEffects[bonusType] = DateTime.Now;
+                        break;
+                    case TankState.SemiActive:
+                        EnableTank();
+                        Tank.ChangeComponent(new TemperatureComponent(0));
+                        Tank.AddComponent(new TankVisibleStateComponent());
+                        break;
+                    case TankState.Dead:
+                        DisableTank();
+                        Player.SendEvent(new SelfTankExplosionEvent(), Tank);
+                        if (Battle.ModeHandler is CTFHandler handler)
+                        {
+                            foreach (Flag flag in handler.Flags.Values)
+                            {
+                                if (flag != null && flag.State == FlagState.Captured && flag.FlagEntity.GetComponent<TankGroupComponent>().Key == Tank.EntityId)
+                                    flag.Drop(false);
+                            }
+                        }
+                        break;
                 }
 
-                Tank.RemoveComponent(StateComponents[_TankState]);
+                if (Tank.GetComponent(StateComponents[_TankState]) != null)
+                    Tank.RemoveComponent(StateComponents[_TankState]);
                 Tank.AddComponent((Component)Activator.CreateInstance(StateComponents[value]));
                 _TankState = value;
-
-                if (value == TankState.Dead)
-                {
-                    DisableTank();
-                    Player.SendEvent(new SelfTankExplosionEvent(), Tank);
-                }
 
                 TankStateChangeTime = DateTime.Now.AddSeconds(value switch
                 {
@@ -254,12 +279,12 @@ namespace TXServer.Core.Battles
         public bool KeepDisabled { get; set; }
 
         public DateTime TankStateChangeTime { get; set; }
+        public DateTime? SelfDestructionTime { get; set; }
         public bool WaitingForTankActivation { get; set; }
 
         public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new ConcurrentDictionary<Type, TranslatedEvent>();
         public Vector3 TankPosition { get; set; }
         public bool Paused { get; set; } = false;
-        public int FlagBlocks;
         public Dictionary<BonusType, DateTime> SupplyEffects { get; } = new();
 
         private IList<SpawnPoint> SpawnCoordinates;

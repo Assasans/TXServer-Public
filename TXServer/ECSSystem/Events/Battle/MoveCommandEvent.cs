@@ -1,4 +1,5 @@
-﻿using TXServer.Core;
+﻿using System.Numerics;
+using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -9,7 +10,9 @@ namespace TXServer.ECSSystem.Events.Battle
     {
         public void Execute(Player player, Entity tank)
         {
-            player.BattlePlayer.MatchPlayer.TankPosition = MoveCommand.Movement.GetValueOrDefault().Position;
+            Vector3? position = MoveCommand.Movement?.Position;
+            if (position.HasValue)
+                player.BattlePlayer.MatchPlayer.TankPosition = position.Value;
             SelfEvent.Execute(this, player, tank);
         }
 

@@ -66,10 +66,18 @@ namespace TXServer.ECSSystem.Base
         /// <returns>
         /// Component, or null if it does not exist.
         /// </returns>
-        public T GetComponent<T>() where T : Component
+        public T GetComponent<T>() where T : Component => GetComponent(typeof(T)) as T;
+
+        /// <summary>
+        /// Get component by type.
+        /// </summary>
+        /// <returns>
+        /// Component, or null if it does not exist.
+        /// </returns>
+        public Component GetComponent(Type componentType)
         {
-            Components.TryGetValue(FormatterServices.GetUninitializedObject(typeof(T)) as Component, out Component component);
-            return component as T;
+            Components.TryGetValue(FormatterServices.GetUninitializedObject(componentType) as Component, out Component component);
+            return component;
         }
 
         public void AddComponent(Component component)
