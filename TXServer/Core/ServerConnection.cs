@@ -99,8 +99,7 @@ namespace TXServer.Core
                 }
                 catch (SocketException e)
                 {
-                    Logger.Error(e);
-                    HandleError();
+                    HandleError(e);
                     return;
                 }
 
@@ -145,8 +144,7 @@ namespace TXServer.Core
                 }
                 catch (HttpListenerException e)
                 {
-                    Logger.Error(e);
-                    HandleError();
+                    HandleError(e);
                     return;
                 }
 
@@ -268,11 +266,11 @@ namespace TXServer.Core
 #if DEBUG
                 Debugger.Launch();
 #endif
-                HandleError();
+                HandleError(e);
             }
         }
 
-        private static void HandleError() => Server.Instance.HandleError();
+        private static void HandleError(Exception exception) => Server.Instance.HandleError(exception);
 
         // Player pool.
         public List<Player> Pool { get; } = new List<Player>();

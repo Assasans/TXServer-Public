@@ -43,17 +43,17 @@ namespace TXServer.Core.Battles
                 base.CompleteWarmUp();
 
                 Battle.MatchPlayers.Select(x => x.Player).ShareEntities(Flags.Values.Select(x => x.FlagEntity));
-                Battle.FlagsPlaced = true;
+                Battle.IsWarmUpCompleted = true;
             }
 
             public override void Tick()
             {
                 base.Tick();
 
-                foreach (KeyValuePair<Entity, Flag> flag in Flags)
+                foreach (Flag flag in Flags.Values)
                 {
-                    if (flag.Value.FlagState == FlagState.Dropped && DateTime.Now > flag.Value.ReturnStartTime)
-                        flag.Value.Return(null, null);
+                    if (flag.State == FlagState.Dropped && DateTime.Now > flag.ReturnStartTime)
+                        flag.Return();
                 }
             }
 
@@ -62,7 +62,7 @@ namespace TXServer.Core.Battles
                 base.OnMatchJoin(battlePlayer);
 
                 battlePlayer.Player.ShareEntities(Flags.Select(p => p.Value.PedestalEntity));
-                if (!Battle.IsMatchMaking || Battle.FlagsPlaced)
+                if (!Battle.IsMatchMaking || Battle.IsWarmUpCompleted)
                 {
                     battlePlayer.Player.ShareEntities(Flags.Select(f => f.Value.FlagEntity));
                 }
@@ -74,14 +74,14 @@ namespace TXServer.Core.Battles
 
                 battlePlayer.Player.UnshareEntities(Flags.Select(p => p.Value.PedestalEntity));
 
-                if (!Battle.IsMatchMaking || Battle.FlagsPlaced)
+                if (!Battle.IsMatchMaking || Battle.IsWarmUpCompleted)
                 {
                     foreach (KeyValuePair<Entity, Flag> flag in Flags)
                     {
-                        if (flag.Value.FlagState != FlagState.Captured)
+                        if (flag.Value.State != FlagState.Captured)
                             continue;
                         flag.Value.FlagEntity.PlayerReferences.Remove(battlePlayer.Player);
-                        flag.Value.Drop(battlePlayer.Player, isUserAction: false);
+                        flag.Value.Drop(false);
                     }
                     battlePlayer.Player.UnshareEntities(Flags.Select(f => f.Value.FlagEntity));
                 }

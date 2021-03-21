@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.ServerMapInformation;
+using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Round;
+using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles
@@ -20,6 +23,28 @@ namespace TXServer.Core.Battles
             public IEnumerable<UserResult> Results => Players.Where(x => x.MatchPlayer != null).Select(x => x.MatchPlayer.UserResult);
             public int EnemyCountFor(BattlePlayer battlePlayer) => _Players.Count - Convert.ToInt32(_Players.Contains(battlePlayer));
             public TeamBattleResult TeamBattleResultFor(BattlePlayer battlePlayer) => TeamBattleResult.DRAW;
+            public void SortRoundUsers()
+            {
+                _Players.Sort(new ScoreComparer());
+
+                int place = 1;
+                foreach (BattlePlayer battlePlayer in _Players)
+                {
+                    if (battlePlayer.MatchPlayer == null) break;
+
+                    Entity roundUser = battlePlayer.MatchPlayer.RoundUser;
+                    var component = roundUser.GetComponent<RoundUserStatisticsComponent>();
+
+                    if (component.Place != place)
+                    {
+                        component.Place = place;
+                        roundUser.ChangeComponent(component);
+                        Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SetScoreTablePositionEvent(place), roundUser);
+                    }
+
+                    place++;
+                }
+            }
 
             public bool IsEnoughPlayers => _Players.Count > 2;
             public TeamColor LosingTeam => TeamColor.NONE;

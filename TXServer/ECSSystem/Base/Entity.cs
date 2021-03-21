@@ -92,6 +92,13 @@ namespace TXServer.ECSSystem.Base
             }
         }
 
+        public void ChangeComponent<T>(Action<T> action) where T : Component
+        {
+            T component = GetComponent<T>() ?? throw new ArgumentException("Component was not found", typeof(T).Name);
+            action(component);
+            ChangeComponent(component);
+        }
+
         public void RemoveComponent<T>() where T : Component => RemoveComponent(typeof(T));
 
         public void RemoveComponent(Type componentType)

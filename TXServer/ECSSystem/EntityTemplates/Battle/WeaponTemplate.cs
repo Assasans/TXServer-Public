@@ -45,7 +45,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 new WeaponCooldownComponent(1.3f),
                 new WeaponRotationComponent(113.667f, 113.333f, 113.333f),
                 new WeaponEnergyComponent(1.3f),
-                new ShootableComponent(),
                 tank.GetComponent<UserGroupComponent>(),
                 tank.GetComponent<TankGroupComponent>(),
                 tank.GetComponent<BattleGroupComponent>());

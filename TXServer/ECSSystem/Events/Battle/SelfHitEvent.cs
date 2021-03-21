@@ -8,6 +8,7 @@ using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Types;
+using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -36,24 +37,37 @@ namespace TXServer.ECSSystem.Events.Battle
                     } 
                 }
 
-                TemperatureComponent temperatureComponent = hitPlayer.MatchPlayer.Tank.GetComponent<TemperatureComponent>();
-                switch (weapon.TemplateAccessor.Template) {
-                    case FlamethrowerBattleItemTemplate:
-                        temperatureComponent.Temperature += 2;
-                        hitPlayer.MatchPlayer.Tank.ChangeComponent(temperatureComponent);
-                        break;
-                    case FreezeBattleItemTemplate:
-                        temperatureComponent.Temperature -= 2;
-                        hitPlayer.MatchPlayer.Tank.ChangeComponent(temperatureComponent);
-                        break;
-                    case IsisBattleItemTemplate:
-                        break;
-                }
+                hitPlayer.MatchPlayer.Tank.ChangeComponent<TemperatureComponent>(component =>
+                {
+                    component.Temperature += weapon.TemplateAccessor.Template switch
+                    {
+                        FlamethrowerBattleItemTemplate => 2,
+                        FreezeBattleItemTemplate => -2,
+                        _ => 0
+                    };
+                });
 
-                HealthComponent healthComponent = hitPlayer.MatchPlayer.Tank.GetComponent<HealthComponent>();
-                if (healthComponent.CurrentHealth > 0)
-                    healthComponent.CurrentHealth -= 400;
-                hitPlayer.MatchPlayer.Tank.ChangeComponent(healthComponent);
+                hitPlayer.MatchPlayer.Tank.ChangeComponent<HealthComponent>(component =>
+                {
+                    if (component.CurrentHealth >= 0)
+                        component.CurrentHealth -= 900;
+
+                    if (component.CurrentHealth < 0)
+                    {
+                        hitPlayer.MatchPlayer.TankState = TankState.Dead;
+
+                        Flag flag = (battle.ModeHandler as CTFHandler)?.Flags[player.BattlePlayer.Team];
+                        if (flag != null && flag.State == FlagState.Captured && flag.FlagEntity.GetComponent<TankGroupComponent>().Key == hitPlayer.MatchPlayer.Tank.EntityId)
+                            flag.Drop(false);
+
+                        battle.MatchPlayers.Select(x => x.Player).SendEvent(new KillEvent(player.CurrentPreset.Weapon, hitTarget.Entity), player.BattlePlayer.MatchPlayer.BattleUser);
+                        battle.UpdateUserStatistics(player, 10, 1, 0, 0);
+                        battle.UpdateUserStatistics(hitPlayer.Player, 0, 0, 0, 1);
+
+                        if (battle.ModeHandler is TDMHandler)
+                            battle.UpdateScore(player.BattlePlayer.Team, 1);
+                    }
+                });
                 battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), hitPlayer.MatchPlayer.Tank);
             }
         }

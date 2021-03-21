@@ -21,7 +21,7 @@ namespace TXServer.ECSSystem.Events.Battle
             BattleView teamView = handler.BattleViewFor(player.BattlePlayer);
 			Entity team = TeamColor == TeamColor.BLUE ? teamView.AllyTeamEntity : teamView.EnemyTeamEntity;
 
-			battle.UpdateScore(player, team, Amount);
+			battle.UpdateScore(team, Amount);
 		}
 		public TeamColor TeamColor { get; set; }
 		public int Amount { get; set; }

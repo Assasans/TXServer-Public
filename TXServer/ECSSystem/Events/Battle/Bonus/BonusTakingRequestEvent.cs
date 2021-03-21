@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
@@ -22,8 +23,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 		{
 			Core.Battles.Battle battle = player.BattlePlayer.Battle;
 
-			CommandManager.BroadcastCommands(battle.MatchPlayers.Select(x => x.Player),
-				new SendEventCommand(new BonusTakenEvent(), bonus));
+			battle.MatchPlayers.Select(x => x.Player).SendEvent(new BonusTakenEvent(), bonus);
 
 			BattleBonus battleBonus = battle.BattleBonuses.Single(b => b.Bonus == bonus);
 			BonusType bonusType = battleBonus.BattleBonusType;
@@ -54,9 +54,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 					case BonusType.REPAIR:
 						player.BattlePlayer.MatchPlayer.Tank.ChangeComponent(new TemperatureComponent(0));
 
-						HealthComponent healthComponent = player.BattlePlayer.MatchPlayer.Tank.GetComponent<HealthComponent>();
-						healthComponent.CurrentHealth = healthComponent.MaxHealth;
-						player.BattlePlayer.MatchPlayer.Tank.ChangeComponent(healthComponent);
+						player.BattlePlayer.MatchPlayer.Tank.ChangeComponent<HealthComponent>(component => component.CurrentHealth = component.MaxHealth);
 						player.SendEvent(new HealthChangedEvent(), player.BattlePlayer.MatchPlayer.Tank);
 
 						// todo: research healing effect animation trigger
@@ -73,7 +71,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 			if (bonusType != BonusType.REPAIR && bonusType != BonusType.GOLD)
 			{
 				player.BattlePlayer.MatchPlayer.SupplyEffects.Remove(bonusType);
-				player.BattlePlayer.MatchPlayer.SupplyEffects.Add(bonusType, 30);
+				player.BattlePlayer.MatchPlayer.SupplyEffects.Add(bonusType, DateTime.Now.AddSeconds(30));
 			}
 
 			player.BattlePlayer.MatchPlayer.UserResult.BonusesTaken += 1;

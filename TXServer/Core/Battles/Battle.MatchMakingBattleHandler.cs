@@ -99,11 +99,12 @@ namespace TXServer.Core.Battles
                             case WarmUpState.WarmingUp:
                                 if (Battle.CountdownTimer <= 4)
                                 {
-                                    foreach (BattlePlayer battleLobbyPlayer in Battle.MatchPlayers)
+                                    foreach (BattlePlayer battlePlayer in Battle.MatchPlayers)
                                     {
-                                        battleLobbyPlayer.MatchPlayer.Tank.RemoveComponent<TankMovableComponent>();
-                                        battleLobbyPlayer.MatchPlayer.Weapon.RemoveComponent<ShootableComponent>();
+                                        battlePlayer.MatchPlayer.KeepDisabled = true;
+                                        battlePlayer.MatchPlayer.DisableTank();
                                     }
+
                                     Battle.CompleteWarmUp();
                                     WarmUpState = WarmUpState.MatchBegins;
                                 }
@@ -111,15 +112,12 @@ namespace TXServer.Core.Battles
                             case WarmUpState.MatchBegins:
                                 if (Battle.CountdownTimer <= 0)
                                 {
-                                    foreach (BattlePlayer battleLobbyPlayer in Battle.MatchPlayers)
+                                    foreach (BattlePlayer battlePlayer in Battle.MatchPlayers)
                                     {
-                                        battleLobbyPlayer.MatchPlayer.Tank.RemoveComponent<TankVisibleStateComponent>();
-                                        battleLobbyPlayer.MatchPlayer.Tank.RemoveComponent<TankActiveStateComponent>();
-                                        battleLobbyPlayer.MatchPlayer.TankState = TankState.New;
-                                        battleLobbyPlayer.MatchPlayer.Tank.RemoveComponent<TankMovementComponent>();
-                                        battleLobbyPlayer.MatchPlayer.Incarnation.RemoveComponent<TankIncarnationComponent>();
-                                        battleLobbyPlayer.MatchPlayer.TankState = TankState.Spawn;
+                                        battlePlayer.MatchPlayer.KeepDisabled = false;
+                                        battlePlayer.MatchPlayer.TankState = TankState.Spawn;
                                     }
+
                                     WarmUpState = WarmUpState.Respawning;
                                     Battle.CountdownTimer = 1;
                                 }
@@ -127,9 +125,6 @@ namespace TXServer.Core.Battles
                             case WarmUpState.Respawning:
                                 if (Battle.CountdownTimer <= 0)
                                 {
-                                    foreach (BattlePlayer battleLobbyPlayer in Battle.MatchPlayers)
-                                        battleLobbyPlayer.MatchPlayer.Weapon.AddComponent(new ShootableComponent());
-
                                     Battle.BattleState = BattleState.Running;
                                 }
                                 break;
@@ -138,8 +133,8 @@ namespace TXServer.Core.Battles
                     case BattleState.Running:
                         if (!Battle.AllBattlePlayers.Any())
                         {
-                            Battle.StartBattle();
                             Battle.BattleState = BattleState.NotEnoughPlayers;
+                            Battle.IsWarmUpCompleted = false;
                         }
 
                         if (Battle.CountdownTimer < 0)

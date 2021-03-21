@@ -48,9 +48,9 @@ namespace TXServer.Core
             Logger.Log("Server is stopped.");
         }
 
-        internal void HandleError()
+        internal void HandleError(Exception exception)
         {
-            Logger.Error("Fatal error!");
+            Logger.Error($"Fatal error: {exception}");
             Stop();
             UserErrorHandler?.Invoke();
         }

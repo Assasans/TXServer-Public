@@ -7,4 +7,14 @@ namespace TXServer.ECSSystem.Events.Battle.Score
     public class RoundUserStatisticsUpdatedEvent : ECSEvent
     {
     }
+    [SerialVersionUID(1463648611538L)]
+    public class SetScoreTablePositionEvent : ECSEvent
+    {
+        public int Position { get; set; }
+
+        public SetScoreTablePositionEvent(int position)
+        {
+            Position = position;
+        }
+    }
 }

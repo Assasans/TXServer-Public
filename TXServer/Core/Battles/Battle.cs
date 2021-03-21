@@ -177,28 +177,32 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            foreach (BattlePlayer battlePlayer in AllBattlePlayers)
+            foreach (BattlePlayer battlePlayer in AllBattlePlayers.ToArray())
                 InitMatchPlayer(battlePlayer);
+
+            SortRoundUsers();
         }
 
         public void FinishBattle()
         {
             BattleState = BattleState.Ended;
+
             foreach (BattlePlayer battlePlayer in MatchPlayers)
             {
-                battlePlayer.MatchPlayer.Tank.RemoveComponent<TankActiveStateComponent>();
-                battlePlayer.MatchPlayer.Tank.RemoveComponent<TankMovableComponent>();
+                battlePlayer.MatchPlayer.KeepDisabled = true;
+                battlePlayer.MatchPlayer.DisableTank();
 
                 PersonalBattleResultForClient personalResult = new(battlePlayer.Player, ModeHandler.TeamBattleResultFor(battlePlayer));
                 BattleResultForClient battleResultForClient = new(this, ModeHandler, personalResult);
                 battlePlayer.Player.SendEvent(new BattleResultForClientEvent(battleResultForClient), battlePlayer.Player.User);
 
-                BattleLeaveCounterComponent battleLeaveCounterComponent = battlePlayer.Player.User.GetComponent<BattleLeaveCounterComponent>();
-                if (battleLeaveCounterComponent.Value > 0)
-                    battleLeaveCounterComponent.Value -= 1;
-                if (battleLeaveCounterComponent.NeedGoodBattles > 0)
-                    battleLeaveCounterComponent.NeedGoodBattles -= 1;
-                battlePlayer.Player.User.ChangeComponent(battleLeaveCounterComponent);
+                battlePlayer.Player.User.ChangeComponent<BattleLeaveCounterComponent>(component =>
+                {
+                    if (component.Value > 0)
+                        component.Value -= 1;
+                    if (component.NeedGoodBattles > 0)
+                        component.NeedGoodBattles -= 1;
+                });
             }
 
             foreach (BattlePlayer battlePlayer1 in AllBattlePlayers)
@@ -209,6 +213,8 @@ namespace TXServer.Core.Battles
                     (ModeHandler is TeamBattleHandler tbHandler && Math.Abs(tbHandler.RedTeamPlayers.Count - tbHandler.BlueTeamPlayers.Count) >= 2))
                     battlePlayer1.MatchPlayer.UserResult.UnfairMatching = true;
             }
+
+            IsWarmUpCompleted = false;
 
             if (RoundEntity.GetComponent<RoundRestartingStateComponent>() == null)
                 RoundEntity.AddComponent(new RoundRestartingStateComponent());
@@ -285,82 +291,11 @@ namespace TXServer.Core.Battles
             }
         }
 
-        private void ProcessMatchPlayers(double deltaTime)
+        private void ProcessMatchPlayers()
         {
-            foreach (MatchPlayer MatchPlayer in MatchPlayers.Select(x => x.MatchPlayer))
+            foreach (MatchPlayer matchPlayer in MatchPlayers.Select(x => x.MatchPlayer))
             {
-                if (MatchPlayer.TankState != TankState.Active && MatchPlayer.TankState != TankState.New)
-                {
-                    MatchPlayer.TankStateChangeCountdown -= deltaTime;
-                }
-
-                // switch state after it's ended
-                if (MatchPlayer.TankStateChangeCountdown < 0)
-                {
-                    switch (MatchPlayer.TankState)
-                    {
-                        case TankState.Spawn:
-                            MatchPlayer.TankState = TankState.SemiActive;
-                            MatchPlayer.Tank.AddComponent(new TankVisibleStateComponent());
-                            MatchPlayer.Tank.AddComponent(new TankMovableComponent());
-                            break;
-                        case TankState.SemiActive:
-                            if (!MatchPlayer.WaitingForTankActivation)
-                            {
-                                MatchPlayer.Tank.AddComponent(new TankStateTimeOutComponent());
-                                MatchPlayer.WaitingForTankActivation = true;
-                            }
-                            break;
-                        case TankState.Dead:
-                            MatchPlayer.TankState = TankState.Spawn;
-                            MatchPlayer.Tank.RemoveComponent<TankVisibleStateComponent>();
-                            MatchPlayer.Tank.RemoveComponent<TankMovableComponent>();
-                            break;
-                    }
-                }
-
-                if (MatchPlayer.CollisionsPhase == CollisionsComponent.SemiActiveCollisionsPhase)
-                {
-                    CollisionsComponent.SemiActiveCollisionsPhase++;
-
-                    MatchPlayer.Tank.RemoveComponent<TankStateTimeOutComponent>();
-                    BattleEntity.ChangeComponent(CollisionsComponent);
-
-                    MatchPlayer.TankState = TankState.Active;
-                    MatchPlayer.WaitingForTankActivation = false;
-                }
-
-                foreach (KeyValuePair<Type, TranslatedEvent> pair in MatchPlayer.TranslatedEvents)
-                {
-                    (from matchPlayer in MatchPlayers
-                     where matchPlayer.MatchPlayer != MatchPlayer
-                     select matchPlayer.Player).SendEvent(pair.Value.Event, pair.Value.TankPart);
-                    MatchPlayer.TranslatedEvents.TryRemove(pair.Key, out _);
-                }
-
-                // supply effects
-                foreach (KeyValuePair<BonusType, double> entry in MatchPlayer.SupplyEffects.ToArray())
-                {
-                    MatchPlayer.SupplyEffects[entry.Key] -= deltaTime;
-
-                    if (entry.Value < 0)
-                    {
-                        switch (entry.Key)
-                        {
-                            case BonusType.ARMOR:
-                                MatchPlayer.Tank.RemoveComponent<ArmorEffectComponent>();
-                                break;
-                            case BonusType.DAMAGE:
-                                MatchPlayer.Tank.RemoveComponent<DamageEffectComponent>();
-                                break;
-                            case BonusType.SPEED:
-                                MatchPlayer.Tank.RemoveComponent<TurboSpeedEffectComponent>();
-                                MatchPlayer.Tank.ChangeComponent(new SpeedComponent(9.967f, 98f, 13.205f));
-                                break;
-                        }
-                        MatchPlayer.SupplyEffects.Remove(entry.Key);
-                    }
-                }
+                matchPlayer.Tick();
             }
         }
 
@@ -397,12 +332,12 @@ namespace TXServer.Core.Battles
                 ModeHandler.Tick();
                 TypeHandler.Tick();
 
-                ProcessMatchPlayers(deltaTime);
+                ProcessMatchPlayers();
                 ProcessBonuses(deltaTime);
             }
         }
 
-        public void UpdateScore(Player player, Entity team, int additiveScore)
+        public void UpdateScore(Entity team, int additiveScore)
         {
             var scoreComponent = team.GetComponent<TeamScoreComponent>();
             scoreComponent.Score += additiveScore;
@@ -413,19 +348,22 @@ namespace TXServer.Core.Battles
         public void UpdateUserStatistics(Player player, int additiveScore, int additiveKills, int additiveKillAssists, int additiveDeath)
         {
             // TODO: rank up effect/system
-            RoundUserStatisticsComponent roundUserStatisticsComponent = player.BattlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>();
             UserExperienceComponent userExperienceComponent = player.User.GetComponent<UserExperienceComponent>();
 
-            roundUserStatisticsComponent.ScoreWithoutBonuses += additiveScore;
-            roundUserStatisticsComponent.Kills += additiveKills;
-            roundUserStatisticsComponent.KillAssists += additiveKillAssists;
-            roundUserStatisticsComponent.Deaths += additiveDeath;
-
-            player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent(roundUserStatisticsComponent);
+            player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(component =>
+            {
+                component.ScoreWithoutBonuses += additiveScore;
+                component.Kills += additiveKills;
+                component.KillAssists += additiveKillAssists;
+                component.Deaths += additiveDeath;
+            });
 
             MatchPlayers.Select(x => x.Player).SendEvent(new RoundUserStatisticsUpdatedEvent(), player.BattlePlayer.MatchPlayer.RoundUser);
+
+            ModeHandler.SortRoundUsers();
         }
 
+        private void SortRoundUsers() => ModeHandler.SortRoundUsers();
         private void CompleteWarmUp() => ModeHandler.CompleteWarmUp();
 
         private int EnemyCountFor(BattlePlayer battlePlayer) => ModeHandler.EnemyCountFor(battlePlayer);
@@ -446,10 +384,11 @@ namespace TXServer.Core.Battles
         };
 
         public ClientBattleParams Params { get; set; }
-        public int WarmUpSeconds { get; set; }
-        public Entity MapEntity { get; private set; }
         public bool IsMatchMaking { get; }
-        private bool FlagsPlaced { get; set; }
+        public Entity MapEntity { get; private set; }
+        
+        public int WarmUpSeconds { get; set; }
+        private bool IsWarmUpCompleted { get; set; }
 
         public MapInfo CurrentMapInfo { get; set; }
         public IList<SpawnPoint> DeathmatchSpawnPoints { get; set; }
@@ -500,8 +439,6 @@ namespace TXServer.Core.Battles
             }
         }
         private BattleState _BattleState;
-        public WarmUpState WarmUpState { get; set; }
-        private int ScoreGap { get; set; }
 
         public IBattleTypeHandler TypeHandler { get; }
         public IBattleModeHandler ModeHandler { get; private set; }

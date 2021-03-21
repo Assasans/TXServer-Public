@@ -25,6 +25,7 @@ namespace TXServer.Core.Battles
             void RemovePlayer(BattlePlayer battlePlayer);
             void OnMatchJoin(BattlePlayer battlePlayer);
             void OnMatchLeave(BattlePlayer battlePlayer);
+            void SortRoundUsers();
         }
     }
 }

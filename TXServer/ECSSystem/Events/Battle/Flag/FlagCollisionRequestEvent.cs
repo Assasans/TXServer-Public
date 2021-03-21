@@ -21,32 +21,31 @@ namespace TXServer.ECSSystem.Events.Battle
             BattleView view = handler.BattleViewFor(player.BattlePlayer);
             Flag enemyFlag = view.EnemyTeamFlag;
             Flag allieFlag = view.AllyTeamFlag;
-
             
             if (battle.BattleState == BattleState.WarmUp)
                 return;
 
-            switch (collisedFlag.FlagState)
+            switch (collisedFlag.State)
             {
                 case FlagState.Home:
                     if (flagEntity.GetComponent<TeamGroupComponent>().Key == tank.GetComponent<TeamGroupComponent>().Key)
                     {
                         if (enemyFlag.FlagEntity.GetComponent<TankGroupComponent>() == null)
                             return;
-                        if (enemyFlag.FlagState == FlagState.Captured)
+                        if (enemyFlag.State == FlagState.Captured)
                         {
                             if (enemyFlag.FlagEntity.GetComponent<TankGroupComponent>().Key != tank.GetComponent<TankGroupComponent>().Key)
                                 return;
                         }
                         else return;
-                        enemyFlag.Deliver(player, tank, allieFlag);
+                        enemyFlag.Deliver();
                     }
                     else
-                        enemyFlag.Capture(player, tank);
+                        enemyFlag.Capture(player.BattlePlayer);
                     break;
                 case FlagState.Dropped:
                     if (flagEntity.GetComponent<TeamGroupComponent>().Key == tank.GetComponent<TeamGroupComponent>().Key)
-                        allieFlag.Return(player, tank);
+                        allieFlag.Return(player.BattlePlayer);
                     else
                     {
                         // pickup flag
@@ -55,7 +54,7 @@ namespace TXServer.ECSSystem.Events.Battle
                             player.BattlePlayer.MatchPlayer.FlagBlocks -= 1;
                             return;
                         }
-                        enemyFlag.Pickup(player, tank);
+                        enemyFlag.Pickup(player.BattlePlayer);
                     }
                     break;
             }

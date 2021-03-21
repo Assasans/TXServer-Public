@@ -17,107 +17,135 @@ namespace TXServer.Core.Battles
     {
         public Flag(Vector3 position, Entity team, List<BattlePlayer> enemyPlayers, Battle battle)
         {
-            PedestalEntity = PedestalTemplate.CreateEntity(position, team, battle.BattleEntity);
             Team = team;
             TeamColor = team.GetComponent<TeamColorComponent>().TeamColor;
             Position = position;
             EnemyPlayers = enemyPlayers;
             Battle = battle;
 
-            Prepare();
+            PedestalEntity = PedestalTemplate.CreateEntity(position, team, battle.BattleEntity);
+            FlagEntity = FlagTemplate.CreateEntity(position, Team, Battle.BattleEntity);
+
+            State = FlagState.Home;
         }
 
-        private void Prepare()
+        private void Reshare()
         {
-            FlagEntity = FlagTemplate.CreateEntity(Position, Team, Battle.BattleEntity);
-
-            CurrentAssists.Clear();
-            FlagState = FlagState.Home;
+            List<Player> refs = new(FlagEntity.PlayerReferences);
+            refs.UnshareEntity(FlagEntity);
+            refs.ShareEntity(FlagEntity);
         }
 
-        private void Recreate()
+        public void Capture(BattlePlayer battlePlayer)
         {
-            Battle.MatchPlayers.Select(x => x.Player).UnshareEntity(FlagEntity);
-            Prepare();
-            Battle.MatchPlayers.Select(x => x.Player).ShareEntity(FlagEntity);
-        }
+            State = FlagState.Captured;
+            Carrier = battlePlayer;
+            Entity tank = Carrier.MatchPlayer.Tank;
 
-        public void Capture(Player player, Entity tank)
-        {
-            FlagState = FlagState.Captured;
             FlagEntity.AddComponent(new TankGroupComponent(tank));
+
+            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagPickupEvent(), FlagEntity);
+            CurrentAssists.Add(battlePlayer);
+
             FlagEntity.RemoveComponent<FlagHomeStateComponent>();
-            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagPickupEvent(), FlagEntity);
-            CurrentAssists.Add(player.BattlePlayer);
         }
 
-        public void Pickup(Player player, Entity tank)
+        public void Pickup(BattlePlayer battlePlayer)
         {
-            FlagState = FlagState.Captured;
-            FlagEntity.RemoveComponent<TankGroupComponent>();
+            State = FlagState.Captured;
+            Carrier = battlePlayer;
+            Entity tank = Carrier.MatchPlayer.Tank;
+
             FlagEntity.AddComponent(new TankGroupComponent(tank));
-            FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
+
             Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagPickupEvent(), FlagEntity);
-            if (!CurrentAssists.Contains(player.BattlePlayer))
-                CurrentAssists.Add(player.BattlePlayer);
+            if (!CurrentAssists.Contains(battlePlayer))
+                CurrentAssists.Add(battlePlayer);
+            
+            FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
         }
 
-        public void Drop(Player player, bool isUserAction)
+        public void Drop(bool isUserAction)
         {
             ReturnStartTime = DateTime.Now.AddSeconds(60);
-            FlagState = FlagState.Dropped;
-            player.BattlePlayer.MatchPlayer.FlagBlocks = 3;
-            Vector3 flagPosition = new(player.BattlePlayer.MatchPlayer.TankPosition.X, player.BattlePlayer.MatchPlayer.TankPosition.Y - 1,
-                player.BattlePlayer.MatchPlayer.TankPosition.Z);
-            FlagEntity.AddComponent(new FlagGroundedStateComponent());
-            FlagEntity.ChangeComponent(new FlagPositionComponent(flagPosition));
-            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDropEvent(IsUserAction: isUserAction), FlagEntity);
-        }
+            State = FlagState.Dropped;
 
-        public void Return(Player player, Entity tank)
-        {
+            Carrier.MatchPlayer.FlagBlocks = 3;
+            Vector3 flagPosition = Carrier.MatchPlayer.TankPosition;
+            Carrier = null;
+
+            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
             FlagEntity.RemoveComponent<TankGroupComponent>();
-            if (tank != null)
-                FlagEntity.AddComponent(new TankGroupComponent(tank));
-            FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
-            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagReturnEvent(), FlagEntity);
-            Recreate();
 
-            if (player != null)
-            {
-                player.BattlePlayer.MatchPlayer.UserResult.FlagReturns += 1;
-            }
+            FlagEntity.ChangeComponent(new FlagPositionComponent(flagPosition));
+            Reshare();
+            FlagEntity.AddComponent(new FlagGroundedStateComponent());
         }
 
-        public void Deliver(Player player, Entity tank, Flag allieFlag)
+        public void Return(BattlePlayer battlePlayer = null)
         {
-            FlagEntity.ChangeComponent(new FlagPositionComponent(allieFlag.Position));
-            FlagEntity.AddComponent(new FlagGroundedStateComponent());
+            State = FlagState.Home;
+            if (battlePlayer != null)
+                FlagEntity.AddComponent(new TankGroupComponent(battlePlayer.MatchPlayer.Tank));
+
+            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagReturnEvent(), FlagEntity);
+
+            if (battlePlayer != null)
+            {
+                battlePlayer.MatchPlayer.UserResult.FlagReturns += 1;
+                FlagEntity.RemoveComponent<TankGroupComponent>();
+            }
+
+            FlagEntity.ChangeComponent(new FlagPositionComponent(Position));
+            FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
+            FlagEntity.AddComponent(new FlagHomeStateComponent());
+            Reshare();
+        }
+
+        public void Deliver()
+        {
+            State = FlagState.Home;
+
             Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), FlagEntity);
-            Recreate();
+            FlagEntity.RemoveComponent<TankGroupComponent>();
 
-            Battle.UpdateScore(player, allieFlag.Team, 1);
-            Battle.UpdateUserStatistics(player, additiveScore: allieFlag.EnemyPlayers.Count * 10, 0, 0, 0);
-            CurrentAssists.Remove(player.BattlePlayer);
-            UserResult delivererResult = player.BattlePlayer.MatchPlayer.UserResult;
-            delivererResult.Flags += 1;
+            FlagEntity.ChangeComponent(new FlagPositionComponent(Position));
+            FlagEntity.AddComponent(new FlagGroundedStateComponent());
+            FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
+            
+            FlagEntity.AddComponent(new FlagHomeStateComponent());
 
-            foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(player.BattlePlayer).AllyTeamResults)
+            Battle.UpdateScore(Carrier.Team, 1);
+            Battle.UpdateUserStatistics(Carrier.Player, additiveScore: EnemyPlayers.Count * 10, 0, 0, 0);
+            CurrentAssists.Remove(Carrier);
+
+            UserResult carrierResult = Carrier.MatchPlayer.UserResult;
+            carrierResult.Flags += 1;
+
+            foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(Carrier).AllyTeamResults)
             {
                 if (CurrentAssists.Select(p => p.User.EntityId).Contains(assistResult.UserId))
                     assistResult.FlagAssists += 1;
             }
+            CurrentAssists.Clear();
+
+            Carrier = null;
         }
 
         public Entity PedestalEntity { get; }
-        public Entity FlagEntity { get; set; }
-        public Entity Team { get; set; }
+        public Entity FlagEntity { get; }
+
+        public Entity Team { get; }
         public TeamColor TeamColor { get; }
-        public Vector3 Position { get; }
-        public FlagState FlagState { get; set; }
-        public List<BattlePlayer> EnemyPlayers { get; set; }
-        public Battle Battle { get; }
+
+        private readonly Vector3 Position;
+        public FlagState State { get; private set; }
+
+        private readonly Battle Battle;
+        private readonly IReadOnlyCollection<BattlePlayer> EnemyPlayers;
+
         public DateTime ReturnStartTime { get; set; }
-        private List<BattlePlayer> CurrentAssists { get; } = new();
+        private readonly List<BattlePlayer> CurrentAssists = new();
+        private BattlePlayer Carrier;
     }
 }
