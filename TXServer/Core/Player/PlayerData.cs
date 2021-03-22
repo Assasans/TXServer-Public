@@ -124,7 +124,7 @@ namespace TXServer.Core
             foreach (PropertyInfo info in typeof(T).GetProperties())
             {
                 if (info.PropertyType != value.GetType()) continue;
-                Logger.Debug($"Updated user value \"{info.Name}\"");
+                Logger.Debug($"{Player}: Updated user value \"{info.Name}\"");
                 info.SetValue(component, value);
             }
             

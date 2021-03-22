@@ -80,6 +80,12 @@ namespace TXServer.ECSSystem.Base
             return component;
         }
 
+        public bool HasComponent<T>() where T : Component => HasComponent(typeof(T));
+        public bool HasComponent(Type componentType)
+        {
+            return GetComponent(componentType) != null;
+        }
+
         public void AddComponent(Component component)
         {
             AddComponentLocally(component);
@@ -108,7 +114,6 @@ namespace TXServer.ECSSystem.Base
         }
 
         public void RemoveComponent<T>() where T : Component => RemoveComponent(typeof(T));
-
         public void RemoveComponent(Type componentType)
         {
             RemoveComponentLocally(componentType);
@@ -116,6 +121,20 @@ namespace TXServer.ECSSystem.Base
             foreach (Player player in PlayerReferences)
             {
                 CommandManager.SendCommandsSafe(player, new ComponentRemoveCommand(this, componentType, removeDone: true));
+            }
+        }
+
+        public bool TryRemoveComponent<T>() where T : Component => TryRemoveComponent(typeof(T));
+        public bool TryRemoveComponent(Type componentType)
+        {
+            try
+            {
+                RemoveComponent(componentType);
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 

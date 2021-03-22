@@ -73,7 +73,7 @@ namespace TXServer.Core
 
         public bool LogIn(Entity clientSession)
         {
-	        if (GetUniqueId() == null)
+	        if (UniqueId == null)
 			{
 				CommandManager.SendCommands(this,
 					new SendEventCommand(new LoginFailedEvent(), ClientSession),
@@ -234,15 +234,13 @@ namespace TXServer.Core
         public Entity User { get; set; }
 		public BattlePlayer BattlePlayer { get; set; }
 
-        public string GetUniqueId()
-        {
-            return Data?.UniqueId;
-        }
+        public string UniqueId => Data?.UniqueId;
 
         public override string ToString()
         {
-            return (_EndPoint ??= Connection.Socket.RemoteEndPoint).ToString();
-        }
+			//return $"{_EndPoint ??= Connection.Socket.RemoteEndPoint} ({UniqueId ?? ClientSession.EntityId.ToString()})";
+			return $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : "")})" : "")}";
+		}
 		private static EndPoint _EndPoint;
     }
 }

@@ -66,27 +66,7 @@ namespace TXServer.Core.Battles
             public void SortRoundUsers()
             {
                 foreach (List<BattlePlayer> list in new[] { RedTeamPlayers, BlueTeamPlayers })
-                {
-                    list.Sort(new ScoreComparer());
-
-                    int place = 1;
-                    foreach (BattlePlayer battlePlayer in list)
-                    {
-                        if (battlePlayer.MatchPlayer == null) break;
-
-                        Entity roundUser = battlePlayer.MatchPlayer.RoundUser;
-                        var component = roundUser.GetComponent<RoundUserStatisticsComponent>();
-
-                        if (component.Place != place)
-                        {
-                            component.Place = place;
-                            roundUser.ChangeComponent(component);
-                            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SetScoreTablePositionEvent(place), roundUser);
-                        }
-
-                        place++;
-                    }
-                }
+                    ((IBattleModeHandler)this).SortRoundUsers(list);
             }
 
             public virtual void SetupBattle()
@@ -143,6 +123,10 @@ namespace TXServer.Core.Battles
             }
 
             public virtual void CompleteWarmUp()
+            {
+            }
+
+            public virtual void OnFinish()
             {
             }
 

@@ -66,7 +66,7 @@ namespace TXServer.Core.Battles
             FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
         }
 
-        public void Drop(bool isUserAction)
+        public void Drop(bool isUserAction, bool silent = false)
         {
             LastCarrier = Carrier;
             LastCarrierMinTime = DateTime.Now.AddSeconds(3);
@@ -77,7 +77,8 @@ namespace TXServer.Core.Battles
             Vector3 flagPosition = Carrier.MatchPlayer.TankPosition - Vector3.UnitY;
             Carrier = null;
 
-            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
+            if (!silent)
+                Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
             FlagEntity.RemoveComponent<TankGroupComponent>();
 
             FlagEntity.ChangeComponent(new FlagPositionComponent(flagPosition));
@@ -118,6 +119,7 @@ namespace TXServer.Core.Battles
             FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
             
             FlagEntity.AddComponent(new FlagHomeStateComponent());
+            Reshare();
 
             foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(Carrier).AllyTeamResults)
             {

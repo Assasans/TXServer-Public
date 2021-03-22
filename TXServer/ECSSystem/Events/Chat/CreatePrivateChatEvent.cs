@@ -21,7 +21,7 @@ namespace TXServer.ECSSystem.Events
 			Entity goalUser = null;
 			foreach (Player p in player.Server.Connection.Pool)
             {
-				if (p.GetUniqueId() == UserUid)
+				if (p.UniqueId == UserUid)
 				{
 					goalUser = p.User;
 					break;

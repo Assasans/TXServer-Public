@@ -180,13 +180,13 @@ namespace TXServer.Core.Battles
 
             foreach (BattlePlayer battlePlayer in AllBattlePlayers.ToArray())
                 InitMatchPlayer(battlePlayer);
-
-            SortRoundUsers();
         }
 
         public void FinishBattle()
         {
             BattleState = BattleState.Ended;
+
+            ModeHandler.OnFinish();
 
             foreach (BattlePlayer battlePlayer in MatchPlayers)
             {
@@ -204,15 +204,12 @@ namespace TXServer.Core.Battles
                     if (component.NeedGoodBattles > 0)
                         component.NeedGoodBattles -= 1;
                 });
-            }
 
-            foreach (BattlePlayer battlePlayer1 in AllBattlePlayers)
-            {
-                battlePlayer1.MatchPlayer.UserResult.ScoreWithoutPremium = battlePlayer1.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
-                
+                battlePlayer.MatchPlayer.UserResult.ScoreWithoutPremium = battlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
+
                 if (AllBattlePlayers.Count() <= 3 ||
                     (ModeHandler is TeamBattleHandler tbHandler && Math.Abs(tbHandler.RedTeamPlayers.Count - tbHandler.BlueTeamPlayers.Count) >= 2))
-                    battlePlayer1.MatchPlayer.UserResult.UnfairMatching = true;
+                    battlePlayer.MatchPlayer.UserResult.UnfairMatching = true;
             }
 
             IsWarmUpCompleted = false;
@@ -247,6 +244,8 @@ namespace TXServer.Core.Battles
             MatchPlayers.Add(battlePlayer);
 
             MatchPlayers.Select(x => x.Player).ShareEntities(battlePlayer.MatchPlayer.GetEntities());
+
+            SortRoundUsers();
         }
 
         private void RemoveMatchPlayer(BattlePlayer battlePlayer)
@@ -276,6 +275,8 @@ namespace TXServer.Core.Battles
 
             if (IsMatchMaking) RemovePlayer(battlePlayer);
             battlePlayer.Reset();
+
+            SortRoundUsers();
         }
 
         private void ProcessExitedPlayers()
@@ -360,7 +361,7 @@ namespace TXServer.Core.Battles
 
             MatchPlayers.Select(x => x.Player).SendEvent(new RoundUserStatisticsUpdatedEvent(), player.BattlePlayer.MatchPlayer.RoundUser);
 
-            ModeHandler.SortRoundUsers();
+            SortRoundUsers();
         }
 
         public void DropSpecificBonusType(BonusType bonusType, string sender)

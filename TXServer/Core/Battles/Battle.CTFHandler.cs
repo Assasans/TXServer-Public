@@ -46,6 +46,17 @@ namespace TXServer.Core.Battles
                 Battle.IsWarmUpCompleted = true;
             }
 
+            public override void OnFinish()
+            {
+                base.OnFinish();
+
+                foreach (KeyValuePair<Entity, Flag> flag in Flags)
+                {
+                    if (flag.Value.State == FlagState.Captured)
+                        flag.Value.Drop(false, silent: true);
+                }
+            }
+
             public override void Tick()
             {
                 base.Tick();

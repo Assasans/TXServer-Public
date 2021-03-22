@@ -88,13 +88,10 @@ namespace TXServer.Core.Battles
 
         private void PrepareForRespawning()
         {
-            if (Tank.GetComponent<TankVisibleStateComponent>() != null)
-                Tank.RemoveComponent<TankVisibleStateComponent>();
+            Tank.TryRemoveComponent<TankVisibleStateComponent>();
 
-            if (Tank.GetComponent<TankMovementComponent>() != null)
+            if (Tank.TryRemoveComponent<TankMovementComponent>())
             {
-                Tank.RemoveComponent<TankMovementComponent>();
-
                 Entity prevIncarnation = Incarnation;
                 Incarnation = TankIncarnationTemplate.CreateEntity(Tank);
 
@@ -126,12 +123,11 @@ namespace TXServer.Core.Battles
         public void DisableTank()
         {
             if (KeepDisabled)
-                Tank.RemoveComponent(StateComponents[_TankState]);
-            if (Tank.GetComponent<SelfDestructionComponent>() != null)
-                Tank.RemoveComponent<SelfDestructionComponent>();
-            if (Tank.GetComponent<TankMovableComponent>() == null) return;
-            Tank.RemoveComponent<TankMovableComponent>();
-            Weapon.RemoveComponent<ShootableComponent>();
+                Tank.TryRemoveComponent(StateComponents[_TankState]);
+            Tank.TryRemoveComponent<SelfDestructionComponent>();
+
+            if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
+            Weapon.TryRemoveComponent<ShootableComponent>();
         }
 
         public void Tick()
@@ -239,8 +235,6 @@ namespace TXServer.Core.Battles
                     case TankState.Spawn:
                         DisableTank();
                         PrepareForRespawning();
-                        foreach (BonusType bonusType in SupplyEffects.Keys.ToArray())
-                            SupplyEffects[bonusType] = DateTime.Now;
                         break;
                     case TankState.SemiActive:
                         EnableTank();
@@ -258,6 +252,8 @@ namespace TXServer.Core.Battles
                                     flag.Drop(false);
                             }
                         }
+                        foreach (BonusType bonusType in SupplyEffects.Keys.ToArray())
+                            SupplyEffects[bonusType] = DateTime.Now;
                         break;
                 }
 

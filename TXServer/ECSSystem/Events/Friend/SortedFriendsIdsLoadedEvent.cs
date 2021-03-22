@@ -14,7 +14,7 @@ namespace TXServer.ECSSystem.Events
             {
                 Player player = Server.Instance.Connection.Pool[poolIndex];
                 if (player.User.EntityId != player.User.EntityId)
-                    FriendsAcceptedIds.Add(player.User.EntityId, player.GetUniqueId());
+                    FriendsAcceptedIds.Add(player.User.EntityId, player.UniqueId);
             }
         }
 
