@@ -65,12 +65,12 @@ namespace TXServer.Core.Battles
                 switch (Battle.BattleState)
                 {
                     case BattleState.NotEnoughPlayers:
-                        if (Battle.IsEnoughPlayers)
+                        if (Battle.IsEnoughPlayers || Battle.ForceStart)
                             Battle.BattleState = BattleState.StartCountdown;
 
                         break;
                     case BattleState.StartCountdown:
-                        if (!Battle.IsEnoughPlayers)
+                        if (!Battle.IsEnoughPlayers && !Battle.ForceStart)
                         {
                             //Thread.Sleep(1000); // TODO: find a better solution for this (client crash when no delay)
                             Battle.BattleState = BattleState.NotEnoughPlayers;
@@ -81,7 +81,7 @@ namespace TXServer.Core.Battles
 
                         break;
                     case BattleState.Starting:
-                        if (!Battle.IsEnoughPlayers)
+                        if (!Battle.IsEnoughPlayers && !Battle.ForceStart)
                         {
                             Battle.BattleState = BattleState.NotEnoughPlayers;
                             break;

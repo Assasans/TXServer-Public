@@ -103,14 +103,14 @@ namespace TXServer.Core.Battles
             }
 
             int index = new Random().Next(SpawnCoordinates.Count);
-            SpawnPoint coordinate = SpawnCoordinates[index];
+            LastSpawnPoint = SpawnCoordinates[index];
 
             /* in case you want to set another json for testing a SINGLE spawn coordinate  
             string CoordinatesJson = File.ReadAllText("YourPath\\test.json");
             coordinate = JsonSerializer.Deserialize<Coordinates.spawnCoordinate>(CoordinatesJson);
             */
 
-            Tank.AddComponent(new TankMovementComponent(new Movement(coordinate.Position, Vector3.Zero, Vector3.Zero, coordinate.Rotation), new MoveControl(), 0, 0));
+            Tank.AddComponent(new TankMovementComponent(new Movement(LastSpawnPoint.Position, Vector3.Zero, Vector3.Zero, LastSpawnPoint.Rotation), new MoveControl(), 0, 0));
         }
 
         public void EnableTank()
@@ -137,6 +137,7 @@ namespace TXServer.Core.Battles
                 TankState = TankState.Dead;
                 Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
                 SelfDestructionTime = null;
+                Battle.UpdateUserStatistics(Player, 0, 0, 0, 1);
             }
 
             // switch state after it's ended
@@ -283,5 +284,6 @@ namespace TXServer.Core.Battles
         public bool Paused { get; set; } = false;
         public Dictionary<BonusType, DateTime> SupplyEffects { get; } = new();
         private IList<SpawnPoint> SpawnCoordinates;
+        public SpawnPoint LastSpawnPoint { get; set; }
     }
 }

@@ -415,7 +415,8 @@ namespace TXServer.Core.Battles
         public ClientBattleParams Params { get; set; }
         public bool IsMatchMaking { get; }
         public Entity MapEntity { get; private set; }
-        
+
+        public bool ForceStart { get; set; } = false;
         public int WarmUpSeconds { get; set; }
         private bool IsWarmUpCompleted { get; set; }
 

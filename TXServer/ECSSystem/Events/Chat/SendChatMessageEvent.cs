@@ -4,12 +4,9 @@ using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
-using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -28,6 +25,15 @@ namespace TXServer.ECSSystem.Events
 				UserUid = player.User.GetComponent<UserUidComponent>().Uid,
 				UserAvatarId = player.User.GetComponent<UserAvatarComponent>().Id
 			};
+
+			string reply = ChatCommands.CheckForCommand(player, Message);
+			if (!string.IsNullOrEmpty(reply))
+            {
+				evt.Message = reply;
+				evt.SystemMessage = true;
+				player.SendEvent(evt, chat);
+				return;
+            }
 
 			// todo: return if user has chat ban
 
