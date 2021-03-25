@@ -5,10 +5,8 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Health;
-using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle;
-using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -19,6 +17,9 @@ namespace TXServer.ECSSystem.Events.Battle
     {
         public void Execute(Player player, Entity weapon) {
             SelfEvent.Execute(this, player, weapon);
+
+            if (player.BattlePlayer.MatchPlayer.TankState == TankState.Dead)
+                return;
 
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
             foreach (HitTarget hitTarget in Targets)
@@ -31,7 +32,7 @@ namespace TXServer.ECSSystem.Events.Battle
                     {
                         if (weapon.TemplateAccessor.Template.GetType() == typeof(IsisBattleItemTemplate))
                         {
-                            hitPlayer.MatchPlayer.IsisHeal();
+                            hitPlayer.MatchPlayer.IsisHeal(player, hitTarget);
                             return;
                         }
                         if (!battle.Params.FriendlyFire)
@@ -60,8 +61,8 @@ namespace TXServer.ECSSystem.Events.Battle
                         hitPlayer.MatchPlayer.TankState = TankState.Dead;
 
                         battle.MatchPlayers.Select(x => x.Player).SendEvent(new KillEvent(player.CurrentPreset.Weapon, hitTarget.Entity), player.BattlePlayer.MatchPlayer.BattleUser);
-                        battle.UpdateUserStatistics(player, 10, 1, 0, 0);
-                        battle.UpdateUserStatistics(hitPlayer.Player, 0, 0, 0, 1);
+                        player.BattlePlayer.MatchPlayer.UpdateStatistics(10, 1, 0, 0, null);
+                        hitPlayer.MatchPlayer.UpdateStatistics(0, 0, 0, 1, player.BattlePlayer.MatchPlayer);
 
                         if (battle.ModeHandler is TDMHandler)
                             battle.UpdateScore(player.BattlePlayer.Team, 1);
@@ -71,6 +72,7 @@ namespace TXServer.ECSSystem.Events.Battle
                         player.BattlePlayer.MatchPlayer.UserResult.Damage += damage;
                     }
                 });
+                player.SendEvent(new DamageInfoEvent(900, hitTarget.LocalHitPoint, false, false), hitPlayer.MatchPlayer.Tank);
                 battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), hitPlayer.MatchPlayer.Tank);
             }
         }

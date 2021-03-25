@@ -17,7 +17,7 @@ namespace TXServer.Core.Data.Database.Impl
                 CountryCode = "EN";
                 Avatar = "8b74e6a3-849d-4a8d-a20e-be3c142fd5e8";
                 Admin = true;
-                Beta = false;
+                Beta = true;
                 Crystals = 1000000;
                 XCrystals = 50000;
                 Original = (PlayerData) Clone();

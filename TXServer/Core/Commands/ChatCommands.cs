@@ -4,6 +4,9 @@ using System.Numerics;
 using TXServer.Core.Battles;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Battle.Tank;
+using TXServer.ECSSystem.Events.Battle;
+using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.Core.Commands
 {
@@ -55,6 +58,6 @@ namespace TXServer.Core.Commands
 			return null;
 		}
 		private static readonly List<string> TesterCommands = new() { "/spawnInfo"};
-		private static readonly List<string> AdminCommands = new() { "/positionInfo", "/start", "/statistics" };
+		private static readonly List<string> AdminCommands = new() { "/positionInfo", "/start", "/stats" };
 	}
 }

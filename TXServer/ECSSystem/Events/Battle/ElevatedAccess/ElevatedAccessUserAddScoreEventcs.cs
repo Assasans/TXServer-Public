@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Events.Battle
 		public void Execute(Player player, Entity entity)
 		{
 			if (player.BattlePlayer != null)
-				player.BattlePlayer.Battle.UpdateUserStatistics(player, additiveScore:Count, additiveKills:0, additiveKillAssists:0, additiveDeath:0);
+				player.BattlePlayer.MatchPlayer.UpdateStatistics(additiveScore:Count, 0, 0, 0, null);
 		}
 		public int Count { get; set; }
 	}

@@ -118,6 +118,11 @@ namespace TXServer.Core
 				//new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(12, 0, 0))),
 			    new UserReputationComponent(0.0));
 
+			// temp solution
+			List<string> AdminUids = new() { "NoNick", "Tim203", "M8", "Kaveman"};
+			if (!AdminUids.Contains(Data.UniqueId))
+				Data.Admin = false;
+
 			if (Data.Admin)
 			{
 				user.Components.Add(new UserAdminComponent());

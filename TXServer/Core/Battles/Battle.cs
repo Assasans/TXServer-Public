@@ -7,10 +7,7 @@ using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Components.Battle.Bonus;
-using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Round;
-using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Time;
 using TXServer.ECSSystem.EntityTemplates.Battle;
@@ -346,24 +343,6 @@ namespace TXServer.Core.Battles
             MatchPlayers.Select(x => x.Player).SendEvent(new RoundScoreUpdatedEvent(), RoundEntity);
         }
 
-        public void UpdateUserStatistics(Player player, int additiveScore, int additiveKills, int additiveKillAssists, int additiveDeath)
-        {
-            // TODO: rank up effect/system
-            UserExperienceComponent userExperienceComponent = player.User.GetComponent<UserExperienceComponent>();
-
-            player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(component =>
-            {
-                component.ScoreWithoutBonuses += additiveScore;
-                component.Kills += additiveKills;
-                component.KillAssists += additiveKillAssists;
-                component.Deaths += additiveDeath;
-            });
-
-            MatchPlayers.Select(x => x.Player).SendEvent(new RoundUserStatisticsUpdatedEvent(), player.BattlePlayer.MatchPlayer.RoundUser);
-
-            SortRoundUsers();
-        }
-
         public void DropSpecificBonusType(BonusType bonusType, string sender)
         {
             List<int> suppliesIndex = new();
@@ -392,7 +371,7 @@ namespace TXServer.Core.Battles
             }
         }
 
-        private void SortRoundUsers() => ModeHandler.SortRoundUsers();
+        public void SortRoundUsers() => ModeHandler.SortRoundUsers();
         private void CompleteWarmUp() => ModeHandler.CompleteWarmUp();
 
         private int EnemyCountFor(BattlePlayer battlePlayer) => ModeHandler.EnemyCountFor(battlePlayer);

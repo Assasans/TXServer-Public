@@ -38,7 +38,7 @@ namespace TXServer.ECSSystem.Events.Battle
 
                         (BattlePlayer carrier, IEnumerable<UserResult> assistResults) = carriedFlag.Deliver();
                         battle.UpdateScore(carrier.Team, 1);
-                        battle.UpdateUserStatistics(carrier.Player, additiveScore: view.EnemyTeamPlayers.Count * 10, 0, 0, 0);
+                        carrier.Player.BattlePlayer.MatchPlayer.UpdateStatistics(additiveScore: view.EnemyTeamPlayers.Count * 10, 0, 0, 0, null);
 
                         UserResult carrierResult = carrier.MatchPlayer.UserResult;
                         carrierResult.Flags += 1;

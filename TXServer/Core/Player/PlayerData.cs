@@ -23,7 +23,7 @@ namespace TXServer.Core
         public string CountryCode { get; protected set; }
         public string Avatar { get; protected set; }
 
-        public bool Admin { get; protected set; }
+        public bool Admin { get; set; }
         public bool Beta { get; protected set; }
 
         public long XCrystals { get; protected set; }

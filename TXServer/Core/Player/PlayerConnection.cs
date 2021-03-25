@@ -8,6 +8,7 @@ using TXServer.Core.Commands;
 using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Entrance;
 using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.Core
@@ -63,8 +64,8 @@ namespace TXServer.Core
                 // Session init message
                 CommandManager.SendCommands(Player,
                     new EntityShareCommand(ClientSession),
-                    new ComponentAddCommand(ClientSession, new SessionSecurityPublicComponent())
-                    //new ComponentAddCommand(ClientSession, new InviteComponent(true, ""))
+                    new ComponentAddCommand(ClientSession, new SessionSecurityPublicComponent()),
+                    new ComponentAddCommand(ClientSession, new InviteComponent(true, ""))
                 );
 
                 while (IsActive)

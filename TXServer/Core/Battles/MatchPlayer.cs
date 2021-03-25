@@ -5,15 +5,19 @@ using System.Linq;
 using System.Numerics;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Bonus;
 using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Health;
+using TXServer.ECSSystem.Components.Battle.Incarnation;
+using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -60,7 +64,7 @@ namespace TXServer.Core.Battles
             { TankState.Dead, typeof(TankDeadStateComponent) },
         };
 
-        public void IsisHeal()
+        public void IsisHeal(Player healer, HitTarget hitTarget)
         {
             Tank.ChangeComponent<TemperatureComponent>(component =>
             {
@@ -78,12 +82,57 @@ namespace TXServer.Core.Battles
                 if (component.CurrentHealth != component.MaxHealth)
                 {
                     if (component.MaxHealth - component.CurrentHealth > healingPerSecond)
-                        component.CurrentHealth -= healingPerSecond;
+                        component.CurrentHealth += healingPerSecond;
                     else
                         component.CurrentHealth = component.MaxHealth;
                 }
             });
             Player.BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), Tank);
+            healer.SendEvent(new DamageInfoEvent(900, hitTarget.LocalHitPoint, false, true), Tank);
+        }
+
+        public void UpdateStatistics(int additiveScore, int additiveKills, int additiveKillAssists, int additiveDeath, MatchPlayer killer)
+        {
+            // TODO: rank up effect/system
+            Player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(component =>
+            {
+                component.ScoreWithoutBonuses += additiveScore;
+                component.Kills += additiveKills;
+                component.KillAssists += additiveKillAssists;
+                component.Deaths += additiveDeath;
+            });
+
+            if (additiveKills >= 1)
+            {
+                Incarnation.ChangeComponent<TankIncarnationKillStatisticsComponent>(component =>
+                {
+                    component.Kills += additiveKills;
+                    if (component.Kills >= 2)
+                    {
+                        killStreakScores.TryGetValue(component.Kills, out int killStreakScore);
+                        if (component.Kills > 40) killStreakScore = 70;
+                        Player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(statistics => statistics.ScoreWithoutBonuses += killStreakScore);
+                        Player.SendEvent(new KillStreakEvent(killStreakScore), Incarnation);
+                    }
+                });
+            }
+
+            if (additiveDeath == 1)
+            {
+                if (killer != null)
+                {
+                    Incarnation.ChangeComponent<TankIncarnationKillStatisticsComponent>(component =>
+                    {
+                        if (component.Kills >= 2)
+                            killer.Player.SendEvent(new StreakTerminationEvent(Player.User.GetComponent<UserUidComponent>().Uid), killer.BattleUser);
+                        component.Kills = 0;
+                    });
+                }
+            }
+
+            Player.BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new RoundUserStatisticsUpdatedEvent(), Player.BattlePlayer.MatchPlayer.RoundUser);
+
+            Player.BattlePlayer.Battle.SortRoundUsers();
         }
 
         private void PrepareForRespawning()
@@ -102,13 +151,11 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            int index = new Random().Next(SpawnCoordinates.Count);
-            LastSpawnPoint = SpawnCoordinates[index];
+            LastSpawnPoint = SpawnCoordinates.Where(spawnCoordinate => spawnCoordinate.Number != LastSpawnPoint.Number).ElementAt(new Random().Next(1, SpawnCoordinates.Count - 1));
 
             /* in case you want to set another json for testing a SINGLE spawn coordinate  
             string CoordinatesJson = File.ReadAllText("YourPath\\test.json");
-            coordinate = JsonSerializer.Deserialize<Coordinates.spawnCoordinate>(CoordinatesJson);
-            */
+            coordinate = JsonSerializer.Deserialize<Coordinates.spawnCoordinate>(CoordinatesJson); */
 
             Tank.AddComponent(new TankMovementComponent(new Movement(LastSpawnPoint.Position, Vector3.Zero, Vector3.Zero, LastSpawnPoint.Rotation), new MoveControl(), 0, 0));
         }
@@ -137,7 +184,7 @@ namespace TXServer.Core.Battles
                 TankState = TankState.Dead;
                 Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
                 SelfDestructionTime = null;
-                Battle.UpdateUserStatistics(Player, 0, 0, 0, 1);
+                UpdateStatistics(0, 0, 0, additiveDeath:1, null);
             }
 
             // switch state after it's ended
@@ -284,6 +331,8 @@ namespace TXServer.Core.Battles
         public bool Paused { get; set; } = false;
         public Dictionary<BonusType, DateTime> SupplyEffects { get; } = new();
         private IList<SpawnPoint> SpawnCoordinates;
-        public SpawnPoint LastSpawnPoint { get; set; }
+        public SpawnPoint LastSpawnPoint { get; set; } = new SpawnPoint();
+
+        private Dictionary<int, int> killStreakScores = new() {{2,0},{3,5},{4,7},{5,10},{10,10},{15,10},{20,20},{25,30},{30,40},{35,50},{40,60}};
     }
 }
