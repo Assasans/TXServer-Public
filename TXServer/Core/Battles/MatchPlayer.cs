@@ -64,6 +64,36 @@ namespace TXServer.Core.Battles
             { TankState.Dead, typeof(TankDeadStateComponent) },
         };
 
+        public void DealDamage(Player damager, HitTarget hitTarget, int damage)
+        {
+            Tank.ChangeComponent<HealthComponent>(component =>
+            {
+                if (component.CurrentHealth >= 0)
+                    component.CurrentHealth -= damage;
+
+                if (component.CurrentHealth <= 0)
+                {
+                    TankState = TankState.Dead;
+
+                    if (damager != Player)
+                        Battle.MatchPlayers.Select(x => x.Player).SendEvent(new KillEvent(damager.CurrentPreset.Weapon, hitTarget.Entity), damager.BattlePlayer.MatchPlayer.BattleUser);
+                    else
+                        Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
+                    damager.BattlePlayer.MatchPlayer.UpdateStatistics(10, 1, 0, 0, null);
+                    UpdateStatistics(0, 0, 0, 1, damager.BattlePlayer.MatchPlayer);
+
+                    if (Battle.ModeHandler is TDMHandler)
+                        Battle.UpdateScore(damager.BattlePlayer.Team, 1);
+                    UserResult.Deaths += 1;
+                    // todo: why the hell is KillStrike = Kills
+                    damager.BattlePlayer.MatchPlayer.UserResult.KillStrike += 1;
+                    damager.BattlePlayer.MatchPlayer.UserResult.Damage += damage;
+                }
+                damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false, false), Tank);
+                Battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), Tank);
+            });
+        }
+        
         public void IsisHeal(Player healer, HitTarget hitTarget)
         {
             Tank.ChangeComponent<TemperatureComponent>(component =>

@@ -40,7 +40,7 @@ namespace TXServer.Core.Commands
 				return "Started";
 			}
 
-			if (message == "/stats" && adminPermission)
+			if (message == "/stats" && testerPermission)
             {
 				return $"MM battles: {ServerConnection.BattlePool.Where(b => b.IsMatchMaking).Count()}\n" +
 					$"Custom battles: {ServerConnection.BattlePool.Where(b => !b.IsMatchMaking).Count()}";
@@ -57,7 +57,7 @@ namespace TXServer.Core.Commands
 			}
 			return null;
 		}
-		private static readonly List<string> TesterCommands = new() { "/spawnInfo"};
-		private static readonly List<string> AdminCommands = new() { "/positionInfo", "/start", "/stats" };
+		private static readonly List<string> TesterCommands = new() { "/spawnInfo", "/stats" };
+		private static readonly List<string> AdminCommands = new() { "/positionInfo", "/start" };
 	}
 }
