@@ -45,6 +45,7 @@ namespace TXServer.ECSSystem.Events
 						userExperienceComponent.Experience += Convert.ToInt32(Code[2..]);
 						Logger.Debug($"{player}: Changed experience to {userExperienceComponent.Experience}");
 						commands.Add(new ComponentChangeCommand(player.User, userExperienceComponent));
+						player.CheckRankUp(0);
 					}
 				}
 			}

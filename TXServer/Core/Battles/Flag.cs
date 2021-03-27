@@ -8,6 +8,7 @@ using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Events.Battle.VisualScore;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -89,7 +90,11 @@ namespace TXServer.Core.Battles
         {
             State = FlagState.Home;
             if (battlePlayer != null)
+            {
                 FlagEntity.AddComponent(new TankGroupComponent(battlePlayer.MatchPlayer.Tank));
+                // todo: calculate flag return score
+                battlePlayer.Player.SendEvent(new VisualScoreFlagReturnEvent(battlePlayer.MatchPlayer.GetScoreWithPremium(5)), battlePlayer.MatchPlayer.BattleUser);
+            } 
 
             Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagReturnEvent(), FlagEntity);
 

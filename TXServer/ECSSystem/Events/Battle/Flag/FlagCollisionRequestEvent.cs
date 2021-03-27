@@ -6,6 +6,7 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Team;
+using TXServer.ECSSystem.Events.Battle.VisualScore;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -38,7 +39,12 @@ namespace TXServer.ECSSystem.Events.Battle
 
                         (BattlePlayer carrier, IEnumerable<UserResult> assistResults) = carriedFlag.Deliver();
                         battle.UpdateScore(carrier.Team, 1);
-                        carrier.Player.BattlePlayer.MatchPlayer.UpdateStatistics(additiveScore: view.EnemyTeamPlayers.Count * 10, 0, 0, 0, null);
+                        int deliverScore = view.EnemyTeamPlayers.Count * 10;
+                        if (deliverScore > 0)
+                        {
+                            carrier.Player.BattlePlayer.MatchPlayer.UpdateStatistics(additiveScore: deliverScore, 0, 0, 0, null);
+                            carrier.Player.SendEvent(new VisualScoreFlagDeliverEvent(carrier.MatchPlayer.GetScoreWithPremium(deliverScore)), carrier.MatchPlayer.BattleUser);
+                        }
 
                         UserResult carrierResult = carrier.MatchPlayer.UserResult;
                         carrierResult.Flags += 1;

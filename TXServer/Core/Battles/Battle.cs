@@ -203,6 +203,8 @@ namespace TXServer.Core.Battles
                 });
 
                 battlePlayer.MatchPlayer.UserResult.ScoreWithoutPremium = battlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
+                battlePlayer.Player.User.ChangeComponent<UserExperienceComponent>(component =>
+                    component.Experience += battlePlayer.MatchPlayer.UserResult.ScoreWithoutPremium - battlePlayer.MatchPlayer.AlreadyAddedExperience);
 
                 if (AllBattlePlayers.Count() <= 3 ||
                     (ModeHandler is TeamBattleHandler tbHandler && Math.Abs(tbHandler.RedTeamPlayers.Count - tbHandler.BlueTeamPlayers.Count) >= 2))
