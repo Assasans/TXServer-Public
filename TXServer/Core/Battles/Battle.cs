@@ -233,12 +233,14 @@ namespace TXServer.Core.Battles
                     if (battleBonus.BonusState == BonusState.Spawned)
                         battlePlayer.Player.ShareEntity(battleBonus.Bonus);
                 }
+                foreach (BattlePlayer battlePlayer1 in MatchPlayers)
+                    battlePlayer.Player.ShareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
             }
 
             ModeHandler.OnMatchJoin(battlePlayer);
 
-            foreach (BattlePlayer battlePlayer1 in MatchPlayers)
-                battlePlayer.Player.ShareEntities(battlePlayer1.MatchPlayer.GetEntities());
+            foreach (BattlePlayer battlePlayer2 in MatchPlayers)
+                battlePlayer.Player.ShareEntities(battlePlayer2.MatchPlayer.GetEntities());
 
             MatchPlayers.Add(battlePlayer);
 
@@ -258,9 +260,16 @@ namespace TXServer.Core.Battles
                 foreach (BattleBonus battleBonus in BattleBonuses.Where(b => b.BonusState != BonusState.Unused && b.BonusState != BonusState.New))
                 {
                     player.UnshareEntity(battleBonus.BonusRegion);
-                    if (battleBonus.BonusState == BonusState.Spawned)
+                    if (battleBonus.BonusState == BonusState.Spawned) 
+                    {
                         player.UnshareEntity(battleBonus.Bonus);
+                        Console.WriteLine(battleBonus.BattleBonusType);
+                    }
                 }
+                foreach (BattlePlayer battlePlayer1 in MatchPlayers)
+                    battlePlayer.Player.UnshareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
+                foreach (SupplyEffect supplyEffect in battlePlayer.MatchPlayer.SupplyEffects)
+                    supplyEffect.Remove();
             }
 
             ModeHandler.OnMatchLeave(battlePlayer);
@@ -363,7 +372,7 @@ namespace TXServer.Core.Battles
             if (!suppliesIndex.Any()) return;
 
             int supplyIndex = suppliesIndex[new Random().Next(suppliesIndex.Count)];
-            if (BattleBonuses[supplyIndex].BattleBonusType != BonusType.GOLD)
+            if (bonusType != BonusType.GOLD)
                 BattleBonuses[supplyIndex].BonusStateChangeCountdown = 0;
             else
             {

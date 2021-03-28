@@ -7,8 +7,6 @@ using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Components.Battle.Bonus;
-using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Round;
@@ -67,6 +65,11 @@ namespace TXServer.Core.Battles
 
         public void DealDamage(Player damager, HitTarget hitTarget, int damage)
         {
+            if (damager.BattlePlayer.MatchPlayer.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.DAMAGE))
+                damage = (int)(damage * 1.5);
+            if (SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.ARMOR))
+                damage = (int)(damage * 0.5);
+
             Tank.ChangeComponent<HealthComponent>(component =>
             {
                 if (component.CurrentHealth >= 0)
@@ -92,7 +95,7 @@ namespace TXServer.Core.Battles
 
                     damager.BattlePlayer.MatchPlayer.UserResult.Damage += damage;
 
-                    foreach (KeyValuePair<MatchPlayer, int> assist in damageAssisters.Where(assist => assist.Key != damager.BattlePlayer.MatchPlayer))
+                    foreach (KeyValuePair<MatchPlayer, int> assist in damageAssisters.Where(assist => assist.Key != damager.BattlePlayer.MatchPlayer && assist.Key != this))
                     {
                         int assistScore = 5;
                         assist.Key.UpdateStatistics(additiveScore:assistScore, 0, additiveKillAssists:1, 0, null);
@@ -200,7 +203,7 @@ namespace TXServer.Core.Battles
             ProcessKillStreak(additiveKills, additiveDeath > 0, killer);
             Battle.MatchPlayers.Select(x => x.Player).SendEvent(new RoundUserStatisticsUpdatedEvent(), RoundUser);
             Battle.SortRoundUsers();
-            Player.CheckRankUp(GetScoreWithPremium(additiveScore));
+            Player.CheckRankUp();
         }
 
         public int GetScoreWithPremium(int score)
@@ -258,7 +261,7 @@ namespace TXServer.Core.Battles
                 TankState = TankState.Dead;
                 Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
                 SelfDestructionTime = null;
-                UpdateStatistics(0, 0, 0, additiveDeath:1, null);
+                UpdateStatistics(0, 0, 0, additiveDeath: 1, null);
             }
 
             // switch state after it's ended
@@ -307,29 +310,14 @@ namespace TXServer.Core.Battles
             }
 
             // supply effects
-            foreach (KeyValuePair<BonusType, DateTime> entry in SupplyEffects.ToArray())
+            foreach (SupplyEffect supplyEffect in SupplyEffects.ToArray())
             {
-                if (DateTime.Now > entry.Value)
-                {
-                    switch (entry.Key)
-                    {
-                        case BonusType.ARMOR:
-                            Tank.RemoveComponent<ArmorEffectComponent>();
-                            break;
-                        case BonusType.DAMAGE:
-                            Tank.RemoveComponent<DamageEffectComponent>();
-                            break;
-                        case BonusType.SPEED:
-                            Tank.RemoveComponent<TurboSpeedEffectComponent>();
-                            Tank.ChangeComponent(new SpeedComponent(9.967f, 98f, 13.205f));
-                            break;
-                    }
-                    SupplyEffects.Remove(entry.Key);
-                }
+                if (DateTime.Now > supplyEffect.StopTime)
+                    supplyEffect.Remove();
             }
         }
 
-        private readonly Battle Battle;
+        public readonly Battle Battle;
         public Player Player { get; }
         public Entity BattleUser { get; }
         public Entity RoundUser { get; }
@@ -374,8 +362,8 @@ namespace TXServer.Core.Battles
                                     flag.Drop(false);
                             }
                         }
-                        foreach (BonusType bonusType in SupplyEffects.Keys.ToArray())
-                            SupplyEffects[bonusType] = DateTime.Now;
+                        foreach (SupplyEffect supplyEffect in SupplyEffects.ToArray())
+                            supplyEffect.Remove();
                         break;
                 }
 
@@ -403,7 +391,7 @@ namespace TXServer.Core.Battles
         public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new ConcurrentDictionary<Type, TranslatedEvent>();
         public Vector3 TankPosition { get; set; }
         public bool Paused { get; set; } = false;
-        public Dictionary<BonusType, DateTime> SupplyEffects { get; } = new();
+        public List<SupplyEffect> SupplyEffects { get; } = new();
         private Dictionary<MatchPlayer, int> damageAssisters { get; set; } = new();
         public int AlreadyAddedExperience { get; set; } = 0;
 

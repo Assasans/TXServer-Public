@@ -181,7 +181,7 @@ namespace TXServer.Core
 			return true;
         }
 
-		public void CheckRankUp(int battleExperience)
+		public void CheckRankUp()
         {
 			// todo: load this list from configs
 			List<long> experienceForRank = new() {0, 200, 800, 1800, 3200, 5000, 7200, 9800, 12800, 16200, 20000, 24200, 28800, 33800, 39200, 
@@ -192,7 +192,18 @@ namespace TXServer.Core
 				1248200, 1280000, 1312200, 1344800, 1377800, 1411200, 1445000, 1479200, 1513800, 1548800, 1584200, 1620000, 1656200, 1692800, 
 				1729800, 1767200, 1805000, 1843200, 1881800, 1920800, 1960200, 2000000
 			};
-			int correctRank = experienceForRank.IndexOf(experienceForRank.LastOrDefault(x => x <= User.GetComponent<UserExperienceComponent>().Experience + battleExperience)) + 1;
+
+			long totalExperience = User.GetComponent<UserExperienceComponent>().Experience;
+			if (IsInBattle())
+            {
+				int battleExperience = BattlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
+				if (User.GetComponent<PremiumAccountBoostComponent>() == null)
+					totalExperience += battleExperience;
+				else
+					totalExperience += battleExperience * 2;
+			}
+				
+			int correctRank = experienceForRank.IndexOf(experienceForRank.LastOrDefault(x => x <= totalExperience)) + 1;
 
 			if (User.GetComponent<UserRankComponent>().Rank < correctRank)
             {
@@ -203,7 +214,7 @@ namespace TXServer.Core
 
 				if (IsInBattle())
                 {
-					SendEvent(new UpdateRankEvent(), User);
+					BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new UpdateRankEvent(), User);
 					int currentScoreInBattle = BattlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
 					User.ChangeComponent<UserExperienceComponent>(component => component.Experience += currentScoreInBattle);
 					BattlePlayer.MatchPlayer.AlreadyAddedExperience += currentScoreInBattle;

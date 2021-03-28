@@ -1,14 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle.Bonus;
-using TXServer.ECSSystem.Components.Battle.Chassis;
-using TXServer.ECSSystem.Components.Battle.Health;
-using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Battle.Bonus
@@ -19,56 +16,29 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 		public void Execute(Player player, Entity bonus, Entity tank)
 		{
 			Core.Battles.Battle battle = player.BattlePlayer.Battle;
-
-			battle.MatchPlayers.Select(x => x.Player).SendEvent(new BonusTakenEvent(), bonus);
-
 			BattleBonus battleBonus = battle.BattleBonuses.Single(b => b.Bonus == bonus);
 			BonusType bonusType = battleBonus.BattleBonusType;
+			SupplyEffect supplyEffect = null;
 
 			if (battleBonus.BonusState != BonusState.Spawned)
 				return;
-
 			if (battleBonus.BattleBonusType == BonusType.GOLD)
 				battleBonus.BonusState = BonusState.Unused;
-			else 
+			else
 				battleBonus.BonusState = BonusState.Redrop;
 
-			if (!player.BattlePlayer.MatchPlayer.SupplyEffects.ContainsKey(bonusType))
-            {
-				switch (bonusType)
-				{
-					case BonusType.ARMOR:
-						tank.AddComponent(new ArmorEffectComponent());
-						break;
-					case BonusType.DAMAGE:
-						tank.AddComponent(new DamageEffectComponent());
-						break;
-					case BonusType.GOLD:
-						UserMoneyComponent userMoneyComponent = player.Data.SetCrystals(player.Data.Crystals + battleBonus.GoldboxCrystals);
-						player.User.ChangeComponent(userMoneyComponent);
-						battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
-						break;
-					case BonusType.REPAIR:
-						player.BattlePlayer.MatchPlayer.Tank.ChangeComponent(new TemperatureComponent(0));
+			battle.MatchPlayers.Select(x => x.Player).SendEvent(new BonusTakenEvent(), bonus);
 
-						player.BattlePlayer.MatchPlayer.Tank.ChangeComponent<HealthComponent>(component => component.CurrentHealth = component.MaxHealth);
-						player.BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), player.BattlePlayer.MatchPlayer.Tank);
-
-						// todo: research healing effect animation trigger
-						if (tank.GetComponent<HealingEffectComponent>() == null)
-						    tank.AddComponent(new HealingEffectComponent());
-						break;
-					case BonusType.SPEED:
-						tank.AddComponent(new TurboSpeedEffectComponent());
-						tank.ChangeComponent(new SpeedComponent(float.MaxValue, 98f, 13));
-						break;
-				}
-			}
-
-			if (bonusType != BonusType.REPAIR && bonusType != BonusType.GOLD)
+			switch (bonusType)
 			{
-				player.BattlePlayer.MatchPlayer.SupplyEffects.Remove(bonusType);
-				player.BattlePlayer.MatchPlayer.SupplyEffects.Add(bonusType, DateTime.Now.AddSeconds(30));
+				case BonusType.GOLD:
+					UserMoneyComponent userMoneyComponent = player.Data.SetCrystals(player.Data.Crystals + battleBonus.GoldboxCrystals);
+					player.User.ChangeComponent(userMoneyComponent);
+					battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
+					break;
+				default:
+					supplyEffect = new SupplyEffect(bonusType, player.BattlePlayer.MatchPlayer);
+					break;
 			}
 
 			player.BattlePlayer.MatchPlayer.UserResult.BonusesTaken += 1;
