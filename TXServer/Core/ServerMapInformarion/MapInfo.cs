@@ -8,6 +8,7 @@ namespace TXServer.Core.ServerMapInformation
         public long MapId { get; set; }
         public int MaxPlayers { get; set; }
         public bool MatchMaking { get; set; }
+        public bool Custom { get; set; }
         public float GoldProbability { get; set; }
         public MapFlags Flags { get; set; }
         public IList<PuntativeGeometry> PuntativeGeoms { get; set; }

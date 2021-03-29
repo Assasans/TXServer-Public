@@ -3,7 +3,8 @@
     "name": "Acid Lake",
     "mapId": 485053206,
     "maxPlayers": 20,
-    "matchMaking": false,
+    "matchMaking": true,
+    "custom": false,
     "goldProbability": 0.05,
     "flags": {
       "red": {
@@ -1257,7 +1258,8 @@
     "name": "Lake Hell",
     "mapId": -820833801,
     "maxPlayers": 20,
-    "matchMaking": false,
+    "matchMaking": true,
+    "custom": false,
     "goldProbability": 0.05,
     "flags": {
       "red": {
@@ -2525,6 +2527,7 @@
     "mapId": 1133979230,
     "maxPlayers": 8,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
@@ -3484,6 +3487,7 @@
     "mapId": 1945237110,
     "maxPlayers": 8,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
@@ -4674,6 +4678,7 @@
     "mapId": -51480736,
     "maxPlayers": 12,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
@@ -7111,6 +7116,7 @@
     "mapId": 2127033418,
     "maxPlayers": 20,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
@@ -9734,6 +9740,7 @@
     "mapId": -1551247853,
     "maxPlayers": 12,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
@@ -11249,6 +11256,7 @@
     "mapId": 989096365,
     "maxPlayers": 16,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.01,
     "flags": {
       "red": {
@@ -13855,6 +13863,7 @@
     "mapId": 343745828,
     "maxPlayers": 8,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
@@ -16252,6 +16261,7 @@
     "mapId": -1587964040,
     "maxPlayers": 16,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
@@ -17679,6 +17689,7 @@
     "mapId": -1664220274,
     "maxPlayers": 16,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
@@ -19995,6 +20006,7 @@
     "mapId": -549069251,
     "maxPlayers": 8,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
@@ -21395,6 +21407,7 @@
     "mapId": -321842153,
     "maxPlayers": 16,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
@@ -23197,6 +23210,7 @@
     "mapId": 933129112,
     "maxPlayers": 16,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
@@ -24930,7 +24944,8 @@
     "name": "Testbox",
     "mapId": 458045295,
     "maxPlayers": 8,
-    "matchMaking": true,
+    "matchMaking": false,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
@@ -25547,6 +25562,7 @@
     "mapId": 980475942,
     "maxPlayers": 20,
     "matchMaking": true,
+    "custom": true,
     "goldProbability": 0.0001,
     "flags": {
       "red": {
