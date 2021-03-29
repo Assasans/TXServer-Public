@@ -1,5 +1,4 @@
 ﻿using TXServer.Core;
-using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -10,7 +9,11 @@ namespace TXServer.ECSSystem.Events
     {
         public void Execute(Player player, Entity entity)
         {
-            CommandManager.SendCommands(player, new SendEventCommand(new UserProfileLoadedEvent()));
+            Player remotePlayer = Server.Instance.FindPlayerById(UserId);
+
+            if (!player.EntityList.Contains(remotePlayer.User))
+                player.ShareEntity(remotePlayer.User);
+            player.SendEvent(new UserProfileLoadedEvent(), remotePlayer.User);
         }
 
         public long UserId { get; set; }

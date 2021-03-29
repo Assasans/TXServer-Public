@@ -1,9 +1,7 @@
 ﻿using TXServer.Core;
-using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
-using TXServer.ECSSystem.Components;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -15,7 +13,7 @@ namespace TXServer.ECSSystem.Events
 			PromoCodeCheckResult result = PromoCodeCheckResult.INVALID;
 			// TODO: easter egg: 7FA8-8E12-DB08 (Tanki X discontinuation promo code, let's give away some crystals)
 
-			if (player.User.GetComponent<UserAdminComponent>() != null)
+			if (player.Data.Admin)
             {
 				// for testing
 				switch (Code)
@@ -54,8 +52,14 @@ namespace TXServer.ECSSystem.Events
 				}
 			}
 
-			CommandManager.SendCommands(player,
-				new SendEventCommand(new PromoCodeCheckResultEvent(Code, result), entity));
+			switch (Code)
+			{
+				case "7FA8-8E12-DB08":
+					result = PromoCodeCheckResult.VALID;
+					break;
+			}
+
+			player.SendEvent(new PromoCodeCheckResultEvent(Code, result), entity);
 		}
 		public string Code { get; set; }
 	}

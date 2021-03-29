@@ -29,6 +29,10 @@ namespace TXServer.Core
         public long XCrystals { get; protected set; }
         public long Crystals { get; protected set; }
 
+        public List<long> AcceptedFriendIds { get; set; }
+        public List<long> IncomingFriendIds { get; set; }
+        public List<long> OutgoingFriendIds { get; set; }
+
         public PlayerData(string uid)
         {
             UniqueId = uid;

@@ -256,7 +256,7 @@ namespace TXServer.Core.Battles
 
         public void Tick()
         {
-            if (SelfDestructionTime != null && DateTime.Now > SelfDestructionTime)
+            if (SelfDestructionTime != null && DateTime.Now > SelfDestructionTime && Battle.BattleState != BattleState.Ended)
             {
                 TankState = TankState.Dead;
                 Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);

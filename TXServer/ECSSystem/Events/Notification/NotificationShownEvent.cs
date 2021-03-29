@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity notification)
 		{
-			CommandManager.SendCommands(player, new EntityUnshareCommand(notification));
+			player.UnshareEntity(notification);
 		}
 	}
 }

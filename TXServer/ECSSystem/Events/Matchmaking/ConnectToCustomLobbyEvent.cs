@@ -1,10 +1,7 @@
 ﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Types;
 using TXServer.Core;
-using TXServer.Core.Commands;
 using System.Linq;
-using TXServer.ECSSystem.Components;
 using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.ECSSystem.Events.Battle
@@ -12,12 +9,12 @@ namespace TXServer.ECSSystem.Events.Battle
 	[SerialVersionUID(1547616531111L)]
 	public class ConnectToCustomLobbyEvent : ECSEvent
 	{
-		public void Execute(Player player, Entity mode)
+		public void Execute(Player player, Entity entity)
 		{
-			Core.Battles.Battle battle = ServerConnection.BattlePool.LastOrDefault(b => b.BattleLobbyEntity.EntityId == LobbyId);
+			Core.Battles.Battle battle = Server.FindBattleById(lobbyId: LobbyId, battleId: 0);
 
 			// admins can enter with the "last" code the newest custom lobby
-			if (player.User.GetComponent<UserAdminComponent>() != null) {
+			if (player.Data.Admin) {
 				switch (LobbyId)
 				{
 					// soft join latest open lobby

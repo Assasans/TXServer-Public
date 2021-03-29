@@ -20,7 +20,7 @@ namespace TXServer.ECSSystem.Events
 			var rewards = new Dictionary<Entity, int> {};
 			List<ICommand> commands = new List<ICommand> {};
 
-			if (player.User.GetComponent<UserAdminComponent>() != null)
+			if (player.Data.Admin)
             {
 				var currencieCodes = new Dictionary<string, Entity>
 				{
@@ -50,6 +50,15 @@ namespace TXServer.ECSSystem.Events
 				}
 			}
 
+			switch (Code)
+			{
+				case "7FA8-8E12-DB08":
+					rewards.Add(ExtraItems.GlobalItems.Crystal, 10000);
+					rewards.Add(ExtraItems.GlobalItems.Xcrystal, 10000);
+					rewards.Add(ExtraItems.GlobalItems.Premiumboost, 7);
+					break;
+			}
+
 			foreach (KeyValuePair<Entity, int> item in rewards)
             {
 				Entity notification = new Entity(new TemplateAccessor(new NewItemNotificationTemplate(), "notification/newitem"),
@@ -68,9 +77,18 @@ namespace TXServer.ECSSystem.Events
 					UserXCrystalsComponent userXCrystalsComponent = player.Data.SetXCrystals(player.Data.XCrystals + item.Value);
 					commands.Add(new ComponentChangeCommand(player.User, userXCrystalsComponent));
                 }
+				if (item.Key == ExtraItems.GlobalItems.Premiumboost)
+				{
+					if (player.User.GetComponent<PremiumAccountBoostComponent>() == null)
+						player.User.AddComponent(new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(item.Value * 24, 0, 0))));
+					else
+						player.User.ChangeComponent<PremiumAccountBoostComponent>(component => component.EndDate.Time += item.Value);
+				}
 			}
 
 			CommandManager.SendCommands(player, commands);
+			if (rewards.Count > 0)
+				player.SendEvent(new ShowNotificationGroupEvent(1), entity);
 		}
 		public string Code { get; set; }
 	}

@@ -42,7 +42,8 @@ namespace TXServer.Core.Commands
 
 			if (message == "/stats" && testerPermission)
             {
-				return $"MM battles: {ServerConnection.BattlePool.Where(b => b.IsMatchMaking).Count()}\n" +
+				return $"Online players: {Server.Instance.Connection.Pool.Count}\n" +
+					$"MM battles: {ServerConnection.BattlePool.Where(b => b.IsMatchMaking).Count()}\n" +
 					$"Custom battles: {ServerConnection.BattlePool.Where(b => !b.IsMatchMaking).Count()}";
 			}
 

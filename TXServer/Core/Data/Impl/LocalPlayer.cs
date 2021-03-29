@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TXServer.Core.Data.Database.Impl
 {
@@ -20,6 +21,9 @@ namespace TXServer.Core.Data.Database.Impl
                 Beta = true;
                 Crystals = 1000000;
                 XCrystals = 50000;
+                AcceptedFriendIds = new List<long>();
+                IncomingFriendIds = new List<long>();
+                OutgoingFriendIds = new List<long>();
                 Original = (PlayerData) Clone();
             }
             catch (Exception e)

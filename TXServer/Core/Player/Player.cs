@@ -174,7 +174,7 @@ namespace TXServer.Core
 				//new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
 			    new SendEventCommand(new PaymentSectionLoadedEvent(), user),
 				new ComponentAddCommand(user, new UserOnlineComponent()),
-				new SendEventCommand(new FriendsLoadedEvent(), ClientSession)
+				new SendEventCommand(new FriendsLoadedEvent(this), ClientSession)
 			});
 
 			CommandManager.SendCommands(this, collectedCommands);
@@ -220,6 +220,12 @@ namespace TXServer.Core
 					BattlePlayer.MatchPlayer.AlreadyAddedExperience += currentScoreInBattle;
 				}
 			}
+        }
+
+		public bool IsLoggedIn()
+        {
+			if (User != null) return true;
+			return false;
         }
 
 		public  bool IsInBattle()

@@ -221,6 +221,7 @@ namespace TXServer.Core.Battles
 
         public void InitMatchPlayer(BattlePlayer battlePlayer)
         {
+            battlePlayer.Player.User.AddComponent(BattleEntity.GetComponent<BattleGroupComponent>());
             battlePlayer.MatchPlayer = new MatchPlayer(battlePlayer, BattleEntity, (ModeHandler as TeamBattleHandler)?.BattleViewFor(battlePlayer).AllyTeamResults ?? ((DMHandler)ModeHandler).Results);
 
             battlePlayer.Player.ShareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
@@ -251,6 +252,7 @@ namespace TXServer.Core.Battles
 
         private void RemoveMatchPlayer(BattlePlayer battlePlayer)
         {
+            battlePlayer.Player.User.RemoveComponent<BattleGroupComponent>();
             Player player = battlePlayer.Player;
 
             player.UnshareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
@@ -261,10 +263,7 @@ namespace TXServer.Core.Battles
                 {
                     player.UnshareEntity(battleBonus.BonusRegion);
                     if (battleBonus.BonusState == BonusState.Spawned) 
-                    {
                         player.UnshareEntity(battleBonus.Bonus);
-                        Console.WriteLine(battleBonus.BattleBonusType);
-                    }
                 }
                 foreach (BattlePlayer battlePlayer1 in MatchPlayers)
                     battlePlayer.Player.UnshareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));

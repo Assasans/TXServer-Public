@@ -1,4 +1,5 @@
 ﻿using System;
+using TXServer.Core.Battles;
 using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;
 
@@ -30,6 +31,19 @@ namespace TXServer.Core
                 if (player.User.EntityId == entityId)
                 {
                     return player;
+                }
+            }
+
+            return null;
+        }
+
+        public static Battle FindBattleById(long lobbyId, long battleId)
+        {
+            foreach (Battle battle in ServerConnection.BattlePool)
+            {
+                if (battle.BattleLobbyEntity.EntityId == lobbyId || battle.BattleEntity.EntityId == battleId)
+                {
+                    return battle;
                 }
             }
 
