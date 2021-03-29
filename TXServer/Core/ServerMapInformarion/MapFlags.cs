@@ -1,8 +1,10 @@
-﻿namespace TXServer.Core.ServerMapInformation
+﻿using System.Numerics;
+
+namespace TXServer.Core.ServerMapInformation
 {
     public class MapFlags
     {
-        public Flag Blue { get; set; }
-        public Flag Red { get; set; }
+        public Vector3 Red { get; set; }
+        public Vector3 Blue { get; set; }
     }
 }

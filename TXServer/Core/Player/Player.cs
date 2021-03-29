@@ -300,9 +300,8 @@ namespace TXServer.Core
 
         public override string ToString()
         {
-			//return $"{_EndPoint ??= Connection.Socket.RemoteEndPoint} ({UniqueId ?? ClientSession.EntityId.ToString()})";
 			return $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : "")})" : "")}";
 		}
-		private static EndPoint _EndPoint;
+		private EndPoint _EndPoint;
     }
 }

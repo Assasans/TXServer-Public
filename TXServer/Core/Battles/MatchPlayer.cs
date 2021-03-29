@@ -66,9 +66,9 @@ namespace TXServer.Core.Battles
         public void DealDamage(Player damager, HitTarget hitTarget, int damage)
         {
             if (damager.BattlePlayer.MatchPlayer.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.DAMAGE))
-                damage = (int)(damage * 1.5);
+                damage *= 2;
             if (SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.ARMOR))
-                damage = (int)(damage * 0.5);
+                damage /= 2;
 
             Tank.ChangeComponent<HealthComponent>(component =>
             {
@@ -154,7 +154,7 @@ namespace TXServer.Core.Battles
 
         public void ProcessKillStreak(int additiveKills, bool died, MatchPlayer killer)
         {
-            if (additiveKills >= 1)
+            if (additiveKills > 0)
             {
                 Incarnation.ChangeComponent<TankIncarnationKillStatisticsComponent>(component =>
                 {
@@ -164,7 +164,8 @@ namespace TXServer.Core.Battles
                         KillStreakScores.TryGetValue(component.Kills, out int streakScore);
                         if (component.Kills > 40) streakScore = 70;
                         Player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(statistics => statistics.ScoreWithoutBonuses += streakScore);
-                        Player.SendEvent(new KillStreakEvent(streakScore), Incarnation);
+                        if (component.Kills < 5 || component.Kills % 5 == 0)
+                            Player.SendEvent(new KillStreakEvent(streakScore), Incarnation);
                         if (component.Kills > 2)
                             Player.SendEvent(new VisualScoreStreakEvent(GetScoreWithPremium(streakScore)), BattleUser);
                     }
@@ -189,13 +190,14 @@ namespace TXServer.Core.Battles
         public void UpdateStatistics(int additiveScore, int additiveKills, int additiveKillAssists, int additiveDeath, MatchPlayer killer)
         {
             // TODO: rank up effect/system
-            RoundUser.ChangeComponent<RoundUserStatisticsComponent>(component =>
+            Player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(component =>
             {
-                component.ScoreWithoutBonuses += additiveScore;
-                component.Kills += additiveKills;
-                component.KillAssists += additiveKillAssists;
-                component.Deaths += additiveDeath;
+                component.ScoreWithoutBonuses = Math.Clamp(component.ScoreWithoutBonuses + additiveScore, 0, int.MaxValue);
+                component.Kills = Math.Clamp(component.Kills + additiveKills, 0, int.MaxValue);
+                component.KillAssists = Math.Clamp(component.KillAssists + additiveKillAssists, 0, int.MaxValue);
+                component.Deaths = Math.Clamp(component.Deaths + additiveDeath, 0, int.MaxValue);
             });
+
             UserResult.Kills += additiveKills;
             UserResult.KillAssists += additiveKillAssists;
             UserResult.Deaths += additiveDeath;
@@ -228,7 +230,10 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            LastSpawnPoint = SpawnCoordinates.Where(spawnCoordinate => spawnCoordinate.Number != LastSpawnPoint.Number).ElementAt(new Random().Next(1, SpawnCoordinates.Count - 1));
+            if (SpawnCoordinates.Count == 1)
+                LastSpawnPoint = SpawnCoordinates[0];
+            else
+                LastSpawnPoint = SpawnCoordinates.Where(spawnCoordinate => spawnCoordinate.Number != LastSpawnPoint.Number).ElementAt(new Random().Next(SpawnCoordinates.Count - 1));
 
             /* in case you want to set another json for testing a SINGLE spawn coordinate  
             string CoordinatesJson = File.ReadAllText("YourPath\\test.json");
@@ -258,10 +263,14 @@ namespace TXServer.Core.Battles
         {
             if (SelfDestructionTime != null && DateTime.Now > SelfDestructionTime && Battle.BattleState != BattleState.Ended)
             {
-                TankState = TankState.Dead;
-                Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
+                if (TankState != TankState.Dead)
+                {
+                    TankState = TankState.Dead;
+                    Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
+                    UpdateStatistics(-10, -1, 0, 1, null);
+                }
+
                 SelfDestructionTime = null;
-                UpdateStatistics(0, 0, 0, additiveDeath: 1, null);
             }
 
             // switch state after it's ended

@@ -33,8 +33,8 @@ namespace TXServer.Core.Battles
                 base.SetupBattle();
                 Flags = new()
                 {
-                    { RedTeamEntity, new Flag(Battle.CurrentMapInfo.Flags.Red.Position, RedTeamEntity, Battle) },
-                    { BlueTeamEntity, new Flag(Battle.CurrentMapInfo.Flags.Blue.Position, BlueTeamEntity, Battle) }
+                    { RedTeamEntity, new Flag(Battle.CurrentMapInfo.Flags.Red, RedTeamEntity, Battle) },
+                    { BlueTeamEntity, new Flag(Battle.CurrentMapInfo.Flags.Blue, BlueTeamEntity, Battle) }
                 };
             }
 

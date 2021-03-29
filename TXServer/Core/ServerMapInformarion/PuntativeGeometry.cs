@@ -6,8 +6,6 @@ namespace TXServer.Core.ServerMapInformation
     {
         public int Number { get; set; }
         public Vector3 Position { get; set; }
-        public Quaternion Rotation { get; set; }
         public Vector3 Size { get; set; }
-        public Vector3 Center { get; set; }
     }
 }

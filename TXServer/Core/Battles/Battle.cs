@@ -265,9 +265,9 @@ namespace TXServer.Core.Battles
                     if (battleBonus.BonusState == BonusState.Spawned) 
                         player.UnshareEntity(battleBonus.Bonus);
                 }
-                foreach (BattlePlayer battlePlayer1 in MatchPlayers)
+                foreach (BattlePlayer battlePlayer1 in MatchPlayers.Where(x => x != battlePlayer))
                     battlePlayer.Player.UnshareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
-                foreach (SupplyEffect supplyEffect in battlePlayer.MatchPlayer.SupplyEffects)
+                foreach (SupplyEffect supplyEffect in battlePlayer.MatchPlayer.SupplyEffects.ToArray())
                     supplyEffect.Remove();
             }
 
@@ -348,7 +348,7 @@ namespace TXServer.Core.Battles
         public void UpdateScore(Entity team, int additiveScore)
         {
             var scoreComponent = team.GetComponent<TeamScoreComponent>();
-            scoreComponent.Score += additiveScore;
+            scoreComponent.Score = Math.Clamp(scoreComponent.Score + additiveScore, 0, int.MaxValue);
             team.ChangeComponent(scoreComponent);
             MatchPlayers.Select(x => x.Player).SendEvent(new RoundScoreUpdatedEvent(), RoundEntity);
         }
@@ -363,7 +363,6 @@ namespace TXServer.Core.Battles
                 {
                     if ((bonusType != BonusType.GOLD && battleBonus.BonusState != BonusState.Spawned) || (bonusType == BonusType.GOLD && battleBonus.BonusState == BonusState.Unused))
                         suppliesIndex.Add(index);
-                        
                 }
                 ++index;
             }
