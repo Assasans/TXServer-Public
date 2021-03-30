@@ -5,9 +5,6 @@ using System.Numerics;
 using TXServer.Core.Battles;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle.Tank;
-using TXServer.ECSSystem.Events.Battle;
-using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.Core.Commands
 {
@@ -18,8 +15,8 @@ namespace TXServer.Core.Commands
 			if (!message.StartsWith('/')) return null;
 			string[] args = message.TrimStart('/').Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-			bool isAdmin = player.User.HasComponent<UserAdminComponent>();
-			bool isTester = isAdmin || player.User.HasComponent<ClosedBetaQuestAchievementComponent>();
+			bool isAdmin = player.Data.Admin;
+			bool isTester = isAdmin || player.Data.Beta;
 
 			bool playerInBattle = player.BattlePlayer != null;
 			bool playerInMatch = playerInBattle && player.BattlePlayer.MatchPlayer != null;
@@ -29,6 +26,26 @@ namespace TXServer.Core.Commands
 				// admin only commands
 				switch (args[0])
                 {
+					case "cheat":
+						if (!playerInMatch) return null;
+						switch (args[1])
+                        {
+							case "ARMOR": case "DAMAGE": case "REPAIR": case "SPEED":
+								bool cheatActivated = player.BattlePlayer.MatchPlayer.EnableCheat(args[1], args[2]);
+								if (cheatActivated) return "Cheat activated";
+								else return "Cheat not found";
+							case "disable":
+								player.BattlePlayer.MatchPlayer.DisableCheats();
+								return "Cheat(s) disabled";
+							default:
+								return null;
+						}
+					case "open":
+						if (!playerInMatch) return null;
+						if (player.BattlePlayer.Battle.ForceOpen)
+							return "Already opened";
+						player.BattlePlayer.Battle.ForceOpen = true;
+						return "Opened";
 					case "positionInfo":
 						if (!playerInMatch) return null;
 						Vector3 tankPosition = player.BattlePlayer.MatchPlayer.TankPosition;

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
@@ -18,7 +16,6 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 			Core.Battles.Battle battle = player.BattlePlayer.Battle;
 			BattleBonus battleBonus = battle.BattleBonuses.Single(b => b.Bonus == bonus);
 			BonusType bonusType = battleBonus.BattleBonusType;
-			SupplyEffect supplyEffect = null;
 
 			if (battleBonus.BonusState != BonusState.Spawned)
 				return;
@@ -37,7 +34,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 					battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
 					break;
 				default:
-					supplyEffect = new SupplyEffect(bonusType, player.BattlePlayer.MatchPlayer);
+					_ = new SupplyEffect(bonusType, player.BattlePlayer.MatchPlayer, cheat:false);
 					break;
 			}
 

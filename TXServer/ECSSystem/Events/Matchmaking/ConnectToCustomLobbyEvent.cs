@@ -14,18 +14,22 @@ namespace TXServer.ECSSystem.Events.Battle
 			Core.Battles.Battle battle = Server.FindBattleById(lobbyId: LobbyId, battleId: 0);
 
 			// admins can enter with the "last" code the newest custom lobby
-			if (player.Data.Admin) {
+			if (player.Data.Admin || player.Data.Beta) {
 				switch (LobbyId)
 				{
-					// soft join latest open lobby
+					// soft join latest open (custom) lobby
 					case 1211920:
 						battle = ServerConnection.BattlePool.LastOrDefault(b => ((b.TypeHandler as CustomBattleHandler)?.IsOpen).GetValueOrDefault());
 						break;
-					// brute join latest lobby
+					// brute join latest (custom) lobby
 					case 21211920:
 						battle = ServerConnection.BattlePool.LastOrDefault(b => !b.IsMatchMaking);
 						break;
 				}
+
+				// brute join specific lobby at index
+				if (LobbyId < ServerConnection.BattlePool.Count)
+					battle = ServerConnection.BattlePool[(int)LobbyId];
 			}
 
 			if (battle != null)

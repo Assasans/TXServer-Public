@@ -19,7 +19,7 @@ namespace TXServer.ECSSystem.Events
         }
 
         public HashSet<long> AcceptedFriendsIds { get; set; } = new HashSet<long>();
-        public HashSet<long> IncommingFriendsIds { get; set; }= new HashSet<long>();
+        public HashSet<long> IncommingFriendsIds { get; set; } = new HashSet<long>();
         public HashSet<long> OutgoingFriendsIds { get; set; } = new HashSet<long>();
     }
 }

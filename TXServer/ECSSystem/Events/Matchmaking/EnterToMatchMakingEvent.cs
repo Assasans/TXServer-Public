@@ -2,7 +2,6 @@
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
-using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Time;
@@ -28,8 +27,7 @@ namespace TXServer.ECSSystem.Events.MatchMaking
             }
             if (!modeValid) throw new ArgumentException($"Invalid mode entity: {mode.TemplateAccessor.Template.GetType().Name} ({mode.TemplateAccessor.ConfigPath})");
 
-            CommandManager.SendCommands(player,
-                new SendEventCommand(new EnteredToMatchMakingEvent(), mode));
+            player.SendEvent(new EnteredToMatchMakingEvent(), mode);
 
             Core.Battles.Battle battle = ServerConnection.BattlePool.OrderBy(b => b.AllBattlePlayers).LastOrDefault(b => isValidToEnter(b));
             if (battle == null)
@@ -46,7 +44,7 @@ namespace TXServer.ECSSystem.Events.MatchMaking
                 return false;
             else if (battle.BattleState == BattleState.Running)
             {
-                if (battle.CountdownTimer >= battle.BattleEntity.GetComponent<TimeLimitComponent>().TimeLimitSec - 180)
+                if (battle.CountdownTimer >= battle.BattleEntity.GetComponent<TimeLimitComponent>().TimeLimitSec - 180 || battle.ForceOpen)
                     return true;
                 else
                     return false;

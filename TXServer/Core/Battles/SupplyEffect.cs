@@ -8,15 +8,17 @@ using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Components.Battle.Chassis;
 using System.Linq;
 using TXServer.ECSSystem.Components.Battle;
+using TXServer.ECSSystem.Components.Battle.Time;
 
 namespace TXServer.Core.Battles
 {
     public class SupplyEffect
     {
-        public SupplyEffect(BonusType bonusType, MatchPlayer matchPlayer)
+        public SupplyEffect(BonusType bonusType, MatchPlayer matchPlayer, bool cheat)
         {
             BonusType = bonusType;
             MatchPlayer = matchPlayer;
+            Cheat = cheat;
             StopTime = GetStopTime();
 
             SupplyEffect existingSupplyEffect = matchPlayer.SupplyEffects.SingleOrDefault(supplyEffect => supplyEffect.BonusType == bonusType);
@@ -43,7 +45,11 @@ namespace TXServer.Core.Battles
                     SupplyEffectEntity = HealingEffectTemplate.CreateEntity(MatchPlayer.Tank);
                     break;
                 case BonusType.SPEED:
-                    MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.Speed = (float)(component.Speed * 1.5));
+                    MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component =>
+                    {
+                        if (cheat) component.Speed = float.MaxValue;
+                        else component.Speed = (float)(component.Speed * 1.5);
+                    });
                     SupplyEffectEntity = TurboSpeedEffectTemplate.CreateEntity(MatchPlayer.Tank);
                     break;
             }
@@ -56,12 +62,19 @@ namespace TXServer.Core.Battles
         {
             MatchPlayer.SupplyEffects.Remove(this);
             MatchPlayer.Battle.MatchPlayers.Select(x => x.Player).UnshareEntity(SupplyEffectEntity);
+
             if (BonusType == BonusType.SPEED)
-                MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.Speed = (float)(component.Speed / 1.5));
+            {
+                // todo: load from configs
+                MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.Speed = 9.967f);
+            }
         }
 
         private DateTime GetStopTime()
         {
+            if (Cheat)
+                return DateTime.Now.AddSeconds(MatchPlayer.Battle.BattleEntity.GetComponent<TimeLimitComponent>().TimeLimitSec);
+
             // todo: read this from configs   
             if (BonusType == BonusType.REPAIR)
                 return DateTime.Now.AddSeconds(3);
@@ -72,6 +85,7 @@ namespace TXServer.Core.Battles
         public BonusType BonusType { get; set; }
         public Entity SupplyEffectEntity { get; set; }
         public DateTime StopTime { get; set; }
+        public bool Cheat { get; set; }
         private MatchPlayer MatchPlayer { get; set; }
     }
 }

@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using TXServer.Core;
+﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -12,7 +12,14 @@ namespace TXServer.ECSSystem.Events
         {
             foreach(long userId in InvitedUserIds)
             {
-                Player remotePlayer = Server.Instance.Connection.Pool.Single(tempPlayer => tempPlayer.User != null && tempPlayer.User.EntityId == userId);
+                Player remotePlayer = Server.Instance.FindPlayerById(userId);
+
+                if (remotePlayer != null)
+                {
+                    remotePlayer.ShareEntity(player.User);
+                    remotePlayer.ShareEntity(InviteFriendToBattleNotificationTemplate.CreateEntity(player, entity));
+                    remotePlayer.SendEvent(new ShowNotificationGroupEvent(1), entity);
+                }
             }
         }
 

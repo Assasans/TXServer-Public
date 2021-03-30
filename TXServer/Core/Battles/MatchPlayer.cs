@@ -214,6 +214,32 @@ namespace TXServer.Core.Battles
             else return score * 2;
         }
 
+        public bool EnableCheat(string type, string target)
+        {
+            bool successfullyParsed = Enum.TryParse(type, out BonusType bonusType);
+
+            if (successfullyParsed)
+            {
+                if (target == "all")
+                {
+                    foreach (BattlePlayer battlePlayer in Battle.MatchPlayers)
+                        _ = new SupplyEffect(bonusType, battlePlayer.MatchPlayer, cheat:true);
+                }
+                else
+                    _ = new SupplyEffect(bonusType, this, cheat:true);
+                return true;
+            }
+                
+            return false;
+        }
+
+        public void DisableCheats()
+        {
+            foreach (BattlePlayer battlePlayer in Battle.MatchPlayers)
+                foreach (SupplyEffect supplyEffect in SupplyEffects.Where(supply => supply.Cheat))
+                    supplyEffect.Remove();
+        }
+
         private void PrepareForRespawning()
         {
             Tank.TryRemoveComponent<TankVisibleStateComponent>();

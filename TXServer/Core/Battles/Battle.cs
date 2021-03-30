@@ -145,16 +145,21 @@ namespace TXServer.Core.Battles
         {
             if (!Params.DisabledModules)
             {
-                var battleModesBonusRegionsSpawnPoints = new Dictionary<BattleMode, BonusList> {
+                var modeBonusRegions = new Dictionary<BattleMode, BonusList> {
                     { BattleMode.DM, CurrentMapInfo.BonusRegions.Deathmatch },
                     { BattleMode.CTF, CurrentMapInfo.BonusRegions.CaptureTheFlag },
                     { BattleMode.TDM, CurrentMapInfo.BonusRegions.TeamDeathmatch }};
+                if (modeBonusRegions[Params.BattleMode] == null)
+                {
+                    BattleMode newMode = modeBonusRegions.Keys.First(mode => modeBonusRegions[mode] != null && mode != BattleMode.DM);
+                    modeBonusRegions[Params.BattleMode] = modeBonusRegions[newMode];
+                }
                 var bonusTypeSpawnPoints = new Dictionary<BonusType, IList<Bonus>> {
-                    { BonusType.ARMOR,  battleModesBonusRegionsSpawnPoints[Params.BattleMode].Armor },
-                    { BonusType.DAMAGE,  battleModesBonusRegionsSpawnPoints[Params.BattleMode].Damage },
-                    { BonusType.GOLD,  battleModesBonusRegionsSpawnPoints[Params.BattleMode].Gold },
-                    { BonusType.REPAIR,  battleModesBonusRegionsSpawnPoints[Params.BattleMode].Repair },
-                    { BonusType.SPEED,  battleModesBonusRegionsSpawnPoints[Params.BattleMode].Speed }};
+                    { BonusType.ARMOR,  modeBonusRegions[Params.BattleMode].Armor },
+                    { BonusType.DAMAGE,  modeBonusRegions[Params.BattleMode].Damage },
+                    { BonusType.GOLD,  modeBonusRegions[Params.BattleMode].Gold },
+                    { BonusType.REPAIR,  modeBonusRegions[Params.BattleMode].Repair },
+                    { BonusType.SPEED,  modeBonusRegions[Params.BattleMode].Speed }};
 
                 BattleBonuses.Clear();
                 foreach (BonusType bonusType in Enum.GetValues(typeof(BonusType)))
@@ -405,6 +410,7 @@ namespace TXServer.Core.Battles
         public Entity MapEntity { get; private set; }
 
         public bool ForceStart { get; set; } = false;
+        public bool ForceOpen { get; set; } = false;
         public int WarmUpSeconds { get; set; }
         private bool IsWarmUpCompleted { get; set; }
 
