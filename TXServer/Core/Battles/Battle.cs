@@ -397,7 +397,7 @@ namespace TXServer.Core.Battles
             { BattleMode.CTF, typeof(CTFTemplate) },
         };
 
-        private static readonly Dictionary<GravityType, float> GravityTypes = new Dictionary<GravityType, float>
+        public readonly Dictionary<GravityType, float> GravityTypes = new Dictionary<GravityType, float>
         {
             { GravityType.EARTH, 9.81f },
             { GravityType.SUPER_EARTH, 30 },

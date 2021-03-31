@@ -16,7 +16,8 @@ namespace TXServer.ECSSystem.Events
 
                 if (remotePlayer != null)
                 {
-                    remotePlayer.ShareEntity(player.User);
+                    if (!remotePlayer.EntityList.Contains(player.User))
+                        remotePlayer.ShareEntity(player.User);
                     remotePlayer.ShareEntity(InviteFriendToBattleNotificationTemplate.CreateEntity(player, entity));
                     remotePlayer.SendEvent(new ShowNotificationGroupEvent(1), entity);
                 }

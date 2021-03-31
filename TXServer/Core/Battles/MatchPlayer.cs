@@ -7,6 +7,7 @@ using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
+using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Round;
@@ -214,31 +215,6 @@ namespace TXServer.Core.Battles
             else return score * 2;
         }
 
-        public bool EnableCheat(string type, string target)
-        {
-            bool successfullyParsed = Enum.TryParse(type, out BonusType bonusType);
-
-            if (successfullyParsed)
-            {
-                if (target == "all")
-                {
-                    foreach (BattlePlayer battlePlayer in Battle.MatchPlayers)
-                        _ = new SupplyEffect(bonusType, battlePlayer.MatchPlayer, cheat:true);
-                }
-                else
-                    _ = new SupplyEffect(bonusType, this, cheat:true);
-                return true;
-            }
-                
-            return false;
-        }
-
-        public void DisableCheats()
-        {
-            foreach (BattlePlayer battlePlayer in Battle.MatchPlayers)
-                foreach (SupplyEffect supplyEffect in SupplyEffects.Where(supply => supply.Cheat))
-                    supplyEffect.Remove();
-        }
 
         private void PrepareForRespawning()
         {
@@ -280,6 +256,9 @@ namespace TXServer.Core.Battles
             if (KeepDisabled)
                 Tank.TryRemoveComponent(StateComponents[_TankState]);
             Tank.TryRemoveComponent<SelfDestructionComponent>();
+
+            foreach (SupplyEffect supplyEffect in SupplyEffects.ToArray())
+                supplyEffect.Remove();
 
             if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
             Weapon.TryRemoveComponent<ShootableComponent>();
@@ -348,7 +327,13 @@ namespace TXServer.Core.Battles
             foreach (SupplyEffect supplyEffect in SupplyEffects.ToArray())
             {
                 if (DateTime.Now > supplyEffect.StopTime)
-                    supplyEffect.Remove();
+                {
+                    if (supplyEffect.Cheat)
+                        supplyEffect.ExtendTime();
+                    else
+                        supplyEffect.Remove();
+                }
+                    
             }
         }
 
@@ -397,8 +382,6 @@ namespace TXServer.Core.Battles
                                     flag.Drop(false);
                             }
                         }
-                        foreach (SupplyEffect supplyEffect in SupplyEffects.ToArray())
-                            supplyEffect.Remove();
                         break;
                 }
 

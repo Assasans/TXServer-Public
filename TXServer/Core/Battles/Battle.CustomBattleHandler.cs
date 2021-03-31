@@ -3,12 +3,14 @@ using System.Linq;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.EntityTemplates;
+using TXServer.ECSSystem.Events;
 
 namespace TXServer.Core.Battles
 {
     public partial class Battle
     {
-        public class CustomBattleHandler : IBattleTypeHandler
+        public class 
+            CustomBattleHandler : IBattleTypeHandler
         {
             public Battle Battle { get; init; }
 
@@ -20,6 +22,7 @@ namespace TXServer.Core.Battles
             private Player _Owner;
 
             public bool IsOpen { get; private set; }
+            public bool HackBattle { get; set; }
 
             public void OpenBattle()
             {
@@ -30,7 +33,7 @@ namespace TXServer.Core.Battles
             public void SetupBattle()
             {
                 (Battle.MapEntity, _) = Battle.ConvertMapParams(Battle.Params, Battle.IsMatchMaking);
-                Battle.BattleLobbyEntity = CustomBattleLobbyTemplate.CreateEntity(Battle.Params, Battle.MapEntity, GravityTypes[Battle.Params.Gravity], Owner);
+                Battle.BattleLobbyEntity = CustomBattleLobbyTemplate.CreateEntity(Battle.Params, Battle.MapEntity, Battle.GravityTypes[Battle.Params.Gravity], Owner);
 
                 Battle.BattleState = BattleState.CustomNotStarted;
             }

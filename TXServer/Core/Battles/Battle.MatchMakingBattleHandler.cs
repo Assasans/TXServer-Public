@@ -42,7 +42,7 @@ namespace TXServer.Core.Battles
                 (Battle.MapEntity, Battle.Params.MaxPlayers) = Battle.ConvertMapParams(Battle.Params, Battle.IsMatchMaking);
                 Battle.WarmUpSeconds = 60; // TODO: 1min in Bronze league, 1,5min in Silver, Gold & Master leagues
 
-                Battle.BattleLobbyEntity = MatchMakingLobbyTemplate.CreateEntity(Battle.Params, Battle.MapEntity, GravityTypes[Battle.Params.Gravity]);
+                Battle.BattleLobbyEntity = MatchMakingLobbyTemplate.CreateEntity(Battle.Params, Battle.MapEntity, Battle.GravityTypes[Battle.Params.Gravity]);
             }
 
             public void Tick()
