@@ -22,15 +22,15 @@ namespace TXServer.ECSSystem.Events.Battle
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
             foreach (HitTarget hitTarget in Targets)
             {
-                BattlePlayer hitPlayer = battle.MatchPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
+                BattlePlayer victim = battle.MatchPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
 
                 if (battle.Params.BattleMode != BattleMode.DM)
                 {
-                    if (hitPlayer.Player.User.GetComponent<TeamColorComponent>().TeamColor == player.User.GetComponent<TeamColorComponent>().TeamColor)
+                    if (victim.Player.User.GetComponent<TeamColorComponent>().TeamColor == player.User.GetComponent<TeamColorComponent>().TeamColor)
                     {
                         if (weapon.TemplateAccessor.Template.GetType() == typeof(IsisBattleItemTemplate))
                         {
-                            hitPlayer.MatchPlayer.IsisHeal(player, hitTarget);
+                            Damage.IsisHeal(victim.MatchPlayer, player.BattlePlayer.MatchPlayer, hitTarget);
                             return;
                         }
                         if (!battle.Params.FriendlyFire)
@@ -38,7 +38,7 @@ namespace TXServer.ECSSystem.Events.Battle
                     } 
                 }
 
-                hitPlayer.MatchPlayer.Tank.ChangeComponent<TemperatureComponent>(component =>
+                victim.MatchPlayer.Tank.ChangeComponent<TemperatureComponent>(component =>
                 {
                     component.Temperature += weapon.TemplateAccessor.Template switch
                     {
@@ -48,7 +48,7 @@ namespace TXServer.ECSSystem.Events.Battle
                     };
                 });
 
-                hitPlayer.MatchPlayer.DealDamage(player, hitTarget, 900);
+                Damage.DealDamage(victim.MatchPlayer, player.BattlePlayer.MatchPlayer, hitTarget, 900);
             }
         }
 

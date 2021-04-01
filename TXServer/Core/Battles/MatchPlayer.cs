@@ -17,7 +17,6 @@ using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Score;
-using TXServer.ECSSystem.Events.Battle.VisualScore;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -64,133 +63,8 @@ namespace TXServer.Core.Battles
             { TankState.Dead, typeof(TankDeadStateComponent) },
         };
 
-        public void DealDamage(Player damager, HitTarget hitTarget, int damage)
-        {
-            if (damager.BattlePlayer.MatchPlayer.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.DAMAGE))
-                damage *= 2;
-            if (SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.ARMOR))
-                damage /= 2;
-
-            Tank.ChangeComponent<HealthComponent>(component =>
-            {
-                if (component.CurrentHealth >= 0)
-                    component.CurrentHealth -= damage;
-
-                if (component.CurrentHealth <= 0)
-                {
-                    TankState = TankState.Dead;
-
-                    if (damager != Player)
-                    {
-                        int killScore = 10;
-                        Battle.MatchPlayers.Select(x => x.Player).SendEvent(new KillEvent(damager.CurrentPreset.Weapon, hitTarget.Entity), damager.BattlePlayer.MatchPlayer.BattleUser);
-                        damager.SendEvent(new VisualScoreKillEvent(Player.User.GetComponent<UserUidComponent>().Uid, Player.User.GetComponent<UserRankComponent>().Rank, damager.BattlePlayer.MatchPlayer.GetScoreWithPremium(killScore)), damager.BattlePlayer.MatchPlayer.BattleUser);
-                        damager.BattlePlayer.MatchPlayer.UpdateStatistics(killScore, additiveKills:1, 0, 0, null);
-                    }
-                    else
-                        Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
-                    UpdateStatistics(0, 0, 0, 1, damager.BattlePlayer.MatchPlayer);
-
-                    if (Battle.ModeHandler is TDMHandler)
-                        Battle.UpdateScore(damager.BattlePlayer.Team, 1);
-
-                    damager.BattlePlayer.MatchPlayer.UserResult.Damage += damage;
-
-                    foreach (KeyValuePair<MatchPlayer, int> assist in damageAssisters.Where(assist => assist.Key != damager.BattlePlayer.MatchPlayer && assist.Key != this))
-                    {
-                        int assistScore = 5;
-                        assist.Key.UpdateStatistics(additiveScore:assistScore, 0, additiveKillAssists:1, 0, null);
-                        int percent = (int)(assist.Value / component.MaxHealth * 100);
-                        assist.Key.Player.SendEvent(new VisualScoreAssistEvent(Player.User.GetComponent<UserUidComponent>().Uid, percent, assist.Key.GetScoreWithPremium(assistScore)), assist.Key.BattleUser);
-                    }
-                    damageAssisters.Clear();
-                }
-                else
-                {
-                    if (damageAssisters.ContainsKey(damager.BattlePlayer.MatchPlayer))
-                        damageAssisters[damager.BattlePlayer.MatchPlayer] += damage;
-                    else
-                        damageAssisters.Add(damager.BattlePlayer.MatchPlayer, damage);
-                }
-                
-                damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false, false), Tank);
-                Battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), Tank);
-            });
-        }
-
-        public void IsisHeal(Player healer, HitTarget hitTarget)
-        {
-            bool healed = false;
-            Tank.ChangeComponent<TemperatureComponent>(component =>
-            {
-                if (component.Temperature.CompareTo(0) < 0)
-                    component.Temperature = 0;
-                else if (component.Temperature > 0)
-                    component.Temperature -= 2;
-                else if (component.Temperature < 0)
-                    component.Temperature += 2;
-            });
-
-            Tank.ChangeComponent<HealthComponent>(component =>
-            {
-                int healingPerSecond = 415;
-                if (component.CurrentHealth != component.MaxHealth)
-                {
-                    healed = true;
-                    if (component.MaxHealth - component.CurrentHealth > healingPerSecond)
-                        component.CurrentHealth += healingPerSecond;
-                    else
-                        component.CurrentHealth = component.MaxHealth;
-                }
-            });
-            
-            if (healed)
-            {
-                Player.BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), Tank);
-                healer.SendEvent(new DamageInfoEvent(900, hitTarget.LocalHitPoint, false, true), Tank);
-                healer.SendEvent(new VisualScoreHealEvent(healer.BattlePlayer.MatchPlayer.GetScoreWithPremium(4)), healer.BattlePlayer.MatchPlayer.BattleUser);
-                healer.BattlePlayer.MatchPlayer.UpdateStatistics(additiveScore: 4, 0, 0, 0, null);
-            }
-        }
-
-        public void ProcessKillStreak(int additiveKills, bool died, MatchPlayer killer)
-        {
-            if (additiveKills > 0)
-            {
-                Incarnation.ChangeComponent<TankIncarnationKillStatisticsComponent>(component =>
-                {
-                    component.Kills += additiveKills;
-                    if (component.Kills >= 2)
-                    {
-                        KillStreakScores.TryGetValue(component.Kills, out int streakScore);
-                        if (component.Kills > 40) streakScore = 70;
-                        Player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(statistics => statistics.ScoreWithoutBonuses += streakScore);
-                        if (component.Kills < 5 || component.Kills % 5 == 0)
-                            Player.SendEvent(new KillStreakEvent(streakScore), Incarnation);
-                        if (component.Kills > 2)
-                            Player.SendEvent(new VisualScoreStreakEvent(GetScoreWithPremium(streakScore)), BattleUser);
-                    }
-                });
-            }
-
-            if (died)
-            {
-                if (killer != null)
-                {
-                    Incarnation.ChangeComponent<TankIncarnationKillStatisticsComponent>(component =>
-                    {
-                        if (component.Kills >= 2)
-                            killer.Player.SendEvent(new StreakTerminationEvent(Player.User.GetComponent<UserUidComponent>().Uid), killer.BattleUser);
-                        component.Kills = 0;
-                    });
-                }
-            }
-
-        }
-
         public void UpdateStatistics(int additiveScore, int additiveKills, int additiveKillAssists, int additiveDeath, MatchPlayer killer)
         {
-            // TODO: rank up effect/system
             Player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(component =>
             {
                 component.ScoreWithoutBonuses = Math.Clamp(component.ScoreWithoutBonuses + additiveScore, 0, int.MaxValue);
@@ -203,7 +77,7 @@ namespace TXServer.Core.Battles
             UserResult.KillAssists += additiveKillAssists;
             UserResult.Deaths += additiveDeath;
 
-            ProcessKillStreak(additiveKills, additiveDeath > 0, killer);
+            Damage.ProcessKillStreak(additiveKills, additiveDeath > 0, this, killer);
             Battle.MatchPlayers.Select(x => x.Player).SendEvent(new RoundUserStatisticsUpdatedEvent(), RoundUser);
             Battle.SortRoundUsers();
             Player.CheckRankUp();
@@ -214,7 +88,6 @@ namespace TXServer.Core.Battles
             if (Player.User.GetComponent<PremiumAccountBoostComponent>() == null) return score;
             else return score * 2;
         }
-
 
         private void PrepareForRespawning()
         {
@@ -410,12 +283,10 @@ namespace TXServer.Core.Battles
         public Vector3 TankPosition { get; set; }
         public bool Paused { get; set; } = false;
         public List<SupplyEffect> SupplyEffects { get; } = new();
-        private Dictionary<MatchPlayer, int> damageAssisters { get; set; } = new();
+        public Dictionary<MatchPlayer, int> DamageAssisters { get; set; } = new();
         public int AlreadyAddedExperience { get; set; } = 0;
 
         private IList<SpawnPoint> SpawnCoordinates;
         public SpawnPoint LastSpawnPoint { get; set; } = new SpawnPoint();
-
-        private readonly Dictionary<int, int> KillStreakScores = new() {{2,0},{3,5},{4,7},{5,10},{10,10},{15,10},{20,20},{25,30},{30,40},{35,50},{40,60}};
     }
 }

@@ -4,10 +4,7 @@ using System.Linq;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Round;
-using TXServer.ECSSystem.Components.Battle.Tank;
-using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.Events.Matchmaking;
@@ -187,13 +184,14 @@ namespace TXServer.Core.Battles
                 WaitingToJoinPlayers.Remove(battlePlayer);
                 battlePlayer.User.RemoveComponent<MatchMakingUserComponent>();
 
-                if (Battle.BattleState != BattleState.Ended && Battle.EnemyCountFor(battlePlayer) > 0)
+                if (battlePlayer.Player.IsInMatch() && Battle.EnemyCountFor(battlePlayer) > 0)
                 {
                     // TODO: add deserter status only when player leaves 2 out of 4 last battles prematurely & conditions above
-                    BattleLeaveCounterComponent battleLeaveCounterComponent = battlePlayer.Player.User.GetComponent<BattleLeaveCounterComponent>();
-                    battleLeaveCounterComponent.Value += 1;
-                    battleLeaveCounterComponent.NeedGoodBattles += 2;
-                    battlePlayer.Player.User.ChangeComponent(battleLeaveCounterComponent);
+                    battlePlayer.Player.User.ChangeComponent<BattleLeaveCounterComponent>(component =>
+                    {
+                        component.Value += 1;
+                        component.NeedGoodBattles += 2;
+                    });
                 }
             }
         }

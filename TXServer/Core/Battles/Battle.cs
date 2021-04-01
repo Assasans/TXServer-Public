@@ -123,8 +123,8 @@ namespace TXServer.Core.Battles
 
         private void RemovePlayer(BattlePlayer battlePlayer)
         {
-            ModeHandler.RemovePlayer(battlePlayer);
             TypeHandler.OnPlayerRemoved(battlePlayer);
+            ModeHandler.RemovePlayer(battlePlayer);
 
             battlePlayer.User.RemoveComponent<UserEquipmentComponent>();
             battlePlayer.User.RemoveComponent<BattleLobbyGroupComponent>();
@@ -352,6 +352,8 @@ namespace TXServer.Core.Battles
 
         public void UpdateScore(Entity team, int additiveScore)
         {
+            if (BattleState != BattleState.Running) return;
+
             var scoreComponent = team.GetComponent<TeamScoreComponent>();
             scoreComponent.Score = Math.Clamp(scoreComponent.Score + additiveScore, 0, int.MaxValue);
             team.ChangeComponent(scoreComponent);
