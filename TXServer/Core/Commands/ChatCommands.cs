@@ -47,6 +47,8 @@ namespace TXServer.Core.Commands
 					{
 						case "cheat":
 							if (!player.IsInMatch()) return null;
+							if (player.BattlePlayer.MatchPlayer.TankState != TankState.Active) return "Only possible with an active tank";
+
 							switch (args[1])
 							{
 								case "ARMOR":

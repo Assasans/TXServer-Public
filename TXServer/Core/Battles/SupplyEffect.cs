@@ -8,7 +8,6 @@ using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Components.Battle.Chassis;
 using System.Linq;
 using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Components.Battle.Time;
 
 namespace TXServer.Core.Battles
 {
@@ -16,6 +15,8 @@ namespace TXServer.Core.Battles
     {
         public SupplyEffect(BonusType bonusType, MatchPlayer matchPlayer, bool cheat)
         {
+            if (matchPlayer.TankState != TankState.Active) return;
+
             BonusType = bonusType;
             MatchPlayer = matchPlayer;
             Cheat = cheat;
