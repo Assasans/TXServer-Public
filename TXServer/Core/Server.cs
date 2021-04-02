@@ -28,7 +28,7 @@ namespace TXServer.Core
         {
             foreach (Player player in Connection.Pool)
             {
-                if (player.User.EntityId == entityId)
+                if (player.IsLoggedIn() && player.User.EntityId == entityId)
                 {
                     return player;
                 }

@@ -18,7 +18,9 @@ namespace TXServer.ECSSystem.Events
                 BattlePlayer toUnloadBattlePlayer = toUnloadPlayer != null ? toUnloadPlayer.BattlePlayer : null;
 
                 if (player.IsInBattleLobby() && !player.BattlePlayer.Battle.AllBattlePlayers.ToList().Contains(toUnloadBattlePlayer))
-                    player.UnshareEntity(toUnload);
+                    return;
+                
+                player.UnshareEntity(toUnload);
             }
         }
 
