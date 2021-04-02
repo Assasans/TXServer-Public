@@ -17,7 +17,7 @@ namespace TXServer.ECSSystem.Events
                 Player toUnloadPlayer = Server.Instance.FindPlayerById(toUnload.EntityId);
                 BattlePlayer toUnloadBattlePlayer = toUnloadPlayer != null ? toUnloadPlayer.BattlePlayer : null;
 
-                if (player.IsInBattleLobby() && !player.BattlePlayer.Battle.AllBattlePlayers.ToList().Contains(toUnloadBattlePlayer))
+                if (player.IsInBattleLobby() && player.BattlePlayer.Battle.AllBattlePlayers.ToList().Contains(toUnloadBattlePlayer))
                     return;
                 
                 player.UnshareEntity(toUnload);
