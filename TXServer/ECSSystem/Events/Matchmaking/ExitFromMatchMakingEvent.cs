@@ -13,6 +13,9 @@ namespace TXServer.ECSSystem.Events.Matchmaking
 
         public void Execute(Player player, Entity lobby)
         {
+            if (!player.IsInBattleLobby())
+                return;
+
             player.BattlePlayer.WaitingForExit = true;
 
             if (lobby.TemplateAccessor.Template is MatchMakingLobbyTemplate)

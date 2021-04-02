@@ -29,9 +29,9 @@ namespace TXServer.Core
         public long XCrystals { get; protected set; }
         public long Crystals { get; protected set; }
 
-        public List<long> AcceptedFriendIds { get; set; }
-        public List<long> IncomingFriendIds { get; set; }
-        public List<long> OutgoingFriendIds { get; set; }
+        public List<long> AcceptedFriendIds { get; protected set; }
+        public List<long> IncomingFriendIds { get; protected set; }
+        public List<long> OutgoingFriendIds { get; protected set; }
 
         public PlayerData(string uid)
         {
@@ -116,6 +116,28 @@ namespace TXServer.Core
             return component;
         }
 
+
+        public void AddIncomingFriend(long userId)
+        {
+            IncomingFriendIds.Add(userId);
+        }
+        public void AddOutgoingFriend(long userId)
+        {
+            OutgoingFriendIds.Add(userId);
+        }
+        public void AddAcceptedFriend(long userId)
+        {
+            IncomingFriendIds.Remove(userId);
+            OutgoingFriendIds.Remove(userId);
+            AcceptedFriendIds.Add(userId);
+        }
+        public void RemoveFriend(long userId)
+        {
+            IncomingFriendIds.Remove(userId);
+            OutgoingFriendIds.Remove(userId);
+            AcceptedFriendIds.Remove(userId);
+        }
+
         private T SetValue<T>(object value) where T : Component
         {
             T component = Player.User.GetComponent<T>();
@@ -134,6 +156,7 @@ namespace TXServer.Core
             
             return component;
         }
+
 
         public abstract PlayerData From(object dataReader);
 

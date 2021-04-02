@@ -15,6 +15,7 @@ namespace TXServer.ECSSystem.Events.Battle
 			UserXCrystalsComponent userXCrystalsComponent = player.Data.SetXCrystals(player.Data.XCrystals - Price);
 			player.User.ChangeComponent(userXCrystalsComponent);
 			player.User.ChangeComponent(new UserUidComponent(Uid));
+			player.Data.SetUsername(Uid);
 			player.SendEvent(new CompleteBuyUIDChangeEvent(true), entity);
 
 			Entity notification = UIDChangedNotificationTemplate.CreateEntity(Uid, entity);

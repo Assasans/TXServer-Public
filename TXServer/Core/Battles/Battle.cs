@@ -115,7 +115,7 @@ namespace TXServer.Core.Battles
             player.User.AddComponent(new BattleLobbyGroupComponent(BattleLobbyEntity));
 
             player.ShareEntities(AllBattlePlayers.Select(x => x.User));
-            AllBattlePlayers.Select(x => x.Player).ShareEntity(player.User);
+            AllBattlePlayers.Select(x => x.Player).Where(x => !x.EntityList.Contains(player.User)).ShareEntity(player.User);
 
             BattlePlayer battlePlayer = ModeHandler.AddPlayer(player);
             TypeHandler.OnPlayerAdded(battlePlayer);
