@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using TXServer.Core;
-using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -21,7 +22,7 @@ namespace TXServer.ECSSystem.Events
 			Entity goalUser = null;
 			foreach (Player p in player.Server.Connection.Pool)
             {
-				if (p.UniqueId == UserUid)
+				if (p.UniqueId == UserUid.Replace("Survivor ", "").Replace("Deserter ", ""))
 				{
 					goalUser = p.User;
 					break;
@@ -29,18 +30,37 @@ namespace TXServer.ECSSystem.Events
             }
 			if (goalUser is null) return;
 
-			Entity newChat = new Entity(new TemplateAccessor(new PersonalChatTemplate(), "chat"),
-				new ChatComponent(),
-				new ChatParticipantsComponent(user, goalUser));
+			Entity chat = null;
+			List<Entity> chatParticipants = new() { player.User, goalUser };
+			foreach (Entity participant in chatParticipants)
+            {
+				Entity otherUser = chatParticipants.Single(user => user.EntityId != participant.EntityId);
+				foreach (Entity personalChat in participant.GetComponent<PersonalChatOwnerComponent>().ChatsIs)
+				{
+					if (personalChat.GetComponent<ChatParticipantsComponent>().Users.Contains(otherUser))
+					{
+						chat = personalChat;
+						break;
+					}
+				}
+			}
 
-			PersonalChatOwnerComponent component = player.User.GetComponent<PersonalChatOwnerComponent>();
-			component.ChatsIs.Add(newChat);
+			if (!player.EntityList.Contains(goalUser))
+				player.ShareEntity(goalUser);
+			if (chat == null)
+            {
+				chat = new Entity(new TemplateAccessor(new PersonalChatTemplate(), "chat"),
+			    new ChatComponent(),
+			    new ChatParticipantsComponent(user, goalUser));
 
-			CommandManager.SendCommands(player,
-				new EntityShareCommand(goalUser),
-				new ComponentChangeCommand(player.User, component),
-				new EntityShareCommand(newChat),
-				new EntityUnshareCommand(goalUser));
+				PersonalChatOwnerComponent component = player.User.GetComponent<PersonalChatOwnerComponent>();
+				component.ChatsIs.Add(chat);
+				player.User.ChangeComponent(component);
+			}
+
+			if (!player.EntityList.Contains(chat))
+				player.ShareEntity(chat);
+			player.UnshareEntity(goalUser);
         }
 
 		public string UserUid { get; set; }

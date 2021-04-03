@@ -19,7 +19,7 @@ namespace TXServer.ECSSystem.EntityTemplates
                 player.BattlePlayer.Battle.BattleEntity.GetComponent<BattleModeComponent>(),
                 player.BattlePlayer.Battle.BattleEntity.GetComponent<BattleGroupComponent>(),
                 player.BattlePlayer.Battle.BattleEntity.GetComponent<MapGroupComponent>());
-
+            player.User.AddComponent(new BattleSelectComponent());
             return notification;
         }
     }

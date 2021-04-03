@@ -23,10 +23,7 @@ namespace TXServer.ECSSystem.Events
                 Entity found;
                 try
                 {
-                    found = Server.Instance.Connection.Pool
-                        .Where(p => p.User != null && p.User.EntityId != player.User.EntityId && id == p.User.EntityId)
-                        .Select(p => p.User)
-                        .Single();
+                    found = Server.Instance.FindPlayerById(id).User;
                 }
                 catch (InvalidOperationException)
                 {
@@ -61,11 +58,11 @@ namespace TXServer.ECSSystem.Events
                         new UserGroupComponent(id));
                 }
 
-                commands.Add(new EntityShareCommand(found));
+                if (!player.EntityList.Contains(found))
+                    player.ShareEntity(found);
             }
 
-            commands.Add(new SendEventCommand(new UsersLoadedEvent(RequestEntityId), entity));
-            CommandManager.SendCommands(player, commands.ToArray());
+            player.SendEvent(new UsersLoadedEvent(RequestEntityId), entity);
         }
 
         public long RequestEntityId { get; set; }

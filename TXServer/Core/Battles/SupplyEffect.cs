@@ -8,7 +8,6 @@ using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Components.Battle.Chassis;
 using System.Linq;
 using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Components.Battle.Time;
 
 namespace TXServer.Core.Battles
 {
@@ -16,43 +15,15 @@ namespace TXServer.Core.Battles
     {
         public SupplyEffect(BonusType bonusType, MatchPlayer matchPlayer, bool cheat)
         {
+            if (matchPlayer.TankState != TankState.Active) return;
+
             BonusType = bonusType;
             MatchPlayer = matchPlayer;
             Cheat = cheat;
             StopTime = GetStopTime();
 
-            SupplyEffect existingSupplyEffect = matchPlayer.SupplyEffects.SingleOrDefault(supplyEffect => supplyEffect.BonusType == bonusType);
-            if (existingSupplyEffect != null)
-            {
-                existingSupplyEffect.StopTime = GetStopTime();
-                existingSupplyEffect.SupplyEffectEntity.RemoveComponent<DurationComponent>();
-                existingSupplyEffect.SupplyEffectEntity.AddComponent(new DurationComponent(new TXDate(DateTimeOffset.Now)));
-                return;
-            }
-
-            switch (bonusType) {
-                case BonusType.ARMOR:
-                    SupplyEffectEntity = ArmorEffectTemplate.CreateEntity(MatchPlayer.Tank);
-                    break;
-                case BonusType.DAMAGE:
-                    SupplyEffectEntity = DamageEffectTemplate.CreateEntity(MatchPlayer.Tank);
-                    break;
-                case BonusType.REPAIR:
-                    MatchPlayer.Tank.ChangeComponent(new TemperatureComponent(0));
-                    MatchPlayer.Tank.ChangeComponent<HealthComponent>(component => component.CurrentHealth = component.MaxHealth);
-                    MatchPlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), MatchPlayer.Tank);
-
-                    SupplyEffectEntity = HealingEffectTemplate.CreateEntity(MatchPlayer.Tank);
-                    break;
-                case BonusType.SPEED:
-                    MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component =>
-                    {
-                        if (cheat) component.Speed = float.MaxValue;
-                        else component.Speed = (float)(component.Speed * 1.5);
-                    });
-                    SupplyEffectEntity = TurboSpeedEffectTemplate.CreateEntity(MatchPlayer.Tank);
-                    break;
-            }
+            if (CheckForDuplicate()) return;
+            ApplyEffect();
 
             MatchPlayer.Battle.MatchPlayers.Select(x => x.Player).ShareEntity(SupplyEffectEntity);
             MatchPlayer.SupplyEffects.Add(this);
@@ -70,11 +41,62 @@ namespace TXServer.Core.Battles
             }
         }
 
+        private bool CheckForDuplicate()
+        {
+            SupplyEffect existingSupplyEffect = MatchPlayer.SupplyEffects.SingleOrDefault(supplyEffect => supplyEffect.BonusType == BonusType);
+            if (existingSupplyEffect != null)
+            {
+                existingSupplyEffect.ExtendTime();
+                return true;
+            }
+            return false;
+        }
+
+        private void ApplyEffect()
+        {
+            switch (BonusType)
+            {
+                case BonusType.ARMOR:
+                    SupplyEffectEntity = ArmorEffectTemplate.CreateEntity(MatchPlayer.Tank);
+                    break;
+                case BonusType.DAMAGE:
+                    SupplyEffectEntity = DamageEffectTemplate.CreateEntity(MatchPlayer.Tank);
+                    break;
+                case BonusType.REPAIR:
+                    MatchPlayer.Tank.ChangeComponent(new TemperatureComponent(0));
+                    MatchPlayer.Tank.ChangeComponent<HealthComponent>(component => component.CurrentHealth = component.MaxHealth);
+                    MatchPlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), MatchPlayer.Tank);
+
+                    SupplyEffectEntity = HealingEffectTemplate.CreateEntity(MatchPlayer.Tank);
+                    break;
+                case BonusType.SPEED:
+                    MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component =>
+                    {
+                        if (Cheat) component.Speed = float.MaxValue;
+                        else component.Speed = (float)(component.Speed * 1.5);
+                    });
+                    SupplyEffectEntity = TurboSpeedEffectTemplate.CreateEntity(MatchPlayer.Tank);
+                    break;
+            }
+        }
+
+        public void ExtendTime()
+        {
+            if (BonusType == BonusType.REPAIR)
+            {
+                Remove();
+                _ = new SupplyEffect(BonusType, MatchPlayer, Cheat);
+            }
+            else
+            {
+                StopTime = GetStopTime();
+                SupplyEffectEntity.RemoveComponent<DurationComponent>();
+                SupplyEffectEntity.AddComponent(new DurationComponent(new TXDate(DateTimeOffset.Now)));
+            }
+        }
+
         private DateTime GetStopTime()
         {
-            if (Cheat)
-                return DateTime.Now.AddSeconds(MatchPlayer.Battle.BattleEntity.GetComponent<TimeLimitComponent>().TimeLimitSec);
-
             // todo: read this from configs   
             if (BonusType == BonusType.REPAIR)
                 return DateTime.Now.AddSeconds(3);

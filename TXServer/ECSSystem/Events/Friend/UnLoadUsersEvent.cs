@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using TXServer.Core;
-using TXServer.Core.Commands;
+using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -11,14 +12,16 @@ namespace TXServer.ECSSystem.Events
     {
         public void Execute(Player player, Entity entity)
         {
-            List<ICommand> commands = new List<ICommand>();
-
             foreach (Entity toUnload in Users)
             {
-                commands.Add(new EntityUnshareCommand(toUnload));
-            }
+                Player toUnloadPlayer = Server.Instance.FindPlayerById(toUnload.EntityId);
+                BattlePlayer toUnloadBattlePlayer = toUnloadPlayer != null ? toUnloadPlayer.BattlePlayer : null;
 
-            CommandManager.SendCommands(player, commands.ToArray());
+                if (player.IsInBattleLobby() && player.BattlePlayer.Battle.AllBattlePlayers.ToList().Contains(toUnloadBattlePlayer))
+                    return;
+                
+                player.UnshareEntity(toUnload);
+            }
         }
 
         public HashSet<Entity> Users { get; set; }

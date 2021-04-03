@@ -15,8 +15,7 @@ namespace TXServer.ECSSystem.Events
 
             // todo: search user in database
             Player searchedPlayer = Server.Instance.Connection.Pool.SingleOrDefault(controlledPlayer => controlledPlayer.User != null && controlledPlayer.User.GetComponent<UserUidComponent>().Uid == Uid && isNotSelfUser);
-            long searchedPlayerId = 0;
-            if (searchedPlayer != null) searchedPlayerId = searchedPlayer.User.EntityId;
+            long searchedPlayerId = searchedPlayer != null ? searchedPlayer.User.EntityId : 0;
 
             player.SendEvent(new SerachUserIdByUidResultEvent(searchedPlayer != null, searchedPlayerId), entity);
         }

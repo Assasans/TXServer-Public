@@ -21,12 +21,12 @@ namespace TXServer.ECSSystem.Events.Battle
 			
 			foreach (HitTarget hitTarget in Targets)
 			{
-				BattlePlayer hitPlayer = battle.MatchPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
+				BattlePlayer victim = battle.MatchPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
 
-				if (hitPlayer.Player.User.GetComponent<TeamColorComponent>().TeamColor == player.User.GetComponent<TeamColorComponent>().TeamColor && !battle.Params.FriendlyFire)
+				if (victim.Player.User.GetComponent<TeamColorComponent>().TeamColor == player.User.GetComponent<TeamColorComponent>().TeamColor && !battle.Params.FriendlyFire)
 					return;
 
-				hitPlayer.MatchPlayer.DealDamage(player, hitTarget, 900);
+				Damage.DealDamage(victim.MatchPlayer, player.BattlePlayer.MatchPlayer, hitTarget, 900);
 			}
 
 			foreach (HitTarget splashTarget in SplashTargets)
@@ -40,7 +40,7 @@ namespace TXServer.ECSSystem.Events.Battle
 				}
 					
 
-				hitPlayer.MatchPlayer.DealDamage(player, splashTarget, 500);
+				Damage.DealDamage(hitPlayer.MatchPlayer, player.BattlePlayer.MatchPlayer, splashTarget, 500);
 			}
 		}
 

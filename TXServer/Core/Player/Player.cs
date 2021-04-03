@@ -17,6 +17,7 @@ using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 using TXServer.Library;
+using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.Core
 {
@@ -194,7 +195,7 @@ namespace TXServer.Core
 			};
 
 			long totalExperience = User.GetComponent<UserExperienceComponent>().Experience;
-			if (IsInBattle())
+			if (IsInMatch())
             {
 				int battleExperience = BattlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
 				if (User.GetComponent<PremiumAccountBoostComponent>() == null)
@@ -212,7 +213,7 @@ namespace TXServer.Core
 				Entity rankUpNotification = UserRankRewardNotificationTemplate.CreateEntity(100, 5000, correctRank);
 				ShareEntity(rankUpNotification);
 
-				if (IsInBattle())
+				if (IsInMatch())
                 {
 					BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new UpdateRankEvent(), User);
 					int currentScoreInBattle = BattlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
@@ -228,12 +229,24 @@ namespace TXServer.Core
 			return false;
         }
 
-		public  bool IsInBattle()
+		public bool IsInBattleLobby()
         {
-			if (BattlePlayer != null && BattlePlayer.MatchPlayer != null)
-				return true;
-			else
-				return false;
+			if (BattlePlayer != null) return true;
+			else return false;
+		}
+
+		public bool IsInMatch()
+        {
+			if (IsInBattleLobby() && BattlePlayer.MatchPlayer != null) return true;
+			else return false;
+        }
+
+		public bool IsOwner()
+        {
+			if (IsInBattleLobby() && BattlePlayer.Battle.TypeHandler is CustomBattleHandler)
+				if ((BattlePlayer.Battle.TypeHandler as CustomBattleHandler).Owner == this)
+					return true;
+			return false;
         }
 
 		public void SendEvent(ECSEvent @event, params Entity[] entities)

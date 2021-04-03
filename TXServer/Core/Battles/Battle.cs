@@ -115,7 +115,7 @@ namespace TXServer.Core.Battles
             player.User.AddComponent(new BattleLobbyGroupComponent(BattleLobbyEntity));
 
             player.ShareEntities(AllBattlePlayers.Select(x => x.User));
-            AllBattlePlayers.Select(x => x.Player).ShareEntity(player.User);
+            AllBattlePlayers.Select(x => x.Player).Where(x => !x.EntityList.Contains(player.User)).ShareEntity(player.User);
 
             BattlePlayer battlePlayer = ModeHandler.AddPlayer(player);
             TypeHandler.OnPlayerAdded(battlePlayer);
@@ -123,8 +123,8 @@ namespace TXServer.Core.Battles
 
         private void RemovePlayer(BattlePlayer battlePlayer)
         {
-            ModeHandler.RemovePlayer(battlePlayer);
             TypeHandler.OnPlayerRemoved(battlePlayer);
+            ModeHandler.RemovePlayer(battlePlayer);
 
             battlePlayer.User.RemoveComponent<UserEquipmentComponent>();
             battlePlayer.User.RemoveComponent<BattleLobbyGroupComponent>();
@@ -352,6 +352,8 @@ namespace TXServer.Core.Battles
 
         public void UpdateScore(Entity team, int additiveScore)
         {
+            if (BattleState != BattleState.Running) return;
+
             var scoreComponent = team.GetComponent<TeamScoreComponent>();
             scoreComponent.Score = Math.Clamp(scoreComponent.Score + additiveScore, 0, int.MaxValue);
             team.ChangeComponent(scoreComponent);
@@ -397,7 +399,7 @@ namespace TXServer.Core.Battles
             { BattleMode.CTF, typeof(CTFTemplate) },
         };
 
-        private static readonly Dictionary<GravityType, float> GravityTypes = new Dictionary<GravityType, float>
+        public readonly Dictionary<GravityType, float> GravityTypes = new Dictionary<GravityType, float>
         {
             { GravityType.EARTH, 9.81f },
             { GravityType.SUPER_EARTH, 30 },
