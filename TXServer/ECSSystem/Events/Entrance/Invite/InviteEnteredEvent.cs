@@ -15,11 +15,11 @@ namespace TXServer.ECSSystem.Events.Entrance.Invite
 			// Todo: database immigration
 			List<string> AllowedUids = new()
 			{
-				"NoNick", "Tim203", "M8", "Kaveman",
+				"NoNick", "Tim203", "M8", "Kaveman", "Assasans",
 				"Concodroid", "Corpserdefg",
 				"SH42913",
 				"Bodr", "C6OI", "Legendar-X", "Pchelik", "networkspecter", "DageLV",
-				"Black_Wolf", "NN77296", "MEWPASCO", "Doctor", "TowerCrusher", "Assasans"
+				"Black_Wolf", "NN77296", "MEWPASCO", "Doctor", "TowerCrusher", "Kurays"
 			};
 			string inviteCode = entity.GetComponent<InviteComponent>().InviteCode;
 			if (AllowedUids.Contains(inviteCode) || AllowedUids.Contains(inviteCode.ToLower()))
