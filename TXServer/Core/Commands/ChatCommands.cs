@@ -70,7 +70,7 @@ namespace TXServer.Core.Commands
 						SpawnPoint lastSpawnPoint = player.BattlePlayer.MatchPlayer.LastSpawnPoint;
 						return ($"{player.BattlePlayer.Battle.CurrentMapInfo.Name}, {player.BattlePlayer.Battle.Params.BattleMode}, {player.User.GetComponent<TeamColorComponent>().TeamColor}, Number: {lastSpawnPoint.Number}");
 					case "stats":
-						return $"Online players: {Server.Instance.Connection.Pool.Count}\n" + 
+						return $"Online players: {Server.Instance.Connection.Pool.Count(x => x.IsActive)}\n" + 
 							$"MM battles: {ServerConnection.BattlePool.Count(b => b.IsMatchMaking)}\n" +
 							$"Custom battles: {ServerConnection.BattlePool.Count(b => !b.IsMatchMaking)}";
 				}
