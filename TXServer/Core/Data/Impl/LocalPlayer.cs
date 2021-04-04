@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using TXServer.ECSSystem.Types.Punishments;
 
 namespace TXServer.Core.Data.Database.Impl

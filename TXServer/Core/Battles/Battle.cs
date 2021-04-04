@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using TXServer.Core.Logging;
 using TXServer.Core.ServerMapInformation;
+using TXServer.Core.Squads;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
@@ -114,14 +115,18 @@ namespace TXServer.Core.Battles
             player.ShareEntities(BattleLobbyEntity, BattleLobbyChatEntity);
             player.User.AddComponent(new BattleLobbyGroupComponent(BattleLobbyEntity));
 
-            player.ShareEntities(AllBattlePlayers.Select(x => x.User));
+            player.ShareEntities(AllBattlePlayers.Where(y => !player.IsInSquadWith(y.Player)).Select(x => x.User));
             AllBattlePlayers.Select(x => x.Player).Where(x => !x.EntityList.Contains(player.User)).ShareEntity(player.User);
 
             BattlePlayer battlePlayer = ModeHandler.AddPlayer(player);
             TypeHandler.OnPlayerAdded(battlePlayer);
+
+            if (!IsMatchMaking && player.IsSquadLeader)
+                foreach (SquadPlayer participant in player.SquadPlayer.Squad.ParticipantsWithoutLeader)
+                    AddPlayer(participant.Player);
         }
 
-        private void RemovePlayer(BattlePlayer battlePlayer)
+        public void RemovePlayer(BattlePlayer battlePlayer)
         {
             TypeHandler.OnPlayerRemoved(battlePlayer);
             ModeHandler.RemovePlayer(battlePlayer);
@@ -133,12 +138,17 @@ namespace TXServer.Core.Battles
             if (battlePlayer.User.GetComponent<MatchMakingUserReadyComponent>() != null)
                 battlePlayer.User.RemoveComponent<MatchMakingUserReadyComponent>();
 
-            battlePlayer.Player.UnshareEntities(AllBattlePlayers.Select(x => x.User));
-            AllBattlePlayers.Select(x => x.Player).UnshareEntity(battlePlayer.User);
+            battlePlayer.Player.UnshareEntities(AllBattlePlayers
+                .Where(x => !battlePlayer.Player.IsInSquadWith(x.Player)).Select(x => x.User));
+            AllBattlePlayers.Where(y => !y.Player.IsInSquadWith(battlePlayer.Player)).Select(x => x.Player)
+                .UnshareEntity(battlePlayer.User);
 
             Logger.Log($"{battlePlayer.Player}: Left battle {BattleEntity.EntityId}");
 
             ServerConnection.BattlePool.RemoveAll(p => !p.AllBattlePlayers.Any());
+            
+            if (battlePlayer.Player.IsInSquad)
+                battlePlayer.Player.SquadPlayer.Squad.ProcessBattleLeave(battlePlayer.Player, this);
         }
 
         private void StartBattle()
@@ -298,7 +308,11 @@ namespace TXServer.Core.Battles
                 if (!battlePlayer.Player.IsActive || battlePlayer.WaitingForExit)
                 {
                     if (battlePlayer.MatchPlayer != null)
+                    {
                         RemoveMatchPlayer(battlePlayer);
+                        if (battlePlayer.User.GetComponent<MatchMakingUserReadyComponent>() != null)
+                            battlePlayer.User.RemoveComponent<MatchMakingUserReadyComponent>();
+                    }
                     else
                         RemovePlayer(battlePlayer);
                 }
@@ -392,14 +406,14 @@ namespace TXServer.Core.Battles
 
         private int EnemyCountFor(BattlePlayer battlePlayer) => ModeHandler.EnemyCountFor(battlePlayer);
 
-        private static readonly Dictionary<BattleMode, Type> BattleEntityCreators = new Dictionary<BattleMode, Type>
+        private static readonly Dictionary<BattleMode, Type> BattleEntityCreators = new()
         {
             { BattleMode.DM, typeof(DMTemplate) },
             { BattleMode.TDM, typeof(TDMTemplate) },
             { BattleMode.CTF, typeof(CTFTemplate) },
         };
 
-        public readonly Dictionary<GravityType, float> GravityTypes = new Dictionary<GravityType, float>
+        public readonly Dictionary<GravityType, float> GravityTypes = new()
         {
             { GravityType.EARTH, 9.81f },
             { GravityType.SUPER_EARTH, 30 },
@@ -411,15 +425,15 @@ namespace TXServer.Core.Battles
         public bool IsMatchMaking { get; }
         public Entity MapEntity { get; private set; }
 
-        public bool ForceStart { get; set; } = false;
-        public bool ForceOpen { get; set; } = false;
+        public bool ForceStart { get; set; }
+        public bool ForceOpen { get; set; }
         public int WarmUpSeconds { get; set; }
         private bool IsWarmUpCompleted { get; set; }
 
         public MapInfo CurrentMapInfo { get; set; }
         public IList<SpawnPoint> DeathmatchSpawnPoints { get; set; }
         
-        public List<BattleBonus> BattleBonuses { get; set; } = new List<BattleBonus>();
+        public List<BattleBonus> BattleBonuses { get; set; } = new();
 
         public BattleState BattleState
         {
@@ -483,7 +497,7 @@ namespace TXServer.Core.Battles
         public Entity RoundEntity { get; set; }
         public BattleTankCollisionsComponent CollisionsComponent { get; set; }
 
-        public Entity GeneralBattleChatEntity { get; set; }
-        public Entity BattleLobbyChatEntity { get; set; }
+        public Entity GeneralBattleChatEntity { get; }
+        public Entity BattleLobbyChatEntity { get; }
     }
 }

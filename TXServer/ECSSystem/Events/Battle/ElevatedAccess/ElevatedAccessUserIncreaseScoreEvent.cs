@@ -5,15 +5,14 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
-namespace TXServer.ECSSystem.Events.Battle
+namespace TXServer.ECSSystem.Events.Battle.ElevatedAccess
 {
 	[SerialVersionUID(1504069546662L)]
 	public class ElevatedAccessUserIncreaseScoreEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			if (player.BattlePlayer == null) return;
-			if (player.BattlePlayer.Battle.ModeHandler is not TeamBattleHandler handler) return;
+			if (player.BattlePlayer?.Battle.ModeHandler is not TeamBattleHandler handler) return;
 
             BattleView teamView = handler.BattleViewFor(player.BattlePlayer);
 			Entity team = TeamColor == TeamColor.BLUE ? teamView.AllyTeamEntity : teamView.EnemyTeamEntity;

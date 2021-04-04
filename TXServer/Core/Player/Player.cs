@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.Core.Logging;
+using TXServer.Core.Squads;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Round;
@@ -27,7 +28,8 @@ namespace TXServer.Core
     {
 		public bool IsLoggedIn => User != null;
 		public bool IsInBattleLobby => BattlePlayer != null;
-		public bool IsInMatch => BattlePlayer.MatchPlayer != null;
+		public bool IsInMatch => IsInBattleLobby && BattlePlayer.MatchPlayer != null;
+		public bool IsInSquad => SquadPlayer != null;
 
 		public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
 
@@ -39,6 +41,7 @@ namespace TXServer.Core
 		public Entity ClientSession { get; set; }
 		public Entity User { get; set; }
 		public BattlePlayer BattlePlayer { get; set; }
+		public SquadPlayer SquadPlayer { get; set; }
 
 		public string UniqueId => Data?.UniqueId;
 
@@ -131,8 +134,8 @@ namespace TXServer.Core
 			user.Components.Add(new UserGroupComponent(user));
 
 			// temp solution
-			List<string> AdminUids = new() { "NoNick", "Tim203", "M8", "Kaveman" };
-			if (!AdminUids.Contains(Data.UniqueId))
+			List<string> adminUids = new() { "NoNick", "Tim203", "M8", "Kaveman", "Assasans" };
+			if (!adminUids.Contains(Data.UniqueId))
 				Data.Admin = false;
 
 			if (Data.Admin)
@@ -212,9 +215,18 @@ namespace TXServer.Core
 			}
         }
 
-        
+		public bool IsInBattleWith(Player player)
+		{
+			return IsInBattleLobby && BattlePlayer.Battle.AllBattlePlayers.Contains(player.BattlePlayer);
+		}
 
-        public bool IsOwner => (BattlePlayer?.Battle.TypeHandler as CustomBattleHandler)?.Owner == this;
+		public bool IsInSquadWith(Player player)
+		{
+			return IsInSquad && SquadPlayer.Squad.Participants.Contains(player.SquadPlayer);
+		}
+
+		public bool IsBattleOwner => (BattlePlayer?.Battle.TypeHandler as CustomBattleHandler)?.Owner == this;
+		public bool IsSquadLeader => IsInSquad && SquadPlayer.IsLeader;
 
         public void SendEvent(ECSEvent @event, params Entity[] entities)
         {

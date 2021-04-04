@@ -2,7 +2,7 @@
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Events.Friend
+namespace TXServer.ECSSystem.Events.Friend.FriendRequest
 {
     [SerialVersionUID(1450168255217L)]
     public class AcceptFriendEvent : FriendBaseEvent, ECSEvent

@@ -19,7 +19,8 @@ namespace TXServer.Core.Commands
 			if (!message.StartsWith('/')) return null;
 			string[] args = message[1..].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-			bool hackBattle = player.IsOwner && (player.BattlePlayer.Battle.TypeHandler as CustomBattleHandler).HackBattle;
+
+			bool hackBattle = player.IsBattleOwner && (player.BattlePlayer.Battle.TypeHandler as CustomBattleHandler).HackBattle;
 
 			if (args.Length == 0) return null;
 
@@ -27,8 +28,9 @@ namespace TXServer.Core.Commands
 			{
 				return $"Network latency: {player.Connection.Ping} ms";
 			}
-			if (player.IsOwner || player.Data.Admin)
-            {
+
+			if (player.IsBattleOwner || player.Data.Admin)
+			{
 				if (args[0] == "hackBattle")
                 {
 					if (player.BattlePlayer.Battle.IsMatchMaking)
@@ -143,7 +145,7 @@ namespace TXServer.Core.Commands
 					case "stats":
 						return $"Online players: {Server.Instance.Connection.Pool.Count(x => x.IsActive)}\n" + 
 							$"MM battles: {ServerConnection.BattlePool.Count(b => b.IsMatchMaking)}\n" +
-							$"Custom battles: {ServerConnection.BattlePool.Count(b => !b.IsMatchMaking)}";
+							$"Custom battles: {ServerConnection.BattlePool.Count(b => !b.IsMatchMaking)}\n";
 				}
 			}
 
@@ -155,7 +157,7 @@ namespace TXServer.Core.Commands
 					list = list.Concat(TesterCommands);
 				if (player.Data.Admin)
 					list = list.Concat(AdminCommands);
-				if (player.IsInBattleLobby && (player.IsOwner && hackBattle || player.Data.Admin))
+				if (player.IsInBattleLobby && (player.IsBattleOwner && hackBattle || player.Data.Admin))
 					list = list.Concat(HackBattleCommands);
 
 				return '/' + string.Join("\n/", list);

@@ -29,27 +29,7 @@ namespace TXServer.ECSSystem.Events.MatchMaking
 
             player.SendEvent(new EnteredToMatchMakingEvent(), mode);
 
-            Core.Battles.Battle battle = ServerConnection.BattlePool.OrderBy(b => b.AllBattlePlayers).LastOrDefault(b => isValidToEnter(b));
-            if (battle == null)
-            {
-                battle = new Core.Battles.Battle(battleParams: null, isMatchMaking: true, owner: null);
-                ServerConnection.BattlePool.Add(battle);
-            }
-            battle.AddPlayer(player);
-        }
-
-        private static bool isValidToEnter(Core.Battles.Battle battle)
-        {
-            if (!battle.IsMatchMaking || battle.AllBattlePlayers.Count() == battle.Params.MaxPlayers || battle.BattleState == BattleState.Ended)
-                return false;
-            else if (battle.BattleState == BattleState.Running)
-            {
-                if (battle.CountdownTimer >= battle.BattleEntity.GetComponent<TimeLimitComponent>().TimeLimitSec - 180 || battle.ForceOpen)
-                    return true;
-                else
-                    return false;
-            }
-            return true;
+            Core.Battles.MatchMaking.FindBattle(player);
         }
     }
 }

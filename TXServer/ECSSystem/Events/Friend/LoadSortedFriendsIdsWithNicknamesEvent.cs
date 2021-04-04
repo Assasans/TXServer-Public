@@ -4,7 +4,7 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 
-namespace TXServer.ECSSystem.Events
+namespace TXServer.ECSSystem.Events.Friend
 {
     [SerialVersionUID(1498740539984L)]
     public class LoadSortedFriendsIdsWithNicknamesEvent : ECSEvent
@@ -13,7 +13,11 @@ namespace TXServer.ECSSystem.Events
         {
             Dictionary<long, string> friendsIdsAndNicknames = new();
             foreach (long friendId in player.Data.AcceptedFriendIds)
-                friendsIdsAndNicknames.Add(friendId, Server.Instance.FindPlayerById(friendId).User.GetComponent<UserUidComponent>().Uid);
+            {
+                Player remotePlayer = Server.Instance.FindPlayerById(friendId);
+                if (remotePlayer != null) 
+                    friendsIdsAndNicknames.Add(friendId, remotePlayer.Data.Username);
+            }
 
             player.SendEvent(new SortedFriendsIdsWithNicknamesLoaded(friendsIdsAndNicknames), entity);
         }

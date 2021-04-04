@@ -5,7 +5,7 @@ using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Types;
 
-namespace TXServer.ECSSystem.EntityTemplates.Battle
+namespace TXServer.ECSSystem.EntityTemplates.Effects
 {
     [SerialVersionUID(1486970297039L)]
     public class TurboSpeedEffectTemplate : EffectBaseTemplate, IEntityTemplate

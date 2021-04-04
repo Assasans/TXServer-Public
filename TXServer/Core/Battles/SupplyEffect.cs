@@ -1,13 +1,13 @@
 ﻿using TXServer.ECSSystem.Types;
 using System;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Components.Battle.Chassis;
 using System.Linq;
 using TXServer.ECSSystem.Components.Battle;
+using TXServer.ECSSystem.EntityTemplates.Effects;
 
 namespace TXServer.Core.Battles
 {

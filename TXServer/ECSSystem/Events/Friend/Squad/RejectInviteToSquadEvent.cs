@@ -2,7 +2,7 @@
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Events.Friend
+namespace TXServer.ECSSystem.Events.Friend.Squad
 {
     [SerialVersionUID(1510640414175L)]
     public class RejectInviteToSquadEvent : ECSEvent

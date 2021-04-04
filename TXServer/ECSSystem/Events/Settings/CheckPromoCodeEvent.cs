@@ -1,9 +1,10 @@
 ﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Types;
 
-namespace TXServer.ECSSystem.Events
+namespace TXServer.ECSSystem.Events.Settings
 {
 	[SerialVersionUID(1490931976968L)]
 	public class CheckPromoCodeEvent : ECSEvent
@@ -11,7 +12,6 @@ namespace TXServer.ECSSystem.Events
 		public void Execute(Player player, Entity entity)
 		{
 			PromoCodeCheckResult result = PromoCodeCheckResult.INVALID;
-			// TODO: easter egg: 7FA8-8E12-DB08 (Tanki X discontinuation promo code, let's give away some crystals)
 
 			if (player.Data.Admin)
             {
@@ -36,16 +36,15 @@ namespace TXServer.ECSSystem.Events
 				}
 
 				// cheat codes
-				int var;
 				if (Code.StartsWith("c") | Code.StartsWith("x")) {
-					if (int.TryParse(Code.Substring(1, Code.Length-1), out var))
+					if (int.TryParse(Code.Substring(1, Code.Length-1), out _))
                     {
 						result = PromoCodeCheckResult.VALID;
                     } 
 				}
 				if (Code.StartsWith("xp"))
                 {
-					if (int.TryParse(Code.Substring(2, Code.Length - 2), out var))
+					if (int.TryParse(Code.Substring(2, Code.Length - 2), out _))
 					{
 						result = PromoCodeCheckResult.VALID;
 					}
@@ -55,7 +54,14 @@ namespace TXServer.ECSSystem.Events
 			switch (Code)
 			{
 				case "7FA8-8E12-DB08":
+					// easter egg: Tanki X discontinuation promo code
 					result = PromoCodeCheckResult.VALID;
+					break;
+				case "squad":
+					// for squad testing
+					// TODO: remove later when quads are tested & stable
+					if (player.User.GetComponent<UserExperienceComponent>().Experience < 5000)
+					    result = PromoCodeCheckResult.VALID;
 					break;
 			}
 

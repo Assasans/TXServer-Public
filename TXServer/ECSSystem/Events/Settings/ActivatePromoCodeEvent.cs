@@ -56,6 +56,17 @@ namespace TXServer.ECSSystem.Events
 					rewards.Add(ExtraItems.GlobalItems.Xcrystal, 10000);
 					rewards.Add(ExtraItems.GlobalItems.Premiumboost, 7);
 					break;
+				case "squad":
+				    // for squad testing
+				    // TODO: remove later when quads are tested & stable
+				    player.User.ChangeComponent<UserExperienceComponent>(component =>
+				    {
+					    component.Experience += 5000;
+					    Logger.Debug($"{player}: Changed experience to {component.Experience}");
+				    });
+				    
+				    player.CheckRankUp();
+				    break;
 			}
 
 			foreach (KeyValuePair<Entity, int> item in rewards)

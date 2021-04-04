@@ -136,17 +136,37 @@ namespace TXServer.Core.Battles
 
             public BattlePlayer AddPlayer(Player player)
             {
-                List<BattlePlayer> teamPlayerList;
-                Entity teamEntity;
-                if (RedTeamPlayers.Count < BlueTeamPlayers.Count)
+                List<BattlePlayer> teamPlayerList = null;
+                Entity teamEntity = null;
+
+                List<List<BattlePlayer>> teamPlayerLists = new() {RedTeamPlayers, BlueTeamPlayers};
+                Dictionary<List<BattlePlayer>, Entity> entityPlayersDict = new()
+                {{RedTeamPlayers, RedTeamEntity}, {BlueTeamPlayers, BlueTeamEntity}};
+
+                if (Battle.IsMatchMaking)
                 {
-                    teamEntity = RedTeamEntity;
-                    teamPlayerList = RedTeamPlayers;
+                    foreach (var playersList in teamPlayerLists.Where(y => player.IsInSquad).Where(
+                        playersList => player.SquadPlayer.Squad.Participants.Select(x => x.Player.BattlePlayer)
+                            .Intersect(playersList).Any()))
+                    {
+                        teamEntity = entityPlayersDict[playersList];
+                        teamPlayerList = playersList;
+                        break;
+                    }
                 }
-                else
+
+                if (teamEntity == null)
                 {
-                    teamEntity = BlueTeamEntity;
-                    teamPlayerList = BlueTeamPlayers;
+                    if (RedTeamPlayers.Count < BlueTeamPlayers.Count)
+                    {
+                        teamEntity = RedTeamEntity;
+                        teamPlayerList = RedTeamPlayers;
+                    }
+                    else
+                    {
+                        teamEntity = BlueTeamEntity;
+                        teamPlayerList = BlueTeamPlayers;
+                    }
                 }
 
                 player.User.AddComponent(teamEntity.GetComponent<TeamColorComponent>());

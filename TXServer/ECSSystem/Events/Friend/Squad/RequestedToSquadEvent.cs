@@ -5,18 +5,20 @@ using TXServer.ECSSystem.Components;
 
 namespace TXServer.ECSSystem.Events.Friend.Squad
 {
-    [SerialVersionUID(1507543176898L)]
-    public class InvitedToSquadEvent : ECSEvent
+    [SerialVersionUID(1507799564788L)]
+    public class RequestedToSquadEvent : ECSEvent
     {
-        public InvitedToSquadEvent(Player fromPlayer)
+        public RequestedToSquadEvent(Player fromPlayer, long squadId)
         {
             UserUid = fromPlayer.User.GetComponent<UserUidComponent>().Uid;
             FromUserId = fromPlayer.User.EntityId;
+            SquadId = squadId;
             EngineId = 0;
         }
 
         public string UserUid { get; set; }
         public long FromUserId { get; set; }
+        public long SquadId { get; set; }
         public long EngineId { get; set; }
     }
 }
