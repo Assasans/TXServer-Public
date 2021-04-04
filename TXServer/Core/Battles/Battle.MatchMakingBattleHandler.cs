@@ -184,7 +184,7 @@ namespace TXServer.Core.Battles
                 WaitingToJoinPlayers.Remove(battlePlayer);
                 battlePlayer.User.RemoveComponent<MatchMakingUserComponent>();
 
-                if (battlePlayer.Player.IsInMatch() && Battle.EnemyCountFor(battlePlayer) > 0)
+                if (battlePlayer.Player.IsInMatch && Battle.EnemyCountFor(battlePlayer) > 0)
                 {
                     // TODO: add deserter status only when player leaves 2 out of 4 last battles prematurely & conditions above
                     battlePlayer.Player.User.ChangeComponent<BattleLeaveCounterComponent>(component =>

@@ -17,8 +17,7 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			var rewards = new Dictionary<Entity, int> {};
-			List<ICommand> commands = new List<ICommand> {};
+            Dictionary<Entity, int> rewards = new();
 
 			if (player.Data.Admin)
             {
@@ -33,18 +32,18 @@ namespace TXServer.ECSSystem.Events
 				if (currencieCodes.ContainsKey(Convert.ToString(Code[0])))
                 {
 					if (int.TryParse(Code[1..], out var))
-					{
 						rewards.Add(currencieCodes[Convert.ToString(Code[0])], Convert.ToInt32(Code[1..]));
-					}
                 }
 				if (Code.StartsWith("xp"))
 				{
 					if (int.TryParse(Code[2..], out var))
 					{
-						UserExperienceComponent userExperienceComponent = player.User.GetComponent<UserExperienceComponent>();
-						userExperienceComponent.Experience += Convert.ToInt32(Code[2..]);
-						Logger.Debug($"{player}: Changed experience to {userExperienceComponent.Experience}");
-						commands.Add(new ComponentChangeCommand(player.User, userExperienceComponent));
+						player.User.ChangeComponent<UserExperienceComponent>(component =>
+						{
+							component.Experience += Convert.ToInt32(Code[2..]);
+							Logger.Debug($"{player}: Changed experience to {component.Experience}");
+						});
+						
 						player.CheckRankUp();
 					}
 				}
@@ -61,32 +60,31 @@ namespace TXServer.ECSSystem.Events
 
 			foreach (KeyValuePair<Entity, int> item in rewards)
             {
-				Entity notification = new Entity(new TemplateAccessor(new NewItemNotificationTemplate(), "notification/newitem"),
+				Entity notification = new(new TemplateAccessor(new NewItemNotificationTemplate(), "notification/newitem"),
 				    new NotificationGroupComponent(entity),
 				    new NewItemNotificationComponent(item.Key, item.Value),
 				    new NotificationComponent(NotificationPriority.MESSAGE));
-				commands.Add(new EntityShareCommand(notification));
-				
+				player.ShareEntity(notification);
+
 				if (item.Key == ExtraItems.GlobalItems.Crystal)
 				{
 					UserMoneyComponent userMoneyComponent = player.Data.SetCrystals(player.Data.Crystals + item.Value);
-					commands.Add(new ComponentChangeCommand(player.User, userMoneyComponent));
+					player.User.ChangeComponent(userMoneyComponent);
 				}
 				if (item.Key == ExtraItems.GlobalItems.Xcrystal)
                 {
 					UserXCrystalsComponent userXCrystalsComponent = player.Data.SetXCrystals(player.Data.XCrystals + item.Value);
-					commands.Add(new ComponentChangeCommand(player.User, userXCrystalsComponent));
+					player.User.ChangeComponent(userXCrystalsComponent);
                 }
 				if (item.Key == ExtraItems.GlobalItems.Premiumboost)
 				{
-					if (player.User.GetComponent<PremiumAccountBoostComponent>() == null)
+					if (!player.User.HasComponent<PremiumAccountBoostComponent>())
 						player.User.AddComponent(new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(item.Value * 24, 0, 0))));
 					else
 						player.User.ChangeComponent<PremiumAccountBoostComponent>(component => component.EndDate.Time += item.Value);
 				}
 			}
 
-			CommandManager.SendCommands(player, commands);
 			if (rewards.Count > 0)
 				player.SendEvent(new ShowNotificationGroupEvent(1), entity);
 		}

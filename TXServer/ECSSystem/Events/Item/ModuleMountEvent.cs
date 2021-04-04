@@ -1,5 +1,4 @@
 ﻿using TXServer.Core;
-using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -13,11 +12,8 @@ namespace TXServer.ECSSystem.Events
 		{
 			player.CurrentPreset.Modules[slot] = module;
 
-			ModuleGroupComponent component = new ModuleGroupComponent(module);
-
-			CommandManager.SendCommands(player,
-				new ComponentAddCommand(slot, component),
-				new ComponentAddCommand(module, new MountedItemComponent()));
+			slot.AddComponent(new ModuleGroupComponent(module));
+			module.AddComponent(new MountedItemComponent());
 		}
 	}
 }

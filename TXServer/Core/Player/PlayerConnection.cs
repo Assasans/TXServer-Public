@@ -53,20 +53,13 @@ namespace TXServer.Core
         {
             try
             {
-                Entity ClientSession = new Entity(new TemplateAccessor(new ClientSessionTemplate(), null),
-                                                    new ClientSessionComponent());
+                Player.ClientSession = new(new TemplateAccessor(new ClientSessionTemplate(), null),
+                                                    new ClientSessionComponent(),
+                                                    new SessionSecurityPublicComponent(),
+                                                    new InviteComponent(true, null));
 
-                Player.ClientSession = ClientSession;
-
-                // Server time message
                 CommandManager.SendCommands(Player, new InitTimeCommand());
-
-                // Session init message
-                CommandManager.SendCommands(Player,
-                    new EntityShareCommand(ClientSession),
-                    new ComponentAddCommand(ClientSession, new SessionSecurityPublicComponent()),
-                    new ComponentAddCommand(ClientSession, new InviteComponent(true, ""))
-                );
+                Player.ShareEntity(Player.ClientSession);
 
                 while (IsActive)
                 {
@@ -85,9 +78,7 @@ namespace TXServer.Core
 
                     commands[0] = command;
                     for (int i = 1; i < count; i++)
-                    {
                         commands[i] = QueuedCommands.Take();
-                    }
 
                     if (!IsActive) return;
                     CommandManager.SendCommands(Player, commands);
@@ -97,8 +88,7 @@ namespace TXServer.Core
             {
                 Logger.Error($"{Player}: {e}");
                 Player.Dispose();
-                if (Player.User?.GetComponent<UserOnlineComponent>() != null)
-                    Player.User?.RemoveComponent<UserOnlineComponent>();
+                Player.User?.TryRemoveComponent<UserOnlineComponent>();
             }
         }
 
@@ -129,8 +119,7 @@ namespace TXServer.Core
                 }
 
                 Player.Dispose();
-                if (Player.User?.GetComponent<UserOnlineComponent>() != null)
-                    Player.User?.RemoveComponent<UserOnlineComponent>();
+                Player.User?.TryRemoveComponent<UserOnlineComponent>();
             }
         }
 

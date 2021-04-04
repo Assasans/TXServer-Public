@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.Events.Battle
 
         public void Execute(Player player, Entity entity)
         {
-            CommandManager.SendCommands(player, new SendEventCommand(new BattlePongEvent(ClientSendRealTime), entity));
+            player.SendEvent(new BattlePongEvent(ClientSendRealTime), entity);
         }
     }
 }

@@ -74,24 +74,21 @@ namespace TXServer.Core
 			return found;
         }
 
-        public bool LogIn(Entity clientSession)
-        {
-	        if (UniqueId == null)
+		public bool LogIn(Entity clientSession)
+		{
+			if (UniqueId == null)
 			{
-				CommandManager.SendCommands(this,
-					new SendEventCommand(new LoginFailedEvent(), ClientSession),
-					new SendEventCommand(new InvalidPasswordEvent(), ClientSession));
+				SendEvent(new LoginFailedEvent(), ClientSession);
+				SendEvent(new InvalidPasswordEvent(), ClientSession);
 				return false;
 			}
 
-	        if (ClientSession.EntityId != clientSession?.EntityId)
-	        {
-		        throw new ArgumentException("ClientSession Entity doesn't match Player ClientSession Entity");
-	        }
+			if (ClientSession.EntityId != clientSession?.EntityId)
+				throw new ArgumentException("ClientSession Entity doesn't match Player ClientSession Entity");
 
 			Logger.Log($"{this}: Logged in as {Data.UniqueId}.");
 
-			Entity user = new Entity(new TemplateAccessor(new UserTemplate(), ""),
+			Entity user = new(new TemplateAccessor(new UserTemplate(), ""),
 				new UserXCrystalsComponent(Data.XCrystals),
 				new UserCountryComponent(Data.CountryCode),
 				new UserAvatarComponent(Data.Avatar),
@@ -119,66 +116,49 @@ namespace TXServer.Core
 				new KillsEquipmentStatisticsComponent(),
 				new BattleLeaveCounterComponent(0, 0),
 				//new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(12, 0, 0))),
-			    new UserReputationComponent(0.0));
+				new UserReputationComponent(0.0),
+				new UserOnlineComponent());
+			user.Components.Add(new UserGroupComponent(user));
 
 			// temp solution
-			List<string> AdminUids = new() { "NoNick", "Tim203", "M8", "Kaveman"};
+			List<string> AdminUids = new() { "NoNick", "Tim203", "M8", "Kaveman" };
 			if (!AdminUids.Contains(Data.UniqueId))
 				Data.Admin = false;
 
 			if (Data.Admin)
 			{
 				user.Components.Add(new UserAdminComponent());
-			    if (user.GetComponent<PremiumAccountBoostComponent>() == null)
-                {
+				if (user.GetComponent<PremiumAccountBoostComponent>() == null)
 					user.Components.Add(new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(23999976, 0, 0))));
-                }
 			}
 			if (Data.Beta) user.Components.Add(new ClosedBetaQuestAchievementComponent());
 
 			User = user;
+			ShareEntity(user);
+			clientSession.AddComponent(new UserGroupComponent(user));
 
-			user.Components.Add(new UserGroupComponent(user));
+			ShareEntities(ResourceManager.GetEntities(this, user));
 
-			List<ICommand> collectedCommands = new List<ICommand>
+			CurrentAvatar = ((Avatars.Items)UserItems[typeof(Avatars)]).Tankist;
+			foreach (Entity item in new[]
+            {
+				CurrentAvatar,
+				CurrentPreset.WeaponItem,
+                CurrentPreset.HullItem,
+                CurrentPreset.WeaponPaint,
+                CurrentPreset.TankPaint,
+                CurrentPreset.Graffiti,
+			}.Concat(CurrentPreset.HullSkins.Values)
+             .Concat(CurrentPreset.WeaponSkins.Values)
+             .Concat(CurrentPreset.WeaponShells.Values))
 			{
-				new EntityShareCommand(user),
-				new ComponentAddCommand(ClientSession, new UserGroupComponent(user)),
-			};
-			
-			collectedCommands.AddRange(from collectedEntity in ResourceManager.GetEntities(this, user)
-									   select new EntityShareCommand(collectedEntity));
-
-			collectedCommands.AddRange(new[]
-			{
-				new ComponentAddCommand(CurrentPreset.WeaponItem, new MountedItemComponent()),
-				new ComponentAddCommand(CurrentPreset.HullItem, new MountedItemComponent()),
-
-				new ComponentAddCommand(CurrentPreset.WeaponPaint, new MountedItemComponent()),
-				new ComponentAddCommand(CurrentPreset.TankPaint, new MountedItemComponent())
-			});
-
-			foreach (Entity item in CurrentPreset.WeaponSkins.Values
-				                    .Concat(CurrentPreset.HullSkins.Values)
-									.Concat(CurrentPreset.WeaponShells.Values))
-			{
-				collectedCommands.Add(new ComponentAddCommand(item, new MountedItemComponent()));
+				item.AddComponent(new MountedItemComponent());
 			}
 
-			collectedCommands.Add(new ComponentAddCommand(CurrentPreset.Graffiti, new MountedItemComponent()));
+			//new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
+			SendEvent(new PaymentSectionLoadedEvent(), user);
+			SendEvent(new FriendsLoadedEvent(this), ClientSession);
 
-			Entity avatar = (UserItems["Avatars"] as Avatars.Items).Tankist;
-			collectedCommands.Add(new ComponentAddCommand(avatar, new MountedItemComponent()));
-			ReferencedEntities.TryAdd("CurrentAvatar", avatar);
-
-			collectedCommands.AddRange(new ICommand[] {
-				//new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
-			    new SendEventCommand(new PaymentSectionLoadedEvent(), user),
-				new ComponentAddCommand(user, new UserOnlineComponent()),
-				new SendEventCommand(new FriendsLoadedEvent(this), ClientSession)
-			});
-
-			CommandManager.SendCommands(this, collectedCommands);
 			return true;
         }
 
@@ -195,7 +175,7 @@ namespace TXServer.Core
 			};
 
 			long totalExperience = User.GetComponent<UserExperienceComponent>().Experience;
-			if (IsInMatch())
+			if (IsInMatch)
             {
 				int battleExperience = BattlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
 				if (User.GetComponent<PremiumAccountBoostComponent>() == null)
@@ -209,11 +189,10 @@ namespace TXServer.Core
 			if (User.GetComponent<UserRankComponent>().Rank < correctRank)
             {
 				User.ChangeComponent(new UserRankComponent(correctRank));
-				// todo: load rank rewards from configs (https://vignette2.wikia.nocookie.net/tanki-x/images/f/fb/Rankit.png/revision/latest?cb=20170629172052)
-				Entity rankUpNotification = UserRankRewardNotificationTemplate.CreateEntity(100, 5000, correctRank);
-				ShareEntity(rankUpNotification);
+                // todo: load rank rewards from configs (https://vignette2.wikia.nocookie.net/tanki-x/images/f/fb/Rankit.png/revision/latest?cb=20170629172052)
+                ShareEntity(UserRankRewardNotificationTemplate.CreateEntity(100, 5000, correctRank));
 
-				if (IsInMatch())
+				if (IsInMatch)
                 {
 					BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new UpdateRankEvent(), User);
 					int currentScoreInBattle = BattlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
@@ -223,33 +202,15 @@ namespace TXServer.Core
 			}
         }
 
-		public bool IsLoggedIn()
-        {
-			if (User != null) return true;
-			return false;
-        }
+        public bool IsLoggedIn => User != null;
 
-		public bool IsInBattleLobby()
-        {
-			if (BattlePlayer != null) return true;
-			else return false;
-		}
+        public bool IsInBattleLobby => BattlePlayer != null;
 
-		public bool IsInMatch()
-        {
-			if (IsInBattleLobby() && BattlePlayer.MatchPlayer != null) return true;
-			else return false;
-        }
+        public bool IsInMatch => BattlePlayer.MatchPlayer != null;
 
-		public bool IsOwner()
-        {
-			if (IsInBattleLobby() && BattlePlayer.Battle.TypeHandler is CustomBattleHandler)
-				if ((BattlePlayer.Battle.TypeHandler as CustomBattleHandler).Owner == this)
-					return true;
-			return false;
-        }
+        public bool IsOwner => (BattlePlayer?.Battle.TypeHandler as CustomBattleHandler)?.Owner == this;
 
-		public void SendEvent(ECSEvent @event, params Entity[] entities)
+        public void SendEvent(ECSEvent @event, params Entity[] entities)
         {
 			CommandManager.SendCommandsSafe(this, new SendEventCommand(@event, entities));
         }
@@ -294,14 +255,9 @@ namespace TXServer.Core
 
         public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
 
-        /// <summary>
-        /// Use for short-timed entity references from unconnected places.
-		/// For long-timed ones consider using properties.
-        /// </summary>
-        public ConcurrentDictionary<string, Entity> ReferencedEntities { get; } = new ConcurrentDictionary<string, Entity>();
-        
-        //todo add those two in PlayerData
-        public ConcurrentDictionary<string, ItemList> UserItems { get; } = new ConcurrentDictionary<string, ItemList>();
+		//todo add those two in PlayerData
+		public Entity CurrentAvatar { get; set; }
+        public ConcurrentDictionary<Type, ItemList> UserItems { get; } = new();
         public PresetEquipmentComponent CurrentPreset { get; set; }
 
         public Entity ClientSession { get; set; }
@@ -311,10 +267,7 @@ namespace TXServer.Core
 
         public string UniqueId => Data?.UniqueId;
 
-        public override string ToString()
-        {
-			return $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : "")})" : "")}";
-		}
+        public override string ToString() => $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : "")})" : "")}";
 		private EndPoint _EndPoint;
     }
 }

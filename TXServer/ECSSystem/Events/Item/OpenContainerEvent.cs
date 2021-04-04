@@ -15,20 +15,19 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity container)
         {
-			Entity notification = new Entity(new TemplateAccessor(new NewItemNotificationTemplate(), "notification/newitem"),
+			Entity notification = new(new TemplateAccessor(new NewItemNotificationTemplate(), "notification/newitem"),
 				new NotificationGroupComponent(container),
 				new NewItemNotificationComponent(ExtraItems.GlobalItems.Crystal, 10),
 				new NotificationComponent(NotificationPriority.MESSAGE));
 
-			UserItemCounterComponent component = container.GetComponent<UserItemCounterComponent>();
+			container.ChangeComponent<UserItemCounterComponent>(component =>
+			{
+				if (Amount > component.Count) throw new ArgumentOutOfRangeException(nameof(Amount));
+				component.Count -= Amount;
+			});
 
-			if (Amount > component.Count) throw new ArgumentOutOfRangeException(nameof(Amount));
-			component.Count -= Amount;
-
-			CommandManager.SendCommands(player,
-				new ComponentChangeCommand(container, component),
-				new EntityShareCommand(notification),
-				new SendEventCommand(new ShowNotificationGroupEvent(1), container));
+			player.ShareEntity(notification);
+			player.SendEvent(new ShowNotificationGroupEvent(1), container);
         }
 
         public long Amount { get; set; }

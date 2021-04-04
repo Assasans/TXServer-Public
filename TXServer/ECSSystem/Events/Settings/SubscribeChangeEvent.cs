@@ -12,16 +12,10 @@ namespace TXServer.ECSSystem.Events
 		public void Execute(Player player, Entity entity)
 		{
 			// TODO: save changed subscribed bool in database
-			ICommand command;
 			if (Subscribed)
-            {
-				command = new ComponentAddCommand(player.User, new UserSubscribeComponent());
-			} 
+				player.User.AddComponent(new UserSubscribeComponent());
 			else
-            {
-				command = new ComponentRemoveCommand(player.User, typeof(UserSubscribeComponent));
-            }
-			CommandManager.SendCommands(player, command);
+				player.User.RemoveComponent<UserSubscribeComponent>();
 		}
 		public bool Subscribed { get; set; }
 	}

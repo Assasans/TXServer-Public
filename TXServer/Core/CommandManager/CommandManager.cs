@@ -4,13 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Threading;
 using TXServer.Core.Logging;
 using TXServer.Core.Protocol;
 using TXServer.Library;
 
 namespace TXServer.Core.Commands
 {
+    [Obsolete("To send commands to client, use Entity or Player instead.")]
     public static partial class CommandManager
     {
         /// <summary>

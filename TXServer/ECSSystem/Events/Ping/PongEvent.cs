@@ -1,6 +1,5 @@
 ﻿using System;
 using TXServer.Core;
-using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -19,7 +18,7 @@ namespace TXServer.ECSSystem.Events.Ping
             float ping = ctm - PongCommandClientRealTime;
             player.Connection.DiffToClient = (long) ping;
             player.Connection.PingReceiveTime = DateTimeOffset.Now;
-            CommandManager.SendCommands(player, new SendEventCommand(new PingResultEvent(ctm, ping)));
+            player.SendEvent(new PingResultEvent(ctm, ping));
         }
     }
 }

@@ -19,7 +19,7 @@ namespace TXServer.Core.Commands
 			if (!message.StartsWith('/')) return null;
 			string[] args = message[1..].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-			bool hackBattle = player.IsOwner() && (player.BattlePlayer.Battle.TypeHandler as CustomBattleHandler).HackBattle;
+			bool hackBattle = player.IsOwner && (player.BattlePlayer.Battle.TypeHandler as CustomBattleHandler).HackBattle;
 
 			if (args.Length == 0) return null;
 
@@ -27,12 +27,14 @@ namespace TXServer.Core.Commands
 			{
 				return $"Network latency: {player.Connection.Ping} ms";
 			}
-
-			if (player.IsOwner() || player.Data.Admin)
+			if (player.IsOwner || player.Data.Admin)
             {
 				if (args[0] == "hackBattle")
                 {
-					if ((player.BattlePlayer.Battle.TypeHandler as CustomBattleHandler).HackBattle)
+					if (player.BattlePlayer.Battle.IsMatchMaking)
+						return "HackBattle cannot be enabled in matchmaking mattles";
+
+					if (((CustomBattleHandler)player.BattlePlayer.Battle.TypeHandler).HackBattle)
 						return "HackBattle is already enabled";
 
 					Dictionary<List<BattlePlayer>, Entity> targets = new() { 
@@ -51,7 +53,7 @@ namespace TXServer.Core.Commands
 					switch (args[0])
 					{
 						case "cheat":
-							if (!player.IsInMatch()) return null;
+							if (!player.IsInMatch) return null;
 							if (player.BattlePlayer.MatchPlayer.TankState != TankState.Active) return "Only possible with an active tank";
 
 							switch (args[1])
@@ -72,7 +74,7 @@ namespace TXServer.Core.Commands
 									return null;
 							}
 						case "gravity":
-							if (!player.IsInBattleLobby()) return null;
+							if (!player.IsInBattleLobby) return null;
 
 							string notification = "Gravity changed ";
 							float gravity;
@@ -110,17 +112,17 @@ namespace TXServer.Core.Commands
 				switch (args[0])
 				{
 					case "open":
-						if (!player.IsInMatch()) return null;
+						if (!player.IsInMatch) return null;
 						if (player.BattlePlayer.Battle.ForceOpen)
 							return "Already opened";
 						player.BattlePlayer.Battle.ForceOpen = true;
 						return "Opened";
 					case "positionInfo":
-						if (!player.IsInMatch()) return null;
+						if (!player.IsInMatch) return null;
 						Vector3 tankPosition = player.BattlePlayer.MatchPlayer.TankPosition;
 						return ($"X: {tankPosition.X}, Y: {tankPosition.Y}, Z: {tankPosition.Z}");
 					case "start":
-						if (!player.IsInBattleLobby() || player.IsInMatch()) return null;
+						if (!player.IsInBattleLobby || player.IsInMatch) return null;
 						if (!player.BattlePlayer.Battle.IsMatchMaking)
 							player.BattlePlayer.Battle.BattleState = BattleState.Starting;
 						else
@@ -135,7 +137,7 @@ namespace TXServer.Core.Commands
 				switch (args[0])
 				{
 					case "spawnInfo":
-						if (!player.IsInMatch()) return null;
+						if (!player.IsInMatch) return null;
 						SpawnPoint lastSpawnPoint = player.BattlePlayer.MatchPlayer.LastSpawnPoint;
 						return ($"{player.BattlePlayer.Battle.CurrentMapInfo.Name}, {player.BattlePlayer.Battle.Params.BattleMode}, {player.User.GetComponent<TeamColorComponent>().TeamColor}, Number: {lastSpawnPoint.Number}");
 					case "stats":
@@ -153,11 +155,13 @@ namespace TXServer.Core.Commands
 					list = list.Concat(TesterCommands);
 				if (player.Data.Admin)
 					list = list.Concat(AdminCommands);
+				if (player.IsInBattleLobby && (player.IsOwner && hackBattle || player.Data.Admin))
+					list = list.Concat(HackBattleCommands);
 
-				return string.Join('\n', list);
+				return '/' + string.Join("\n/", list);
 			}
 
-			return null;
+			return "Unknown command. Enter \"/help\" to view available commands";
 		}
 
 
@@ -216,8 +220,8 @@ namespace TXServer.Core.Commands
 			}
 		}
 
-		private static readonly List<string> TesterCommands = new() { "/spawnInfo", "/stats" };
-		private static readonly List<string> AdminCommands = new() { "/positionInfo", "/start" };
-		private static readonly List<string> HackBattleCommands = new() { "/cheat [SUPPLY] [target]", "/gravity [number]" };
+		private static readonly List<string> TesterCommands = new() { "spawnInfo", "stats" };
+		private static readonly List<string> AdminCommands = new() { "positionInfo", "start" };
+		private static readonly List<string> HackBattleCommands = new() { "hackBattle", "cheat [SUPPLY] [target]", "gravity [number]" };
 	}
 }

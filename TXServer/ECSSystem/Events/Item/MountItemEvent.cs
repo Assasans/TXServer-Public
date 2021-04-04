@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.Serialization;
+using System.Linq;
 using TXServer.Core;
-using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -11,7 +9,7 @@ using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.ECSSystem.Events
 {
-	[SerialVersionUID(1434530333851L)]
+    [SerialVersionUID(1434530333851L)]
 	public class MountItemEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity item)
@@ -29,8 +27,8 @@ namespace TXServer.ECSSystem.Events
 					player.CurrentPreset.HullItem = item;
 					break;
 				case AvatarUserItemTemplate _:
-					player.ReferencedEntities.TryGetValue("CurrentAvatar", out prevItem);
-					player.ReferencedEntities["CurrentAvatar"] = item;
+					prevItem = player.CurrentAvatar;
+					player.CurrentAvatar = item;
 					break;
 				case TankPaintUserItemTemplate _:
 					prevItem = player.CurrentPreset.TankPaint;
@@ -57,89 +55,62 @@ namespace TXServer.ECSSystem.Events
 					player.CurrentPreset.Graffiti = item;
 					break;
 				case PresetUserItemTemplate _:
-					LinkedList<ICommand> commands = new LinkedList<ICommand>();
-
 					// Unmount previous preset items
-					PresetEquipmentComponent preset = player.CurrentPreset;
-					List<Entity> entities = new List<Entity>
-					{
-						preset.HullItem,
-						preset.WeaponItem,
-						preset.TankPaint,
-						preset.WeaponPaint,
-						preset.Graffiti,
-					};
-					entities.AddRange(preset.HullSkins.Values);
-					entities.AddRange(preset.WeaponSkins.Values);
-					entities.AddRange(preset.WeaponShells.Values);
-					entities.AddRange(preset.Modules.Values);
+					PresetEquipmentComponent prevPreset = player.CurrentPreset;
 
-					foreach (Entity entity in entities)
+					foreach (Entity presetItem in new[]
 					{
-						if (entity != null)
-							commands.AddLast(new ComponentRemoveCommand(entity, typeof(MountedItemComponent)));
+						prevPreset.HullItem,
+						prevPreset.WeaponItem,
+						prevPreset.TankPaint,
+						prevPreset.WeaponPaint,
+						prevPreset.Graffiti,
+					}.Concat(prevPreset.HullSkins.Values)
+					 .Concat(prevPreset.WeaponSkins.Values)
+					 .Concat(prevPreset.WeaponShells.Values)
+					 .Concat(prevPreset.Modules.Values))
+					{
+						presetItem?.RemoveComponent<MountedItemComponent>();
 					}
 
-					foreach (KeyValuePair<Entity, Entity> pair in preset.Modules)
-					{
-						if (pair.Key.Components.Contains(new ModuleGroupComponent(0)))
-						{
-							commands.AddLast(new ComponentRemoveCommand(pair.Key, typeof(ModuleGroupComponent)));
-						}
-					}
+					foreach (Entity slot in prevPreset.Modules.Keys)
+						slot.TryRemoveComponent<ModuleGroupComponent>();
 
 					// Mount new preset items
-					item.Components.TryGetValue(FormatterServices.GetUninitializedObject(typeof(PresetEquipmentComponent)) as PresetEquipmentComponent, out Component component);
-					PresetEquipmentComponent newPreset = component as PresetEquipmentComponent;
-					entities = new List<Entity>
+					PresetEquipmentComponent newPreset = item.GetComponent<PresetEquipmentComponent>();
+					foreach (Entity presetItem in new[]
 					{
 						newPreset.HullItem,
 						newPreset.WeaponItem,
 						newPreset.TankPaint,
 						newPreset.WeaponPaint,
 						newPreset.Graffiti,
-					};
-					entities.AddRange(newPreset.HullSkins.Values);
-					entities.AddRange(newPreset.WeaponSkins.Values);
-					entities.AddRange(newPreset.WeaponShells.Values);
-					entities.AddRange(newPreset.Modules.Values);
-
-					foreach (Entity entity in entities)
+					}.Concat(newPreset.HullSkins.Values)
+					 .Concat(newPreset.WeaponSkins.Values)
+					 .Concat(newPreset.WeaponShells.Values)
+					 .Concat(newPreset.Modules.Values))
 					{
-						if (entity != null)
-							commands.AddLast(new ComponentAddCommand(entity, new MountedItemComponent()));
+						presetItem?.AddComponent(new MountedItemComponent());
 					}
 
-					foreach (KeyValuePair<Entity, Entity> pair in newPreset.Modules)
+					foreach (KeyValuePair<Entity, Entity> slotModulePair in newPreset.Modules)
 					{
-						if (pair.Value != null)
-						{
-							commands.AddLast(new ComponentAddCommand(pair.Key, new ModuleGroupComponent(pair.Value)));
-						}
+						if (slotModulePair.Value != null)
+							slotModulePair.Key.AddComponent(new ModuleGroupComponent(slotModulePair.Value));
 					}
 
-					CommandManager.SendCommands(player, commands);
-
-					prevItem = preset.Preset;
+					prevItem = prevPreset.Preset;
 					player.CurrentPreset = newPreset;
 					break;
 				default:
 					throw new NotImplementedException();
 			}
 
-			List<ICommand> commands2 = new List<ICommand>
-			{
-				new ComponentRemoveCommand(prevItem, typeof(MountedItemComponent)),
-				new ComponentAddCommand(item, new MountedItemComponent())
-			};
+			prevItem.RemoveComponent<MountedItemComponent>();
+			item.AddComponent(new MountedItemComponent());
 
-			if (player.User.GetComponent<UserEquipmentComponent>() != null)
-            {
-				commands2.Add(new ComponentRemoveCommand(player.User, typeof(UserEquipmentComponent)));
-				commands2.Add(new ComponentAddCommand(player.User, new UserEquipmentComponent(player.CurrentPreset.Weapon.EntityId, player.CurrentPreset.Hull.EntityId)));
-			}
-
-			CommandManager.SendCommands(player, commands2);
+			if (player.User.TryRemoveComponent<UserEquipmentComponent>())
+				player.User.AddComponent(new UserEquipmentComponent(player.CurrentPreset.Weapon.EntityId, player.CurrentPreset.Hull.EntityId));
 		}
 	}
 }

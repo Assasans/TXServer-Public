@@ -1,11 +1,10 @@
 ﻿using TXServer.Core;
-using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Events
 {
-	[SerialVersionUID(635906273125139964L)]
+    [SerialVersionUID(635906273125139964L)]
 	public class CheckEmailEvent : ECSEvent
 	{
 		public CheckEmailEvent(string email)
@@ -15,22 +14,23 @@ namespace TXServer.ECSSystem.Events
 
 		public void Execute(Player player, Entity entity)
 		{
-			ICommand command = new SendEventCommand(new EmailVacantEvent(Email), entity);
 			try
 			{
 				var addr = new System.Net.Mail.MailAddress(Email);
+
 				// TODO: check if email is occupied
 				bool emailIsOccupied = false;
 				if (emailIsOccupied)
 				{
-					command = new SendEventCommand(new EmailOccupiedEvent(Email), entity);
+					player.SendEvent(new EmailOccupiedEvent(Email), entity);
+					return;
 				}
 
-				CommandManager.SendCommands(player, command);
+				player.SendEvent(new EmailVacantEvent(Email), entity);
 			}
 			catch
 			{
-				CommandManager.SendCommands(player, new SendEventCommand(new EmailInvalidEvent(Email), entity));
+				player.SendEvent(new EmailInvalidEvent(Email), entity);
 			}
 		}
 

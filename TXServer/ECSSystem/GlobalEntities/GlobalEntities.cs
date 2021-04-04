@@ -105,7 +105,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                     info.Invoke(null, new object[] { player }) : 
                     info.Invoke(null, new object[] { user })) as ItemList;
                 entities.AddRange(list.GetAllItems());
-                player.UserItems.TryAdd(type.Name, list);
+                player.UserItems.TryAdd(type, list);
             }
 
             return entities.ToArray();

@@ -11,7 +11,7 @@ namespace TXServer.Core.Logging
             lock (_lock)
             {
                 Console.ForegroundColor = color;
-                Console.WriteLine($"[{type}] {content}");
+                Console.WriteLine($"[{DateTime.Now}/{type}] {content}");
             }
         }
 

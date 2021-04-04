@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using TXServer.Core;
-using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -16,19 +15,16 @@ namespace TXServer.ECSSystem.Events
 		{
 			var XCrystals = player.Data.SetXCrystals(player.Data.XCrystals - Price);
 
-			Entity newItem = new Entity(new TemplateAccessor(Activator.CreateInstance((item.TemplateAccessor.Template as IMarketItemTemplate).UserItemType) as IEntityTemplate, item.TemplateAccessor.ConfigPath),
+			Entity newItem = new(new TemplateAccessor((IEntityTemplate)Activator.CreateInstance(((IMarketItemTemplate)item.TemplateAccessor.Template).UserItemType), item.TemplateAccessor.ConfigPath),
 				item.Components.ToArray());
 			newItem.Components.Add(new UserGroupComponent(user));
-			(newItem.TemplateAccessor.Template as IUserItemTemplate).AddUserItemComponents(player, newItem);
+			((IUserItemTemplate)newItem.TemplateAccessor.Template).AddUserItemComponents(player, newItem);
 
-			CommandManager.SendCommands(player,
-				new EntityShareCommand(newItem),
-				new ComponentChangeCommand(user, XCrystals));
+			player.ShareEntity(newItem);
+			user.ChangeComponent(XCrystals);
 
-			if (newItem.TemplateAccessor.Template as IMountableItemTemplate != null)
-			{
+			if (newItem.TemplateAccessor.Template is IMountableItemTemplate)
 				new MountItemEvent().Execute(player, newItem);
-			}
 		}
 
 		public int Price { get; set; }

@@ -16,20 +16,20 @@ namespace TXServer.ECSSystem.Components
             Player = player;
             Preset = preset;
 
-            WeaponItem = (Player.UserItems["Weapons"] as Weapons.Items).Smoky;
-            HullItem = (Player.UserItems["Hulls"] as Hulls.Items).Hunter;
+            Weapons.Items weaponList = (Weapons.Items)player.UserItems[typeof(Weapons)];
+            Hulls.Items hullList = (Hulls.Items)player.UserItems[typeof(Hulls)];
+            WeaponSkins.Items weaponSkinList = (WeaponSkins.Items)player.UserItems[typeof(WeaponSkins)];
+            HullSkins.Items hullSkinList = (HullSkins.Items)player.UserItems[typeof(HullSkins)];
+            Shells.Items shellList = (Shells.Items)player.UserItems[typeof(Shells)];
+            ModuleSlots.Items moduleSlotList = (ModuleSlots.Items)player.UserItems[typeof(ModuleSlots)];
 
-            WeaponPaint = (Player.UserItems["Covers"] as Covers.Items).None;
-            TankPaint = (Player.UserItems["Paints"] as Paints.Items).Green;
+            WeaponItem = weaponList.Smoky;
+            HullItem = hullList.Hunter;
 
-            Graffiti = (Player.UserItems["Graffiti"] as Graffiti.Items).Logo;
+            WeaponPaint = ((Covers.Items)Player.UserItems[typeof(Covers)]).None;
+            TankPaint = ((Paints.Items)Player.UserItems[typeof(Paints)]).Green;
 
-            Weapons.Items weaponList = player.UserItems["Weapons"] as Weapons.Items;
-            Hulls.Items hullList = player.UserItems["Hulls"] as Hulls.Items;
-            WeaponSkins.Items weaponSkinList = player.UserItems["WeaponSkins"] as WeaponSkins.Items;
-            HullSkins.Items hullSkinList = player.UserItems["HullSkins"] as HullSkins.Items;
-            Shells.Items shellList = player.UserItems["Shells"] as Shells.Items;
-            ModuleSlots.Items moduleSlotList = player.UserItems["ModuleSlots"] as ModuleSlots.Items;
+            Graffiti = ((Graffiti.Items)Player.UserItems[typeof(Graffiti)]).Logo;
 
             WeaponSkins = new Dictionary<Entity, Entity>
             {
@@ -96,51 +96,10 @@ namespace TXServer.ECSSystem.Components
         [ProtocolIgnore] public Entity TankPaint { get; set; }
 
         [ProtocolIgnore] public Entity Graffiti { get; set; }
-
-        // commented code below breaks mount item system
-        /*
-        [ProtocolIgnore] public Entity WeaponItem
-        {
-            get => (Player.UserItems["Weapons"] as Weapons.Items).Smoky;
-            set { /* ignored rn / }
-        }
-        
-        [ProtocolIgnore]
-        public Entity HullItem
-        {
-            get => (Player.UserItems["Hulls"] as Hulls.Items).Hunter;
-            set { /* ignored rn / }
-        }
-
-        [ProtocolIgnore]
-        public Entity WeaponPaint
-        {
-            get => (Player.UserItems["Covers"] as Covers.Items).None;
-            set { /* ignored rn / }
-        }
-
-        [ProtocolIgnore]
-        public Entity TankPaint
-        {
-            get => (Player.UserItems["Paints"] as Paints.Items).Green;
-            set { /* ignored rn / }
-        }
-        */
-
         [ProtocolIgnore] public Dictionary<Entity, Entity> WeaponSkins { get; set; }
         [ProtocolIgnore] public Dictionary<Entity, Entity> HullSkins { get; set; }
 
         [ProtocolIgnore] public Dictionary<Entity, Entity> WeaponShells { get; set; }
-
-        /*
-        [ProtocolIgnore]
-        public Entity Graffiti
-        {
-            get => (Player.UserItems["Graffiti"] as Graffiti.Items).Logo;
-            set { /* ignored rn / }
-        }
-        */
-
         [ProtocolIgnore] public Dictionary<Entity, Entity> Modules { get; set; }
     }
 }
