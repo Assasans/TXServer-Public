@@ -92,7 +92,7 @@ namespace TXServer.ECSSystem.Base
             
             foreach (Player player in PlayerReferences)
             {
-                CommandManager.SendCommandsSafe(player, new ComponentAddCommand(this, component, addOrChangeDone: true));
+                player.Connection.QueueCommands(new ComponentAddCommand(this, component));
             }
         }
 
@@ -102,7 +102,7 @@ namespace TXServer.ECSSystem.Base
 
             foreach (Player player in PlayerReferences)
             {
-                CommandManager.SendCommandsSafe(player, new ComponentChangeCommand(this, component, addOrChangeDone: true));
+                player.Connection.QueueCommands(new ComponentChangeCommand(this, component));
             }
         }
 
@@ -120,7 +120,7 @@ namespace TXServer.ECSSystem.Base
 
             foreach (Player player in PlayerReferences)
             {
-                CommandManager.SendCommandsSafe(player, new ComponentRemoveCommand(this, componentType, removeDone: true));
+                player.Connection.QueueCommands(new ComponentRemoveCommand(this, componentType));
             }
         }
 

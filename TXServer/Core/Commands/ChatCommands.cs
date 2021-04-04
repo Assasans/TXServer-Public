@@ -53,7 +53,7 @@ namespace TXServer.Core.Commands
 					switch (args[0])
 					{
 						case "cheat":
-							if (!player.IsInMatch) return null;
+							if (!player.IsInMatch) return "Only possible in match";
 							if (player.BattlePlayer.MatchPlayer.TankState != TankState.Active) return "Only possible with an active tank";
 
 							switch (args[1])
@@ -71,7 +71,7 @@ namespace TXServer.Core.Commands
 									int cheats = DisableSupplyCheats(player.BattlePlayer.MatchPlayer);
 									return $"{cheats} cheat(s) disabled";
 								default:
-									return null;
+									return "Invalid cheat";
 							}
 						case "gravity":
 							if (!player.IsInBattleLobby) return null;

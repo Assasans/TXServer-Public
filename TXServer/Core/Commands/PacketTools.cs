@@ -1,14 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using TXServer.Core.Protocol;
 
 namespace TXServer.Core.Commands
 {
-    public static partial class CommandManager
+    public static class PacketTools
     {
-        private static readonly Dictionary<byte, Type> CommandTypeByCode = new Dictionary<byte, Type>();
+        /// <summary>
+        /// Packet start sequence.
+        /// </summary>
+        public static readonly byte[] Magic = { 0xff, 0x00 };
 
-        static CommandManager()
+        private static readonly Dictionary<byte, Type> CommandTypeByCode = new();
+
+        static PacketTools()
         {
             Assembly currentAssembly = Assembly.GetExecutingAssembly();
 
@@ -17,9 +24,7 @@ namespace TXServer.Core.Commands
                 CommandCodeAttribute attribute = type.GetCustomAttribute<CommandCodeAttribute>();
 
                 if (attribute != null)
-                {
                     CommandTypeByCode.Add(attribute.Code, type);
-                }
             }
         }
 
@@ -49,6 +54,18 @@ namespace TXServer.Core.Commands
             {
                 throw new ArgumentException(string.Format("Command with code {0} not found.", code));
             }
+        }
+
+        /// <summary>
+        /// Returns properties (not ignored with [ProtocolIgnore]) in alphabetical or preset by [ProtocolFixed] order.
+        /// </summary>
+        public static IOrderedEnumerable<PropertyInfo> GetProtocolProperties(Type type)
+        {
+            return from property in type.GetProperties()
+                   where !Attribute.IsDefined(property, typeof(ProtocolIgnoreAttribute))
+                   orderby property.GetCustomAttribute<ProtocolFixedAttribute>()?.Position,
+                           property.Name
+                   select property;
         }
     }
 }

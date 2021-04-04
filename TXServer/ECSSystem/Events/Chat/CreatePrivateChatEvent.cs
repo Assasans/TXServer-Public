@@ -12,11 +12,6 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(636469080057216111L)]
 	public class CreatePrivateChatEvent : ECSEvent
 	{
-		public void Execute(Entity user)
-		{
-			throw new NotImplementedException();
-		}
-
 		public void Execute(Player player, Entity user, Entity sourceChat)
         {
 			Entity goalUser = null;

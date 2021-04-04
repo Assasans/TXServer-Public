@@ -7,29 +7,18 @@ namespace TXServer.Core.Commands
     [CommandCode(3)]
     public class EntityUnshareCommand : ICommand
     {
-        public EntityUnshareCommand(Entity Entity, bool isManual = false)
-        {
-            this.Entity = Entity ?? throw new ArgumentNullException(nameof(Entity));
-            this.isManual = isManual;
-        }
+        [ProtocolFixed] public Entity Entity { get; }
 
-        public void OnSend(Player player)
+        public EntityUnshareCommand(Entity entity)
         {
-            if (isManual) return;
-            player.RemoveEntity(Entity);
+            Entity = entity ?? throw new ArgumentNullException(nameof(entity));
         }
 
         public void OnReceive(Player player)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException("Client by itself cannot share entities.");
         }
 
-        public override string ToString()
-        {
-            return $"EntityUnshareCommand [Entity: {Entity}]";
-        }
-
-        [ProtocolFixed] public Entity Entity { get; }
-        private readonly bool isManual;
+        public override string ToString() => $"EntityUnshareCommand [Entity: {Entity}]";
     }
 }

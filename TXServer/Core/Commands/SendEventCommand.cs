@@ -10,33 +10,29 @@ namespace TXServer.Core.Commands
     [CommandCode(1)]
     public class SendEventCommand : ICommand
     {
-        public SendEventCommand(ECSEvent Event, params Entity[] Entities)
-        {
-            _ = Entities ?? throw new ArgumentNullException(nameof(Entities));
+        [ProtocolFixed] public ECSEvent Event { get; set; }
+        [ProtocolFixed] public Entity[] Entities { get; set; }
 
-            this.Event = Event;
-            this.Entities = Entities;
+        public SendEventCommand(ECSEvent @event, params Entity[] entities)
+        {
+            Event = @event;
+            Entities = entities;
         }
 
-        public void OnSend(Player player) { }
-
         /// <summary>
-        /// Detects event method with same number of Entity parameters and calls it.
+        /// Finds event method with same number of Entity parameters and calls it.
         /// </summary>
         public void OnReceive(Player player)
         {
             bool canBeExecuted = false;
-            MethodInfo[] methods = Event.GetType().GetMethods();
 
-            foreach (MethodInfo method in methods)
+            foreach (MethodInfo method in Event.GetType().GetMethods())
             {
                 if (method.Name != "Execute") continue;
 
                 canBeExecuted = true;
-                ParameterInfo[] parameters = method.GetParameters();
 
-                // Player can be passed as first parameter before entities
-                if (parameters.Length == Entities.Length + 1 && parameters[0].ParameterType == typeof(Player))
+                if (method.GetParameters().Length == Entities.Length + 1)
                 {
                     object[] args = new object[Entities.Length + 1];
                     args[0] = player;
@@ -45,24 +41,12 @@ namespace TXServer.Core.Commands
                     method.Invoke(Event, args);
                     return;
                 }
-
-                // Only entities as parameters
-                if (parameters.Length == Entities.Length && parameters[0].ParameterType != typeof(Player))
-                {
-                    method.Invoke(Event, Entities.ToArray());
-                    return;
-                }
             }
+
             if (canBeExecuted)
                 throw new MissingMethodException(Event.GetType().Name, string.Format("Execute({0})", Entities.Length));
         }
 
-        public override string ToString()
-        {
-            return $"SendEventCommand [Event: {Event}, Entities: {String.Join(", ", Entities.Select(x => x.ToString()))}]";
-        }
-
-        [ProtocolFixed] public ECSEvent Event { get; set; }
-        [ProtocolFixed] public Entity[] Entities { get; set; }
+        public override string ToString() => $"SendEventCommand [Event: {Event}, Entities: {String.Join(", ", Entities.Select(x => x.ToString()))}]";
     }
 }

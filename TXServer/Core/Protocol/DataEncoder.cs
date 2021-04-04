@@ -6,12 +6,11 @@ using System.Numerics;
 using System.Reflection;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Types;
 using TXServer.Library;
-using static TXServer.Core.Commands.CommandManager;
+using static TXServer.Core.Commands.PacketTools;
 
 namespace TXServer.Core.Protocol
 {

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.Core.Logging;
@@ -26,15 +25,26 @@ namespace TXServer.Core
     /// </summary>
     public sealed class Player : IDisposable
     {
-        public Server Server { get; }
-        public PlayerConnection Connection { get; }
-        public PlayerData Data { get; set; }
+		public bool IsLoggedIn => User != null;
+		public bool IsInBattleLobby => BattlePlayer != null;
+		public bool IsInMatch => BattlePlayer.MatchPlayer != null;
 
-#if DEBUG
-		public IEnumerable<ICommand> LastServerPacket { get; set; }
-		public List<ICommand> LastClientPacket { get; set; }
-#endif
+		public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
 
+		//todo add those three in PlayerData
+		public Entity CurrentAvatar { get; set; }
+		public ConcurrentDictionary<Type, ItemList> UserItems { get; } = new();
+		public PresetEquipmentComponent CurrentPreset { get; set; }
+
+		public Entity ClientSession { get; set; }
+		public Entity User { get; set; }
+		public BattlePlayer BattlePlayer { get; set; }
+
+		public string UniqueId => Data?.UniqueId;
+
+		public Server Server { get; }
+		public PlayerConnection Connection { get; }
+		public PlayerData Data { get; set; }
 		public Player(Server server, Socket socket)
         {
             Server = server;
@@ -202,23 +212,19 @@ namespace TXServer.Core
 			}
         }
 
-        public bool IsLoggedIn => User != null;
-
-        public bool IsInBattleLobby => BattlePlayer != null;
-
-        public bool IsInMatch => BattlePlayer.MatchPlayer != null;
+        
 
         public bool IsOwner => (BattlePlayer?.Battle.TypeHandler as CustomBattleHandler)?.Owner == this;
 
         public void SendEvent(ECSEvent @event, params Entity[] entities)
         {
-			CommandManager.SendCommandsSafe(this, new SendEventCommand(@event, entities));
+			Connection.QueueCommands(new SendEventCommand(@event, entities));
         }
 
 		public void ShareEntity(Entity entity)
 		{
 			AddEntity(entity);
-			CommandManager.SendCommandsSafe(this, new EntityShareCommand(entity, isManual: true));
+			Connection.QueueCommands(new EntityShareCommand(entity));
 		}
 
 		public void ShareEntities(params Entity[] entities) => ShareEntities((IEnumerable<Entity>)entities);
@@ -231,7 +237,7 @@ namespace TXServer.Core
 		public void UnshareEntity(Entity entity)
 		{
 			RemoveEntity(entity);
-			CommandManager.SendCommandsSafe(this, new EntityUnshareCommand(entity, isManual: true));
+			Connection.QueueCommands(new EntityUnshareCommand(entity));
 		}
 
 		public void UnshareEntities(params Entity[] entities) => UnshareEntities((IEnumerable<Entity>)entities);
@@ -253,21 +259,7 @@ namespace TXServer.Core
 			entity.PlayerReferences.Remove(this);
 		}
 
-        public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
-
-		//todo add those two in PlayerData
-		public Entity CurrentAvatar { get; set; }
-        public ConcurrentDictionary<Type, ItemList> UserItems { get; } = new();
-        public PresetEquipmentComponent CurrentPreset { get; set; }
-
-        public Entity ClientSession { get; set; }
-
-        public Entity User { get; set; }
-		public BattlePlayer BattlePlayer { get; set; }
-
-        public string UniqueId => Data?.UniqueId;
-
-        public override string ToString() => $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : "")})" : "")}";
+		public override string ToString() => $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : "")})" : "")}";
 		private EndPoint _EndPoint;
-    }
+	}
 }

@@ -13,7 +13,7 @@ using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Types;
 using TXServer.Library;
-using static TXServer.Core.Commands.CommandManager;
+using static TXServer.Core.Commands.PacketTools;
 
 namespace TXServer.Core.Protocol
 {

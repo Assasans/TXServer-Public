@@ -1,20 +1,43 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using TXServer.Core.Commands;
 using TXServer.Core.Logging;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Entrance;
 using TXServer.ECSSystem.EntityTemplates;
+using TXServer.Library;
 
 namespace TXServer.Core
 {
     public class PlayerConnection : IDisposable
     {
+        public bool IsActive => Convert.ToBoolean(_Active);
+        private int _Active = 1;
+
+        public long DiffToClient { get; set; } = 0;
+
+        public DateTimeOffset PingSendTime { get; set; }
+        public DateTimeOffset PingReceiveTime { get; set; }
+
+        public long Ping => (long)(PingReceiveTime - PingSendTime).TotalMilliseconds;
+
+        public Socket Socket { get; private set; }
+        public BlockingCollection<ICommand> QueuedCommands { get; } = new BlockingCollection<ICommand>();
+        public Player Player { get; }
+
+#if DEBUG
+        public IEnumerable<ICommand> LastServerPacket { get; set; }
+        public List<ICommand> LastClientPacket { get; set; }
+#endif
+
         public PlayerConnection(Player player, Socket socket)
         {
             Socket = socket ?? throw new ArgumentNullException(nameof(Socket));
@@ -47,6 +70,12 @@ namespace TXServer.Core
         }
 
         /// <summary>
+        /// Tries to deactivate the client.
+        /// </summary>
+        /// <returns>If client was active, true is returned; otherwise false.</returns>
+        public bool TryDeactivate() => Interlocked.Exchange(ref _Active, 0) != 0;
+
+        /// <summary>
         /// Handle server -> client events.
         /// </summary>
         public void ServerSideEvents()
@@ -58,7 +87,7 @@ namespace TXServer.Core
                                                     new SessionSecurityPublicComponent(),
                                                     new InviteComponent(true, null));
 
-                CommandManager.SendCommands(Player, new InitTimeCommand());
+                SendCommands(new InitTimeCommand());
                 Player.ShareEntity(Player.ClientSession);
 
                 while (IsActive)
@@ -81,7 +110,7 @@ namespace TXServer.Core
                         commands[i] = QueuedCommands.Take();
 
                     if (!IsActive) return;
-                    CommandManager.SendCommands(Player, commands);
+                    SendCommands(commands);
                 }
             }
             catch (Exception e)
@@ -101,7 +130,7 @@ namespace TXServer.Core
             {
                 while (true)
                 {
-                    CommandManager.ReceiveAndExecuteCommands(this);
+                    ReceiveAndExecuteCommands(this);
                 }
             }
             catch (Exception e)
@@ -123,25 +152,52 @@ namespace TXServer.Core
             }
         }
 
-        public bool IsActive => Convert.ToBoolean(_Active);
+        /// <summary>
+        /// Receive data from client.
+        /// </summary>
+        private void ReceiveAndExecuteCommands(PlayerConnection connection)
+        {
+            using NetworkStream stream = new(connection.Socket);
+            using BinaryReader reader = new BigEndianBinaryReader(stream);
+            List<ICommand> commands = new DataDecoder(reader).DecodeCommands(connection.Player);
+
+#if DEBUG
+            LastClientPacket = commands;
+            Logger.Trace($"Received from {Player}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}");
+#endif
+
+            foreach (ICommand command in commands)
+                command.OnReceive(connection.Player);
+        }
 
         /// <summary>
-        /// Tries to deactivate the client.
+        /// Add commands to player's queue.
         /// </summary>
-        /// <returns>If client was active, true is returned; otherwise false.</returns>
-        public bool TryDeactivate() => Interlocked.Exchange(ref _Active, 0) != 0;
+        public void QueueCommands(params ICommand[] commands)
+        {
+            if (!IsActive) return;
 
-        public long DiffToClient { get; set; } = 0;
+            foreach (ICommand command in commands)
+                QueuedCommands.TryAdd(command);
+        }
 
-        public DateTimeOffset PingSendTime { get; set; }
-        public DateTimeOffset PingReceiveTime { get; set; }
+        /// <summary>
+        /// Send commands to client.
+        /// </summary>
+        private void SendCommands(params ICommand[] commands)
+        {
+#if DEBUG
+            LastServerPacket = commands;
+            Logger.Trace($"Sent to {Player}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}");
+#endif
 
-        public long Ping => (long)(PingReceiveTime - PingSendTime).TotalMilliseconds;
+            using MemoryStream buffer = new();
 
-        public Socket Socket { get; private set; }
-        public BlockingCollection<ICommand> QueuedCommands { get; } = new BlockingCollection<ICommand>();
-        public Player Player { get; }
+            new DataEncoder(new BigEndianBinaryWriter(buffer)).EncodeCommands(commands);
+            buffer.Position = 0;
 
-        private int _Active = 1;
+            using NetworkStream stream = new(Socket);
+            buffer.CopyTo(stream);
+        }
     }
 }
