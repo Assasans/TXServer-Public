@@ -18,6 +18,7 @@ namespace TXServer.ECSSystem.Events.Ping
             long ctm = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             float ping = ctm - PongCommandClientRealTime;
             player.Connection.DiffToClient = (long) ping;
+            player.Connection.PingReceiveTime = DateTimeOffset.Now;
             CommandManager.SendCommands(player, new SendEventCommand(new PingResultEvent(ctm, ping)));
         }
     }

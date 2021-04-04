@@ -1,15 +1,19 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
+
 using TXServer.Core.Commands;
 using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Types.Punishments;
 
 namespace TXServer.Core
 {
-    public abstract class PlayerData : ICloneable
+	public abstract class PlayerData : ICloneable
     {
         public PlayerData Original { get; protected set; }
         public Player Player { get; set; }
@@ -33,7 +37,20 @@ namespace TXServer.Core
         public List<long> IncomingFriendIds { get; protected set; }
         public List<long> OutgoingFriendIds { get; protected set; }
 
-        public PlayerData(string uid)
+        public List<Punishment> Punishments { get; protected set; }
+
+		    public ReadOnlyCollection<ChatMute> GetChatMutes(bool expired = false)
+		    {
+			    return Punishments.Where((ban) =>
+          {
+            if (ban is not ChatMute chatMute) return false;
+            if (!expired && chatMute.IsExpired) return false;
+
+            return true;
+          }).Cast<ChatMute>().ToList().AsReadOnly(); // XXX(Assasans): Rewrite without using so much LINQ?
+        }
+
+		    public PlayerData(string uid)
         {
             UniqueId = uid;
         }

@@ -43,7 +43,7 @@ namespace TXServer.ECSSystem.Events.Battle
                 },
 				"adminPlayer" => playerLanguage switch
                 {
-					"RU" => $"Личное сообщение: Не возможно, '{parameter}' ",
+					"RU" => $"Личное сообщение: Не возможно, '{parameter}' является администратором",
 					_ => $"Private message: Not possible, '{parameter}' is an admin",
 				},
                 _ => playerLanguage switch

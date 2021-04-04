@@ -42,7 +42,7 @@ namespace TXServer.Core
             new Thread(() => StateServer(ip)) { Name = "State Server" }.Start();
 
             new Thread(BattleLoop) { Name = "Battle Thread" }.Start();
-            new Thread(PingChecker) { Name = "Ping Checker" };
+            new Thread(PingChecker) { Name = "Ping Checker" }.Start();
 
             Logger.Log("Server is started.");
         }
@@ -216,7 +216,8 @@ namespace TXServer.Core
 
                 foreach (Player player in Pool)
                 {
-                    player.SendEvent(new PingEvent(DateTimeOffset.Now.ToUnixTimeMilliseconds(), id));
+                    player.Connection.PingSendTime = DateTimeOffset.Now;
+                    player.SendEvent(new PingEvent(player.Connection.PingSendTime.ToUnixTimeMilliseconds(), id), player.ClientSession);
                 }
 
                 if (id++ == 255)

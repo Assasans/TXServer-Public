@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using TXServer.ECSSystem.Types.Punishments;
+
 namespace TXServer.Core.Data.Database.Impl
 {
     public class LocalPlayer : PlayerData
@@ -24,6 +26,7 @@ namespace TXServer.Core.Data.Database.Impl
                 AcceptedFriendIds = new List<long>();
                 IncomingFriendIds = new List<long>();
                 OutgoingFriendIds = new List<long>();
+                Punishments = new List<Punishment>();
                 Original = (PlayerData) Clone();
             }
             catch (Exception e)

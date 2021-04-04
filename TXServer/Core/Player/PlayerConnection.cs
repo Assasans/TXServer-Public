@@ -144,6 +144,11 @@ namespace TXServer.Core
 
         public long DiffToClient { get; set; } = 0;
 
+        public DateTimeOffset PingSendTime { get; set; }
+        public DateTimeOffset PingReceiveTime { get; set; }
+
+        public long Ping => (long)(PingReceiveTime - PingSendTime).TotalMilliseconds;
+
         public Socket Socket { get; private set; }
         public BlockingCollection<ICommand> QueuedCommands { get; } = new BlockingCollection<ICommand>();
         public Player Player { get; }

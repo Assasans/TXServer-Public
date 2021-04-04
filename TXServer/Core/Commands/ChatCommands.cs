@@ -17,11 +17,16 @@ namespace TXServer.Core.Commands
 		public static string CheckForCommand(Player player, string message)
 		{
 			if (!message.StartsWith('/')) return null;
-			string[] args = message.TrimStart('/').Split(' ', StringSplitOptions.RemoveEmptyEntries);
+			string[] args = message[1..].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
 			bool hackBattle = player.IsOwner() && (player.BattlePlayer.Battle.TypeHandler as CustomBattleHandler).HackBattle;
 
 			if (args.Length == 0) return null;
+
+			if (args[0] == "ping")
+			{
+				return $"Network latency: {player.Connection.Ping} ms";
+			}
 
 			if (player.IsOwner() || player.Data.Admin)
             {

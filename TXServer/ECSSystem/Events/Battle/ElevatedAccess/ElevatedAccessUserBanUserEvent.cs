@@ -2,17 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+
 using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Types.Punishments;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
 	[SerialVersionUID(1503470104769L)]
 	public class ElevatedAccessUserBanUserEvent : ElevatedAccessUserBasePunishEvent, ECSEvent
 	{
+		// TODO(Assasans): Difficult to understand, rewrite?
 		public void Execute(Player player, Entity entity)
 		{
 			Core.Battles.Battle battle = GetBattle(player);
@@ -124,9 +127,36 @@ namespace TXServer.ECSSystem.Events.Battle
             foreach (BattlePlayer battleLobbyPlayer in battle.MatchPlayers)
             {
                 SendMessage(battleLobbyPlayer.Player, languages[battleLobbyPlayer.User.GetComponent<UserCountryComponent>().CountryCode], battle);
-            }
-            // todo: ban user from chat
-        }
+      }
+
+      if(Type != "WARN")
+      {
+        int intDuration = Convert.ToInt32(duration);
+        if (intDuration == 0) intDuration = 1;
+
+        ChatMute mute = new ChatMute(punishedPlayer.Data, DateTimeOffset.Now)
+        {
+          Duration = Type != "FOREVER" ? new TimeSpan(
+            Regex.Replace(Type, "[0-9S]", "") == "DAY" ? intDuration : 0,
+            Regex.Replace(Type, "[0-9S]", "") == "HOUR" ? intDuration : 0,
+            Regex.Replace(Type, "[0-9S]", "") == "MINUTE" ? intDuration : 0,
+            Regex.Replace(Type, "[0-9S]", "") == "SECOND" ? intDuration : 0
+          ) : null,
+          Reason = Reason
+        };
+
+        punishedPlayer.Data.Punishments.Add(mute);
+      } else
+      {
+        ChatWarning warn = new ChatWarning(punishedPlayer.Data, DateTimeOffset.Now)
+        {
+          Reason = Reason
+        };
+
+        punishedPlayer.Data.Punishments.Add(warn);
+      }
+    }
+
 		public string Type { get; set; }
 	}
 }

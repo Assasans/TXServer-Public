@@ -1,11 +1,16 @@
-﻿using TXServer.Core;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+using TXServer.Core;
 using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
-using System.Linq;
+using TXServer.ECSSystem.Types.Punishments;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -34,7 +39,22 @@ namespace TXServer.ECSSystem.Events
 				return;
             }
 
-			// todo: return if user has chat ban
+			ReadOnlyCollection<ChatMute> mutes = player.Data.GetChatMutes();
+			if (mutes.Count > 0)
+			{
+				// TODO(Assasans): Show all mutes to player
+				ChatMute mute = mutes[0];
+
+				evt.Message = player.User.GetComponent<UserCountryComponent>().CountryCode.ToLowerInvariant() switch
+				{
+					"ru" => $"Вы были отключены от чата {(mute.IsPermanent ? "навсегда" : $"на {((TimeSpan)mute.Duration).TotalMinutes} минут")}. Причина: {mute.Reason}",
+					_ => $"You have been muted {(mute.IsPermanent ? "forever" : $"for {((TimeSpan)mute.Duration).TotalMinutes} minutes")}. Reason: {mute.Reason}"
+				};
+				evt.SystemMessage = true;
+
+				player.SendEvent(evt, chat);
+				return;
+			}
 
 			switch (chat.TemplateAccessor.Template)
 			{
