@@ -12,6 +12,7 @@ using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Time;
 using TXServer.ECSSystem.EntityTemplates.Battle;
+using TXServer.ECSSystem.EntityTemplates.Chat;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
 using TXServer.ECSSystem.Events.Battle.Score;
@@ -54,7 +55,7 @@ namespace TXServer.Core.Battles
             CollisionsComponent = BattleEntity.GetComponent<BattleTankCollisionsComponent>();
         }
 
-        public (Entity, int) ConvertMapParams(ClientBattleParams Params, bool isMatchMaking)
+        private (Entity, int) ConvertMapParams(ClientBattleParams Params, bool isMatchMaking)
         {
             Entity mapEntity = Maps.GlobalItems.Rio;
             int maxPlayers = Params.MaxPlayers;

@@ -2,7 +2,7 @@
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Events
+namespace TXServer.ECSSystem.Events.Entrance
 {
     [SerialVersionUID(1439375251389)]
 	public class IntroduceUserByUidEvent : ECSEvent

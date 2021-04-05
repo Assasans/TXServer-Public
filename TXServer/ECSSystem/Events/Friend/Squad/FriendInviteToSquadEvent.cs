@@ -3,7 +3,7 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
 
-namespace TXServer.ECSSystem.Events.Friend
+namespace TXServer.ECSSystem.Events.Friend.Squad
 {
     [SerialVersionUID(1507725575587L)]
     public class FriendInviteToSquadEvent : ECSEvent

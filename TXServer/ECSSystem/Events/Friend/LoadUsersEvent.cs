@@ -9,7 +9,7 @@ using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.GlobalEntities;
 
-namespace TXServer.ECSSystem.Events
+namespace TXServer.ECSSystem.Events.Friend
 {
     [SerialVersionUID(1458555246853L)]
     public class LoadUsersEvent : ECSEvent

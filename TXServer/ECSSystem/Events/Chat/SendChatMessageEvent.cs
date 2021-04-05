@@ -10,9 +10,10 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
+using TXServer.ECSSystem.EntityTemplates.Chat;
 using TXServer.ECSSystem.Types.Punishments;
 
-namespace TXServer.ECSSystem.Events
+namespace TXServer.ECSSystem.Events.Chat
 {
     [SerialVersionUID(1446035600297L)]
 	public class SendChatMessageEvent : ECSEvent
@@ -83,10 +84,13 @@ namespace TXServer.ECSSystem.Events
 					break;
 				case BattleLobbyChatTemplate _:
 				case GeneralBattleChatTemplate _:
-					battle.AllBattlePlayers.Select(p => p.Player).SendEvent(evt, chat);
+					battle?.MatchPlayers.Select(p => p.Player).SendEvent(evt, chat);
+					break;
+				case SquadChatTemplate _:
+					player.SquadPlayer.Squad.Participants.Select(p => p.Player).SendEvent(evt, chat);
 					break;
 				case TeamBattleChatTemplate _:
-					battle.AllBattlePlayers.Where(x => x.Team == player.BattlePlayer.Team).Select(p => p.Player).SendEvent(evt, chat);
+					battle?.MatchPlayers.Where(x => x.Team == player.BattlePlayer.Team).Select(p => p.Player).SendEvent(evt, chat);
 					break;
 			}
 		}

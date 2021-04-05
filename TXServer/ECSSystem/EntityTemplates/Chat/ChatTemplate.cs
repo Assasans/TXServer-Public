@@ -2,7 +2,7 @@
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 
-namespace TXServer.ECSSystem.EntityTemplates.Battle
+namespace TXServer.ECSSystem.EntityTemplates.Chat
 {
     [SerialVersionUID(1447137441472)]
     public class ChatTemplate : IEntityTemplate
