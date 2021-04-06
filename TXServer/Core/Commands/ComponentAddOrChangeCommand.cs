@@ -14,9 +14,9 @@ namespace TXServer.Core.Commands
             this.Component = Component;
         }
 
-        public virtual void OnReceive(Player player) => AddOrChangeComponent();
+        public virtual void OnReceive(Player player) => AddOrChangeComponent(player);
 
-        protected abstract void AddOrChangeComponent();
+        protected abstract void AddOrChangeComponent(Player player);
 
         public override string ToString() => $"{GetType().Name} [Entity: {Target}, Component: {Component}]";
     }

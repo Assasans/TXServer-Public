@@ -9,8 +9,7 @@ namespace TXServer.Core.Battles
 {
     public partial class Battle
     {
-        public class 
-            CustomBattleHandler : IBattleTypeHandler
+        public class CustomBattleHandler : IBattleTypeHandler
         {
             public Battle Battle { get; init; }
 

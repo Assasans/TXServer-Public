@@ -37,7 +37,15 @@ namespace TXServer.Core.Battles
             CreateBattle();
             BattleLobbyChatEntity = BattleLobbyChatTemplate.CreateEntity();
             GeneralBattleChatEntity = GeneralBattleChatTemplate.CreateEntity();
+        }
+        
+        public void CreateBattle()
+        {
+            BattleEntity = BattleEntityCreators[Params.BattleMode](BattleLobbyEntity, Params.ScoreLimit, Params.TimeLimit * 60, 120);
+            RoundEntity = RoundTemplate.CreateEntity(BattleEntity);
+            CollisionsComponent = BattleEntity.GetComponent<BattleTankCollisionsComponent>();
 
+            IBattleModeHandler prevHandler = ModeHandler;
             ModeHandler = Params.BattleMode switch
             {
                 BattleMode.DM => new DMHandler { Battle = this },
@@ -45,14 +53,11 @@ namespace TXServer.Core.Battles
                 BattleMode.CTF => new CTFHandler { Battle = this },
                 _ => throw new NotImplementedException()
             };
-            ModeHandler.SetupBattle();
-        }
-        
-        public void CreateBattle()
-        {
-            BattleEntity = (Entity)BattleEntityCreators[Params.BattleMode].GetMethod("CreateEntity").Invoke(null, new object[] { BattleLobbyEntity, Params.ScoreLimit, Params.TimeLimit * 60, 120 });
-            RoundEntity = RoundTemplate.CreateEntity(BattleEntity);
-            CollisionsComponent = BattleEntity.GetComponent<BattleTankCollisionsComponent>();
+
+            if (prevHandler != null)
+                ModeHandler.SetupBattle(prevHandler);
+            else
+                ModeHandler.SetupBattle();
         }
 
         private (Entity, int) ConvertMapParams(ClientBattleParams Params, bool isMatchMaking)
@@ -95,16 +100,6 @@ namespace TXServer.Core.Battles
             }
 
             CreateBattle();
-
-            IBattleModeHandler prevHandler = ModeHandler;
-            ModeHandler = @params.BattleMode switch
-            {
-                BattleMode.DM => new DMHandler { Battle = this },
-                BattleMode.TDM => new TDMHandler { Battle = this },
-                BattleMode.CTF => new CTFHandler { Battle = this },
-                _ => throw new NotImplementedException()
-            };
-            ModeHandler.SetupBattle(prevHandler);
         }
 
         public void AddPlayer(Player player)
@@ -323,9 +318,7 @@ namespace TXServer.Core.Battles
         private void ProcessMatchPlayers()
         {
             foreach (MatchPlayer matchPlayer in MatchPlayers.Select(x => x.MatchPlayer))
-            {
                 matchPlayer.Tick();
-            }
         }
 
         private void ProcessBonuses(double deltaTime)
@@ -407,11 +400,11 @@ namespace TXServer.Core.Battles
 
         private int EnemyCountFor(BattlePlayer battlePlayer) => ModeHandler.EnemyCountFor(battlePlayer);
 
-        private static readonly Dictionary<BattleMode, Type> BattleEntityCreators = new()
+        private static readonly Dictionary<BattleMode, Func<Entity, int, int, int, Entity>> BattleEntityCreators = new()
         {
-            { BattleMode.DM, typeof(DMTemplate) },
-            { BattleMode.TDM, typeof(TDMTemplate) },
-            { BattleMode.CTF, typeof(CTFTemplate) },
+            { BattleMode.DM, DMTemplate.CreateEntity },
+            { BattleMode.TDM, TDMTemplate.CreateEntity },
+            { BattleMode.CTF, CTFTemplate.CreateEntity },
         };
 
         public readonly Dictionary<GravityType, float> GravityTypes = new()

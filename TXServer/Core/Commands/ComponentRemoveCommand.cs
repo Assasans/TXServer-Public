@@ -16,7 +16,7 @@ namespace TXServer.Core.Commands
             ComponentType = componentType ?? throw new ArgumentNullException(nameof(componentType));
         }
 
-        public void OnReceive(Player player) => Target.RemoveComponentLocally(ComponentType);
+        public void OnReceive(Player player) => Target.RemoveComponent(ComponentType, player);
 
         public override string ToString() => $"ComponentRemoveCommand [Entity: {Target}, Component: {ComponentType.Name}]";
     }

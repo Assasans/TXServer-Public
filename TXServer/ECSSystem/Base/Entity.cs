@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using TXServer.Core;
@@ -81,29 +82,26 @@ namespace TXServer.ECSSystem.Base
         }
 
         public bool HasComponent<T>() where T : Component => HasComponent(typeof(T));
-        public bool HasComponent(Type componentType)
-        {
-            return GetComponent(componentType) != null;
-        }
+        public bool HasComponent(Type componentType) => GetComponent(componentType) != null;
 
-        public void AddComponent(Component component)
+        public void AddComponent(Component component, Player excludedFromSending = null)
         {
-            AddComponentLocally(component);
-            
-            foreach (Player player in PlayerReferences)
-            {
+            if (!Components.Add(component))
+                throw new ArgumentException("Entity already contains component", component.GetType().FullName);
+
+            foreach (Player player in PlayerReferences.Where(x => x != excludedFromSending))
                 player.Connection.QueueCommands(new ComponentAddCommand(this, component));
-            }
         }
 
-        public void ChangeComponent(Component component)
+        public void ChangeComponent(Component component, Player excludedFromSending = null)
         {
-            ChangeComponentLocally(component);
+            if (!Components.Remove(component))
+                throw new ArgumentException("Component " + component.GetType().FullName + " does not exist.");
 
-            foreach (Player player in PlayerReferences)
-            {
+            Components.Add(component);
+
+            foreach (Player player in PlayerReferences.Where(x => x != excludedFromSending))
                 player.Connection.QueueCommands(new ComponentChangeCommand(this, component));
-            }
         }
 
         public void ChangeComponent<T>(Action<T> action) where T : Component
@@ -114,48 +112,24 @@ namespace TXServer.ECSSystem.Base
         }
 
         public void RemoveComponent<T>() where T : Component => RemoveComponent(typeof(T));
-        public void RemoveComponent(Type componentType)
+        public void RemoveComponent(Type componentType, Player excludedFromSending = null)
         {
-            RemoveComponentLocally(componentType);
-
-            foreach (Player player in PlayerReferences)
-            {
-                player.Connection.QueueCommands(new ComponentRemoveCommand(this, componentType));
-            }
+            if (!TryRemoveComponent(componentType, excludedFromSending))
+                throw new ArgumentException("Component was not found", componentType.Name);
         }
 
         public bool TryRemoveComponent<T>() where T : Component => TryRemoveComponent(typeof(T));
-        public bool TryRemoveComponent(Type componentType)
+        public bool TryRemoveComponent(Type componentType, Player excludedFromSending = null)
         {
-            try
+            bool successful = Components.Remove((Component)FormatterServices.GetUninitializedObject(componentType));
+
+            if (successful)
             {
-                RemoveComponent(componentType);
-                return true;
+                foreach (Player player in PlayerReferences.Where(x => x != excludedFromSending))
+                    player.Connection.QueueCommands(new ComponentRemoveCommand(this, componentType));
             }
-            catch
-            {
-                return false;
-            }
-        }
 
-        public void AddComponentLocally(Component component)
-        {
-            if (!Components.Add(component))
-                throw new ArgumentException("Entity already contains component", component.GetType().FullName);
-        }
-
-        public void ChangeComponentLocally(Component component)
-        {
-            if (!Components.Remove(component))
-                throw new ArgumentException("Component " + component.GetType().FullName + " does not exist.");
-
-            Components.Add(component);
-        }
-
-        public void RemoveComponentLocally(Type componentType)
-        {
-            if (!Components.Remove((Component)FormatterServices.GetUninitializedObject(componentType)))
-                throw new ArgumentException("Component was not found", componentType.Name);
+            return successful;
         }
 
         public override string ToString()

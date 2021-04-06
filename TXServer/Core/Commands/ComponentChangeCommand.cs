@@ -7,6 +7,6 @@ namespace TXServer.Core.Commands
     {
         public ComponentChangeCommand(Entity Target, Component Component) : base(Target, Component) { }
 
-        protected override void AddOrChangeComponent() => Target.ChangeComponentLocally(Component);
+        protected override void AddOrChangeComponent(Player player) => Target.ChangeComponent(Component, player);
     }
 }

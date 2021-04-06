@@ -16,6 +16,6 @@ namespace TXServer.Core.Commands
                      ?.Invoke(Component, new object[] { player, Target });
         }
 
-        protected override void AddOrChangeComponent() => Target.AddComponentLocally(Component);
+        protected override void AddOrChangeComponent(Player player) => Target.AddComponent(Component, player);
     }
 }

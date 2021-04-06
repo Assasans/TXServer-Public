@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.ServerMapInformation;
-using TXServer.Core.Squads;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Round;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using TXServer.Core.Commands;
@@ -84,8 +85,9 @@ namespace TXServer.Core
             {
                 Player.ClientSession = new(new TemplateAccessor(new ClientSessionTemplate(), null),
                                                     new ClientSessionComponent(),
-                                                    new SessionSecurityPublicComponent(),
-                                                    new InviteComponent(true, null));
+                                                    new SessionSecurityPublicComponent());
+                if (!((IPEndPoint)Socket.RemoteEndPoint).Address.Equals(IPAddress.Loopback))
+                    Player.ClientSession.AddComponent(new InviteComponent(true, null));
 
                 SendCommands(new InitTimeCommand());
                 Player.ShareEntity(Player.ClientSession);
