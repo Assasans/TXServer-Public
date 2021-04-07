@@ -27,8 +27,8 @@ namespace TXServer.Core
     public sealed class Player : IDisposable
     {
 		public bool IsLoggedIn => User != null;
-		public bool IsInBattleLobby => BattlePlayer != null;
-		public bool IsInMatch => IsInBattleLobby && BattlePlayer.MatchPlayer != null;
+		public bool IsInBattle => BattlePlayer != null;
+		public bool IsInMatch => BattlePlayer?.MatchPlayer != null;
 		public bool IsInSquad => SquadPlayer != null;
 
 		public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
@@ -217,7 +217,7 @@ namespace TXServer.Core
 
 		public bool IsInBattleWith(Player player)
 		{
-			return IsInBattleLobby && BattlePlayer.Battle.AllBattlePlayers.Contains(player.BattlePlayer);
+			return IsInBattle && BattlePlayer.Battle.AllBattlePlayers.Contains(player.BattlePlayer);
 		}
 
 		public bool IsInSquadWith(Player player)

@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.Events.Matchmaking
 
         public void Execute(Player player, Entity lobby)
         {
-            if (!player.IsInBattleLobby)
+            if (!player.IsInBattle)
                 return;
 
             player.BattlePlayer.WaitingForExit = true;

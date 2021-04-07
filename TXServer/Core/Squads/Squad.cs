@@ -85,7 +85,7 @@ namespace TXServer.Core.Squads
         {
             if (battle.BattleState is BattleState.Ended) return;
 
-            if (player.IsSquadLeader && ParticipantsWithoutLeader.All(x => x.Player.IsInBattleLobby && !x.Player.IsInMatch))
+            if (player.IsSquadLeader && ParticipantsWithoutLeader.All(x => x.Player.IsInBattle && !x.Player.IsInMatch))
             {
                 foreach (SquadPlayer participant in ParticipantsWithoutLeader)
                     battle.RemovePlayer(participant.Player.BattlePlayer);
@@ -93,7 +93,7 @@ namespace TXServer.Core.Squads
             else
             {
                 if (player.IsSquadLeader) DisbandSquad();
-                else if (Leader.IsInBattleLobby) RemovePlayer(player, false);
+                else if (Leader.IsInBattle) RemovePlayer(player, false);
             }
         }
         

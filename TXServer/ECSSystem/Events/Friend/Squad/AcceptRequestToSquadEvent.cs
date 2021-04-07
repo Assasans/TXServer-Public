@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Events.Friend.Squad
         {
             Player remotePlayer = Server.Instance.FindPlayerById(FromUserId);
             
-            if (remotePlayer.IsInBattleLobby || !remotePlayer.IsActive || !remotePlayer.IsLoggedIn) 
+            if (remotePlayer.IsInBattle || !remotePlayer.IsActive || !remotePlayer.IsLoggedIn) 
                 return;
             
             player.SquadPlayer.Squad.AddPlayer(remotePlayer);
