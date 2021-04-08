@@ -82,12 +82,14 @@ namespace TXServer.ECSSystem.Events.Chat
 							p.UnshareEntity(player.User);
 					}
 					break;
-				case BattleLobbyChatTemplate _:
-				case GeneralBattleChatTemplate _:
-					battle?.MatchPlayers.Select(p => p.Player).SendEvent(evt, chat);
-					break;
 				case SquadChatTemplate _:
 					player.SquadPlayer.Squad.Participants.Select(p => p.Player).SendEvent(evt, chat);
+					break;
+				case BattleLobbyChatTemplate _:
+					battle?.AllBattlePlayers.Select(p => p.Player).SendEvent(evt, chat);
+					break;
+				case GeneralBattleChatTemplate _:
+					battle?.MatchPlayers.Select(p => p.Player).SendEvent(evt, chat);
 					break;
 				case TeamBattleChatTemplate _:
 					battle?.MatchPlayers.Where(x => x.Team == player.BattlePlayer.Team).Select(p => p.Player).SendEvent(evt, chat);
