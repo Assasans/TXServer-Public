@@ -21,14 +21,18 @@ namespace TXServer.ECSSystem.Events.Entrance.Invite
 				"Bodr", "C6OI", "Legendar-X", "Pchelik", "networkspecter", "DageLV",
 				"Black_Wolf", "NN77296", "MEWPASCO", "Doctor", "TowerCrusher", "Kurays"
 			};
+
 			string inviteCode = entity.GetComponent<InviteComponent>().InviteCode;
 			if (AllowedUids.Contains(inviteCode) || AllowedUids.Contains(inviteCode.ToLower()))
-            {
-				Logger.Log($"{entity.EntityId}: New session with invite code '{inviteCode}'");
+			{
 				player.SendEvent(new CommenceRegistrationEvent(), entity);
+				Logger.Log($"{player}: New session with invite code '{inviteCode}'");
 			}
 			else
-			    player.SendEvent(new InviteDoesNotExistEvent(), entity);
+			{
+				player.SendEvent(new InviteDoesNotExistEvent(), entity);
+				Logger.Log($"{player}: Invalid invite code {inviteCode}");
+			}
 		}
 	}
 }
