@@ -25,7 +25,7 @@ namespace TXServer.ECSSystem.Events.Battle
 			player.User.AddComponent(new TeamColorComponent(view.EnemyTeamColor));
 
 			view.AllyTeamPlayers.Remove(player.BattlePlayer);
-			player.BattlePlayer = new BattlePlayer(battle, player, view.EnemyTeamEntity);
+			player.BattlePlayer = new BattlePlayer(battle, player, view.EnemyTeamEntity, false);
 			view.EnemyTeamPlayers.Add(player.BattlePlayer);
 		}
 	}

@@ -38,7 +38,7 @@ namespace TXServer.ECSSystem.Events.Battle
 				{
 					player.SendEvent(new EnterBattleLobbyFailedEvent(alreadyInLobby: false, lobbyIsFull: true), player.User);
 				} else {
-					battle.AddPlayer(player);
+					battle.AddPlayer(player, false);
 				}
 			} 
 			else

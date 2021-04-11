@@ -14,17 +14,24 @@ namespace TXServer.Core.Data.Database.Impl
             {
                 Email = "none";
                 Subscribed = false;
-                Username = "tim";
+                Username = "Tanker";
                 HashedPassword = "abc";
                 CountryCode = "EN";
                 Avatar = "8b74e6a3-849d-4a8d-a20e-be3c142fd5e8";
                 Admin = true;
                 Beta = true;
+                
                 Crystals = 1000000;
                 XCrystals = 50000;
+                Experience = 0;
+                Reputation = 0;
+                PremiumExpirationDate = DateTime.MinValue;
+                
                 AcceptedFriendIds = new List<long>();
                 IncomingFriendIds = new List<long>();
                 OutgoingFriendIds = new List<long>();
+                BlockedPlayerIds = new List<long>();
+                ReportedPlayerIds = new List<long>();
                 Punishments = new List<Punishment>();
                 Original = (PlayerData) Clone();
             }

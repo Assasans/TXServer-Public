@@ -22,10 +22,8 @@ namespace TXServer.ECSSystem.EntityTemplates
             entity.Components.Add(new BattleLobbyGroupComponent(entity));
             
             int price = 1000;  // 1000 Blue-Crystals standard price for opening custom battles
-            if (owner.User.GetComponent<PremiumAccountBoostComponent>() != null)
-            {
+            if (owner.IsPremium)
                 price = 0;  // official premium pass feature: open custom battles for free
-            }      
             entity.Components.Add(new OpenCustomLobbyPriceComponent(price));
 
             return entity;

@@ -60,12 +60,14 @@ namespace TXServer.Core.Battles
             {
             }
 
-            public BattlePlayer AddPlayer(Player player)
+            public BattlePlayer AddPlayer(Player player, bool isSpectator)
             {
-                player.User.AddComponent(new TeamColorComponent(TeamColor.NONE));
-
-                BattlePlayer battlePlayer = new(Battle, player, null);
+                BattlePlayer battlePlayer = new(Battle, player, null, isSpectator);
                 player.BattlePlayer = battlePlayer;
+
+                if (isSpectator) return battlePlayer;
+                
+                player.User.AddComponent(new TeamColorComponent(TeamColor.NONE));
 
                 _Players.Add(battlePlayer);
 
@@ -76,7 +78,8 @@ namespace TXServer.Core.Battles
             {
                 _Players.Remove(battlePlayer);
 
-                battlePlayer.User.RemoveComponent<TeamColorComponent>();
+                if (!battlePlayer.IsSpectator) 
+                    battlePlayer.User.RemoveComponent<TeamColorComponent>();
                 battlePlayer.Player.BattlePlayer = null;
             }
 

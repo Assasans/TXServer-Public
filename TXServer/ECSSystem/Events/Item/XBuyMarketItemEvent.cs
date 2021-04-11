@@ -13,15 +13,13 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity user, Entity item)
 		{
-			var XCrystals = player.Data.SetXCrystals(player.Data.XCrystals - Price);
-
 			Entity newItem = new(new TemplateAccessor((IEntityTemplate)Activator.CreateInstance(((IMarketItemTemplate)item.TemplateAccessor.Template).UserItemType), item.TemplateAccessor.ConfigPath),
 				item.Components.ToArray());
 			newItem.Components.Add(new UserGroupComponent(user));
 			((IUserItemTemplate)newItem.TemplateAccessor.Template).AddUserItemComponents(player, newItem);
 
 			player.ShareEntity(newItem);
-			user.ChangeComponent(XCrystals);
+			player.Data.SetXCrystals(player.Data.XCrystals - Price);
 
 			if (newItem.TemplateAccessor.Template is IMountableItemTemplate)
 				new MountItemEvent().Execute(player, newItem);

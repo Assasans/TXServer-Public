@@ -21,7 +21,7 @@ namespace TXServer.ECSSystem.Events
 
 			if (player.Data.Admin)
             {
-				var currencieCodes = new Dictionary<string, Entity>
+				var currencyCodes = new Dictionary<string, Entity>
 				{
 					{ "c", ExtraItems.GlobalItems.Crystal },
 					{ "x", ExtraItems.GlobalItems.Xcrystal }
@@ -29,10 +29,10 @@ namespace TXServer.ECSSystem.Events
 				
 				// cheat codes
 				int var;
-				if (currencieCodes.ContainsKey(Convert.ToString(Code[0])))
+				if (currencyCodes.ContainsKey(Convert.ToString(Code[0])))
                 {
 					if (int.TryParse(Code[1..], out var))
-						rewards.Add(currencieCodes[Convert.ToString(Code[0])], Convert.ToInt32(Code[1..]));
+						rewards.Add(currencyCodes[Convert.ToString(Code[0])], Convert.ToInt32(Code[1..]));
                 }
 				if (Code.StartsWith("xp"))
 				{
@@ -78,27 +78,17 @@ namespace TXServer.ECSSystem.Events
 				player.ShareEntity(notification);
 
 				if (item.Key == ExtraItems.GlobalItems.Crystal)
-				{
-					UserMoneyComponent userMoneyComponent = player.Data.SetCrystals(player.Data.Crystals + item.Value);
-					player.User.ChangeComponent(userMoneyComponent);
-				}
-				if (item.Key == ExtraItems.GlobalItems.Xcrystal)
-                {
-					UserXCrystalsComponent userXCrystalsComponent = player.Data.SetXCrystals(player.Data.XCrystals + item.Value);
-					player.User.ChangeComponent(userXCrystalsComponent);
-                }
-				if (item.Key == ExtraItems.GlobalItems.Premiumboost)
-				{
-					if (!player.User.HasComponent<PremiumAccountBoostComponent>())
-						player.User.AddComponent(new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(item.Value * 24, 0, 0))));
-					else
-						player.User.ChangeComponent<PremiumAccountBoostComponent>(component => component.EndDate.Time += item.Value);
-				}
-			}
+					player.Data.SetCrystals(player.Data.Crystals + item.Value);
+	            if (item.Key == ExtraItems.GlobalItems.Xcrystal)
+		            player.Data.SetXCrystals(player.Data.XCrystals + item.Value);
+	            if (item.Key == ExtraItems.GlobalItems.Premiumboost)
+					player.Data.RenewPremium(new TimeSpan(item.Value, 0, 0, 0));
+            }
 
 			if (rewards.Count > 0)
 				player.SendEvent(new ShowNotificationGroupEvent(1), entity);
 		}
+		
 		public string Code { get; set; }
 	}
 }

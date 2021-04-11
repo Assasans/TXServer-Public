@@ -134,47 +134,50 @@ namespace TXServer.Core.Battles
             {
             }
 
-            public BattlePlayer AddPlayer(Player player)
+            public BattlePlayer AddPlayer(Player player, bool isSpectator)
             {
                 List<BattlePlayer> teamPlayerList = null;
                 Entity teamEntity = null;
-
-                List<List<BattlePlayer>> teamPlayerLists = new() {RedTeamPlayers, BlueTeamPlayers};
-                Dictionary<List<BattlePlayer>, Entity> entityPlayersDict = new()
-                {{RedTeamPlayers, RedTeamEntity}, {BlueTeamPlayers, BlueTeamEntity}};
-
-                if (Battle.IsMatchMaking)
+                
+                if (!isSpectator)
                 {
-                    foreach (var playersList in teamPlayerLists.Where(y => player.IsInSquad).Where(
-                        playersList => player.SquadPlayer.Squad.Participants.Select(x => x.Player.BattlePlayer)
-                            .Intersect(playersList).Any()))
+                    List<List<BattlePlayer>> teamPlayerLists = new() {RedTeamPlayers, BlueTeamPlayers};
+                    Dictionary<List<BattlePlayer>, Entity> entityPlayersDict = new()
+                        {{RedTeamPlayers, RedTeamEntity}, {BlueTeamPlayers, BlueTeamEntity}};
+                    
+                    if (Battle.IsMatchMaking)
                     {
-                        teamEntity = entityPlayersDict[playersList];
-                        teamPlayerList = playersList;
-                        break;
+                        foreach (var playersList in teamPlayerLists.Where(y => player.IsInSquad).Where(
+                            playersList => player.SquadPlayer.Squad.Participants.Select(x => x.Player.BattlePlayer)
+                                .Intersect(playersList).Any()))
+                        {
+                            teamEntity = entityPlayersDict[playersList];
+                            teamPlayerList = playersList;
+                            break;
+                        }
                     }
+
+                    if (teamEntity == null)
+                    {
+                        if (RedTeamPlayers.Count < BlueTeamPlayers.Count)
+                        {
+                            teamEntity = RedTeamEntity;
+                            teamPlayerList = RedTeamPlayers;
+                        }
+                        else
+                        {
+                            teamEntity = BlueTeamEntity;
+                            teamPlayerList = BlueTeamPlayers;
+                        }
+                    }
+
+                    player.User.AddComponent(teamEntity.GetComponent<TeamColorComponent>());
                 }
 
-                if (teamEntity == null)
-                {
-                    if (RedTeamPlayers.Count < BlueTeamPlayers.Count)
-                    {
-                        teamEntity = RedTeamEntity;
-                        teamPlayerList = RedTeamPlayers;
-                    }
-                    else
-                    {
-                        teamEntity = BlueTeamEntity;
-                        teamPlayerList = BlueTeamPlayers;
-                    }
-                }
-
-                player.User.AddComponent(teamEntity.GetComponent<TeamColorComponent>());
-
-                BattlePlayer battlePlayer = new(Battle, player, teamEntity);
+                BattlePlayer battlePlayer = new(Battle, player, teamEntity, isSpectator);
                 player.BattlePlayer = battlePlayer;
 
-                teamPlayerList.Add(battlePlayer);
+                if (!isSpectator) teamPlayerList.Add(battlePlayer);
 
                 return battlePlayer;
             }
@@ -184,7 +187,8 @@ namespace TXServer.Core.Battles
                 if (!RedTeamPlayers.Remove(battlePlayer))
                     BlueTeamPlayers.Remove(battlePlayer);
 
-                battlePlayer.User.RemoveComponent<TeamColorComponent>();
+                if (!battlePlayer.IsSpectator)
+                    battlePlayer.User.RemoveComponent<TeamColorComponent>();
                 battlePlayer.Player.BattlePlayer = null;
             }
 

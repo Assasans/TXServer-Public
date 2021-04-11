@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.Events.Battle
 		{
 			var battle = new Core.Battles.Battle(battleParams: Params, isMatchMaking: false, owner: player);
 			ServerConnection.BattlePool.Add(battle);
-			battle.AddPlayer(player);
+			battle.AddPlayer(player, false);
 		}
 
 		public ClientBattleParams Params { get; set; }

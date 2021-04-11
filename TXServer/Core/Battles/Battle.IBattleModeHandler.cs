@@ -49,7 +49,7 @@ namespace TXServer.Core.Battles
             void CompleteWarmUp();
             void OnFinish();
 
-            BattlePlayer AddPlayer(Player player);
+            BattlePlayer AddPlayer(Player player, bool isSpectator);
             void RemovePlayer(BattlePlayer battlePlayer);
             void OnMatchJoin(BattlePlayer battlePlayer);
             void OnMatchLeave(BattlePlayer battlePlayer);

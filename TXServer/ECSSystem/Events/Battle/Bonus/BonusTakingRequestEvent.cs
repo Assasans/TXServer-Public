@@ -29,8 +29,7 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 			switch (bonusType)
 			{
 				case BonusType.GOLD:
-					UserMoneyComponent userMoneyComponent = player.Data.SetCrystals(player.Data.Crystals + battleBonus.GoldboxCrystals);
-					player.User.ChangeComponent(userMoneyComponent);
+					player.Data.SetCrystals(player.Data.Crystals + battleBonus.GoldboxCrystals);
 					battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
 					break;
 				default:

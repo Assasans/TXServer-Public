@@ -10,8 +10,7 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			// TODO: save changed countryCode in database
-			player.User.ChangeComponent(new UserCountryComponent(CountryCode));
+			player.Data.SetCountryCode(CountryCode);
 		}
 		public string CountryCode { get; set; }
 	}

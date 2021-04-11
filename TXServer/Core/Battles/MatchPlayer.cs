@@ -28,7 +28,11 @@ namespace TXServer.Core.Battles
         {
             Battle = battlePlayer.Battle;
             Player = battlePlayer.Player;
+
             BattleUser = BattleUserTemplate.CreateEntity(battlePlayer.Player, battleEntity, battlePlayer.Team);
+
+            if (battlePlayer.IsSpectator) return;
+            
             Tank = TankTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullItem, BattleUser);
             Weapon = WeaponTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponItem, Tank);
             HullSkin = HullSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullSkins[battlePlayer.Player.CurrentPreset.HullItem], Tank);
@@ -37,20 +41,20 @@ namespace TXServer.Core.Battles
             TankPaint = TankPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.TankPaint, Tank);
             Graffiti = GraffitiBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.Graffiti, Tank);
             Shell = ShellBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponShells[battlePlayer.Player.CurrentPreset.WeaponItem], Tank);
-            RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, Tank);
             Incarnation = TankIncarnationTemplate.CreateEntity(Tank);
-            UserResult = new(battlePlayer, userResults);
-
-            if (Battle.ModeHandler is Battle.TeamBattleHandler handler)
+            RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, Tank);
+            UserResult = new UserResult(battlePlayer, userResults);
+                
+            if (Battle.ModeHandler is TeamBattleHandler handler)
                 SpawnCoordinates = handler.BattleViewFor(Player.BattlePlayer).SpawnPoints;
             else
-                SpawnCoordinates = ((Battle.DMHandler)Battle.ModeHandler).SpawnPoints;
+                SpawnCoordinates = ((DMHandler)Battle.ModeHandler).SpawnPoints;
         }
 
         public IEnumerable<Entity> GetEntities()
         {
             return from property in typeof(MatchPlayer).GetProperties()
-                   where property.PropertyType == typeof(Entity)
+                   where property.PropertyType == typeof(Entity) && property.GetValue(this) != null
                    select (Entity)property.GetValue(this);
         }
 
@@ -85,8 +89,8 @@ namespace TXServer.Core.Battles
 
         public int GetScoreWithPremium(int score)
         {
-            if (Player.User.GetComponent<PremiumAccountBoostComponent>() == null) return score;
-            else return score * 2;
+            if (Player.IsPremium) return score * 2;
+            return score;
         }
 
         private void PrepareForRespawning()

@@ -36,7 +36,7 @@ namespace TXServer.Core.Commands
 			{ ChatCommandConditions.Admin, "You are not an admin" },
 			{ ChatCommandConditions.Tester, "You are not a tester" },
 			{ ChatCommandConditions.InBattle, "You are not in battle" },
-			{ ChatCommandConditions.BattleOwner, "You do not own a battle" },
+			{ ChatCommandConditions.BattleOwner, "You are not the battle owner" },
 			{ ChatCommandConditions.HackBattle, "This is not a HackBattle" },
 			{ ChatCommandConditions.InMatch, "You are not in match" },
 			{ ChatCommandConditions.ActiveTank, "Your tank is not active" },
@@ -132,7 +132,7 @@ namespace TXServer.Core.Commands
 		private static string HackBattle(Player player, string[] args)
 		{
 			if (player.BattlePlayer.Battle.IsMatchMaking)
-				return "HackBattle cannot be enabled in matchmaking mattles";
+				return "HackBattle cannot be enabled in matchmaking battles";
 
 			if (((CustomBattleHandler)player.BattlePlayer.Battle.TypeHandler).HackBattle)
 				return "HackBattle is already enabled";
@@ -220,7 +220,7 @@ namespace TXServer.Core.Commands
 
 				if (player.IsBattleOwner || player.Data.Admin)
 					conditions |= ChatCommandConditions.BattleOwner;
-				if (player.BattlePlayer.Battle.TypeHandler is CustomBattleHandler handler && handler.HackBattle || player.Data.Admin)
+				if (player.BattlePlayer.Battle.TypeHandler is CustomBattleHandler {HackBattle: true} || player.Data.Admin)
 					conditions |= ChatCommandConditions.HackBattle;
 
 				if (player.IsInMatch)
@@ -234,28 +234,26 @@ namespace TXServer.Core.Commands
 
         private static bool EnableSupplyCheat(string type, string target, MatchPlayer matchPlayer)
 		{
-			bool supplieCheat = Enum.TryParse(type, out BonusType bonusType);
+			bool supplyCheat = Enum.TryParse(type, out BonusType bonusType);
 
-			if (supplieCheat)
+			if (!supplyCheat) return false;
+			switch (target)
 			{
-				switch (target)
-				{
-					case "":
-						_ = new SupplyEffect(bonusType, matchPlayer, cheat: true);
+				case "":
+					_ = new SupplyEffect(bonusType, matchPlayer, cheat: true);
+					return true;
+				case "all":
+					foreach (BattlePlayer battlePlayer in matchPlayer.Battle.MatchPlayers)
+						_ = new SupplyEffect(bonusType, battlePlayer.MatchPlayer, cheat: true);
+					return true;
+				default:
+					BattlePlayer specificTarget = matchPlayer.Battle.MatchPlayers.SingleOrDefault(player => player.User.GetComponent<UserUidComponent>().Uid == target);
+					if (specificTarget != null)
+					{
+						_ = new SupplyEffect(bonusType, specificTarget.MatchPlayer, cheat: true);
 						return true;
-					case "all":
-						foreach (BattlePlayer battlePlayer in matchPlayer.Battle.MatchPlayers)
-							_ = new SupplyEffect(bonusType, battlePlayer.MatchPlayer, cheat: true);
-						return true;
-					default:
-						BattlePlayer specificTarget = matchPlayer.Battle.MatchPlayers.SingleOrDefault(player => player.User.GetComponent<UserUidComponent>().Uid == target);
-						if (specificTarget != null)
-						{
-							_ = new SupplyEffect(bonusType, specificTarget.MatchPlayer, cheat: true);
-							return true;
-						}
-						break;
-				}
+					}
+					break;
 			}
 			return false;
 		}

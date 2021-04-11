@@ -97,7 +97,7 @@ namespace TXServer.Core.Battles
                             case WarmUpState.WarmingUp:
                                 if (Battle.CountdownTimer <= 4)
                                 {
-                                    foreach (BattlePlayer battlePlayer in Battle.MatchPlayers)
+                                    foreach (BattlePlayer battlePlayer in Battle.MatchPlayers.Where(x => !x.IsSpectator))
                                     {
                                         battlePlayer.MatchPlayer.KeepDisabled = true;
                                         battlePlayer.MatchPlayer.DisableTank();

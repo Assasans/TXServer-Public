@@ -9,6 +9,8 @@ using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Battle;
+using TXServer.ECSSystem.Types;
 using TXServer.ECSSystem.Types.Punishments;
 
 namespace TXServer.Core
@@ -32,25 +34,28 @@ namespace TXServer.Core
 
         public long XCrystals { get; protected set; }
         public long Crystals { get; protected set; }
+        public long Experience { get; protected set; }
+        public long Reputation { get; protected set; }
+        public DateTime PremiumExpirationDate { get; protected set; }
 
         public List<long> AcceptedFriendIds { get; protected set; }
         public List<long> IncomingFriendIds { get; protected set; }
         public List<long> OutgoingFriendIds { get; protected set; }
+        public List<long> BlockedPlayerIds { get; protected set; }
+        public List<long> ReportedPlayerIds { get; protected set; }
 
         public List<Punishment> Punishments { get; protected set; }
 
-		    public ReadOnlyCollection<ChatMute> GetChatMutes(bool expired = false)
-		    {
-			    return Punishments.Where((ban) =>
-          {
-            if (ban is not ChatMute chatMute) return false;
-            if (!expired && chatMute.IsExpired) return false;
-
-            return true;
-          }).Cast<ChatMute>().ToList().AsReadOnly(); // XXX(Assasans): Rewrite without using so much LINQ?
+        public ReadOnlyCollection<ChatMute> GetChatMutes(bool expired = false)
+        {
+            return Punishments.Where((ban) => 
+            {
+                if (ban is not ChatMute chatMute) return false;
+                return expired || !chatMute.IsExpired;
+            }).Cast<ChatMute>().ToList().AsReadOnly(); // XXX(Assasans): Rewrite without using so much LINQ?
         }
 
-		    public PlayerData(string uid)
+        public PlayerData(string uid)
         {
             UniqueId = uid;
         }
@@ -72,6 +77,7 @@ namespace TXServer.Core
         public void SetUsername(string username)
         {
             Username = username;
+            Player.User.ChangeComponent(new UserUidComponent(username));
         }
 
         public void SetHashedPassword(string hashedPassword)
@@ -79,58 +85,66 @@ namespace TXServer.Core
             HashedPassword = hashedPassword;
         }
 
-        public UserCountryComponent SetCountryCode(string countryCode)
+        public void SetCountryCode(string countryCode)
         {
-            var component = SetValue<UserCountryComponent>(countryCode);
             CountryCode = countryCode;
-            return component;
+            Player.User.ChangeComponent(new UserCountryComponent(countryCode));
         }
 
-        public UserAvatarComponent SetAvatar(string avatarId)
+        public void SetAvatar(string avatarId)
         {
-            var component = SetValue<UserAvatarComponent>(avatarId);
             Avatar = avatarId;
-            return component;
+            Player.User.ChangeComponent(new UserAvatarComponent(avatarId));
         }
 
         public void SetAdmin(bool admin)
         {
-            if (admin)
-            {
+            if (admin && !Admin)
                 Player.User.Components.Add(new UserAdminComponent());
-                return;
-            }
-            
-            Player.User.Components.Remove(new UserAdminComponent());
+            else if (!admin && Admin)
+                Player.User.Components.Remove(new UserAdminComponent());
+            Admin = admin;
         }
-
         public void SetBeta(bool beta)
         {
-            if (beta)
-            {
+            if (beta && !Beta)
                 Player.User.Components.Add(new ClosedBetaQuestAchievementComponent());
-                return;
-            }
-
-            Player.User.Components.Remove(new ClosedBetaQuestAchievementComponent());
+            else if (!beta && Beta)
+                Player.User.Components.Remove(new ClosedBetaQuestAchievementComponent());
+            Beta = beta;
         }
         
-        public UserMoneyComponent SetCrystals(long value)
+        public void SetCrystals(long value)
         {
-            var component = SetValue<UserMoneyComponent>(value);
             Crystals = value;
-            return component;
+            Player.User.ChangeComponent(new UserMoneyComponent(value));
         }
-        
-        public UserXCrystalsComponent SetXCrystals(long value)
+        public void SetXCrystals(long value)
         {
-            var component = SetValue<UserXCrystalsComponent>(value);
-            // Component tmpComponent;
-            // Player.User.Components.TryGetValue(new UserXCrystalsComponent(0), out tmpComponent);
-            // UserXCrystalsComponent component = (UserXCrystalsComponent) tmpComponent;
-            // component.Money = value;
             XCrystals = value;
-            return component;
+            Player.User.ChangeComponent(new UserXCrystalsComponent(value));
+        }
+        public void SetExperience(long value)
+        {
+            Experience = value;
+            Player.User.ChangeComponent(new UserExperienceComponent(value));
+        }
+        public void SetReputation(long value)
+        {
+            Reputation = value;
+            Player.User.ChangeComponent(new UserReputationComponent(value));
+        }
+        public void RenewPremium(TimeSpan additionalPremiumTime)
+        {
+            if (Player.IsPremium)
+                PremiumExpirationDate += additionalPremiumTime;
+            else
+                PremiumExpirationDate = DateTime.UtcNow + additionalPremiumTime;
+
+            if (Player.User.GetComponent<PremiumAccountBoostComponent>() == null)
+                Player.User.AddComponent(new PremiumAccountBoostComponent(new TXDate(PremiumExpirationDate)));
+            else
+                Player.User.ChangeComponent(new PremiumAccountBoostComponent(new TXDate(PremiumExpirationDate)));
         }
 
 
@@ -153,6 +167,17 @@ namespace TXServer.Core
             IncomingFriendIds.Remove(userId);
             OutgoingFriendIds.Remove(userId);
             AcceptedFriendIds.Remove(userId);
+        }
+        public void ChangeBlockedPlayer(long userId)
+        {
+            if (BlockedPlayerIds.Contains(userId))
+                BlockedPlayerIds.Remove(userId);
+            else
+                BlockedPlayerIds.Add(userId);
+        }
+        public void AddReportedPlayer(long userId)
+        {
+            ReportedPlayerIds.Add(userId);
         }
 
         private T SetValue<T>(object value) where T : Component

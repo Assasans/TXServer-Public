@@ -102,9 +102,10 @@ namespace TXServer.Core.Battles
             CreateBattle();
         }
 
-        public void AddPlayer(Player player)
+        public void AddPlayer(Player player, bool isSpectator)
         {
-            Logger.Log($"{player}: Joined battle {BattleEntity.EntityId}");
+            Logger.Log($"{player}: Joined battle {BattleEntity.EntityId} " + 
+                       (isSpectator ? "as spectator" : null));
 
             // prepare client
             player.User.AddComponent(new UserEquipmentComponent(player.CurrentPreset.Weapon.EntityId, player.CurrentPreset.Hull.EntityId));
@@ -114,22 +115,30 @@ namespace TXServer.Core.Battles
             player.ShareEntities(AllBattlePlayers.Where(y => !player.IsInSquadWith(y.Player)).Select(x => x.User));
             AllBattlePlayers.Select(x => x.Player).Where(x => !x.EntityList.Contains(player.User)).ShareEntity(player.User);
 
-            BattlePlayer battlePlayer = ModeHandler.AddPlayer(player);
+            BattlePlayer battlePlayer = ModeHandler.AddPlayer(player, isSpectator);
             TypeHandler.OnPlayerAdded(battlePlayer);
 
             if (!IsMatchMaking && player.IsSquadLeader)
                 foreach (SquadPlayer participant in player.SquadPlayer.Squad.ParticipantsWithoutLeader)
-                    AddPlayer(participant.Player);
+                    AddPlayer(participant.Player, isSpectator);
+
+            if (isSpectator)
+            {
+                Spectators.Add(player.BattlePlayer);
+                InitMatchPlayer(player.BattlePlayer);
+            }
         }
 
         public void RemovePlayer(BattlePlayer battlePlayer)
         {
+            Spectators.Remove(battlePlayer);
+            bool wasSpectator = battlePlayer.IsSpectator;
             TypeHandler.OnPlayerRemoved(battlePlayer);
             ModeHandler.RemovePlayer(battlePlayer);
 
             battlePlayer.User.RemoveComponent<UserEquipmentComponent>();
-            battlePlayer.User.RemoveComponent<BattleLobbyGroupComponent>();
             battlePlayer.Player.UnshareEntities(BattleLobbyEntity, BattleLobbyChatEntity);
+            battlePlayer.User.RemoveComponent<BattleLobbyGroupComponent>();
 
             if (battlePlayer.User.GetComponent<MatchMakingUserReadyComponent>() != null)
                 battlePlayer.User.RemoveComponent<MatchMakingUserReadyComponent>();
@@ -139,7 +148,8 @@ namespace TXServer.Core.Battles
             AllBattlePlayers.Where(y => !y.Player.IsInSquadWith(battlePlayer.Player)).Select(x => x.Player)
                 .UnshareEntity(battlePlayer.User);
 
-            Logger.Log($"{battlePlayer.Player}: Left battle {BattleEntity.EntityId}");
+            Logger.Log($"{battlePlayer.Player}: Left battle {BattleEntity.EntityId}" + 
+                       (wasSpectator ? "as spectator" : null));
 
             ServerConnection.BattlePool.RemoveAll(p => !p.AllBattlePlayers.Any());
             
@@ -196,7 +206,7 @@ namespace TXServer.Core.Battles
 
             ModeHandler.OnFinish();
 
-            foreach (BattlePlayer battlePlayer in MatchPlayers)
+            foreach (BattlePlayer battlePlayer in MatchPlayers.Where(x => !x.IsSpectator))
             {
                 battlePlayer.MatchPlayer.KeepDisabled = true;
                 battlePlayer.MatchPlayer.DisableTank();
@@ -232,7 +242,14 @@ namespace TXServer.Core.Battles
 
         public void InitMatchPlayer(BattlePlayer battlePlayer)
         {
-            battlePlayer.Player.User.AddComponent(BattleEntity.GetComponent<BattleGroupComponent>());
+            //if (battlePlayer.IsSpectator)
+            //{
+                //InitSpectator(battlePlayer);
+                //return;
+            //}
+            
+            if (!battlePlayer.IsSpectator)
+                battlePlayer.Player.User.AddComponent(BattleEntity.GetComponent<BattleGroupComponent>());
             battlePlayer.MatchPlayer = new MatchPlayer(battlePlayer, BattleEntity, (ModeHandler as TeamBattleHandler)?.BattleViewFor(battlePlayer).AllyTeamResults ?? ((DMHandler)ModeHandler).Results);
 
             battlePlayer.Player.ShareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
@@ -263,7 +280,8 @@ namespace TXServer.Core.Battles
 
         private void RemoveMatchPlayer(BattlePlayer battlePlayer)
         {
-            battlePlayer.Player.User.RemoveComponent<BattleGroupComponent>();
+            if (!battlePlayer.IsSpectator)
+                battlePlayer.Player.User.RemoveComponent<BattleGroupComponent>();
             Player player = battlePlayer.Player;
 
             player.UnshareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
@@ -291,7 +309,7 @@ namespace TXServer.Core.Battles
             foreach (BattlePlayer matchPlayer in MatchPlayers)
                 player.UnshareEntities(matchPlayer.MatchPlayer.GetEntities());
 
-            if (IsMatchMaking) RemovePlayer(battlePlayer);
+            if (IsMatchMaking || battlePlayer.IsSpectator) RemovePlayer(battlePlayer);
             battlePlayer.Reset();
 
             SortRoundUsers();
@@ -299,7 +317,7 @@ namespace TXServer.Core.Battles
 
         private void ProcessExitedPlayers()
         {
-            foreach (BattlePlayer battlePlayer in AllBattlePlayers.ToArray())
+            foreach (BattlePlayer battlePlayer in AllBattlePlayers.Concat(Spectators).ToArray())
             {
                 if (!battlePlayer.Player.IsActive || battlePlayer.WaitingForExit)
                 {
@@ -425,8 +443,7 @@ namespace TXServer.Core.Battles
         private bool IsWarmUpCompleted { get; set; }
 
         public MapInfo CurrentMapInfo { get; set; }
-        public IList<SpawnPoint> DeathmatchSpawnPoints { get; set; }
-        
+
         public List<BattleBonus> BattleBonuses { get; set; } = new();
 
         public BattleState BattleState
@@ -478,10 +495,10 @@ namespace TXServer.Core.Battles
         public IBattleModeHandler ModeHandler { get; private set; }
 
         public double CountdownTimer { get; set; }
-        public double DominationTimer { get; set; }
 
         public IEnumerable<BattlePlayer> AllBattlePlayers => ModeHandler.Players;
         public List<BattlePlayer> MatchPlayers { get; } = new();
+        public List<BattlePlayer> Spectators { get; } = new();
 
         private bool IsEnoughPlayers => ModeHandler.IsEnoughPlayers;
         private TeamColor LosingTeam => ModeHandler.LosingTeam;

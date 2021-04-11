@@ -1,4 +1,5 @@
-﻿using TXServer.Core;
+﻿using System.Linq;
+using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -9,9 +10,15 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity battleUser)
 		{
+			if (player.IsInSquad || player.IsInBattle) return;
+			
 			Core.Battles.Battle battle = Server.FindBattleById(lobbyId: 0, battleId: BattleId);
-
-			// todo: enter battle as spectator system
+			foreach (Entity user in battle.AllBattlePlayers.Select(x => x.User))
+			{
+				if (player.EntityList.Contains(user))
+					player.UnshareEntity(user);
+			}
+			battle.AddPlayer(player, true);
         }
 
 		public long BattleId { get; set; }

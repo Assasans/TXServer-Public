@@ -11,10 +11,7 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			// TODO: update uid in database
-			UserXCrystalsComponent userXCrystalsComponent = player.Data.SetXCrystals(player.Data.XCrystals - Price);
-			player.User.ChangeComponent(userXCrystalsComponent);
-			player.User.ChangeComponent(new UserUidComponent(Uid));
+			player.Data.SetXCrystals(player.Data.XCrystals - Price);
 			player.Data.SetUsername(Uid);
 			player.SendEvent(new CompleteBuyUIDChangeEvent(true), entity);
 

@@ -11,7 +11,7 @@ namespace TXServer.Core.Battles
             Battle battle = ServerConnection.BattlePool.OrderBy(b => b.AllBattlePlayers).LastOrDefault(IsValidToEnter) ??
                             CreateMatchMakingBattle();
 
-            battle.AddPlayer(player);
+            battle.AddPlayer(player, false);
         }
 
         public static void FindSquadBattle(Squad squad)
@@ -20,7 +20,7 @@ namespace TXServer.Core.Battles
                             CreateMatchMakingBattle();
 
             foreach (SquadPlayer participant in squad.Participants)
-                battle.AddPlayer(participant.Player);
+                battle.AddPlayer(participant.Player, false);
         }
 
         

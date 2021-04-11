@@ -30,6 +30,7 @@ namespace TXServer.Core
 		public bool IsInBattle => BattlePlayer != null;
 		public bool IsInMatch => BattlePlayer?.MatchPlayer != null;
 		public bool IsInSquad => SquadPlayer != null;
+		public bool IsPremium => Data.PremiumExpirationDate > DateTime.UtcNow;
 
 		public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
 
@@ -102,11 +103,9 @@ namespace TXServer.Core
 			Logger.Log($"{this}: Logged in as {Data.UniqueId}.");
 
 			Entity user = new(new TemplateAccessor(new UserTemplate(), ""),
-				new UserXCrystalsComponent(Data.XCrystals),
 				new UserCountryComponent(Data.CountryCode),
 				new UserAvatarComponent(Data.Avatar),
 				new UserComponent(),
-				new UserMoneyComponent(Data.Crystals),
 				//new FractionGroupComponent(Fractions.GlobalItems.Frontier),
 				//new UserDailyBonusCycleComponent(1),
 				new TutorialCompleteIdsComponent(),
@@ -115,11 +114,16 @@ namespace TXServer.Core
 				new UserStatisticsComponent(),
 				new PersonalChatOwnerComponent(),
 				new GameplayChestScoreComponent(),
-				new UserRankComponent(1),
 				new BlackListComponent(),
 				new UserUidComponent(Data.UniqueId),
 				//new FractionUserScoreComponent(500),
-				new UserExperienceComponent(0),
+				
+				new UserMoneyComponent(Data.Crystals),
+				new UserXCrystalsComponent(Data.XCrystals),
+				new UserRankComponent(1),
+				new UserExperienceComponent(Data.Experience),
+				new UserReputationComponent(Data.Reputation),
+
 				new QuestReadyComponent(),
 				new UserPublisherComponent(),
 				new FavoriteEquipmentStatisticsComponent(),
@@ -128,25 +132,27 @@ namespace TXServer.Core
 				new UserSubscribeComponent(),
 				new KillsEquipmentStatisticsComponent(),
 				new BattleLeaveCounterComponent(0, 0),
-				//new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(12, 0, 0))),
-				new UserReputationComponent(0.0),
 				new UserOnlineComponent());
 			user.Components.Add(new UserGroupComponent(user));
 
+			User = user;
+			
 			// temp solution
-			List<string> adminUids = new() { "NoNick", "Tim203", "M8", "Kaveman", "Assasans" };
-			if (!adminUids.Contains(Data.UniqueId))
+			List<string> admins = new() { "NoNick", "Tim203", "M8", "Kaveman", "Assasans" };
+			if (!admins.Contains(Data.UniqueId))
 				Data.Admin = false;
-
+			
+			// tip: don't change this order
+			if (Data.PremiumExpirationDate > DateTime.UtcNow)
+				user.AddComponent(new PremiumAccountBoostComponent(new TXDate(Data.PremiumExpirationDate)));
 			if (Data.Admin)
 			{
 				user.Components.Add(new UserAdminComponent());
-				if (user.GetComponent<PremiumAccountBoostComponent>() == null)
-					user.Components.Add(new PremiumAccountBoostComponent(endDate: new TXDate(new TimeSpan(23999976, 0, 0))));
+				Data.RenewPremium(new TimeSpan(23999976, 0, 0));
 			}
 			if (Data.Beta) user.Components.Add(new ClosedBetaQuestAchievementComponent());
 
-			User = user;
+
 			ShareEntity(user);
 			clientSession.AddComponent(new UserGroupComponent(user));
 
@@ -191,28 +197,24 @@ namespace TXServer.Core
 			if (IsInMatch)
             {
 				int battleExperience = BattlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
-				if (User.GetComponent<PremiumAccountBoostComponent>() == null)
-					totalExperience += battleExperience;
-				else
+				if (IsPremium) 
 					totalExperience += battleExperience * 2;
+				else 
+					totalExperience += battleExperience;
 			}
 				
 			int correctRank = experienceForRank.IndexOf(experienceForRank.LastOrDefault(x => x <= totalExperience)) + 1;
 
-			if (User.GetComponent<UserRankComponent>().Rank < correctRank)
-            {
-				User.ChangeComponent(new UserRankComponent(correctRank));
-                // todo: load rank rewards from configs (https://vignette2.wikia.nocookie.net/tanki-x/images/f/fb/Rankit.png/revision/latest?cb=20170629172052)
-                ShareEntity(UserRankRewardNotificationTemplate.CreateEntity(100, 5000, correctRank));
+			if (User.GetComponent<UserRankComponent>().Rank >= correctRank) return;
+			User.ChangeComponent(new UserRankComponent(correctRank));
+			// todo: load rank rewards from configs (https://vignette2.wikia.nocookie.net/tanki-x/images/f/fb/Rankit.png/revision/latest?cb=20170629172052)
+			ShareEntity(UserRankRewardNotificationTemplate.CreateEntity(100, 5000, correctRank));
 
-				if (IsInMatch)
-                {
-					BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new UpdateRankEvent(), User);
-					int currentScoreInBattle = BattlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
-					User.ChangeComponent<UserExperienceComponent>(component => component.Experience += currentScoreInBattle);
-					BattlePlayer.MatchPlayer.AlreadyAddedExperience += currentScoreInBattle;
-				}
-			}
+			if (!IsInMatch) return;
+			BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new UpdateRankEvent(), User);
+			int currentScoreInBattle = BattlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
+			Data.SetExperience(Data.Experience + BattlePlayer.MatchPlayer.GetScoreWithPremium(currentScoreInBattle));
+			BattlePlayer.MatchPlayer.AlreadyAddedExperience += currentScoreInBattle;
         }
 
 		public bool IsInBattleWith(Player player)

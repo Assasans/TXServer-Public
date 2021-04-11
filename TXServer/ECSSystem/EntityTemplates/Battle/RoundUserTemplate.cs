@@ -18,14 +18,11 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 new RoundUserStatisticsComponent(place:1, scoreWithoutBonuses:0, kills:0, killAssists:0, deaths:0),
                 new RoundUserComponent(),
                 new UserGroupComponent(battlePlayer.User),
-                new BattleGroupComponent(battle),
-                new TankGroupComponent(tank));
-
+                new BattleGroupComponent(battle));
             if (battlePlayer.Team != null)
-            {
-                entity.Components.Add(new TeamGroupComponent(battlePlayer.Team));
-            }
-
+                entity.Components.Add(battlePlayer.Team.GetComponent<TeamGroupComponent>());
+            if (tank != null)
+                entity.Components.Add(tank.GetComponent<TankGroupComponent>());
             return entity;
         }
     }

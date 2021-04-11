@@ -5,12 +5,13 @@ namespace TXServer.Core.Battles
 {
     public class BattlePlayer
     {
-        public BattlePlayer(Battle battle, Player player, Entity team)
+        public BattlePlayer(Battle battle, Player player, Entity team, bool isSpectator)
         {
             Battle = battle;
             Player = player;
             User = player.User;
             Team = team;
+            IsSpectator = isSpectator;
         }
 
         public void Reset()
@@ -29,5 +30,6 @@ namespace TXServer.Core.Battles
 
         public DateTime MatchMakingJoinCountdown { get; set; } = DateTime.Now.AddSeconds(10);
         public bool WaitingForExit { get; set; }
+        public bool IsSpectator { get; set; }
     }
 }
