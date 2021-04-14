@@ -36,8 +36,8 @@ namespace TXServer.Core.Commands
 			{ ChatCommandConditions.Admin, "You are not an admin" },
 			{ ChatCommandConditions.Tester, "You are not a tester" },
 			{ ChatCommandConditions.InBattle, "You are not in battle" },
-			{ ChatCommandConditions.BattleOwner, "You are not the battle owner" },
-			{ ChatCommandConditions.HackBattle, "This is not a HackBattle" },
+			{ ChatCommandConditions.BattleOwner, "You do not own this battle" },
+			{ ChatCommandConditions.HackBattle, "HackBattle is not enabled in this battle" },
 			{ ChatCommandConditions.InMatch, "You are not in match" },
 			{ ChatCommandConditions.ActiveTank, "Your tank is not active" },
 		};
@@ -211,7 +211,7 @@ namespace TXServer.Core.Commands
 
 			if (player.Data.Admin)
 				conditions |= ChatCommandConditions.Admin;
-			if (player.Data.Beta)
+			if (player.Data.Beta || player.Data.Admin)
 				conditions |= ChatCommandConditions.Tester;
 
 			if (player.IsInBattle)

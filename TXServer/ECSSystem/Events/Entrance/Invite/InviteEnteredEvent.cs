@@ -1,13 +1,13 @@
-﻿using TXServer.Core.Protocol;
-using TXServer.ECSSystem.Base;
+﻿using System.Collections.Generic;
 using TXServer.Core;
-using TXServer.ECSSystem.Components.Entrance;
-using System.Collections.Generic;
 using TXServer.Core.Logging;
+using TXServer.Core.Protocol;
+using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components.Entrance;
 
 namespace TXServer.ECSSystem.Events.Entrance.Invite
 {
-	[SerialVersionUID(1439810001590L)]
+    [SerialVersionUID(1439810001590L)]
 	public class InviteEnteredEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity entity)
@@ -26,12 +26,12 @@ namespace TXServer.ECSSystem.Events.Entrance.Invite
 			if (AllowedUids.Contains(inviteCode) || AllowedUids.Contains(inviteCode.ToLower()))
 			{
 				player.SendEvent(new CommenceRegistrationEvent(), entity);
-				Logger.Log($"{player}: New session with invite code '{inviteCode}'");
+				Logger.Log($"{player}: New session with invite code \"{inviteCode}\"");
 			}
 			else
 			{
 				player.SendEvent(new InviteDoesNotExistEvent(), entity);
-				Logger.Log($"{player}: Invalid invite code {inviteCode}");
+				Logger.Log($"{player}: Invalid invite code \"{inviteCode}\"");
 			}
 		}
 	}

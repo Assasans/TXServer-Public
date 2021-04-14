@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using TXServer.Core;
+using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
@@ -32,19 +33,29 @@ namespace TXServer.ECSSystem.Events.Battle
         {
             SelfEvent.Execute(this, player, tank);
 
+            MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
+            if (matchPlayer.TankState == TankState.Dead) return;
+
             Vector3? position = MoveCommand.Movement?.Position;
             if (!position.HasValue) return;
 
-            player.BattlePlayer.MatchPlayer.TankPosition = position.Value;
-            if (CheckOverflow(position.Value + (MoveCommand.Movement?.Velocity).GetValueOrDefault()))
-                player.BattlePlayer.MatchPlayer.SelfDestructionTime = DateTime.Now;
+            // Calculate velocity based on 2 previous positions and last position is kept instead
+            // Reasons:
+            // - velocity sent by client may be corrupled by overflow
+            // - latest position may be corrupted too
+            Vector3 velocity = matchPlayer.TankPosition - matchPlayer.PrevTankPosition;
+            matchPlayer.PrevTankPosition = matchPlayer.TankPosition;
+            matchPlayer.TankPosition = position.Value;
+
+            if (CheckOverflow(position.Value + velocity))
+                matchPlayer.SelfDestructionTime = DateTime.Now;
 
             if (player.BattlePlayer.Battle.Params.KillZoneEnabled)
             {
                 foreach (PuntativeGeometry geometry in player.BattlePlayer.Battle.CurrentMapInfo.PuntativeGeoms)
                 {
                     if (IsInsideBox(position.Value, geometry.Position, geometry.Size))
-                        player.BattlePlayer.MatchPlayer.SelfDestructionTime = DateTime.Now;
+                        matchPlayer.SelfDestructionTime = DateTime.Now;
                 }
             }
         }

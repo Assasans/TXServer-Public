@@ -209,8 +209,7 @@ namespace TXServer.Core.Battles
                         supplyEffect.ExtendTime();
                     else
                         supplyEffect.Remove();
-                }
-                    
+                } 
             }
         }
 
@@ -284,7 +283,10 @@ namespace TXServer.Core.Battles
         public bool WaitingForTankActivation { get; set; }
 
         public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new ConcurrentDictionary<Type, TranslatedEvent>();
+
         public Vector3 TankPosition { get; set; }
+        public Vector3 PrevTankPosition { get; set; }
+
         public bool Paused { get; set; } = false;
         public List<SupplyEffect> SupplyEffects { get; } = new();
         public Dictionary<MatchPlayer, int> DamageAssisters { get; set; } = new();
