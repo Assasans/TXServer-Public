@@ -150,6 +150,9 @@ namespace TXServer.Core.Battles
                     TankState = TankState.Dead;
                     Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
                     UpdateStatistics(-10, -1, 0, 1, null);
+
+                    TankPosition = new();
+                    PrevTankPosition = new();
                 }
 
                 SelfDestructionTime = null;
