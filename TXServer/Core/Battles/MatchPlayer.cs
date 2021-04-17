@@ -5,11 +5,8 @@ using System.Linq;
 using System.Numerics;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Health;
-using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Weapon;
@@ -264,8 +261,7 @@ namespace TXServer.Core.Battles
                         break;
                 }
 
-                if (Tank.GetComponent(StateComponents[_TankState]) != null)
-                    Tank.RemoveComponent(StateComponents[_TankState]);
+                Tank.TryRemoveComponent(StateComponents[_TankState]);
                 Tank.AddComponent((Component)Activator.CreateInstance(StateComponents[value]));
                 _TankState = value;
 
@@ -295,7 +291,7 @@ namespace TXServer.Core.Battles
         public Dictionary<MatchPlayer, int> DamageAssisters { get; set; } = new();
         public int AlreadyAddedExperience { get; set; } = 0;
 
-        private IList<SpawnPoint> SpawnCoordinates;
+        private readonly IList<SpawnPoint> SpawnCoordinates;
         public SpawnPoint LastSpawnPoint { get; set; } = new SpawnPoint();
     }
 }

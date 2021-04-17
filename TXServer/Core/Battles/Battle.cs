@@ -149,7 +149,7 @@ namespace TXServer.Core.Battles
                 .UnshareEntity(battlePlayer.User);
 
             Logger.Log($"{battlePlayer.Player}: Left battle {BattleEntity.EntityId}" + 
-                       (wasSpectator ? "as spectator" : null));
+                       (wasSpectator ? " as spectator" : null));
 
             ServerConnection.BattlePool.RemoveAll(p => !p.AllBattlePlayers.Any());
             
@@ -309,8 +309,12 @@ namespace TXServer.Core.Battles
             foreach (BattlePlayer matchPlayer in MatchPlayers)
                 player.UnshareEntities(matchPlayer.MatchPlayer.GetEntities());
 
-            if (IsMatchMaking || battlePlayer.IsSpectator) RemovePlayer(battlePlayer);
             battlePlayer.Reset();
+
+            if (battlePlayer.Rejoin) return;
+
+            if (IsMatchMaking || battlePlayer.IsSpectator)
+                RemovePlayer(battlePlayer);
 
             SortRoundUsers();
         }
@@ -490,6 +494,7 @@ namespace TXServer.Core.Battles
             }
         }
         private BattleState _BattleState;
+        public bool KeepRunning { get; set; }
 
         public IBattleTypeHandler TypeHandler { get; }
         public IBattleModeHandler ModeHandler { get; private set; }

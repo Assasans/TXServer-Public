@@ -56,7 +56,7 @@ namespace TXServer.Core.Battles
                         }
                         break;
                     case BattleState.Running:
-                        if (!Battle.MatchPlayers.Any())
+                        if (!Battle.MatchPlayers.Any() && !Battle.KeepRunning)
                         {
                             Battle.BattleLobbyEntity.RemoveComponent<BattleGroupComponent>();
                             Battle.BattleState = BattleState.CustomNotStarted;

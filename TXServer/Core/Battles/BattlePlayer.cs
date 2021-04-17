@@ -26,10 +26,11 @@ namespace TXServer.Core.Battles
         public Entity User { get; }
         public Entity Team { get; set; }
 
-        public MatchPlayer MatchPlayer { get; set; }
+        public MatchPlayer MatchPlayer { get; set; }        
+        public bool IsSpectator { get; set; }
 
         public DateTime MatchMakingJoinCountdown { get; set; } = DateTime.Now.AddSeconds(10);
         public bool WaitingForExit { get; set; }
-        public bool IsSpectator { get; set; }
+        public bool Rejoin { get; set; }
     }
 }

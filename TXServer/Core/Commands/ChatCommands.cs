@@ -7,6 +7,7 @@ using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Events;
+using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -152,11 +153,13 @@ namespace TXServer.Core.Commands
 
 		private static string Gravity(Player player, string[] args)
 		{
+			Battle battle = player.BattlePlayer.Battle;
+
 			string notification = "Gravity changed ";
 			float gravity;
 			if (args.Length == 0)
 			{
-				gravity = player.BattlePlayer.Battle.GravityTypes[player.BattlePlayer.Battle.Params.Gravity];
+				gravity = battle.GravityTypes[battle.Params.Gravity];
 				notification += "to params gravity";
 			}
 			else
@@ -167,15 +170,24 @@ namespace TXServer.Core.Commands
 				notification += $"to {gravity}";
 			}
 
-			player.BattlePlayer.Battle.BattleEntity.ChangeComponent<GravityComponent>(component => component.Gravity = gravity);
+			foreach (BattlePlayer battlePlayer in battle.MatchPlayers)
+            {
+				battle.KeepRunning = true;
+				battlePlayer.Rejoin = true;
+				battlePlayer.Player.SendEvent(new KickFromBattleEvent(), battlePlayer.MatchPlayer.BattleUser);
+			}
 
-			if (player.BattlePlayer.Battle.MatchPlayers.Any()) notification += ": All match players have to rejoin or it will get glitchy";
+			battle.BattleEntity.ChangeComponent<GravityComponent>(component => component.Gravity = gravity);
+
+			//if (battle.MatchPlayers.Any()) notification += ": All match players have to rejoin or it will get glitchy";
 			Dictionary<List<BattlePlayer>, Entity> targets = new()
 			{
-				{ player.BattlePlayer.Battle.AllBattlePlayers.ToList(), player.BattlePlayer.Battle.BattleLobbyChatEntity }
+				{ battle.AllBattlePlayers.ToList(), battle.BattleLobbyChatEntity }
 			};
-			if (player.BattlePlayer.Battle.MatchPlayers.Any())
-				targets.Add(player.BattlePlayer.Battle.MatchPlayers, player.BattlePlayer.Battle.GeneralBattleChatEntity);
+			/*
+			if (battle.MatchPlayers.Any())
+				targets.Add(battle.MatchPlayers, battle.GeneralBattleChatEntity);
+			*/
 			MessageOtherPlayers(notification, player, targets);
 
 			return notification;

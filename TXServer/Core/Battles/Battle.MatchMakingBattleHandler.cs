@@ -68,10 +68,7 @@ namespace TXServer.Core.Battles
                         break;
                     case BattleState.StartCountdown:
                         if (!Battle.IsEnoughPlayers && !Battle.ForceStart)
-                        {
-                            //Thread.Sleep(1000); // TODO: find a better solution for this (client crash when no delay)
                             Battle.BattleState = BattleState.NotEnoughPlayers;
-                        }
 
                         if (Battle.CountdownTimer < 0)
                             Battle.BattleState = BattleState.Starting;
@@ -129,12 +126,6 @@ namespace TXServer.Core.Battles
                         }
                         break;
                     case BattleState.Running:
-                        if (!Battle.AllBattlePlayers.Any())
-                        {
-                            Battle.BattleState = BattleState.NotEnoughPlayers;
-                            Battle.IsWarmUpCompleted = false;
-                        }
-
                         if (Battle.CountdownTimer < 0)
                             Battle.FinishBattle();
                         break;
