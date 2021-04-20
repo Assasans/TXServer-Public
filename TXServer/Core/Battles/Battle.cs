@@ -242,12 +242,6 @@ namespace TXServer.Core.Battles
 
         public void InitMatchPlayer(BattlePlayer battlePlayer)
         {
-            //if (battlePlayer.IsSpectator)
-            //{
-                //InitSpectator(battlePlayer);
-                //return;
-            //}
-            
             if (!battlePlayer.IsSpectator)
                 battlePlayer.Player.User.AddComponent(BattleEntity.GetComponent<BattleGroupComponent>());
             battlePlayer.MatchPlayer = new MatchPlayer(battlePlayer, BattleEntity, (ModeHandler as TeamBattleHandler)?.BattleViewFor(battlePlayer).AllyTeamResults ?? ((DMHandler)ModeHandler).Results);
@@ -442,6 +436,7 @@ namespace TXServer.Core.Battles
         public Entity MapEntity { get; private set; }
 
         public bool ForceStart { get; set; }
+        public bool ForcePause { get; set; }
         public bool ForceOpen { get; set; }
         public int WarmUpSeconds { get; set; }
         private bool IsWarmUpCompleted { get; set; }

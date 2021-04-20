@@ -78,8 +78,8 @@ namespace TXServer.Core.Battles
                 {
                     if (Battle.AllBattlePlayers.Any())
                     {
-                        var AllBattlePlayers = Battle.AllBattlePlayers.ToList();
-                        _Owner = AllBattlePlayers[new Random().Next(AllBattlePlayers.Count)].Player;
+                        var allBattlePlayers = Battle.AllBattlePlayers.ToList();
+                        _Owner = allBattlePlayers[new Random().Next(allBattlePlayers.Count)].Player;
                         Battle.BattleLobbyEntity.RemoveComponent<UserGroupComponent>();
                         Battle.BattleLobbyEntity.AddComponent(new UserGroupComponent(Owner.User));
                     }

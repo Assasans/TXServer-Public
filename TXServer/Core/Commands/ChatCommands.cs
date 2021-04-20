@@ -22,6 +22,8 @@ namespace TXServer.Core.Commands
 
 			{ "open", (null, ChatCommandConditions.Admin | ChatCommandConditions.InBattle, Open) },
 			{ "start", (null, ChatCommandConditions.Admin | ChatCommandConditions.InBattle, Start) },
+			{ "pause", (null, ChatCommandConditions.Admin | ChatCommandConditions.InBattle, Pause) },
+			{ "finish", (null, ChatCommandConditions.Admin | ChatCommandConditions.InBattle, Finish) },
 			{ "positionInfo", (null, ChatCommandConditions.Admin | ChatCommandConditions.InMatch, PositionInfo) },
 
 			{ "stats", (null, ChatCommandConditions.Tester, Stats) },
@@ -103,10 +105,30 @@ namespace TXServer.Core.Commands
 		private static string Start(Player player, string[] args)
 		{
 			if (!player.BattlePlayer.Battle.IsMatchMaking)
+			{
 				player.BattlePlayer.Battle.BattleState = BattleState.Starting;
-			else
-				player.BattlePlayer.Battle.ForceStart = true;
+			}
+			player.BattlePlayer.Battle.ForcePause = false;
+			player.BattlePlayer.Battle.ForceStart = true;
 			return "Started";
+		}
+
+		private static string Pause(Player player, string[] args)
+		{
+			Battle battle = player.BattlePlayer.Battle;
+			
+			if (!battle.ForceOpen && battle.ForcePause)
+				return "Already paused";
+
+			player.BattlePlayer.Battle.ForceStart = false;
+			player.BattlePlayer.Battle.ForcePause = true;
+			return "Paused battle entry";
+		}
+		
+		private static string Finish(Player player, string[] args)
+		{
+			player.BattlePlayer.Battle.FinishBattle();
+			return "Finished";
 		}
 
 		private static string Open(Player player, string[] args)
@@ -120,7 +142,8 @@ namespace TXServer.Core.Commands
 		private static string SpawnInfo(Player player, string[] args)
 		{
 			SpawnPoint lastSpawnPoint = player.BattlePlayer.MatchPlayer.LastSpawnPoint;
-			return $"{player.BattlePlayer.Battle.CurrentMapInfo.Name}, {player.BattlePlayer.Battle.Params.BattleMode}, {player.User.GetComponent<TeamColorComponent>().TeamColor}, Number: {lastSpawnPoint.Number}";
+			return $"{player.BattlePlayer.Battle.CurrentMapInfo.Name}, {player.BattlePlayer.Battle.Params.BattleMode}, " +
+			       $"{player.User.GetComponent<TeamColorComponent>().TeamColor}, Number: {lastSpawnPoint.Number}";
 		}
 
 		private static string Stats(Player player, string[] args)
@@ -178,16 +201,12 @@ namespace TXServer.Core.Commands
 			}
 
 			battle.BattleEntity.ChangeComponent<GravityComponent>(component => component.Gravity = gravity);
-
-			//if (battle.MatchPlayers.Any()) notification += ": All match players have to rejoin or it will get glitchy";
+			
 			Dictionary<List<BattlePlayer>, Entity> targets = new()
 			{
 				{ battle.AllBattlePlayers.ToList(), battle.BattleLobbyChatEntity }
 			};
-			/*
-			if (battle.MatchPlayers.Any())
-				targets.Add(battle.MatchPlayers, battle.GeneralBattleChatEntity);
-			*/
+
 			MessageOtherPlayers(notification, player, targets);
 
 			return notification;

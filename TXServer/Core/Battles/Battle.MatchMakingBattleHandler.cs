@@ -48,28 +48,30 @@ namespace TXServer.Core.Battles
             {
                 WaitingToJoinPlayers.RemoveAll(battlePlayer =>
                 {
-                    if (DateTime.Now > battlePlayer.MatchMakingJoinCountdown)
+                    if (DateTime.Now < battlePlayer.MatchMakingJoinCountdown) return false;
+                    if (Battle.ForcePause)
                     {
-                        Battle.InitMatchPlayer(battlePlayer);
-
-                        // Prevent joining and immediate exiting
-                        battlePlayer.WaitingForExit = false;
-
-                        return true;
+                        battlePlayer.MatchMakingJoinCountdown = DateTime.Now.AddSeconds(10);
+                        return false;
                     }
+                    
+                    Battle.InitMatchPlayer(battlePlayer);
 
-                    return false;
+                    // Prevent joining and immediate exiting
+                    battlePlayer.WaitingForExit = false;
+
+                    return true;
                 });
 
                 switch (Battle.BattleState)
                 {
                     case BattleState.NotEnoughPlayers:
-                        if (Battle.IsEnoughPlayers || Battle.ForceStart)
+                        if (Battle.IsEnoughPlayers && !Battle.ForcePause || Battle.ForceStart)
                             Battle.BattleState = BattleState.StartCountdown;
 
                         break;
                     case BattleState.StartCountdown:
-                        if (!Battle.IsEnoughPlayers && !Battle.ForceStart)
+                        if (!Battle.IsEnoughPlayers && !Battle.ForceStart || Battle.ForcePause)
                             Battle.BattleState = BattleState.NotEnoughPlayers;
 
                         if (Battle.CountdownTimer < 0)
@@ -77,7 +79,7 @@ namespace TXServer.Core.Battles
 
                         break;
                     case BattleState.Starting:
-                        if (!Battle.IsEnoughPlayers && !Battle.ForceStart)
+                        if (!Battle.IsEnoughPlayers && !Battle.ForceStart || Battle.ForcePause)
                         {
                             Battle.BattleState = BattleState.NotEnoughPlayers;
                             break;
@@ -171,7 +173,7 @@ namespace TXServer.Core.Battles
             public void OnPlayerAdded(BattlePlayer battlePlayer)
             {
                 battlePlayer.User.AddComponent(new MatchMakingUserComponent());
-                if (Battle.BattleState is BattleState.WarmUp or BattleState.Running)
+                if (Battle.BattleState is BattleState.WarmUp or BattleState.Running && !Battle.ForcePause)
                 {
                     battlePlayer.Player.SendEvent(new MatchMakingLobbyStartTimeEvent(new TimeSpan(0, 0, 10)), battlePlayer.User);
                     WaitingToJoinPlayers.Add(battlePlayer);
