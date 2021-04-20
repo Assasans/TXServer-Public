@@ -480,13 +480,15 @@ namespace TXServer.Core.Battles
                         CountdownTimer = 3;
                         break;
                     case BattleState.WarmUp:
-                        BattleEntity.ChangeComponent(new BattleStartTimeComponent(new DateTimeOffset(DateTime.Now.AddSeconds(WarmUpSeconds))));
+                        BattleEntity.ChangeComponent(new BattleStartTimeComponent(DateTimeOffset.Now.AddSeconds(WarmUpSeconds)));
+                        RoundEntity.ChangeComponent(new RoundStopTimeComponent(DateTimeOffset.Now.AddSeconds(60 * Params.TimeLimit)));
                         RoundEntity.AddComponent(new RoundWarmingUpStateComponent());
                         CountdownTimer = WarmUpSeconds;
                         break;
                     case BattleState.Running:
                         CountdownTimer = 60 * Params.TimeLimit;
                         BattleEntity.ChangeComponent(new BattleStartTimeComponent(DateTime.Now));
+                        RoundEntity.ChangeComponent(new RoundStopTimeComponent(DateTimeOffset.Now.AddSeconds(CountdownTimer)));
                         break;
                 }
 

@@ -5,6 +5,7 @@ using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Round;
+using TXServer.ECSSystem.Components.Battle.Time;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.Events.Matchmaking;
@@ -24,6 +25,7 @@ namespace TXServer.Core.Battles
 
             private TeamColor LastLosingTeam;
             private DateTime DominationStartTime;
+            private RoundStopTimeComponent StopTimeBeforeDomination;
 
             public void SetupBattle()
             {
@@ -142,10 +144,16 @@ namespace TXServer.Core.Battles
                         Battle.BattleEntity.AddComponent(roundDisbalancedComponent);
                         Battle.BattleEntity.AddComponent(new RoundComponent());
 
+                        StopTimeBeforeDomination = Battle.RoundEntity.GetComponent<RoundStopTimeComponent>();
+                        Battle.RoundEntity.ChangeComponent(new RoundStopTimeComponent(DateTimeOffset.Now.AddSeconds(30)));
+
                         DominationStartTime = DateTime.Now.AddSeconds(30);
                     }
                     else
                     {
+                        Battle.RoundEntity.ChangeComponent(StopTimeBeforeDomination);
+                        StopTimeBeforeDomination = null;
+
                         Battle.MatchPlayers.Select(x => x.Player).SendEvent(new RoundBalanceRestoredEvent(), Battle.BattleEntity);
                         Battle.BattleEntity.RemoveComponent<RoundComponent>();
                         Battle.BattleEntity.RemoveComponent<RoundDisbalancedComponent>();
