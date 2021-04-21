@@ -8,9 +8,12 @@ using TXServer.Core.Squads;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
+using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.Components.Battle.Round;
+using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Time;
+using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Chat;
 using TXServer.ECSSystem.Events.Battle;
@@ -270,6 +273,114 @@ namespace TXServer.Core.Battles
             MatchPlayers.Select(x => x.Player).ShareEntities(battlePlayer.MatchPlayer.GetEntities());
 
             SortRoundUsers();
+
+            Entity slot = new Entity(
+                new TemplateAccessor(new SlotUserItemTemplate(), "/garage/module/slot"),
+                new SlotTankPartComponent(TankPartModuleType.TANK),
+                // new ModuleTierComponent(1),
+                new SlotUserItemInfoComponent(Slot.SLOT1, ModuleBehaviourType.ACTIVE) {
+                    UpgradeLevel = 1
+                },
+                battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
+                battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>()
+            );
+            
+            Entity module = new Entity(new TemplateAccessor(new ModuleUserItemTemplate(), "/garage/module/module/tank/active/1/turbospeed"),
+                new SlotTankPartComponent(TankPartModuleType.TANK),
+                // new ModuleTierComponent(1),
+                new SlotUserItemInfoComponent(Slot.SLOT1, ModuleBehaviourType.ACTIVE) {
+                    UpgradeLevel = 1
+                },
+                new InventoryAmmunitionComponent(),
+                new InventoryEnabledStateComponent(),
+                /*
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleTankPartComponent(TankPartModuleType.TANK),
+                new ModuleUpgradeLevelComponent() {
+                    Level = 666
+                },
+                */
+                new ModuleUsesCounterComponent(),
+                battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
+                battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>(),
+                new UserItemCounterComponent(100)
+            );
+
+            module.AddComponent(new ModuleGroupComponent(slot.EntityId));
+
+            Entity slot2 = new Entity(
+                new TemplateAccessor(new SlotUserItemTemplate(), "/garage/module/slot"),
+                new SlotTankPartComponent(TankPartModuleType.WEAPON),
+                // new ModuleTierComponent(1),
+                new SlotUserItemInfoComponent(Slot.SLOT6, ModuleBehaviourType.PASSIVE) {
+                    UpgradeLevel = 1
+                },
+                battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
+                battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>()
+            );
+            
+            Entity module2 = new Entity(new TemplateAccessor(new ModuleUserItemTemplate(), "/garage/module/module/weapon/passive/1/engineer"),
+                new SlotTankPartComponent(TankPartModuleType.WEAPON),
+                // new ModuleTierComponent(1),
+                new SlotUserItemInfoComponent(Slot.SLOT6, ModuleBehaviourType.PASSIVE) {
+                    UpgradeLevel = 1
+                },
+                new InventoryAmmunitionComponent(),
+                new InventoryEnabledStateComponent(),
+                /*
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleTankPartComponent(TankPartModuleType.WEAPON),
+                new ModuleUpgradeLevelComponent() {
+                    Level = 666
+                },
+                */
+                new ModuleUsesCounterComponent(),
+                battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
+                battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>(),
+                new UserItemCounterComponent(100)
+            );
+            module2.AddComponent(new ModuleGroupComponent(slot2.EntityId));
+
+            Entity slot3 = new Entity(
+                new TemplateAccessor(new SlotUserItemTemplate(), "/garage/module/slot"),
+                new SlotTankPartComponent(TankPartModuleType.WEAPON),
+                // new ModuleTierComponent(1),
+                new SlotUserItemInfoComponent(Slot.SLOT2, ModuleBehaviourType.PASSIVE) {
+                    UpgradeLevel = 1
+                },
+                battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
+                battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>()
+            );
+            
+            Entity module3 = new Entity(new TemplateAccessor(new ModuleUserItemTemplate(), "/garage/module/prebuildmodule/common/active/1/gold"),
+                new SlotTankPartComponent(TankPartModuleType.COMMON),
+                // new ModuleTierComponent(1),
+                new SlotUserItemInfoComponent(Slot.SLOT2, ModuleBehaviourType.ACTIVE) {
+                    UpgradeLevel = 1
+                },
+                new InventoryAmmunitionComponent() {
+                    CurrentCount = 1337
+                },
+                new InventoryEnabledStateComponent(),
+                /*
+                new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
+                new ModuleTankPartComponent(TankPartModuleType.COMMON),
+                new ModuleUpgradeLevelComponent() {
+                    Level = 666
+                },
+                */
+                new ModuleUsesCounterComponent(),
+                battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
+                battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>(),
+                new UserItemCounterComponent(100)
+            );
+            module3.AddComponent(new ModuleGroupComponent(slot3.EntityId));
+            
+            // FIXME(Assasans): Should unshare on battle finish and player exit
+            battlePlayer.Player.ShareEntities(
+                slot, slot2, slot3,
+                module, module2, module3
+            );
         }
 
         private void RemoveMatchPlayer(BattlePlayer battlePlayer)

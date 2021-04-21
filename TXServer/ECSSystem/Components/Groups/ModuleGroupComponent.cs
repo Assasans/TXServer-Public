@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Components
         {
         }
 
-        public ModuleGroupComponent(long Key) : base(Key)
+        public ModuleGroupComponent(long key) : base(key)
         {
         }
     }
