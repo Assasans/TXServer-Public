@@ -124,11 +124,13 @@ namespace TXServer.Core
 				new UserExperienceComponent(Data.Experience),
 				new UserReputationComponent(Data.Reputation),
 
+				/*
 				new UserDailyBonusCycleComponent(1),
 				new UserDailyBonusReceivedRewardsComponent(),
 				new UserDailyBonusZoneComponent(1),
 				new UserDailyBonusNextReceivingDateComponent(),
 				new UserDailyBonusInitializedComponent(),
+				*/
 
 				new QuestReadyComponent(),
 				new UserPublisherComponent(),
