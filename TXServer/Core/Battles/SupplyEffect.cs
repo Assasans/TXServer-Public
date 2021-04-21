@@ -91,7 +91,7 @@ namespace TXServer.Core.Battles
             {
                 StopTime = GetStopTime();
                 SupplyEffectEntity.RemoveComponent<DurationComponent>();
-                SupplyEffectEntity.AddComponent(new DurationComponent(new TXDate(DateTimeOffset.Now)));
+                SupplyEffectEntity.AddComponent(new DurationComponent { StartedTime = DateTime.Now });
             }
         }
 

@@ -14,6 +14,7 @@ namespace TXServer.ECSSystem.EntityTemplates
                 new NotificationGroupComponent(entity),
                 new NotificationComponent(NotificationPriority.MESSAGE));
 
+
             return notification;
         }
     }

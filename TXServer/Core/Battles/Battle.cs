@@ -467,7 +467,7 @@ namespace TXServer.Core.Battles
                 switch (value)
                 {
                     case BattleState.StartCountdown:
-                        BattleLobbyEntity.AddComponent(new MatchMakingLobbyStartTimeComponent(new TimeSpan(0, 0, 10)));
+                        BattleLobbyEntity.AddComponent(new MatchMakingLobbyStartTimeComponent { StartTime = DateTime.Now.AddSeconds(10) });
                         CountdownTimer = 10;
                         break;
                     case BattleState.Starting:

@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Protocol;
+﻿using System;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
 
@@ -7,7 +8,7 @@ namespace TXServer.ECSSystem.Components.Battle
     [SerialVersionUID(3051892485776042754L)]
     public class RoundDisbalancedComponent : Component
     {
-        public RoundDisbalancedComponent(TeamColor Loser, int InitialDominationTimerSec, TXDate FinishTime)
+        public RoundDisbalancedComponent(TeamColor Loser, int InitialDominationTimerSec, DateTime FinishTime)
         {
             this.Loser = Loser;
             this.InitialDominationTimerSec = InitialDominationTimerSec;
@@ -16,6 +17,6 @@ namespace TXServer.ECSSystem.Components.Battle
 
         public TeamColor Loser { get; set; }
         public int InitialDominationTimerSec { get; set; }
-        public TXDate FinishTime { get; set; }
+        public DateTime FinishTime { get; set; }
     }
 }

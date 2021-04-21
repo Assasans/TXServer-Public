@@ -85,9 +85,9 @@ namespace TXServer.Core.Protocol
             }
         }
 
-        private void EncodeDateTime(DateTime date)
+        private void EncodeDateTime(DateTime time)
         {
-            writer.Write((new DateTimeOffset(date).UtcTicks - DateTime.UtcNow.Ticks) / 10000);
+            writer.Write((time.ToUniversalTime() - DateTime.UnixEpoch).Ticks / 10000);
         }
 
         private void EncodeVector3(Vector3 vector3)
@@ -99,19 +99,22 @@ namespace TXServer.Core.Protocol
 
         private void EncodeMoveCommand(MoveCommand moveCommand)
         {
-            bool flag = moveCommand.Movement != null;
-            bool flag2 = moveCommand.WeaponRotation != null;
-            bool flag3 = moveCommand.IsDiscrete();
-            map.Add(flag);
-            map.Add(flag2);
-            map.Add(flag3);
-            if (flag3)
+            bool hasMovement = moveCommand.Movement != null;
+            bool hasWeaponRotation = moveCommand.WeaponRotation != null;
+            bool isDiscrete = moveCommand.IsDiscrete();
+
+            map.Add(hasMovement);
+            map.Add(hasWeaponRotation);
+            map.Add(isDiscrete);
+
+            if (isDiscrete)
             {
-                DiscreteTankControl discreteTankControl = default(DiscreteTankControl);
-                discreteTankControl.MoveAxis = (int)moveCommand.TankControlVertical;
-                discreteTankControl.TurnAxis = (int)moveCommand.TankControlHorizontal;
-                discreteTankControl.WeaponControl = (int)moveCommand.WeaponRotationControl;
-                writer.Write(discreteTankControl.Control);
+                writer.Write(new DiscreteTankControl()
+                {
+                    MoveAxis = (int)moveCommand.TankControlVertical,
+                    TurnAxis = (int)moveCommand.TankControlHorizontal,
+                    WeaponControl = (int)moveCommand.WeaponRotationControl,
+                }.Control);
             }
             else
             {
@@ -119,23 +122,24 @@ namespace TXServer.Core.Protocol
                 writer.Write(moveCommand.TankControlHorizontal);
                 writer.Write(moveCommand.WeaponRotationControl);
             }
-            if (flag)
-            {
+
+            if (hasMovement)
                 MovementCodec.Encode(writer, moveCommand.Movement.Value);
-            }
-            if (flag2)
+
+            if (hasWeaponRotation)
             {
-                byte[] buffer = !flag2 ? bufferEmpty : bufferForWeaponRotation;
-                BitArray bits = !flag2 ? bitsEmpty : bitsForWeaponRotation;
-                int num = 0;
-                MovementCodec.WriteFloat(bits, ref num, moveCommand.WeaponRotation.Value, WEAPON_ROTATION_COMPONENT_BITSIZE, WEAPON_ROTATION_FACTOR);
+                byte[] buffer = bufferForWeaponRotation;
+                BitArray bits = bitsForWeaponRotation;
+                int position = 0;
+
+                MovementCodec.WriteFloat(bits, ref position, moveCommand.WeaponRotation.Value, WEAPON_ROTATION_COMPONENT_BITSIZE, WEAPON_ROTATION_FACTOR);
                 bits.CopyTo(buffer, 0);
                 writer.Write(buffer);
-                if (num != bits.Length)
-                {
+
+                if (position != bits.Length)
                     throw new Exception("Move command pack mismatch");
-                }
             }
+
             writer.Write(moveCommand.ClientTime);
         }
 

@@ -13,6 +13,6 @@ namespace TXServer.Core.Commands
             return $"InitTimeCommand [ServerTime: {ServerTime}]";
         }
 
-        [ProtocolFixed] public Int64 ServerTime { get; set; } = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+        [ProtocolFixed] public long ServerTime { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
 }

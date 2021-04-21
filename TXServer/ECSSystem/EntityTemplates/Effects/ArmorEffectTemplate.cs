@@ -3,7 +3,6 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Tank;
-using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.EntityTemplates.Effects
 {
@@ -15,7 +14,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Effects
             Entity entity = new(new TemplateAccessor(new ArmorEffectTemplate(), "battle/effect/armor"),
                 new EffectComponent(),
                 new DurationConfigComponent(30000),
-                new DurationComponent(new TXDate(DateTimeOffset.Now)),
+                new DurationComponent { StartedTime = DateTime.Now },
                 tank.GetComponent<TankGroupComponent>());
             return entity;
         }

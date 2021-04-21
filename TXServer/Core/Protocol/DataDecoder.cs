@@ -148,21 +148,23 @@ namespace TXServer.Core.Protocol
         private object DecodeMoveCommand()
         {
             const int WEAPON_ROTATION_SIZE = 2;
-            byte[] bufferEmpty = Array.Empty<byte>();
-            byte[] bufferForWeaponRotation = new byte[WEAPON_ROTATION_SIZE];
-            BitArray bitsEmpty = new BitArray(bufferEmpty);
-            BitArray bitsForWeaponRotation = new BitArray(bufferForWeaponRotation);
             const int WEAPON_ROTATION_COMPONENT_BITSIZE = WEAPON_ROTATION_SIZE * 8;
             const float WEAPON_ROTATION_FACTOR = 360f / (1 << WEAPON_ROTATION_COMPONENT_BITSIZE);
 
-            bool flag = map.Read();
-            bool flag2 = map.Read();
-            bool flag3 = map.Read();
+            byte[] bufferEmpty = Array.Empty<byte>();
+            byte[] bufferForWeaponRotation = new byte[WEAPON_ROTATION_SIZE];
+
+            BitArray bitsEmpty = new(bufferEmpty);
+            BitArray bitsForWeaponRotation = new(bufferForWeaponRotation);
+
+            bool hasMovement = map.Read();
+            bool hasWeaponRotation = map.Read();
+            bool isDiscrete = map.Read();
+
             MoveCommand moveCommand = default;
-            if (flag3)
+            if (isDiscrete)
             {
-                DiscreteTankControl discreteTankControl = default;
-                discreteTankControl.Control = reader.ReadByte();
+                DiscreteTankControl discreteTankControl = new() { Control = reader.ReadByte() };
                 moveCommand.TankControlHorizontal = discreteTankControl.TurnAxis;
                 moveCommand.TankControlVertical = discreteTankControl.MoveAxis;
                 moveCommand.WeaponRotationControl = discreteTankControl.WeaponControl;
@@ -173,28 +175,26 @@ namespace TXServer.Core.Protocol
                 moveCommand.TankControlHorizontal = reader.ReadSingle();
                 moveCommand.WeaponRotationControl = reader.ReadSingle();
             }
-            if (flag)
-            {
-                moveCommand.Movement = new Movement?((Movement)MovementCodec.Decode(reader));
-            }
-            byte[] buffer = GetBuffer(flag2);
-            BitArray bits = GetBits(flag2);
-            int num = 0;
+
+            if (hasMovement)
+                moveCommand.Movement = MovementCodec.Decode(reader);
+
+            byte[] buffer = hasWeaponRotation ? bufferForWeaponRotation : bufferEmpty;
+            BitArray bits = hasWeaponRotation ? bitsForWeaponRotation : bitsEmpty;
+            int weaponRotationBitLength = 0;
+
             reader.Read(buffer, 0, buffer.Length);
             MovementCodec.CopyBits(buffer, bits);
-            if (flag2)
-            {
-                moveCommand.WeaponRotation = new float?(MovementCodec.ReadFloat(bits, ref num, WEAPON_ROTATION_COMPONENT_BITSIZE, WEAPON_ROTATION_FACTOR));
-            }
-            if (num != bits.Length)
-            {
-                throw new Exception("Move command unpack mismatch");
-            }
-            moveCommand.ClientTime = reader.ReadInt32();
-            return moveCommand;
 
-            byte[] GetBuffer(bool hasWeaponRotation) => (!hasWeaponRotation) ? bufferEmpty : bufferForWeaponRotation;
-            BitArray GetBits(bool hasWeaponRotation) => (!hasWeaponRotation) ? bitsEmpty : bitsForWeaponRotation;
+            if (hasWeaponRotation)
+                moveCommand.WeaponRotation = new float?(MovementCodec.ReadFloat(bits, ref weaponRotationBitLength, WEAPON_ROTATION_COMPONENT_BITSIZE, WEAPON_ROTATION_FACTOR));
+
+            if (weaponRotationBitLength != bits.Length)
+                throw new Exception("Move command unpack mismatch");
+
+            moveCommand.ClientTime = reader.ReadInt32();
+
+            return moveCommand;
         }
 
         private object DecodeMovement()

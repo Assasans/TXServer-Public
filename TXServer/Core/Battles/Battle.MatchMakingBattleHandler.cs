@@ -141,7 +141,7 @@ namespace TXServer.Core.Battles
                 {
                     if (Battle.LosingTeam != TeamColor.NONE)
                     {
-                        var roundDisbalancedComponent = new RoundDisbalancedComponent(Loser: Battle.LosingTeam, InitialDominationTimerSec: 30, FinishTime: new TXDate(new TimeSpan(0, 0, 30)));
+                        var roundDisbalancedComponent = new RoundDisbalancedComponent(Loser: Battle.LosingTeam, InitialDominationTimerSec: 30, FinishTime: DateTime.Now.AddSeconds(30));
 
                         Battle.BattleEntity.AddComponent(roundDisbalancedComponent);
                         Battle.BattleEntity.AddComponent(new RoundComponent());
@@ -175,7 +175,7 @@ namespace TXServer.Core.Battles
                 battlePlayer.User.AddComponent(new MatchMakingUserComponent());
                 if (Battle.BattleState is BattleState.WarmUp or BattleState.Running && !Battle.ForcePause)
                 {
-                    battlePlayer.Player.SendEvent(new MatchMakingLobbyStartTimeEvent(new TimeSpan(0, 0, 10)), battlePlayer.User);
+                    battlePlayer.Player.SendEvent(new MatchMakingLobbyStartTimeEvent { StartTime = DateTime.Now.AddSeconds(10) }, battlePlayer.User);
                     WaitingToJoinPlayers.Add(battlePlayer);
                 }
             }

@@ -149,7 +149,7 @@ namespace TXServer.Core
 			
 			// tip: don't change this order
 			if (Data.PremiumExpirationDate > DateTime.UtcNow)
-				user.AddComponent(new PremiumAccountBoostComponent(new TXDate(Data.PremiumExpirationDate)));
+				user.AddComponent(new PremiumAccountBoostComponent { EndDate = Data.PremiumExpirationDate });
 			if (Data.Admin)
 			{
 				user.Components.Add(new UserAdminComponent());

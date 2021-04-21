@@ -1,7 +1,6 @@
 ﻿using System;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Components.Battle.Tank
 {
@@ -10,9 +9,9 @@ namespace TXServer.ECSSystem.Components.Battle.Tank
     {
         public TankDeadStateComponent()
         {
-            EndTime = new TXDate(new TimeSpan(0, 0, 3));
+            EndTime = DateTime.Now.AddSeconds(3);
         }
         
-        public TXDate EndTime { get; set; }
+        public DateTime EndTime { get; set; }
     }
 }

@@ -141,10 +141,12 @@ namespace TXServer.Core
             else
                 PremiumExpirationDate = DateTime.UtcNow + additionalPremiumTime;
 
+            PremiumAccountBoostComponent component = new() { EndDate = PremiumExpirationDate };
+
             if (Player.User.GetComponent<PremiumAccountBoostComponent>() == null)
-                Player.User.AddComponent(new PremiumAccountBoostComponent(new TXDate(PremiumExpirationDate)));
+                Player.User.AddComponent(component);
             else
-                Player.User.ChangeComponent(new PremiumAccountBoostComponent(new TXDate(PremiumExpirationDate)));
+                Player.User.ChangeComponent(component);
         }
 
 

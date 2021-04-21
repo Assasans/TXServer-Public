@@ -1,6 +1,6 @@
-﻿using TXServer.Core.Protocol;
+﻿using System;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Components
 {
@@ -8,6 +8,6 @@ namespace TXServer.ECSSystem.Components
     public class RegistrationDateComponent : Component
     {
         [OptionalMapped]
-        public TXDate Date { get; set; } = null;
+        public DateTime? Date { get; set; } = null;
     }
 }
