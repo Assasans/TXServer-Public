@@ -41,7 +41,7 @@ namespace TXServer.Core.Battles
                     victim.UpdateStatistics(0, 0, 0, 1, damager);
 
                     if (Battle.ModeHandler is TDMHandler)
-                        Battle.UpdateScore(damager.Player.BattlePlayer.Team, 1);
+                        Battle.UpdateScore(damager.Player.BattlePlayer.Team);
 
                     damager.UserResult.Damage += damage;
 

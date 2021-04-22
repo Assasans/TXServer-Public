@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using TXServer.Core.Battles;
 using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;
@@ -36,8 +37,15 @@ namespace TXServer.Core
 
             return null;
         }
+        
+        public Player FindPlayerByUid(string uid)
+        {
+            Player searchedPlayer = Connection.Pool.FirstOrDefault(controlledPlayer =>
+                controlledPlayer.User != null && controlledPlayer.Data.Username == uid);
+            return searchedPlayer;
+        }
 
-        public static Battle FindBattleById(long lobbyId, long battleId)
+        public Battle FindBattleById(long lobbyId, long battleId)
         {
             foreach (Battle battle in ServerConnection.BattlePool)
             {

@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Events.User.Lobby
     {
         public void Execute(Player player, Entity entity)
         {
-            Core.Battles.Battle battle = Server.FindBattleById(lobbyId, 0);
+            Core.Battles.Battle battle = Server.Instance.FindBattleById(lobbyId, 0);
 
             battle.AddPlayer(player, false);
         }

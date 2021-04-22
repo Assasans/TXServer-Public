@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Types;
@@ -8,6 +7,7 @@ using TXServer.ECSSystem.EntityTemplates.Battle.Bonus;
 using System.Text.Json;
 using System.IO;
 using System.Linq;
+using TXServer.ECSSystem.Events.Battle.Bonus;
 
 namespace TXServer.Core.Battles
 {
@@ -15,10 +15,10 @@ namespace TXServer.Core.Battles
     {
         public BattleBonus(BonusType bonusType, Bonus bonus, Battle battle)
         {
-            BattleBonusType = bonusType;
+            BonusType = bonusType;
             Position = bonus.Position;
             HasParachute = bonus.HasParachute;
-            BonusState = BonusState.Unused;
+            State = BonusState.Unused;
             if (!HasParachute) SpawnHeight = 0;
             if (battle.TypeHandler is not Battle.MatchMakingBattleHandler) GoldboxCrystals = 0;
             Battle = battle;
@@ -26,24 +26,45 @@ namespace TXServer.Core.Battles
 
         public void CreateRegion()
         {
-            BonusState = BonusState.RegionShared;
-            BonusRegion = BonusRegionTemplate.CreateEntity(BattleBonusType, Position);
+            State = BonusState.RegionShared;
+            BonusRegion = BonusRegionTemplate.CreateEntity(BonusType, Position);
             Battle.MatchPlayers.Select(x => x.Player).ShareEntity(BonusRegion);
         }
 
         public void CreateBonus(Entity battleEntity)
         {
-            if (BattleBonusType != BonusType.GOLD)
-                Bonus = SupplyBonusTemplate.CreateEntity(BattleBonusType, BonusRegion, new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity);
+            if (BonusType != BonusType.GOLD)
+                BonusEntity = SupplyBonusTemplate.CreateEntity(BonusType, BonusRegion, new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity);
             else
-                Bonus = GoldBonusWithCrystalsTemplate.CreateEntity(BattleBonusType, BonusRegion, new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity);
-            Battle.MatchPlayers.Select(x => x.Player).ShareEntity(Bonus);
-            BonusState = BonusState.Spawned;
+                BonusEntity = GoldBonusWithCrystalsTemplate.CreateEntity(BonusType, BonusRegion, new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity);
+            Battle.MatchPlayers.Select(x => x.Player).ShareEntity(BonusEntity);
+            State = BonusState.Spawned;
+        }
+
+        public void Take(Player player)
+        {
+            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new BonusTakenEvent(), BonusEntity);
+            if (BonusType == BonusType.GOLD)
+                Battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
+            Battle.MatchPlayers.Select(x => x.Player).UnshareEntity(BonusEntity);
+            
+            State = BonusType == BonusType.GOLD ? BonusState.Unused : BonusState.Redrop;
+            player.BattlePlayer.MatchPlayer.UserResult.BonusesTaken += 1;
+            
+            switch (BonusType)
+            {
+                case BonusType.GOLD:
+                    player.Data.SetCrystals(player.Data.Crystals + CurrentCrystals);
+                    break;
+                default:
+                    _ = new SupplyEffect(BonusType, player.BattlePlayer.MatchPlayer, cheat:false);
+                    break;
+            }
         }
 
         public Entity BonusRegion { get; set; }
-        public Entity Bonus { get; set; }
-        public BonusType BattleBonusType { get; }
+        public Entity BonusEntity { get; set; }
+        public BonusType BonusType { get; }
         private Vector3 Position { get; }
         private int SpawnHeight { get; } = 30;
         private bool HasParachute { get; }
@@ -52,21 +73,21 @@ namespace TXServer.Core.Battles
         private static int GoldboxCrystals { get; set; } = 1000;
         public int CurrentCrystals { get; set; } = GoldboxCrystals;
 
-        public BonusState BonusState
+        public BonusState State
         {
-            get => _BonusState;
+            get => _state;
             set
             {
-                _BonusState = value;
+                _state = value;
 
                 switch (value)
                 {
                     case BonusState.RegionShared:
-                        if (BattleBonusType == BonusType.GOLD)
-                            BonusStateChangeCountdown = 20;
+                        if (BonusType == BonusType.GOLD)
+                            StateChangeCountdown = 20;
                         break;
                     case BonusState.Redrop:
-                        BonusStateChangeCountdown = 180;
+                        StateChangeCountdown = 180;
                         break;
                     case BonusState.Unused:
                         CurrentCrystals = GoldboxCrystals;
@@ -74,7 +95,7 @@ namespace TXServer.Core.Battles
                 }
             }
         }
-        private BonusState _BonusState;
-        public double BonusStateChangeCountdown { get; set; } = -1;
+        private BonusState _state;
+        public double StateChangeCountdown { get; set; } = -1;
     }
 }

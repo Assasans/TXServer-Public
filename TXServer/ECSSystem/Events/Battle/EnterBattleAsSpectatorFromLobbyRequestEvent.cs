@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.Events.Battle
 		{
 			if (player.IsInSquad || player.IsInBattle) return;
 			
-			Core.Battles.Battle battle = Server.FindBattleById(lobbyId: 0, battleId: BattleId);
+			Core.Battles.Battle battle = Server.Instance.FindBattleById(lobbyId: 0, battleId: BattleId);
 			foreach (Entity user in battle.AllBattlePlayers.Select(x => x.User))
 			{
 				if (player.EntityList.Contains(user))

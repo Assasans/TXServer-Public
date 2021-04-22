@@ -86,7 +86,7 @@ namespace TXServer.Core.Battles
             FlagEntity.AddComponent(new FlagGroundedStateComponent());
         }
 
-        public void Return(BattlePlayer battlePlayer = null)
+        public void Return(BattlePlayer battlePlayer = null, bool silent = false)
         {
             State = FlagState.Home;
             if (battlePlayer != null)
@@ -96,7 +96,8 @@ namespace TXServer.Core.Battles
                 battlePlayer.Player.SendEvent(new VisualScoreFlagReturnEvent(battlePlayer.MatchPlayer.GetScoreWithPremium(5)), battlePlayer.MatchPlayer.BattleUser);
             } 
 
-            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagReturnEvent(), FlagEntity);
+            if (!silent)
+                Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagReturnEvent(), FlagEntity);
 
             if (battlePlayer != null)
             {
@@ -115,8 +116,7 @@ namespace TXServer.Core.Battles
         public (BattlePlayer, IEnumerable<UserResult>) Deliver()
         {
             State = FlagState.Home;
-
-            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), FlagEntity);
+            
             FlagEntity.RemoveComponent<TankGroupComponent>();
 
             FlagEntity.ChangeComponent(new FlagPositionComponent(BasePosition));
@@ -124,6 +124,7 @@ namespace TXServer.Core.Battles
             FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
             
             FlagEntity.AddComponent(new FlagHomeStateComponent());
+            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), FlagEntity);
             Reshare();
 
             foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(Carrier).AllyTeamResults)
@@ -163,8 +164,8 @@ namespace TXServer.Core.Battles
         public FlagState State { get; private set; }
         public DateTime ReturnStartTime { get; set; }
 
-        
-        private BattlePlayer Carrier;
+
+        public BattlePlayer Carrier;
         private readonly List<BattlePlayer> CurrentAssists = new();
 
         private BattlePlayer LastCarrier;

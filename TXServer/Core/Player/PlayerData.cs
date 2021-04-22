@@ -23,7 +23,7 @@ namespace TXServer.Core
         public string UniqueId { get; }
         public string Email { get; protected set; }
         public bool Subscribed { get; protected set; }
-        public string Username { get; protected set; }
+        public string Username { get; set; }
         public string HashedPassword { get; protected set; }
 
         public string CountryCode { get; protected set; }

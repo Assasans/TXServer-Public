@@ -18,7 +18,7 @@ namespace TXServer.ECSSystem.Events.Battle
         public static void Execute(Player player, Entity tank, Entity flagEntity)
         {
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
-            var handler = (Core.Battles.Battle.CTFHandler)battle.ModeHandler;
+            var handler = (CTFHandler)battle.ModeHandler;
 
             Flag flag = handler.Flags.Values.First(x => x.FlagEntity == flagEntity);
 
@@ -38,7 +38,7 @@ namespace TXServer.ECSSystem.Events.Battle
                         if (carriedFlag.FlagEntity.GetComponent<TankGroupComponent>()?.Key != tank.EntityId) return;
 
                         (BattlePlayer carrier, IEnumerable<UserResult> assistResults) = carriedFlag.Deliver();
-                        battle.UpdateScore(carrier.Team, 1);
+                        battle.UpdateScore(carrier.Team);
                         int deliverScore = view.EnemyTeamPlayers.Count * 10;
                         if (deliverScore > 0)
                         {

@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			Core.Battles.Battle battle = Server.FindBattleById(lobbyId: LobbyId, battleId: 0);
+			Core.Battles.Battle battle = Server.Instance.FindBattleById(lobbyId: LobbyId, battleId: 0);
 
 			// admins can enter with the "last" code the newest custom lobby
 			if (player.Data.Admin || player.Data.Beta) {

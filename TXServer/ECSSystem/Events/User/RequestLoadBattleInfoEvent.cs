@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events.Friend
     {
         public void Execute(Player player, Entity entity)
         {
-            Core.Battles.Battle battle = Server.FindBattleById(lobbyId: 0, battleId: BattleId);
+            Core.Battles.Battle battle = Server.Instance.FindBattleById(lobbyId: 0, battleId: BattleId);
 
             player.SendEvent(new BattleInfoForLabelLoadedEvent(battle.MapEntity, BattleId, battle.Params.BattleMode.ToString()), entity);
         }

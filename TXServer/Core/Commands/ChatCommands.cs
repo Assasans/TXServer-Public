@@ -31,8 +31,10 @@ namespace TXServer.Core.Commands
 			{ "spawnInfo", (null, ChatCommandConditions.Tester | ChatCommandConditions.InMatch, SpawnInfo) },
 
 			{ "hackBattle", (null, ChatCommandConditions.BattleOwner, HackBattle) },
-			{ "cheat", ("cheat [SUPPLY] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.ActiveTank, Cheat) },
+			{ "cheat", ("cheat [supply] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.ActiveTank, Cheat) },
+			{ "flag", ("flag [color] [deliver/drop/return/give] [user]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, FlagAction) },
 			{ "goldrain", ("goldrain [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, GoldboxRain) },
+			{ "supplyrain", ("supplyrain", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, SupplyRain) },
 			{ "gravity", ("gravity [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.BattleOwner, Gravity) },
 			{ "turretRotation", ("turretRotation [number]", ChatCommandConditions.HackBattle, TurretRotation) }
 		};
@@ -90,7 +92,7 @@ namespace TXServer.Core.Commands
 
 		private static string Help(Player player, string[] args)
         {
-			var playerConditions = GetConditionsFor(player);
+			ChatCommandConditions playerConditions = GetConditionsFor(player);
 			string message;
 
 			if (!args.Any())
@@ -102,29 +104,32 @@ namespace TXServer.Core.Commands
 			}
 			else
 			{
+				ChatCommandConditions condition;
 				switch (args[0])
 				{
 					case "admin":
+						condition = ChatCommandConditions.Admin;
 						if (!player.Data.Admin)
-							return ConditionErrors[ChatCommandConditions.Admin];
-						
-						message = '/' + string.Join("\n/", from command in Commands
-							where playerConditions.HasFlag(command.Value.Item2) &&
-							      command.Value.Item2.HasFlag(ChatCommandConditions.Admin)
-							select command.Value.Item1 ?? command.Key);
+							return ConditionErrors[condition];
 						break;
 					case "hackBattle":
-						if (!player.IsInBattle || !playerConditions.HasFlag(ChatCommandConditions.HackBattle))
-							return ConditionErrors[ChatCommandConditions.HackBattle];
-						
-						message = '/' + string.Join("\n/", from command in Commands
-							where playerConditions.HasFlag(command.Value.Item2) &&
-							      command.Value.Item2.HasFlag(ChatCommandConditions.HackBattle)
-							select command.Value.Item1 ?? command.Key);
+						condition = ChatCommandConditions.HackBattle;
+						if (!playerConditions.HasFlag(ChatCommandConditions.HackBattle))
+							return ConditionErrors[condition];
+						break;
+					case "test":
+						condition = ChatCommandConditions.Tester;
+						if (!player.Data.Beta)
+							return ConditionErrors[condition];
 						break;
 					default:
 						return "Invalid command, specific help message wasn't found";
 				}
+				
+				message = '/' + string.Join("\n/", from command in Commands
+					where playerConditions.HasFlag(command.Value.Item2) &&
+					      command.Value.Item2.HasFlag(condition)
+					select command.Value.Item1 ?? command.Key);
 			}
 			return message;
         }
@@ -164,6 +169,89 @@ namespace TXServer.Core.Commands
 		{
 			player.BattlePlayer.Battle.FinishBattle();
 			return "Finished";
+		}
+
+		private static string FlagAction(Player player, string[] args)
+		{
+			if (player.BattlePlayer?.Battle.Params.BattleMode is not BattleMode.CTF) 
+				return "Flag command is only available in CTF";
+			if (args.Length < 2)
+				return "Parsing error, '/flag' needs at least 2 arguments";
+			if (args[0].ToUpper() is not "BLUE" and not "RED")
+				return $"Parsing error, didn't find flag with the color '{args[0]}'";
+			
+			Battle battle = player.BattlePlayer.Battle;
+			var modeHandler = (CTFHandler)battle.ModeHandler;
+			BattleView teamView = modeHandler.BattleViewFor(player.BattlePlayer);
+			Flag flag = args[0].ToUpper() == "BLUE" ? teamView.AllyTeamFlag : teamView.EnemyTeamFlag;
+			Entity enemyTeamOfFlag = args[0].ToUpper() == "BLUE" ? teamView.EnemyTeamEntity : teamView.AllyTeamEntity;
+
+			switch (args[1])
+			{
+				case "deliver":
+					switch (flag.State)
+					{
+						case FlagState.Captured:
+							string carrierUid = flag.Carrier.Player.Data.Username;
+							flag.Deliver();
+							battle.UpdateScore(enemyTeamOfFlag);
+							return $"{carrierUid} delivered the {args[0].ToLower()} flag";
+						case FlagState.Dropped:
+							flag.Return(silent:true);
+							break;
+					}
+					
+					battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), flag.FlagEntity);
+					battle.UpdateScore(enemyTeamOfFlag);
+					return $"Delivered the {args[0].ToLower()} flag";
+				case "drop":
+					if (flag.State != FlagState.Captured)
+						return "Flag state error, flag needs to be captured";
+					
+					flag.Drop(false);
+					return $"Dropped the {args[0].ToLower()} flag";
+				case "return":
+					switch (flag.State)
+					{
+						case FlagState.Captured:
+							flag.Drop(false);
+							flag.Return();
+							break;
+						case FlagState.Dropped:
+							flag.Return();
+							break;
+						case FlagState.Home:
+							return "Flag state error, flag needs to be captured or dropped";
+					}
+					return $"Returned the {args[0].ToLower()} flag to its base";
+				case "give":
+					string targetName = "";
+					targetName = args.Length < 3 ? player.Data.Username : args[2];
+					Player target = battle.FindPlayerByUid(targetName);
+					if (target == null)
+						return $"Error, the user '{targetName}' wasn't found in this battle";
+					if (target.BattlePlayer.Team == flag.Team)
+						return $"Logical error, {targetName} can't capture the flag of this team";
+					if (flag.Carrier == player.BattlePlayer)
+						return $"Logical error, {targetName} already has the {args[0].ToLower()} flag";
+
+					switch (flag.State)
+					{
+						case FlagState.Captured:
+							flag.Drop(false);
+							flag.Pickup(target.BattlePlayer);
+							break;
+						case FlagState.Home:
+							flag.Capture(target.BattlePlayer);
+							break;
+						case FlagState.Dropped:
+							flag.Pickup(target.BattlePlayer);
+							break;
+					}
+					return $"Gave flag to user '{targetName}'";
+				default:
+					return $"Parsing error, '/flag' doesn't have an argument named '{args[1]}'";
+			}
 		}
 
 		private static string Open(Player player, string[] args)
@@ -250,8 +338,8 @@ namespace TXServer.Core.Commands
 		private static string GoldboxRain(Player player, string[] args)
 		{
 			Battle battle = player.BattlePlayer.Battle;
-			IEnumerable<BattleBonus> unusedGolds = battle.BattleBonuses
-				.Where(b => b.BattleBonusType == BonusType.GOLD && b.BonusState == BonusState.Unused).ToArray();
+			IEnumerable<BattleBonus> unusedGolds = battle.GoldBonuses
+				.Where(b => b.State == BonusState.Unused).ToArray();
 
 			if (!unusedGolds.Any())
 				return "Weather error, it's not cloudy enough";
@@ -270,17 +358,29 @@ namespace TXServer.Core.Commands
 			foreach (BattleBonus goldBonus in unusedGolds)
 			{
 				goldBonus.CurrentCrystals = 0;
-				goldBonus.BonusState = BonusState.New;
+				goldBonus.State = BonusState.New;
 				battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldScheduleNotificationEvent(""), 
 					battle.RoundEntity);
 			}
 			
+			return "It'll start raining gold soon, get an umbrella!";
+		}
+		
+		private static string SupplyRain(Player player, string[] args)
+		{
+			Battle battle = player.BattlePlayer.Battle;
+			if (player.BattlePlayer.Battle.Params.DisabledModules)
+				return "Logical error, '/supplyrain' is only available when supplies are activated";
+
+			foreach (BattleBonus battleBonus in battle.BattleBonuses)
+				battleBonus.StateChangeCountdown = 20;
+
 			return "It'll start raining soon, get an umbrella!";
 		}
 
 		private static string Cheat(Player player, string[] args)
 		{
-			switch (args[0])
+			switch (args[0].ToUpper())
 			{
 				case "ARMOR":
 				case "DAMAGE":

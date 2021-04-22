@@ -14,13 +14,11 @@ namespace TXServer.ECSSystem.Events.User
             bool isNotSelfUser = player.User.GetComponent<UserUidComponent>().Uid != Uid;
 
             // todo: search user in database
-            Player searchedPlayer = Server.Instance.Connection.Pool.FirstOrDefault(controlledPlayer =>
-                controlledPlayer.User != null && controlledPlayer.User.GetComponent<UserUidComponent>().Uid == Uid &&
-                isNotSelfUser);
+            Player searchedPlayer = Server.Instance.FindPlayerByUid(Uid);
             long searchedPlayerId = searchedPlayer?.User.EntityId ?? 0;
 
             PlayerData data = player.Data;
-            bool canBeFriended = searchedPlayer != null &&
+            bool canBeFriended = searchedPlayer != null && searchedPlayer != player &&
                                  !data.IncomingFriendIds.Concat(data.AcceptedFriendIds).Concat(data.OutgoingFriendIds)
                                      .Contains(searchedPlayerId) &&
                                  !searchedPlayer.Data.BlockedPlayerIds.Contains(player.User.EntityId);

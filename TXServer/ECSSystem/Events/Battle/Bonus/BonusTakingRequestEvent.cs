@@ -14,28 +14,8 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 		public void Execute(Player player, Entity bonus, Entity tank)
 		{
 			Core.Battles.Battle battle = player.BattlePlayer.Battle;
-			BattleBonus battleBonus = battle.BattleBonuses.Single(b => b.Bonus == bonus);
-			BonusType bonusType = battleBonus.BattleBonusType;
-
-			battle.MatchPlayers.Select(x => x.Player).SendEvent(new BonusTakenEvent(), bonus);
-
-			switch (bonusType)
-			{
-				case BonusType.GOLD:
-					player.Data.SetCrystals(player.Data.Crystals + battleBonus.CurrentCrystals);
-					battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
-					break;
-				default:
-					_ = new SupplyEffect(bonusType, player.BattlePlayer.MatchPlayer, cheat:false);
-					break;
-			}
-			
-			if (battleBonus.BonusState != BonusState.Spawned)
-				return;
-			battleBonus.BonusState = battleBonus.BattleBonusType == BonusType.GOLD ? BonusState.Unused : BonusState.Redrop;
-
-			player.BattlePlayer.MatchPlayer.UserResult.BonusesTaken += 1;
-			battle.MatchPlayers.Select(x => x.Player).UnshareEntity(battleBonus.Bonus);
+			BattleBonus battleBonus = battle.BattleBonuses.Single(b => b.BonusEntity == bonus);
+			battleBonus.Take(player);
 		}
 	}
 }

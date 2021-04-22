@@ -13,6 +13,7 @@ namespace TXServer.ECSSystem.Events.Entrance
 			if (data == null) return; // Player#LogIn(Entity) will kick the player
 			data.Player = player;
 			player.Data = data;
+			player.Data.Username = Uid;
 			player.SendEvent(new PersonalPasscodeEvent(), entity);
 		}
 

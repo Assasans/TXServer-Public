@@ -23,8 +23,16 @@ namespace TXServer.Core.Battles
             public override BattleView BattleViewFor(BattlePlayer battlePlayer)
             {
                 BattleView view = base.BattleViewFor(battlePlayer);
-                view.AllyTeamFlag = Flags[battlePlayer.Team];
-                view.EnemyTeamFlag = Flags.First(x => x.Key != battlePlayer.Team).Value;
+                if (!battlePlayer.IsSpectator)
+                {
+                    view.AllyTeamFlag = Flags[battlePlayer.Team];
+                    view.EnemyTeamFlag = Flags.First(x => x.Key != battlePlayer.Team).Value;
+                }
+                else
+                {
+                    view.AllyTeamFlag = Flags.Values.ToList()[0];
+                    view.EnemyTeamFlag = Flags.Values.ToList()[1];
+                }
                 return view;
             }
 
