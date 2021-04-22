@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Protocol;
+﻿using TXServer.Core.Battles;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 
@@ -7,9 +8,9 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(-1716200834009238305L)]
     public class DiscreteWeaponTemplate : WeaponTemplate
     {
-        protected static new Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank)
+        protected static new Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank, BattlePlayer battlePlayer)
         {
-            Entity entity = WeaponTemplate.CreateEntity(template, configPath, tank);
+            Entity entity = WeaponTemplate.CreateEntity(template, configPath, tank, battlePlayer);
             entity.Components.Add(new ImpactComponent(2.5f));
             entity.Components.Add(new KickbackComponent(3f));
             entity.Components.Add(new DiscreteWeaponEnergyComponent(1.0f, 1.0f));

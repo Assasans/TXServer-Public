@@ -4,6 +4,7 @@ using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.Events;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles
 {

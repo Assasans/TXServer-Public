@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Protocol;
+﻿using TXServer.Core.Battles;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 
@@ -7,9 +8,9 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(4652768934679402653L)]
     public class FlamethrowerBattleItemTemplate : StreamWeaponTemplate
     {
-        public static Entity CreateEntity(Entity tank)
+        public static Entity CreateEntity(Entity tank, BattlePlayer battlePlayer)
         {
-            Entity entity = CreateEntity(new FlamethrowerBattleItemTemplate(), "battle/weapon/flamethrower", tank);
+            Entity entity = CreateEntity(new FlamethrowerBattleItemTemplate(), "battle/weapon/flamethrower", tank, battlePlayer);
             entity.Components.Add(new FlamethrowerComponent());
 
             return entity;

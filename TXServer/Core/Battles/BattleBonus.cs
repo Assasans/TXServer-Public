@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Types;
@@ -19,6 +20,7 @@ namespace TXServer.Core.Battles
             HasParachute = bonus.HasParachute;
             BonusState = BonusState.Unused;
             if (!HasParachute) SpawnHeight = 0;
+            if (battle.TypeHandler is not Battle.MatchMakingBattleHandler) GoldboxCrystals = 0;
             Battle = battle;
         }
 
@@ -46,7 +48,9 @@ namespace TXServer.Core.Battles
         private int SpawnHeight { get; } = 30;
         private bool HasParachute { get; }
         private Battle Battle { get; }
-        public int GoldboxCrystals { get; } = 1000;
+
+        private static int GoldboxCrystals { get; set; } = 1000;
+        public int CurrentCrystals { get; set; } = GoldboxCrystals;
 
         public BonusState BonusState
         {
@@ -63,6 +67,9 @@ namespace TXServer.Core.Battles
                         break;
                     case BonusState.Redrop:
                         BonusStateChangeCountdown = 180;
+                        break;
+                    case BonusState.Unused:
+                        CurrentCrystals = GoldboxCrystals;
                         break;
                 }
             }

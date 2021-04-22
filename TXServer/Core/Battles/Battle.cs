@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using TXServer.Core.Logging;
 using TXServer.Core.ServerMapInformation;
 using TXServer.Core.Squads;
@@ -503,7 +504,7 @@ namespace TXServer.Core.Battles
             {
                 if (battleBonus.BattleBonusType == bonusType)
                 {
-                    if ((bonusType != BonusType.GOLD && battleBonus.BonusState != BonusState.Spawned) || (bonusType == BonusType.GOLD && battleBonus.BonusState == BonusState.Unused))
+                    if (bonusType != BonusType.GOLD && battleBonus.BonusState != BonusState.Spawned || bonusType == BonusType.GOLD && battleBonus.BonusState == BonusState.Unused)
                         suppliesIndex.Add(index);
                 }
                 ++index;
@@ -518,7 +519,7 @@ namespace TXServer.Core.Battles
             {
                 BattleBonuses[supplyIndex].BonusState = BonusState.New;
                 if (String.IsNullOrWhiteSpace(sender)) sender = "";
-                AllBattlePlayers.Select(x => x.Player).SendEvent(new GoldScheduleNotificationEvent(sender), RoundEntity);
+                MatchPlayers.Select(x => x.Player).SendEvent(new GoldScheduleNotificationEvent(sender), RoundEntity);
             }
         }
 
@@ -555,6 +556,7 @@ namespace TXServer.Core.Battles
         public MapInfo CurrentMapInfo { get; set; }
 
         public List<BattleBonus> BattleBonuses { get; set; } = new();
+        public IEnumerable<BattleBonus> GoldBonuses => BattleBonuses.Where(b => b.BattleBonusType == BonusType.GOLD);
 
         public BattleState BattleState
         {

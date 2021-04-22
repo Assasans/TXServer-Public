@@ -8,6 +8,7 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Events.Battle.Bonus;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -17,7 +18,7 @@ namespace TXServer.Core.Commands
 	{
 		private static readonly Dictionary<string, (string, ChatCommandConditions, Func<Player, string[], string>)> Commands = new()
 		{
-			{ "help", (null, ChatCommandConditions.None, Help) },
+			{ "help", ("help [opt: hackBattle]", ChatCommandConditions.None, Help) },
 			{ "ping", (null, ChatCommandConditions.None, Ping) },
 
 			{ "open", (null, ChatCommandConditions.Admin | ChatCommandConditions.InBattle, Open) },
@@ -30,8 +31,10 @@ namespace TXServer.Core.Commands
 			{ "spawnInfo", (null, ChatCommandConditions.Tester | ChatCommandConditions.InMatch, SpawnInfo) },
 
 			{ "hackBattle", (null, ChatCommandConditions.BattleOwner, HackBattle) },
-			{ "gravity", ("gravity [number]", ChatCommandConditions.BattleOwner | ChatCommandConditions.HackBattle, Gravity) },
 			{ "cheat", ("cheat [SUPPLY] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.ActiveTank, Cheat) },
+			{ "goldrain", ("goldrain [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, GoldboxRain) },
+			{ "gravity", ("gravity [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.BattleOwner, Gravity) },
+			{ "turretRotation", ("turretRotation [number]", ChatCommandConditions.HackBattle, TurretRotation) }
 		};
 
 		private static readonly Dictionary<ChatCommandConditions, string> ConditionErrors = new()
@@ -88,11 +91,43 @@ namespace TXServer.Core.Commands
 		private static string Help(Player player, string[] args)
         {
 			var playerConditions = GetConditionsFor(player);
+			string message;
 
-			return '/' + string.Join("\n/", from command in Commands
-											where playerConditions.HasFlag(command.Value.Item2)
-											select command.Value.Item1 ?? command.Key);
-		}
+			if (!args.Any())
+			{
+				message = '/' + string.Join("\n/", from command in Commands
+				    where playerConditions.HasFlag(command.Value.Item2) &&
+				          !command.Value.Item2.HasFlag(ChatCommandConditions.HackBattle)
+				    select command.Value.Item1 ?? command.Key);
+			}
+			else
+			{
+				switch (args[0])
+				{
+					case "admin":
+						if (!player.Data.Admin)
+							return ConditionErrors[ChatCommandConditions.Admin];
+						
+						message = '/' + string.Join("\n/", from command in Commands
+							where playerConditions.HasFlag(command.Value.Item2) &&
+							      command.Value.Item2.HasFlag(ChatCommandConditions.Admin)
+							select command.Value.Item1 ?? command.Key);
+						break;
+					case "hackBattle":
+						if (!player.IsInBattle || !playerConditions.HasFlag(ChatCommandConditions.HackBattle))
+							return ConditionErrors[ChatCommandConditions.HackBattle];
+						
+						message = '/' + string.Join("\n/", from command in Commands
+							where playerConditions.HasFlag(command.Value.Item2) &&
+							      command.Value.Item2.HasFlag(ChatCommandConditions.HackBattle)
+							select command.Value.Item1 ?? command.Key);
+						break;
+					default:
+						return "Invalid command, specific help message wasn't found";
+				}
+			}
+			return message;
+        }
 
         private static string Ping(Player player, string[] args) => $"Network latency: {player.Connection.Ping} ms";
 
@@ -212,6 +247,37 @@ namespace TXServer.Core.Commands
 			return notification;
 		}
 
+		private static string GoldboxRain(Player player, string[] args)
+		{
+			Battle battle = player.BattlePlayer.Battle;
+			IEnumerable<BattleBonus> unusedGolds = battle.BattleBonuses
+				.Where(b => b.BattleBonusType == BonusType.GOLD && b.BonusState == BonusState.Unused).ToArray();
+
+			if (!unusedGolds.Any())
+				return "Weather error, it's not cloudy enough";
+			if (args.Length != 0)
+			{
+				bool successfullyParsed = int.TryParse(args[0], out int amount);
+				if (!successfullyParsed)
+					return "Parsing error, '/goldrain' only allows integer or nothing as argument";
+
+				if (unusedGolds.Count() < amount)
+					return $"Weather error, not enough goldboxes available: {unusedGolds.Count()}";
+				Random random = new();
+				unusedGolds = unusedGolds.OrderBy(x => random.Next()).Take(amount);
+			}
+
+			foreach (BattleBonus goldBonus in unusedGolds)
+			{
+				goldBonus.CurrentCrystals = 0;
+				goldBonus.BonusState = BonusState.New;
+				battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldScheduleNotificationEvent(""), 
+					battle.RoundEntity);
+			}
+			
+			return "It'll start raining soon, get an umbrella!";
+		}
+
 		private static string Cheat(Player player, string[] args)
 		{
 			switch (args[0])
@@ -234,6 +300,37 @@ namespace TXServer.Core.Commands
 				default:
 					return "Cheat or target not found";
 			}
+		}
+
+		private static string TurretRotation(Player player, string[] args)
+		{
+			string notification = "Changed turret rotation ";
+			float? rotationSpeed;
+
+			if (args.Length == 0)
+			{
+				rotationSpeed = null;
+				notification += "to normal";
+			}
+			else
+			{
+				bool successfullyParsed = float.TryParse(args[0], out float temp);
+				
+				if (!successfullyParsed)
+					return "Parsing error, '/turretRotation' only allows numbers or nothing as argument";
+				if (temp > 1000 || temp < 0)
+					return "Out of range, '/turretRotation' only allows range from 0 to 1000";
+				
+				rotationSpeed = temp;
+				notification += $"to {rotationSpeed}";
+			}
+			
+			player.BattlePlayer.Battle.KeepRunning = true;
+			player.BattlePlayer.Rejoin = true;
+			player.BattlePlayer.Player.SendEvent(new KickFromBattleEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
+
+			player.BattlePlayer.TurretRotationSpeed = rotationSpeed;
+			return notification;
 		}
 
 		private static ChatCommandConditions GetConditionsFor(Player player)
