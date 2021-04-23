@@ -60,19 +60,7 @@ namespace TXServer.Core.Protocol
 
         private object DecodeString()
         {
-            byte part1 = reader.ReadByte();
-            byte[] bytes;
-
-            if ((part1 & 0x80) == 0x80)
-            {
-                bytes = reader.ReadBytes(((part1 & 0x3f) << 8) & reader.ReadByte());
-            }
-            else
-            {
-                bytes = reader.ReadBytes(part1);
-            }
-
-            return Encoding.UTF8.GetString(bytes);
+            return Encoding.UTF8.GetString(reader.ReadBytes(DecodeLength(reader)));
         }
 
         private int DecodeLength(BinaryReader buf)

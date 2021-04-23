@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
+using System.Text;
 using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Tank;
@@ -45,6 +46,38 @@ namespace TXServer.Core.Protocol
             writer.GetType()
                   .GetMethod("Write", new Type[] { obj.GetType() })
                   .Invoke(writer, new object[] { obj });
+        }
+
+        private void EncodeLength(int length)
+        {
+            if (length < 128)
+            {
+                writer.Write((byte)(length & 127));
+            }
+            else if (length < 16384)
+            {
+                long num = (length & 16383) + 32768;
+                writer.Write((byte)((num & 65280L) >> 8));
+                writer.Write((byte)(num & 255L));
+            }
+            else
+            {
+                if (length >= 4194304)
+                {
+                    throw new IndexOutOfRangeException("length=" + length);
+                }
+                long num2 = (length & 4194303) + 12582912;
+                writer.Write((byte)((num2 & 16711680L) >> 16));
+                writer.Write((byte)((num2 & 65280L) >> 8));
+                writer.Write((byte)(num2 & 255L));
+            }
+        }
+
+        private void EncodeString(string str)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(str);
+            EncodeLength(data.Length);
+            writer.Write(data);
         }
 
         private void EncodeCollection(ICollection collection)
@@ -152,7 +185,7 @@ namespace TXServer.Core.Protocol
         {
             Type objType = obj.GetType();
 
-            if (objType.IsPrimitive || objType == typeof(string) || objType == typeof(decimal))
+            if (objType.IsPrimitive || objType == typeof(decimal))
             {
                 EncodePrimitive(obj);
                 return;
@@ -160,6 +193,9 @@ namespace TXServer.Core.Protocol
 
             switch (obj)
             {
+                case string str:
+                    EncodeString(str);
+                    return;
                 case Entity entity:
                     EncodeEntity(entity);
                     return;
