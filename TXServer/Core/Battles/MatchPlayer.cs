@@ -288,6 +288,7 @@ namespace TXServer.Core.Battles
 
         public bool Paused { get; set; } = false;
         public List<SupplyEffect> SupplyEffects { get; } = new();
+        public Dictionary<Entity, Entity> SlotsModules { get; set; } = new();
         public Dictionary<MatchPlayer, int> DamageAssisters { get; set; } = new();
         public int AlreadyAddedExperience { get; set; } = 0;
 
