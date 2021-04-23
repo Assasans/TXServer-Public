@@ -34,7 +34,8 @@ namespace TXServer.Core.Protocol
                 { typeof(Vector3), DecodeVector3 },
                 { typeof(MoveCommand), DecodeMoveCommand },
                 { typeof(Movement), DecodeMovement },
-                { typeof(Type), DecodeType }
+                { typeof(Type), DecodeType },
+                { typeof(DateTime), DecodeDateTime }
             };
         }
 
@@ -131,6 +132,11 @@ namespace TXServer.Core.Protocol
             Int64 EntityId = reader.ReadInt64();
 
             return player.FindEntityById(EntityId);
+        }
+
+        private object DecodeDateTime()
+        {
+            return new DateTime(DateTime.UnixEpoch.Ticks + reader.ReadInt64() * 10000);
         }
 
         private object DecodeVector3()
