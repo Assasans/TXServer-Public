@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using TXServer.Core.Battles.Module;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
@@ -38,6 +39,7 @@ namespace TXServer.Core.Battles
             TankPaint = TankPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.TankPaint, Tank);
             Graffiti = GraffitiBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.Graffiti, Tank);
             Shell = ShellBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponShells[battlePlayer.Player.CurrentPreset.WeaponItem], Tank);
+            Modules = new List<BattleModule>();
             Incarnation = TankIncarnationTemplate.CreateEntity(Tank);
             RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, Tank);
             UserResult = new UserResult(battlePlayer, userResults);
@@ -134,6 +136,9 @@ namespace TXServer.Core.Battles
             foreach (SupplyEffect supplyEffect in SupplyEffects.ToArray())
                 supplyEffect.Remove();
 
+            foreach (BattleModule module in Modules.ToArray())
+                module.Deactivate();
+
             if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
             Weapon.TryRemoveComponent<ShootableComponent>();
         }
@@ -211,6 +216,13 @@ namespace TXServer.Core.Battles
                         supplyEffect.Remove();
                 } 
             }
+
+            // Battle modules
+            foreach (BattleModule module in Modules.ToArray())
+            {
+                module.CooldownTick(); 
+                module.Tick();
+            }
         }
 
         public readonly Battle Battle;
@@ -227,6 +239,7 @@ namespace TXServer.Core.Battles
         public Entity TankPaint { get; }
         public Entity Graffiti { get; }
         public Entity Shell { get; }
+        public List<BattleModule> Modules { get; }
 
         public UserResult UserResult { get; }
 
@@ -288,7 +301,6 @@ namespace TXServer.Core.Battles
 
         public bool Paused { get; set; } = false;
         public List<SupplyEffect> SupplyEffects { get; } = new();
-        public Dictionary<Entity, Entity> SlotsModules { get; set; } = new();
         public Dictionary<MatchPlayer, int> DamageAssisters { get; set; } = new();
         public int AlreadyAddedExperience { get; set; } = 0;
 

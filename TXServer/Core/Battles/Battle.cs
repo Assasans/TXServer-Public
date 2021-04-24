@@ -2,23 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
+using TXServer.Core.Battles.Module;
 using TXServer.Core.Logging;
 using TXServer.Core.ServerMapInformation;
 using TXServer.Core.Squads;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.Components.Battle.Round;
-using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Time;
-using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Chat;
-using TXServer.ECSSystem.EntityTemplates.Item.Module;
-using TXServer.ECSSystem.EntityTemplates.Item.Slot;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
 using TXServer.ECSSystem.Events.Battle.Score;
@@ -267,21 +262,38 @@ namespace TXServer.Core.Battles
 
                 if (!battlePlayer.IsSpectator)
                 {
-                    Dictionary<Entity, Entity> slotsModules = new();
-                    foreach (Entity garageModule in battlePlayer.Player.CurrentPreset.Modules.Values.Where(m => m?.GetComponent<MountedItemComponent>() != null))
+                    foreach ((Entity garageSlot, Entity garageModule) in battlePlayer.Player.CurrentPreset.Modules.Where(
+                        (entry) => entry.Value?.GetComponent<MountedItemComponent>() != null
+                    ))
                     {
-                        Entity battleModule = ModuleUserItemTemplate.CreateEntity(garageModule, battlePlayer);
-                        Entity battleSlot = SlotUserItemTemplate.CreateEntity(battleModule, battlePlayer);
-                        slotsModules.Add(battleSlot, battleModule);
+                        try {
+                            BattleModule module = Server.Instance.ModuleRegistry.CreateModule(
+                                battlePlayer.MatchPlayer,
+                                garageModule
+                            );
+                            if (module == null)
+                                throw new InvalidOperationException(
+                                    $"Failed to create module '{garageModule.EntityId}'"
+                                );
+
+                            battlePlayer.MatchPlayer.Modules.Add(module);
+                            battlePlayer.Player.ShareEntities(module.SlotEntity, module.ModuleEntity);
+                        }
+                        catch(Exception exception) {
+                        }
                     }
+
                     if (IsMatchMaking || battlePlayer.Player.Data.Admin)
                     {
-                        Entity goldModule = ModuleUserItemTemplate.CreateEntity(Modules.GlobalItems.Gold, battlePlayer);
-                        Entity battleSlot = SlotUserItemTemplate.CreateEntity(goldModule, battlePlayer);
-                        slotsModules.Add(battleSlot, goldModule);
+                        BattleModule module = Server.Instance.ModuleRegistry.CreateModule(
+                            battlePlayer.MatchPlayer,
+                            Modules.GlobalItems.Gold
+                        );
+                        if (module == null) throw new InvalidOperationException($"Failed to create module '{Modules.GlobalItems.Gold.EntityId}'");
+
+                        battlePlayer.MatchPlayer.Modules.Add(module);
+                        battlePlayer.Player.ShareEntities(module.SlotEntity, module.ModuleEntity);
                     }
-                    battlePlayer.MatchPlayer.SlotsModules = slotsModules;
-                    battlePlayer.Player.ShareEntities(slotsModules.Keys.Concat(slotsModules.Values));
                 }
             }
 
@@ -295,8 +307,6 @@ namespace TXServer.Core.Battles
             MatchPlayers.Select(x => x.Player).ShareEntities(battlePlayer.MatchPlayer.GetEntities());
 
             SortRoundUsers();
-
-            if (battlePlayer.IsSpectator) return;
         }
 
         private void RemoveMatchPlayer(BattlePlayer battlePlayer)
@@ -321,9 +331,8 @@ namespace TXServer.Core.Battles
                     supplyEffect.Remove();
 
                 if (!battlePlayer.IsSpectator)
-                    battlePlayer.Player.UnshareEntities(
-                        battlePlayer.MatchPlayer.SlotsModules.Keys.Concat(battlePlayer.MatchPlayer.SlotsModules
-                            .Values));
+                    foreach (BattleModule module in battlePlayer.MatchPlayer.Modules.ToArray())
+                        battlePlayer.Player.UnshareEntities(module.SlotEntity, module.ModuleEntity);
             }
 
             ModeHandler.OnMatchLeave(battlePlayer);

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 using TXServer.Core;
 using TXServer.Core.Battles;
+using TXServer.Core.Battles.Module;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -13,71 +14,40 @@ using TXServer.ECSSystem.Types;
 namespace TXServer.ECSSystem.Events.Battle {
 	[SerialVersionUID(1486015564167L)]
 	public class ActivateModuleEvent : ECSEvent {
-		public void Execute(Player player, Entity module) {
-			// Should check module type instead of slot index
-			SlotUserItemInfoComponent slotItem = module.GetComponent<SlotUserItemInfoComponent>();
-			if(slotItem.Slot == 0) {
-				const int cooldown = 5000;
+		public void Execute(Player player, Entity entity) {
+			BattleModule? module = player.BattlePlayer.MatchPlayer.Modules.Find((module) => module.ModuleEntity == entity);
+			if(module == null) return;
 
-				InventorySlotTemporaryBlockedByServerComponent blocked =
-					module.GetComponent<InventorySlotTemporaryBlockedByServerComponent>();
-				if(blocked == null) {
-					_ = new SupplyEffect(BonusType.SPEED, player.BattlePlayer.MatchPlayer, cheat: false);
-
-					DateTime startDate = DateTime.Now;
-
-					module.AddComponent(new InventorySlotTemporaryBlockedByServerComponent(cooldown, startDate));
-					module.AddComponent(new InventoryCooldownStateComponent(cooldown, startDate));
-
-					// TODO(Assasans): Move to battle thread
-					Task.Run(
-						async () => {
-							await Task.Delay(cooldown);
-
-							// if(DateTimeOffset.Now.ToUnixTimeMilliseconds() > blocked.StartBlockTime.Time + blocked.BlockTimeMS) {
-							if(module.HasComponent<InventorySlotTemporaryBlockedByServerComponent>()) {
-								module.RemoveComponent<InventorySlotTemporaryBlockedByServerComponent>();
-							}
-
-							if(module.HasComponent<InventoryCooldownStateComponent>()) {
-								module.RemoveComponent<InventoryCooldownStateComponent>();
-							}
-							// }
-						}
-					);
-				}
+			if(module.IsOnCooldown) {
+				/*
+				player.SendEvent(
+					new ChatMessageReceivedEvent() {
+						UserId = 1,
+						UserUid = "System",
+						UserAvatarId = "",
+						Message = $"Module '{module.GetType().Name}' is on cooldown, stopping...",
+						SystemMessage = true
+					},
+					player.BattlePlayer.MatchPlayer.Battle.GeneralBattleChatEntity
+				);
+				*/
+				return;
 			}
-			else if(slotItem.Slot == Slot.SLOT2) {
-				const int cooldown = 1000;
-
-				InventorySlotTemporaryBlockedByServerComponent blocked =
-					module.GetComponent<InventorySlotTemporaryBlockedByServerComponent>();
-				if(blocked == null) {
-					player.BattlePlayer.Battle.DropSpecificBonusType(BonusType.GOLD, player.UniqueId);
-
-					DateTime startDate = DateTime.Now;
-
-					module.AddComponent(new InventorySlotTemporaryBlockedByServerComponent(cooldown, startDate));
-					module.AddComponent(new InventoryCooldownStateComponent(cooldown, startDate));
-
-					// TODO(Assasans): Move to battle thread
-					Task.Run(
-						async () => {
-							await Task.Delay(cooldown);
-
-							// if(DateTimeOffset.Now.ToUnixTimeMilliseconds() > blocked.StartBlockTime.Time + blocked.BlockTimeMS) {
-							if(module.HasComponent<InventorySlotTemporaryBlockedByServerComponent>()) {
-								module.RemoveComponent<InventorySlotTemporaryBlockedByServerComponent>();
-							}
-
-							if(module.HasComponent<InventoryCooldownStateComponent>()) {
-								module.RemoveComponent<InventoryCooldownStateComponent>();
-							}
-							// }
-						}
-					);
-				}
-			}
+			module.StartCooldown();
+			
+			/*
+			player.SendEvent(
+				new ChatMessageReceivedEvent() {
+					UserId = 1,
+					UserUid = "System",
+					UserAvatarId = "",
+					Message = $"Invoking '{module.GetType().Name}' handler...",
+					SystemMessage = true
+				},
+				player.BattlePlayer.MatchPlayer.Battle.GeneralBattleChatEntity
+			);
+			*/
+			module.Activate();
 		}
 
 		public int ClientTime { get; set; }

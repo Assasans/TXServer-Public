@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using TXServer.Core.Battles;
+using TXServer.Core.Battles.Module;
 using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;
 
@@ -15,6 +16,15 @@ namespace TXServer.Core
         public ServerSettings Settings { get; init; }
         public IDatabase Database { get; init; }
         public Action UserErrorHandler { get; init; }
+        public ModuleRegistry ModuleRegistry { get; }
+
+        public Server() {
+            ModuleRegistry = new ModuleRegistry();
+            
+            ModuleRegistry.Register("garage/module/module/tank/active/1/turbospeed", new ModuleTypeInfo(typeof(TurbospeedModule), TimeSpan.FromMilliseconds(5000)));
+            ModuleRegistry.Register("garage/module/module/tank/active/2/jumpimpact", new ModuleTypeInfo(typeof(JumpImpactModule), TimeSpan.FromMilliseconds(500)));
+            ModuleRegistry.Register("garage/module/prebuildmodule/common/active/1/gold", new ModuleTypeInfo(typeof(GoldModule), TimeSpan.FromMilliseconds(500)));
+        }
 
         public void Start()
         {
