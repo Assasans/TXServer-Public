@@ -458,7 +458,8 @@ namespace TXServer.Core.Battles
         public Player FindPlayerByUid(string uid)
         {
             Player searchedPlayer = AllBattlePlayers.FirstOrDefault(controlledPlayer =>
-                controlledPlayer.Player.Data.Username == uid).Player;
+                controlledPlayer.Player.Data.Username == uid)
+                ?.Player;
             return searchedPlayer;
         } 
 

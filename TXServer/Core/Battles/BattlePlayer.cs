@@ -32,7 +32,9 @@ namespace TXServer.Core.Battles
         public DateTime MatchMakingJoinCountdown { get; set; } = DateTime.Now.AddSeconds(10);
         public bool WaitingForExit { get; set; }
         public bool Rejoin { get; set; }
-
+        
+        public float? TurretKickback { get; set; }
         public float? TurretRotationSpeed { get; set; }
+        public float? TurretUnloadEnergyPerShot { get; set; }
     }
 }

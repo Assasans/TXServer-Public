@@ -8,4 +8,12 @@
         SPEED,
         GOLD
     }
+
+    public enum SupplyType : byte
+    {
+        REPAIR,
+        ARMOR,
+        DAMAGE,
+        SPEED
+    }
 }

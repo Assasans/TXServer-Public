@@ -11,8 +11,11 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
         public static Entity CreateEntity(Entity tank, BattlePlayer battlePlayer)
         {
             Entity entity = CreateEntity(new RailgunBattleItemTemplate(), "battle/weapon/railgun", tank, battlePlayer);
-            entity.Components.Add(new RailgunChargingWeaponComponent(1f));
             entity.Components.Add(new RailgunComponent());
+            
+            entity.Components.Add(battlePlayer.TurretUnloadEnergyPerShot == null
+                ? new RailgunChargingWeaponComponent(1f)
+                : new RailgunChargingWeaponComponent((float) battlePlayer.TurretUnloadEnergyPerShot));
 
             return entity;
         }

@@ -12,7 +12,10 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
         {
             Entity entity = WeaponTemplate.CreateEntity(template, configPath, tank, battlePlayer);
             entity.Components.Add(new StreamWeaponComponent());
-            entity.Components.Add(new StreamWeaponEnergyComponent(.167f, .25f));
+
+            entity.Components.Add(battlePlayer.TurretUnloadEnergyPerShot == null
+                ? new StreamWeaponEnergyComponent(.167f, .25f)
+                : new StreamWeaponEnergyComponent(.167f, (float) battlePlayer.TurretUnloadEnergyPerShot));
 
             return entity;
         }

@@ -16,7 +16,7 @@ namespace TXServer.Core.Battles
     {
         public static void DealDamage(MatchPlayer victim, MatchPlayer damager, HitTarget hitTarget, int damage)
         {
-            Battle Battle = victim.Battle;
+            Battle battle = victim.Battle;
 
             damage = DamageWithSupplies(damage, victim, damager);
 
@@ -32,16 +32,16 @@ namespace TXServer.Core.Battles
                     if (damager.Player != victim.Player)
                     {
                         int killScore = 10;
-                        Battle.MatchPlayers.Select(x => x.Player).SendEvent(new KillEvent(damager.Player.CurrentPreset.Weapon, hitTarget.Entity), damager.BattleUser);
+                        battle.MatchPlayers.Select(x => x.Player).SendEvent(new KillEvent(damager.Player.CurrentPreset.Weapon, hitTarget.Entity), damager.BattleUser);
                         damager.Player.SendEvent(new VisualScoreKillEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid, victim.Player.User.GetComponent<UserRankComponent>().Rank, damager.GetScoreWithPremium(killScore)), damager.BattleUser);
                         damager.UpdateStatistics(killScore, additiveKills: 1, 0, 0, null);
                     }
                     else
-                        Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), victim.BattleUser);
+                        battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), victim.BattleUser);
                     victim.UpdateStatistics(0, 0, 0, 1, damager);
 
-                    if (Battle.ModeHandler is TDMHandler)
-                        Battle.UpdateScore(damager.Player.BattlePlayer.Team);
+                    if (battle.ModeHandler is TDMHandler)
+                        battle.UpdateScore(damager.Player.BattlePlayer.Team);
 
                     damager.UserResult.Damage += damage;
 

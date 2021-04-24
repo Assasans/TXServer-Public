@@ -6,9 +6,13 @@ using TXServer.Core.Battles;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Battle;
+using TXServer.ECSSystem.Components.Battle.Weapon;
+using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
+using TXServer.ECSSystem.Events.User.Friend;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -32,10 +36,13 @@ namespace TXServer.Core.Commands
 
 			{ "hackBattle", (null, ChatCommandConditions.BattleOwner, HackBattle) },
 			{ "cheat", ("cheat [supply] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.ActiveTank, Cheat) },
-			{ "flag", ("flag [color] [deliver/drop/return/give] [user]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, FlagAction) },
+			{ "flag", ("flag [color] [deliver/drop/return/give] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, FlagAction) },
 			{ "goldrain", ("goldrain [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, GoldboxRain) },
-			{ "supplyrain", ("supplyrain", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, SupplyRain) },
 			{ "gravity", ("gravity [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.BattleOwner, Gravity) },
+			{ "kickback", ("kickback [number]", ChatCommandConditions.HackBattle, Kickback) },
+			{ "kill", ("kill [target]", ChatCommandConditions.InMatch | ChatCommandConditions.Admin, KillPlayer) },
+			{ "supplyrain", ("supplyrain", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, SupplyRain) },
+			{ "turretReload", ("turretReload [instant/never] [target]", ChatCommandConditions.HackBattle, ReloadTime) },
 			{ "turretRotation", ("turretRotation [number]", ChatCommandConditions.HackBattle, TurretRotation) }
 		};
 
@@ -89,83 +96,96 @@ namespace TXServer.Core.Commands
 
 			return "Unknown command. Enter \"/help\" to view available commands";
 		}
-
-		private static string Help(Player player, string[] args)
+        private static string Help(Player player, string[] args)
         {
-			ChatCommandConditions playerConditions = GetConditionsFor(player);
-			string message;
+	        ChatCommandConditions playerConditions = GetConditionsFor(player);
+	        string message;
 
-			if (!args.Any())
-			{
-				message = '/' + string.Join("\n/", from command in Commands
-				    where playerConditions.HasFlag(command.Value.Item2) &&
-				          !command.Value.Item2.HasFlag(ChatCommandConditions.HackBattle)
-				    select command.Value.Item1 ?? command.Key);
-			}
-			else
-			{
-				ChatCommandConditions condition;
-				switch (args[0])
-				{
-					case "admin":
-						condition = ChatCommandConditions.Admin;
-						if (!player.Data.Admin)
-							return ConditionErrors[condition];
-						break;
-					case "hackBattle":
-						condition = ChatCommandConditions.HackBattle;
-						if (!playerConditions.HasFlag(ChatCommandConditions.HackBattle))
-							return ConditionErrors[condition];
-						break;
-					case "test":
-						condition = ChatCommandConditions.Tester;
-						if (!player.Data.Beta)
-							return ConditionErrors[condition];
-						break;
-					default:
-						return "Invalid command, specific help message wasn't found";
-				}
+	        if (!args.Any())
+	        {
+		        message = '/' + string.Join("\n/", from command in Commands
+			        where playerConditions.HasFlag(command.Value.Item2) &&
+			              !command.Value.Item2.HasFlag(ChatCommandConditions.HackBattle)
+			        select command.Value.Item1 ?? command.Key);
+	        }
+	        else
+	        {
+		        ChatCommandConditions condition;
+		        switch (args[0])
+		        {
+			        case "admin":
+				        condition = ChatCommandConditions.Admin;
+				        if (!player.Data.Admin)
+					        return ConditionErrors[condition];
+				        break;
+			        case "hackBattle":
+				        condition = ChatCommandConditions.HackBattle;
+				        if (!playerConditions.HasFlag(ChatCommandConditions.HackBattle))
+					        return ConditionErrors[condition];
+				        break;
+			        case "test":
+				        condition = ChatCommandConditions.Tester;
+				        if (!player.Data.Beta)
+					        return ConditionErrors[condition];
+				        break;
+			        default:
+				        return "Invalid command, specific help message wasn't found";
+		        }
 				
-				message = '/' + string.Join("\n/", from command in Commands
-					where playerConditions.HasFlag(command.Value.Item2) &&
-					      command.Value.Item2.HasFlag(condition)
-					select command.Value.Item1 ?? command.Key);
-			}
-			return message;
+		        message = '/' + string.Join("\n/", from command in Commands
+			        where playerConditions.HasFlag(command.Value.Item2) &&
+			              command.Value.Item2.HasFlag(condition)
+			        select command.Value.Item1 ?? command.Key);
+	        }
+	        return message;
+        }
+        
+        
+        private static string Cheat(Player player, string[] args)
+        {
+	        if (!args.Any())
+		        return "Parsing error, '/cheat' needs at least the desired cheat as argument";
+	        
+	        string targetName = args.Length > 1 ? args[1] : player.Data.Username;
+	        List<BattlePlayer> targets = FindTargets(targetName, player.BattlePlayer.Battle);
+	        if (!targets.Any())
+		        return $"Error, the user '{targetName}' wasn't found in this battle";
+	        
+	        switch (args[0].ToUpper())
+	        {
+		        case "ARMOR" or "DAMAGE" or "REPAIR" or "SPEED" or "ALL":
+			        List<BonusType> cheats = new();
+			        if (Enum.TryParse(args[0].ToUpper(), out BonusType bonusType))
+				        cheats.Add(bonusType);
+			        else if (args[0].ToUpper() == "ALL")
+				        cheats = new List<BonusType>((BonusType[]) Enum.GetValues(typeof(SupplyType)));
+
+			        foreach (BattlePlayer target in targets)
+			        foreach (BonusType bonusCheat in cheats)
+				        _ = new SupplyEffect(bonusCheat, target.MatchPlayer, true);
+
+			        string cheat = char.ToUpper(bonusType.ToString().First()) + bonusType.ToString().Substring(1).ToLower();
+			        return targets.Count > 1
+				        ? $"{cheat} cheat has been activated for multiple people"
+				        : $"{cheat} cheat has been activated for '{targets[0].Player.Data.Username}'";
+		        case "DISABLE":
+			        int amount = 0;
+			        foreach (SupplyEffect supplyEffect in targets.SelectMany(target => 
+				        target.MatchPlayer.SupplyEffects.ToArray().Where(supply => supply.Cheat)))
+			        {
+				        amount += 1;
+				        supplyEffect.Remove();
+			        }
+			        string cheatString = amount == 1 ? "cheat" : "cheats";
+			        return targets.Count > 1
+				        ? $"{amount} {cheatString} has been deactivated for multiple people"
+				        : $"{amount} {cheatString} has been deactivated for '{targets[0].Player.Data.Username}'";
+		        default:
+			        return "Parsing error, valid cheats are only: 'armor', 'damage', 'repair', & 'speed'";
+	        }
         }
 
-        private static string Ping(Player player, string[] args) => $"Network latency: {player.Connection.Ping} ms";
-
-		private static string PositionInfo(Player player, string[] args)
-        {
-			Vector3 tankPosition = player.BattlePlayer.MatchPlayer.TankPosition;
-			return $"X: {tankPosition.X}, Y: {tankPosition.Y}, Z: {tankPosition.Z}";
-		}
-
-		private static string Start(Player player, string[] args)
-		{
-			if (!player.BattlePlayer.Battle.IsMatchMaking)
-			{
-				player.BattlePlayer.Battle.BattleState = BattleState.Starting;
-			}
-			player.BattlePlayer.Battle.ForcePause = false;
-			player.BattlePlayer.Battle.ForceStart = true;
-			return "Started";
-		}
-
-		private static string Pause(Player player, string[] args)
-		{
-			Battle battle = player.BattlePlayer.Battle;
-			
-			if (!battle.ForceOpen && battle.ForcePause)
-				return "Already paused";
-
-			player.BattlePlayer.Battle.ForceStart = false;
-			player.BattlePlayer.Battle.ForcePause = true;
-			return "Paused battle entry";
-		}
-		
-		private static string Finish(Player player, string[] args)
+        private static string Finish(Player player, string[] args)
 		{
 			player.BattlePlayer.Battle.FinishBattle();
 			return "Finished";
@@ -225,12 +245,12 @@ namespace TXServer.Core.Commands
 					}
 					return $"Returned the {args[0].ToLower()} flag to its base";
 				case "give":
-					string targetName = "";
+					string targetName;
 					targetName = args.Length < 3 ? player.Data.Username : args[2];
-					Player target = battle.FindPlayerByUid(targetName);
-					if (target == null)
+					List<BattlePlayer> targets = FindTargets(targetName, battle);
+					if (targets.Count != 1)
 						return $"Error, the user '{targetName}' wasn't found in this battle";
-					if (target.BattlePlayer.Team == flag.Team)
+					if (targets[0].Team == flag.Team)
 						return $"Logical error, {targetName} can't capture the flag of this team";
 					if (flag.Carrier == player.BattlePlayer)
 						return $"Logical error, {targetName} already has the {args[0].ToLower()} flag";
@@ -239,13 +259,13 @@ namespace TXServer.Core.Commands
 					{
 						case FlagState.Captured:
 							flag.Drop(false);
-							flag.Pickup(target.BattlePlayer);
+							flag.Pickup(targets[0]);
 							break;
 						case FlagState.Home:
-							flag.Capture(target.BattlePlayer);
+							flag.Capture(targets[0]);
 							break;
 						case FlagState.Dropped:
-							flag.Pickup(target.BattlePlayer);
+							flag.Pickup(targets[0]);
 							break;
 					}
 					return $"Gave flag to user '{targetName}'";
@@ -253,51 +273,8 @@ namespace TXServer.Core.Commands
 					return $"Parsing error, '/flag' doesn't have an argument named '{args[1]}'";
 			}
 		}
-
-		private static string Open(Player player, string[] args)
-		{
-			if (player.BattlePlayer.Battle.ForceOpen)
-				return "Already opened";
-			player.BattlePlayer.Battle.ForceOpen = true;
-			return "Opened";
-		}
-
-		private static string SpawnInfo(Player player, string[] args)
-		{
-			SpawnPoint lastSpawnPoint = player.BattlePlayer.MatchPlayer.LastSpawnPoint;
-			return $"{player.BattlePlayer.Battle.CurrentMapInfo.Name}, {player.BattlePlayer.Battle.Params.BattleMode}, " +
-			       $"{player.User.GetComponent<TeamColorComponent>().TeamColor}, Number: {lastSpawnPoint.Number}";
-		}
-
-		private static string Stats(Player player, string[] args)
-		{
-			return $"Online players: {Server.Instance.Connection.Pool.Count(x => x.IsActive)}\n" +
-				$"MM battles: {ServerConnection.BattlePool.Count(b => b.IsMatchMaking)}\n" +
-				$"Custom battles: {ServerConnection.BattlePool.Count(b => !b.IsMatchMaking)}\n";
-		}
-
-		private static string HackBattle(Player player, string[] args)
-		{
-			if (player.BattlePlayer.Battle.IsMatchMaking)
-				return "HackBattle cannot be enabled in matchmaking battles";
-
-			if (((CustomBattleHandler)player.BattlePlayer.Battle.TypeHandler).HackBattle)
-				return "HackBattle is already enabled";
-
-			Dictionary<List<BattlePlayer>, Entity> targets = new()
-			{
-				{ player.BattlePlayer.Battle.AllBattlePlayers.ToList(), player.BattlePlayer.Battle.BattleLobbyChatEntity }
-			};
-			if (player.BattlePlayer.Battle.MatchPlayers.Any())
-				targets.Add(player.BattlePlayer.Battle.MatchPlayers, player.BattlePlayer.Battle.GeneralBattleChatEntity);
-			string notification = "This is now a \"HackBattle\"! The owner can cheat & change a lot of things. Note: this is very experimental.";
-			MessageOtherPlayers(notification, player, targets);
-
-			((CustomBattleHandler)player.BattlePlayer.Battle.TypeHandler).HackBattle = true;
-			return "HackBattle was enabled";
-		}
-
-		private static string Gravity(Player player, string[] args)
+        
+        private static string Gravity(Player player, string[] args)
 		{
 			Battle battle = player.BattlePlayer.Battle;
 
@@ -365,7 +342,231 @@ namespace TXServer.Core.Commands
 			
 			return "It'll start raining gold soon, get an umbrella!";
 		}
+
+        private static string HackBattle(Player player, string[] args)
+        {
+	        if (player.BattlePlayer.Battle.IsMatchMaking)
+		        return "HackBattle cannot be enabled in matchmaking battles";
+
+	        CustomBattleHandler handler = (CustomBattleHandler) player.BattlePlayer.Battle.TypeHandler;
+	        string notification = handler.HackBattle ? "HackBattle was disabled" 
+		        : "This is now a \"HackBattle\"! The owner can cheat & change a lot of things. Note: this is very experimental.";
+
+	        Dictionary<List<BattlePlayer>, Entity> targets = new()
+	        {
+		        { player.BattlePlayer.Battle.AllBattlePlayers.ToList(), player.BattlePlayer.Battle.BattleLobbyChatEntity }
+	        };
+	        if (player.BattlePlayer.Battle.MatchPlayers.Any())
+		        targets.Add(player.BattlePlayer.Battle.MatchPlayers, player.BattlePlayer.Battle.GeneralBattleChatEntity);
+	        MessageOtherPlayers(notification, player, targets);
+
+	        handler.HackBattle = !handler.HackBattle;
+	        return handler.HackBattle ? "HackBattle was enabled" : "HackBattle was disabled";
+        }
+
+        private static string KillPlayer(Player player, string[] args)
+        {
+	        string targetName = args.Length < 1 ? player.Data.Username : args[0];
+	        
+	        List<BattlePlayer> targets = FindTargets(targetName, player.BattlePlayer.Battle);
+	        if (!targets.Any()) return $"Error, the user '{targetName}' wasn't found in this battle";
+	        foreach (BattlePlayer target in targets)
+		        target.MatchPlayer.SelfDestructionTime = DateTime.Now.AddSeconds(0);
+
+	        return targets.Count > 1
+		        ? $"{targets.Count} players have been killed"
+		        : $"'{targets[0].Player.Data.Username}' has been killed'";
+        }
+
+        private static string Kickback(Player player, string[] args)
+        {
+	        if (args.Length < 1)
+		        return "Parsing error, '/kickback' needs a number or 'norm' as argument";
+
+	        float? kickback;
+	        string targetName;
+	        Battle battle = player.BattlePlayer.Battle;
+	        
+	        switch (args.Length)
+	        {
+		        case < 1:
+				        return "Parsing error, '/kickback' needs a number or 'norm' as argument";
+		        case < 2:
+			        targetName = player.Data.Username;
+			        break;
+		        default:
+			        targetName = args[1];
+			        break;
+	        }
+	        switch (args[0])
+	        {
+		        case "norm":
+			        kickback = null;
+			        break;
+		        default:
+			        bool successfullyParsed = float.TryParse(args[0], out float floatyKickback);
+			        if (!successfullyParsed)
+				        return "Parsing error, '/kickback' only allows numbers or 'norm' as argument";
+			        if (floatyKickback < 0 || floatyKickback > 1000)
+				        return "Command error, '/kickback' only allowed in a range from 0 - 1000";
+			        kickback = floatyKickback;
+			        break;
+	        }
+	        
+	        List<BattlePlayer> targets = FindTargets(targetName, battle);
+	        if (!targets.Any()) return $"Error, the user '{targetName}' wasn't found in this battle";
+	        foreach (BattlePlayer target in targets)
+	        {
+		        target.TurretKickback = kickback;
+		        
+		        if (!target.Player.IsInMatch) continue;
+		        if (kickback == null)
+		        {
+			        battle.KeepRunning = true;
+			        target.Rejoin = true;
+			        target.Player.SendEvent(new KickFromBattleEvent(), target.MatchPlayer.BattleUser);
+			        continue;
+		        }
+		        
+		        target.MatchPlayer.Weapon.ChangeComponent<KickbackComponent>(component =>
+			        component.KickbackForce = (float) kickback);
+	        }
+	        
+	        return "Set";
+        }
+        
+        private static string Open(Player player, string[] args)
+		{
+			if (player.BattlePlayer.Battle.ForceOpen)
+				return "Already opened";
+			player.BattlePlayer.Battle.ForceOpen = true;
+			return "Opened";
+		}
+
+		private static string Pause(Player player, string[] args)
+		{
+			Battle battle = player.BattlePlayer.Battle;
+			
+			if (!battle.ForceOpen && battle.ForcePause)
+				return "Already paused";
+
+			player.BattlePlayer.Battle.ForceStart = false;
+			player.BattlePlayer.Battle.ForcePause = true;
+			return "Paused battle entry";
+		}
 		
+        private static string Ping(Player player, string[] args) => $"Network latency: {player.Connection.Ping} ms";
+
+		private static string PositionInfo(Player player, string[] args)
+        {
+			Vector3 tankPosition = player.BattlePlayer.MatchPlayer.TankPosition;
+			return $"X: {tankPosition.X}, Y: {tankPosition.Y}, Z: {tankPosition.Z}";
+		}
+		
+		private static string ReloadTime(Player player, string[] args)
+		{
+			string targetName;
+			Battle battle = player.BattlePlayer.Battle;
+			float? unloadEnergyPerShot;
+
+			switch (args.Length)
+			{
+				case < 1:
+					return "Parsing error, '/turretReload' needs & allows only 'instant', 'never' or 'norm' " +
+					       "as first argument";
+				case < 2:
+					targetName = player.Data.Username;
+					break;
+				default:
+					targetName = args[1];
+					break;
+			}
+			switch (args[0])
+			{
+				case "instant" or "0":
+					unloadEnergyPerShot = 0;
+					break;
+				case "never":
+					unloadEnergyPerShot = float.MaxValue;
+					break;
+				case "norm":
+					unloadEnergyPerShot = null;
+					break;
+				default:
+					return "Parsing error, '/turretReload' needs & allows only 'instant', 'never' or 'norm' " +
+					       "as first argument";
+			}
+
+			List<BattlePlayer> targets = FindTargets(targetName, battle);
+			if (!targets.Any()) return $"Error, the user '{targetName}' wasn't found in this battle";
+			foreach (BattlePlayer target in targets)
+			{
+				target.TurretUnloadEnergyPerShot = unloadEnergyPerShot;
+				
+				if (!target.Player.IsInMatch) continue;
+				if (unloadEnergyPerShot == null)
+				{
+					battle.KeepRunning = true;
+					target.Rejoin = true;
+					target.Player.SendEvent(new KickFromBattleEvent(), target.MatchPlayer.BattleUser);
+					continue;
+				}
+				
+				if (target.MatchPlayer.Weapon.GetComponent<StreamWeaponComponent>() != null)
+					target.MatchPlayer.Weapon.ChangeComponent<StreamWeaponEnergyComponent>(component =>
+						component.UnloadEnergyPerSec = (float) unloadEnergyPerShot);
+				else
+					target.MatchPlayer.Weapon.ChangeComponent<DiscreteWeaponEnergyComponent>(component =>
+					    component.UnloadEnergyPerShot = (float) unloadEnergyPerShot);
+				target.MatchPlayer.Weapon.ChangeComponent<WeaponCooldownComponent>(component =>
+					component.CooldownIntervalSec = (float) unloadEnergyPerShot);
+				
+				switch (target.MatchPlayer.Weapon.TemplateAccessor.Template)
+				{
+					case RailgunBattleItemTemplate:
+						target.MatchPlayer.Weapon.ChangeComponent<RailgunChargingWeaponComponent>(component =>
+							component.ChargingTime = (float) unloadEnergyPerShot);
+						break;
+					case ShaftBattleItemTemplate:
+						target.MatchPlayer.Weapon.ChangeComponent<ShaftEnergyComponent>(component =>
+						{
+							component.PossibleUnloadEnergyPerAimingShot = 0;
+							component.ReloadEnergyPerSec = 1;
+							component.UnloadAimingEnergyPerSec = 0;
+							component.UnloadEnergyPerQuickShot = 0;
+						});
+						break;
+				}
+			}
+
+			return $"Changed reload time for '{targetName}' to {args[0]}";
+		}
+
+		private static string SpawnInfo(Player player, string[] args)
+		{
+			SpawnPoint lastSpawnPoint = player.BattlePlayer.MatchPlayer.LastSpawnPoint;
+			return $"{player.BattlePlayer.Battle.CurrentMapInfo.Name}, {player.BattlePlayer.Battle.Params.BattleMode}, " +
+			       $"{player.User.GetComponent<TeamColorComponent>().TeamColor}, Number: {lastSpawnPoint.Number}";
+		}
+		
+		private static string Start(Player player, string[] args)
+		{
+			if (!player.BattlePlayer.Battle.IsMatchMaking)
+			{
+				player.BattlePlayer.Battle.BattleState = BattleState.Starting;
+			}
+			player.BattlePlayer.Battle.ForcePause = false;
+			player.BattlePlayer.Battle.ForceStart = true;
+			return "Started";
+		}
+
+		private static string Stats(Player player, string[] args)
+		{
+			return $"Online players: {Server.Instance.Connection.Pool.Count(x => x.IsActive)}\n" +
+				$"MM battles: {ServerConnection.BattlePool.Count(b => b.IsMatchMaking)}\n" +
+				$"Custom battles: {ServerConnection.BattlePool.Count(b => !b.IsMatchMaking)}\n";
+		}
+
 		private static string SupplyRain(Player player, string[] args)
 		{
 			Battle battle = player.BattlePlayer.Battle;
@@ -377,31 +578,7 @@ namespace TXServer.Core.Commands
 
 			return "It'll start raining soon, get an umbrella!";
 		}
-
-		private static string Cheat(Player player, string[] args)
-		{
-			switch (args[0].ToUpper())
-			{
-				case "ARMOR":
-				case "DAMAGE":
-				case "REPAIR":
-				case "SPEED":
-					string cheatTargets = "";
-					if (args.Length > 1) cheatTargets = args[1];
-
-					bool cheatActivated = EnableSupplyCheat(args[0], cheatTargets, player.BattlePlayer.MatchPlayer);
-					if (cheatActivated)
-						return "Cheat activated";
-					else
-						goto default;
-				case "disable":
-					int cheats = DisableSupplyCheats(player.BattlePlayer.MatchPlayer);
-					return $"{cheats} cheat(s) disabled";
-				default:
-					return "Cheat or target not found";
-			}
-		}
-
+		
 		private static string TurretRotation(Player player, string[] args)
 		{
 			string notification = "Changed turret rotation ";
@@ -433,6 +610,7 @@ namespace TXServer.Core.Commands
 			return notification;
 		}
 
+
 		private static ChatCommandConditions GetConditionsFor(Player player)
         {
 			ChatCommandConditions conditions = 0;
@@ -459,45 +637,6 @@ namespace TXServer.Core.Commands
 
 			return conditions;
 		}
-
-        private static bool EnableSupplyCheat(string type, string target, MatchPlayer matchPlayer)
-		{
-			bool supplyCheat = Enum.TryParse(type, out BonusType bonusType);
-
-			if (!supplyCheat) return false;
-			switch (target)
-			{
-				case "":
-					_ = new SupplyEffect(bonusType, matchPlayer, cheat: true);
-					return true;
-				case "all":
-					foreach (BattlePlayer battlePlayer in matchPlayer.Battle.MatchPlayers)
-						_ = new SupplyEffect(bonusType, battlePlayer.MatchPlayer, cheat: true);
-					return true;
-				default:
-					BattlePlayer specificTarget = matchPlayer.Battle.MatchPlayers.SingleOrDefault(player => player.User.GetComponent<UserUidComponent>().Uid == target);
-					if (specificTarget != null)
-					{
-						_ = new SupplyEffect(bonusType, specificTarget.MatchPlayer, cheat: true);
-						return true;
-					}
-					break;
-			}
-			return false;
-		}
-
-		private static int DisableSupplyCheats(MatchPlayer matchPlayer)
-		{
-			int cheats = 0;
-			foreach (BattlePlayer battlePlayer in matchPlayer.Battle.MatchPlayers)
-				foreach (SupplyEffect supplyEffect in battlePlayer.MatchPlayer.SupplyEffects.ToArray().Where(supply => supply.Cheat))
-				{
-					cheats += 1;
-					supplyEffect.Remove();
-				}
-			return cheats;
-		}
-
 		private static void MessageOtherPlayers(string message, Player selfPlayer, Dictionary<List<BattlePlayer>, Entity> targets)
         {
 			foreach (KeyValuePair<List<BattlePlayer>, Entity> target in targets)
@@ -511,6 +650,21 @@ namespace TXServer.Core.Commands
 					UserAvatarId = selfPlayer.User.GetComponent<UserAvatarComponent>().Id
 				}, target.Value);
 			}
+		}
+		private static List<BattlePlayer> FindTargets(string targetName, Battle battle)
+		{
+			List<BattlePlayer> targets = new();
+			switch (targetName)
+			{
+				case "all":
+					return battle.MatchPlayers;
+				default:
+					Player target = battle.FindPlayerByUid(targetName);
+					if (target != null)
+						targets.Add(target.BattlePlayer);
+					break;
+			}
+			return targets;
 		}
 	}
 }

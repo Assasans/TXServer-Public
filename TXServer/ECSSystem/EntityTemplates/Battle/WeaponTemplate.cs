@@ -44,11 +44,14 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 tank.GetComponent<TankPartComponent>(),
                 new WeaponComponent(),
                 // These components should be gotten from configs.
-                new WeaponCooldownComponent(1.3f),
                 new WeaponEnergyComponent(1.3f),
                 tank.GetComponent<UserGroupComponent>(),
                 tank.GetComponent<TankGroupComponent>(),
                 tank.GetComponent<BattleGroupComponent>());
+            
+            weapon.Components.Add(battlePlayer.TurretUnloadEnergyPerShot == null
+                ? new WeaponCooldownComponent(1.3f)
+                : new WeaponCooldownComponent((float) battlePlayer.TurretUnloadEnergyPerShot));
             
             if (battlePlayer.TurretRotationSpeed == null)
                 weapon.AddComponent(new WeaponRotationComponent(113.667f, 113.333f, 113.333f));
