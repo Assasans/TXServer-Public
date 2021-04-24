@@ -25,8 +25,5 @@ namespace TXServer.Core.Battles.Module {
 				Player.Battle.GeneralBattleChatEntity
 			);
 		}
-
-		public override void Deactivate() {
-		}
 	}
 }

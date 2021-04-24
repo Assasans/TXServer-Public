@@ -220,8 +220,7 @@ namespace TXServer.Core.Battles
             // Battle modules
             foreach (BattleModule module in Modules.ToArray())
             {
-                module.CooldownTick(); 
-                module.Tick();
+                module.ModuleTick();
             }
         }
 

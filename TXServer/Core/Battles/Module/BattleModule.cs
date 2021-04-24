@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Module;
@@ -11,6 +12,8 @@ namespace TXServer.Core.Battles.Module {
 
 			SlotEntity = SlotUserItemTemplate.CreateEntity(moduleEntity, player.Player.BattlePlayer);
 			ModuleEntity = moduleEntity;
+
+			nextTickHandlers = new List<Action>();
 		}
 
 		public MatchPlayer Player { get; }
@@ -23,6 +26,8 @@ namespace TXServer.Core.Battles.Module {
 		public DateTimeOffset? CooldownEnd => CooldownStart + CooldownDuration;
 
 		public bool IsOnCooldown => ModuleEntity.HasComponent<InventoryCooldownStateComponent>();
+
+		private readonly List<Action> nextTickHandlers;
 
 		// TODO(Assasans): Cooldown has visual bugs on client
 		public void StartCooldown() {
@@ -45,22 +50,37 @@ namespace TXServer.Core.Battles.Module {
 
 		public abstract void Activate();
 		public virtual void Deactivate() { }
-		public virtual void Tick() { }
 
-		public void CooldownTick() {
-			if(CooldownEnd == null) return;
+		protected virtual void Tick() { }
 
-			if(DateTimeOffset.Now < CooldownEnd) return;
+		/// <summary>
+		/// Schedules an action to run at next module tick
+		/// </summary>
+		/// <param name="handler">Action to run at next module tick</param>
+		protected void Schedule(Action handler) {
+			nextTickHandlers.Add(handler);
+		}
 
-			if(ModuleEntity.HasComponent<InventoryCooldownStateComponent>()) {
-				ModuleEntity.RemoveComponent<InventoryCooldownStateComponent>();
+		public void ModuleTick() {
+			if(CooldownStart != null && DateTimeOffset.Now >= CooldownEnd) {
+				if(ModuleEntity.HasComponent<InventoryCooldownStateComponent>()) {
+					ModuleEntity.RemoveComponent<InventoryCooldownStateComponent>();
+				}
+
+				if(ModuleEntity.HasComponent<InventorySlotTemporaryBlockedByServerComponent>()) {
+					ModuleEntity.RemoveComponent<InventorySlotTemporaryBlockedByServerComponent>();
+				}
+
+				CooldownStart = null;
+			}
+			
+			foreach(Action handler in nextTickHandlers.ToArray()) {
+				nextTickHandlers.Remove(handler);
+
+				handler();
 			}
 
-			if(ModuleEntity.HasComponent<InventorySlotTemporaryBlockedByServerComponent>()) {
-				ModuleEntity.RemoveComponent<InventorySlotTemporaryBlockedByServerComponent>();
-			}
-
-			CooldownStart = null;
+			Tick();
 		}
 	}
 }

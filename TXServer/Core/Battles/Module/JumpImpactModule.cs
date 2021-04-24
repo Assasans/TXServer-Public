@@ -1,9 +1,6 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle.Module;
+﻿using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
+using TXServer.ECSSystem.EntityTemplates.Battle.Module;
 
 namespace TXServer.Core.Battles.Module {
 	public class JumpImpactModule : BattleModule {
@@ -12,34 +9,14 @@ namespace TXServer.Core.Battles.Module {
 			ModuleUserItemTemplate.CreateEntity(garageModule, player.Player.BattlePlayer)
 		) { }
 
-		public override async void Activate() {
-			if(!Player.Tank.HasComponent<JumpEffectComponent>()) {
-				Player.Tank.AddComponent(
-					new JumpEffectComponent() {
-						BaseImpact = 150000,
-						ScaleByMass = true,
-						FlyComponentDelayInMs = 10,
-						AlwaysUp = false,
-						GravityPenalty = 3.0f
-					}
-				);
-			}
+		public override void Activate() {
+			Entity effect = JumpEffectTemplate.CreateEntity(Player);
 
-			if(!Player.Tank.HasComponent<JumpEffectConfigComponent>()) {
-				Player.Tank.AddComponent(new JumpEffectConfigComponent(12.00f));
-			}
+			Player.Player.ShareEntities(effect);
 
-			await Task.Delay(10);
-
-			if(Player.Tank.HasComponent<JumpEffectConfigComponent>()) {
-				Player.Tank.RemoveComponent<JumpEffectComponent>();
-			}
-
-			if(Player.Tank.HasComponent<JumpEffectConfigComponent>()) {
-				Player.Tank.RemoveComponent<JumpEffectConfigComponent>();
-			}
+			Schedule(() => {
+				Player.Player.UnshareEntities(effect);
+			});
 		}
-
-		public override void Deactivate() { }
 	}
 }
