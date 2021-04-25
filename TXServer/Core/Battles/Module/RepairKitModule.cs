@@ -12,7 +12,5 @@ namespace TXServer.Core.Battles.Module {
 		public override void Activate() {
 			_ = new SupplyEffect(BonusType.REPAIR, MatchPlayer);
 		}
-
-		public override void Deactivate() { }
 	}
 }

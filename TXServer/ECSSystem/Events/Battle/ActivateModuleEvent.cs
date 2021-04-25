@@ -18,6 +18,8 @@ namespace TXServer.ECSSystem.Events.Battle {
 			BattleModule? module = player.BattlePlayer.MatchPlayer.Modules.Find((module) => module.ModuleEntity == entity);
 			if(module == null) return;
 
+			if(!module.IsEnabled) return;
+
 			if(module.IsOnCooldown) {
 				/*
 				player.SendEvent(

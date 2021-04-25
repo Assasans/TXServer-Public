@@ -10,10 +10,13 @@ namespace TXServer.Core.Battles.Module {
 		) { }
 
 		public override void Activate() {
-			if(MatchPlayer.Battle.BattleState != BattleState.Running) return; // Prevent dropping during warm-up
-			if(!MatchPlayer.Battle.IsMatchMaking) return;
-			
 			MatchPlayer.Battle.DropSpecificBonusType(BonusType.GOLD, MatchPlayer.Player.Data.Username);
+		}
+
+		protected override void Tick() {
+			base.Tick();
+			
+			IsEnabled &= MatchPlayer.Battle.IsMatchMaking && MatchPlayer.Battle.BattleState == BattleState.Running;
 		}
 	}
 }

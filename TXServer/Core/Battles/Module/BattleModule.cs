@@ -20,6 +20,8 @@ namespace TXServer.Core.Battles.Module {
 
 		public Entity SlotEntity { get; }
 		public Entity ModuleEntity { get; }
+		
+		public bool IsEnabled { get; set; }
 
 		public TimeSpan CooldownDuration { get; set; }
 		public DateTimeOffset? CooldownStart { get; set; }
@@ -51,7 +53,10 @@ namespace TXServer.Core.Battles.Module {
 		public abstract void Activate();
 		public virtual void Deactivate() { }
 
-		protected virtual void Tick() { }
+		protected virtual void Tick() {
+			IsEnabled = MatchPlayer.Battle.BattleState is BattleState.Running or BattleState.WarmUp &&
+			            MatchPlayer.TankState == TankState.Active;
+		}
 
 		/// <summary>
 		/// Schedules an action to run at next module tick
@@ -73,7 +78,7 @@ namespace TXServer.Core.Battles.Module {
 
 				CooldownStart = null;
 			}
-			
+
 			foreach(Action handler in nextTickHandlers.ToArray()) {
 				nextTickHandlers.Remove(handler);
 
@@ -81,6 +86,17 @@ namespace TXServer.Core.Battles.Module {
 			}
 
 			Tick();
+
+			if(IsEnabled) {
+				if(ModuleEntity.HasComponent<InventoryEnabledStateComponent>()) return;
+
+				ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
+			}
+			else {
+				if(!ModuleEntity.HasComponent<InventoryEnabledStateComponent>()) return;
+
+				ModuleEntity.RemoveComponent<InventoryEnabledStateComponent>();
+			}
 		}
 	}
 }
