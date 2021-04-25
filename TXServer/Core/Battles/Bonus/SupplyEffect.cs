@@ -13,17 +13,17 @@ namespace TXServer.Core.Battles
 {
     public class SupplyEffect
     {
-        public SupplyEffect(BonusType bonusType, MatchPlayer matchPlayer, bool cheat)
+        public SupplyEffect(BonusType bonusType, MatchPlayer matchPlayer, bool cheat = false, long duration = 30)
         {
             if (matchPlayer.TankState != TankState.Active) return;
 
             BonusType = bonusType;
             MatchPlayer = matchPlayer;
             Cheat = cheat;
-            StopTime = GetStopTime();
+            StopTime = DateTime.Now.AddSeconds(duration);
 
             if (CheckForDuplicate()) return;
-            ApplyEffect();
+            ApplyEffect(duration * 1000);
 
             MatchPlayer.Battle.MatchPlayers.Select(x => x.Player).ShareEntity(SupplyEffectEntity);
             MatchPlayer.SupplyEffects.Add(this);
@@ -52,15 +52,15 @@ namespace TXServer.Core.Battles
             return false;
         }
 
-        private void ApplyEffect()
+        private void ApplyEffect(long durationMillis)
         {
             switch (BonusType)
             {
                 case BonusType.ARMOR:
-                    SupplyEffectEntity = ArmorEffectTemplate.CreateEntity(MatchPlayer.Tank);
+                    SupplyEffectEntity = ArmorEffectTemplate.CreateEntity(durationMillis, MatchPlayer.Tank);
                     break;
                 case BonusType.DAMAGE:
-                    SupplyEffectEntity = DamageEffectTemplate.CreateEntity(MatchPlayer.Tank);
+                    SupplyEffectEntity = DamageEffectTemplate.CreateEntity(durationMillis, MatchPlayer.Tank);
                     break;
                 case BonusType.REPAIR:
                     MatchPlayer.Tank.ChangeComponent(new TemperatureComponent(0));
@@ -75,7 +75,7 @@ namespace TXServer.Core.Battles
                         if (Cheat) component.Speed = float.MaxValue;
                         else component.Speed = (float)(component.Speed * 1.5);
                     });
-                    SupplyEffectEntity = TurboSpeedEffectTemplate.CreateEntity(MatchPlayer.Tank);
+                    SupplyEffectEntity = TurboSpeedEffectTemplate.CreateEntity(durationMillis, MatchPlayer.Tank);
                     break;
             }
         }
@@ -89,19 +89,10 @@ namespace TXServer.Core.Battles
             }
             else
             {
-                StopTime = GetStopTime();
+                StopTime = DateTime.Now.AddSeconds(30);
                 SupplyEffectEntity.RemoveComponent<DurationComponent>();
                 SupplyEffectEntity.AddComponent(new DurationComponent { StartedTime = DateTime.Now });
             }
-        }
-
-        private DateTime GetStopTime()
-        {
-            // todo: read this from configs   
-            if (BonusType == BonusType.REPAIR)
-                return DateTime.Now.AddSeconds(3);
-            else
-                return DateTime.Now.AddSeconds(30);
         }
 
         public BonusType BonusType { get; set; }

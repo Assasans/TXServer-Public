@@ -217,7 +217,7 @@ namespace TXServer.Core.Battles
                 } 
             }
 
-            // Battle modules
+            // battle modules
             foreach (BattleModule module in Modules.ToArray())
             {
                 module.ModuleTick();

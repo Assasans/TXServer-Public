@@ -9,11 +9,11 @@ namespace TXServer.ECSSystem.EntityTemplates.Effects
     [SerialVersionUID(1486970297039L)]
     public class TurboSpeedEffectTemplate : EffectBaseTemplate, IEntityTemplate
     {
-        public static Entity CreateEntity(Entity tank)
+        public static Entity CreateEntity(long duration, Entity tank)
         {
             Entity entity = new(new TemplateAccessor(new TurboSpeedEffectTemplate(), "battle/effect/turbospeed"),
                 new EffectComponent(),
-                new DurationConfigComponent(30000),
+                new DurationConfigComponent(duration),
                 new DurationComponent { StartedTime = DateTime.Now },
                 tank.GetComponent<TankGroupComponent>());
             return entity;

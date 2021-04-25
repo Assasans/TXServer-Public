@@ -10,11 +10,10 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			if (player.IsInMatch)
-			{
-				foreach (SupplyEffect supplyEffect in player.BattlePlayer.MatchPlayer.SupplyEffects.ToArray())
-					supplyEffect.Remove();
-			}
+			if (!player.IsInMatch) return;
+
+			foreach (SupplyEffect supplyEffect in player.BattlePlayer.MatchPlayer.SupplyEffects.ToArray())
+				supplyEffect.Remove();
 		}
 	}
 }

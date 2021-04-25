@@ -7,16 +7,16 @@ using TXServer.ECSSystem.EntityTemplates.Item.Slot;
 
 namespace TXServer.Core.Battles.Module {
 	public abstract class BattleModule {
-		protected BattleModule(MatchPlayer player, Entity moduleEntity) {
-			Player = player;
+		protected BattleModule(MatchPlayer matchPlayer, Entity moduleEntity) {
+			MatchPlayer = matchPlayer;
 
-			SlotEntity = SlotUserItemTemplate.CreateEntity(moduleEntity, player.Player.BattlePlayer);
+			SlotEntity = SlotUserItemTemplate.CreateEntity(moduleEntity, matchPlayer.Player.BattlePlayer);
 			ModuleEntity = moduleEntity;
 
 			nextTickHandlers = new List<Action>();
 		}
 
-		public MatchPlayer Player { get; }
+		public MatchPlayer MatchPlayer { get; }
 
 		public Entity SlotEntity { get; }
 		public Entity ModuleEntity { get; }

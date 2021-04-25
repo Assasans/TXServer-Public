@@ -1,7 +1,9 @@
-﻿using TXServer.Core;
+﻿using System.Linq;
+using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -18,6 +20,13 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 			Entity team = TeamColor == TeamColor.BLUE ? teamView.AllyTeamEntity : teamView.EnemyTeamEntity;
 
 			player.BattlePlayer.Battle.UpdateScore(team, Amount);
+			
+			if (player.BattlePlayer.Battle.Params.BattleMode == BattleMode.CTF)
+			{
+				Flag flag = TeamColor == TeamColor.BLUE ? teamView.AllyTeamFlag : teamView.EnemyTeamFlag;
+				player.BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), flag.FlagEntity);
+				
+			}
 		}
 		public TeamColor TeamColor { get; set; }
 		public int Amount { get; set; }

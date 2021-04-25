@@ -12,7 +12,6 @@ using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
-using TXServer.ECSSystem.Events.User.Friend;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -123,6 +122,10 @@ namespace TXServer.Core.Commands
 				        if (!playerConditions.HasFlag(ChatCommandConditions.HackBattle))
 					        return ConditionErrors[condition];
 				        break;
+			        case "target":
+				        message = "Valid arguments for 'target' in HackBattle arguments: 'username', 'all', " +
+				                  "'blue'/'red' (only in team battles)";
+				        return message;
 			        case "test":
 				        condition = ChatCommandConditions.Tester;
 				        if (!player.Data.Beta)
@@ -147,7 +150,7 @@ namespace TXServer.Core.Commands
 		        return "Parsing error, '/cheat' needs at least the desired cheat as argument";
 	        
 	        string targetName = args.Length > 1 ? args[1] : player.Data.Username;
-	        List<BattlePlayer> targets = FindTargets(targetName, player.BattlePlayer.Battle);
+	        List<BattlePlayer> targets = FindTargets(targetName, player);
 	        if (!targets.Any())
 		        return $"Error, the user '{targetName}' wasn't found in this battle";
 	        
@@ -201,7 +204,7 @@ namespace TXServer.Core.Commands
 				return $"Parsing error, didn't find flag with the color '{args[0]}'";
 			
 			Battle battle = player.BattlePlayer.Battle;
-			var modeHandler = (CTFHandler)battle.ModeHandler;
+			CTFHandler modeHandler = (CTFHandler)battle.ModeHandler;
 			BattleView teamView = modeHandler.BattleViewFor(player.BattlePlayer);
 			Flag flag = args[0].ToUpper() == "BLUE" ? teamView.AllyTeamFlag : teamView.EnemyTeamFlag;
 			Entity enemyTeamOfFlag = args[0].ToUpper() == "BLUE" ? teamView.EnemyTeamEntity : teamView.AllyTeamEntity;
@@ -209,13 +212,27 @@ namespace TXServer.Core.Commands
 			switch (args[1])
 			{
 				case "deliver":
+					Flag oppositeFlag = args[0].ToUpper() == "BLUE"
+						? teamView.EnemyTeamFlag
+						: teamView.AllyTeamFlag;
+					
+					switch (oppositeFlag.State)
+					{
+						case FlagState.Captured:
+							oppositeFlag.Drop(false);
+							oppositeFlag.Return();
+							break;
+						case FlagState.Dropped:
+							oppositeFlag.Return();
+							break;
+					}
 					switch (flag.State)
 					{
 						case FlagState.Captured:
 							string carrierUid = flag.Carrier.Player.Data.Username;
 							flag.Deliver();
 							battle.UpdateScore(enemyTeamOfFlag);
-							return $"{carrierUid} delivered the {args[0].ToLower()} flag";
+							return $"'{carrierUid}' delivered the {args[0].ToLower()} flag";
 						case FlagState.Dropped:
 							flag.Return(silent:true);
 							break;
@@ -247,7 +264,7 @@ namespace TXServer.Core.Commands
 				case "give":
 					string targetName;
 					targetName = args.Length < 3 ? player.Data.Username : args[2];
-					List<BattlePlayer> targets = FindTargets(targetName, battle);
+					List<BattlePlayer> targets = FindTargets(targetName, player);
 					if (targets.Count != 1)
 						return $"Error, the user '{targetName}' wasn't found in this battle";
 					if (targets[0].Team == flag.Team)
@@ -329,7 +346,7 @@ namespace TXServer.Core.Commands
 				if (unusedGolds.Count() < amount)
 					return $"Weather error, not enough goldboxes available: {unusedGolds.Count()}";
 				Random random = new();
-				unusedGolds = unusedGolds.OrderBy(x => random.Next()).Take(amount);
+				unusedGolds = unusedGolds.OrderBy(_ => random.Next()).Take(amount);
 			}
 
 			foreach (BattleBonus goldBonus in unusedGolds)
@@ -362,20 +379,6 @@ namespace TXServer.Core.Commands
 
 	        handler.HackBattle = !handler.HackBattle;
 	        return handler.HackBattle ? "HackBattle was enabled" : "HackBattle was disabled";
-        }
-
-        private static string KillPlayer(Player player, string[] args)
-        {
-	        string targetName = args.Length < 1 ? player.Data.Username : args[0];
-	        
-	        List<BattlePlayer> targets = FindTargets(targetName, player.BattlePlayer.Battle);
-	        if (!targets.Any()) return $"Error, the user '{targetName}' wasn't found in this battle";
-	        foreach (BattlePlayer target in targets)
-		        target.MatchPlayer.SelfDestructionTime = DateTime.Now.AddSeconds(0);
-
-	        return targets.Count > 1
-		        ? $"{targets.Count} players have been killed"
-		        : $"'{targets[0].Player.Data.Username}' has been killed'";
         }
 
         private static string Kickback(Player player, string[] args)
@@ -413,7 +416,7 @@ namespace TXServer.Core.Commands
 			        break;
 	        }
 	        
-	        List<BattlePlayer> targets = FindTargets(targetName, battle);
+	        List<BattlePlayer> targets = FindTargets(targetName, player);
 	        if (!targets.Any()) return $"Error, the user '{targetName}' wasn't found in this battle";
 	        foreach (BattlePlayer target in targets)
 	        {
@@ -431,8 +434,25 @@ namespace TXServer.Core.Commands
 		        target.MatchPlayer.Weapon.ChangeComponent<KickbackComponent>(component =>
 			        component.KickbackForce = (float) kickback);
 	        }
+
+	        string kickbackWritten = kickback == null ? "back to normal" : $"to {kickback}";
+	        return targets.Count > 1 
+		        ? $"Set turret kickback for multiple players {kickbackWritten}" 
+		        : $"Set '{targets[0]}'s turret kickback {kickbackWritten}";
+        }
+        
+        private static string KillPlayer(Player player, string[] args)
+        {
+	        string targetName = args.Length < 1 ? player.Data.Username : args[0];
 	        
-	        return "Set";
+	        List<BattlePlayer> targets = FindTargets(targetName, player);
+	        if (!targets.Any()) return $"Error, the user '{targetName}' wasn't found in this battle";
+	        foreach (BattlePlayer target in targets)
+		        target.MatchPlayer.SelfDestructionTime = DateTime.Now.AddSeconds(0);
+
+	        return targets.Count > 1
+		        ? $"{targets.Count} players have been killed"
+		        : $"'{targets[0].Player.Data.Username}' has been killed'";
         }
         
         private static string Open(Player player, string[] args)
@@ -497,7 +517,7 @@ namespace TXServer.Core.Commands
 					       "as first argument";
 			}
 
-			List<BattlePlayer> targets = FindTargets(targetName, battle);
+			List<BattlePlayer> targets = FindTargets(targetName, player);
 			if (!targets.Any()) return $"Error, the user '{targetName}' wasn't found in this battle";
 			foreach (BattlePlayer target in targets)
 			{
@@ -651,13 +671,20 @@ namespace TXServer.Core.Commands
 				}, target.Value);
 			}
 		}
-		private static List<BattlePlayer> FindTargets(string targetName, Battle battle)
+		private static List<BattlePlayer> FindTargets(string targetName, Player player)
 		{
+			Battle battle = player.BattlePlayer.Battle;
 			List<BattlePlayer> targets = new();
 			switch (targetName)
 			{
 				case "all":
 					return battle.MatchPlayers;
+				case "blue" or "red":
+					if (player.BattlePlayer.Battle.Params.BattleMode != BattleMode.CTF) return targets;
+					CTFHandler modeHandler = (CTFHandler)battle.ModeHandler;
+					BattleView teamView = modeHandler.BattleViewFor(player.BattlePlayer);
+					targets.AddRange(targetName.ToUpper() == "BLUE" ? teamView.AllyTeamPlayers : teamView.EnemyTeamPlayers);
+					break;
 				default:
 					Player target = battle.FindPlayerByUid(targetName);
 					if (target != null)

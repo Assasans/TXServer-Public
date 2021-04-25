@@ -4,17 +4,15 @@ using TXServer.ECSSystem.EntityTemplates.Item.Module;
 
 namespace TXServer.Core.Battles.Module {
 	public class RepairKitModule : BattleModule {
-		public RepairKitModule(MatchPlayer player, Entity garageModule) : base(
-			player,
-			ModuleUserItemTemplate.CreateEntity(garageModule, player.Player.BattlePlayer)
+		public RepairKitModule(MatchPlayer matchPlayer, Entity garageModule) : base(
+			matchPlayer,
+			ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
 		) { }
 
 		public override void Activate() {
-			_ = new SupplyEffect(BonusType.REPAIR, Player, cheat: false);
+			_ = new SupplyEffect(BonusType.REPAIR, MatchPlayer);
 		}
 
-		public override void Deactivate() {
-			Player.SupplyEffects.Find((effect) => effect.BonusType == BonusType.REPAIR)?.Remove();
-		}
+		public override void Deactivate() { }
 	}
 }
