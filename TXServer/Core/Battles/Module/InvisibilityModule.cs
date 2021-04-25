@@ -20,7 +20,7 @@ namespace TXServer.Core.Battles.Module {
 
 			// TODO(Assasans): Doesn't have effect on new joined players
 			foreach(BattlePlayer battlePlayer in MatchPlayer.Battle.MatchPlayers) {
-				battlePlayer.Player.UnshareEntities(EffectEntity);
+				battlePlayer.Player.ShareEntities(EffectEntity);
 			}
 
 			Schedule(TimeSpan.FromMilliseconds(15000), () => {
