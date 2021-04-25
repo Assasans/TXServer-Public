@@ -1,11 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.EntityTemplates.Item.Slot;
 
 namespace TXServer.Core.Battles.Module {
+	public class TickHandler {
+		public TickHandler(DateTimeOffset time, Action action) {
+			Time = time;
+			Action = action;
+		}
+
+		public DateTimeOffset Time { get; }
+		public Action Action { get; }
+	}
+	
 	public abstract class BattleModule {
 		protected BattleModule(MatchPlayer matchPlayer, Entity moduleEntity) {
 			MatchPlayer = matchPlayer;
@@ -13,6 +24,7 @@ namespace TXServer.Core.Battles.Module {
 			SlotEntity = SlotUserItemTemplate.CreateEntity(moduleEntity, matchPlayer.Player.BattlePlayer);
 			ModuleEntity = moduleEntity;
 
+			tickHandlers = new List<TickHandler>();
 			nextTickHandlers = new List<Action>();
 		}
 
@@ -29,6 +41,7 @@ namespace TXServer.Core.Battles.Module {
 
 		public bool IsOnCooldown => ModuleEntity.HasComponent<InventoryCooldownStateComponent>();
 
+		private readonly List<TickHandler> tickHandlers;
 		private readonly List<Action> nextTickHandlers;
 
 		// TODO(Assasans): Cooldown has visual bugs on client
@@ -66,6 +79,24 @@ namespace TXServer.Core.Battles.Module {
 			nextTickHandlers.Add(handler);
 		}
 
+		/// <summary>
+		/// Schedules an action to run at specified time
+		/// </summary>
+		/// <param name="time">Time at which action should run</param>
+		/// <param name="handler">Action to run at specified time</param>
+		protected void Schedule(DateTimeOffset time, Action handler) {
+			tickHandlers.Add(new TickHandler(time, handler));
+		}
+
+		/// <summary>
+		/// Schedules an action to run after specified time
+		/// </summary>
+		/// <param name="timeSpan">TimeSpan after which action should run</param>
+		/// <param name="handler">Action to run at specified time</param>
+		protected void Schedule(TimeSpan timeSpan, Action handler) {
+			Schedule(DateTimeOffset.Now + timeSpan, handler);
+		}
+
 		public void ModuleTick() {
 			if(CooldownStart != null && DateTimeOffset.Now >= CooldownEnd) {
 				if(ModuleEntity.HasComponent<InventoryCooldownStateComponent>()) {
@@ -79,6 +110,12 @@ namespace TXServer.Core.Battles.Module {
 				CooldownStart = null;
 			}
 
+			foreach(TickHandler handler in tickHandlers.Where(handler => DateTimeOffset.Now >= handler.Time).ToArray()) {
+				tickHandlers.Remove(handler);
+
+				handler.Action();
+			}
+			
 			foreach(Action handler in nextTickHandlers.ToArray()) {
 				nextTickHandlers.Remove(handler);
 

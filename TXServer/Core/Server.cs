@@ -25,6 +25,7 @@ namespace TXServer.Core
             ModuleRegistry.Register("garage/module/prebuildmodule/common/active/1/gold", new ModuleTypeInfo(typeof(GoldModule), TimeSpan.FromMilliseconds(500)));
             ModuleRegistry.Register("garage/module/module/weapon/active/2/increaseddamage", new ModuleTypeInfo(typeof(IncreasedDamageModule), TimeSpan.FromMilliseconds(5000)));
             ModuleRegistry.Register("garage/module/module/tank/active/2/jumpimpact", new ModuleTypeInfo(typeof(JumpImpactModule), TimeSpan.FromMilliseconds(25000)));
+            ModuleRegistry.Register("garage/module/module/tank/active/2/invisibility", new ModuleTypeInfo(typeof(InvisibilityModule), TimeSpan.FromMilliseconds(2000)));
             ModuleRegistry.Register("garage/module/module/tank/active/1/repairkit", new ModuleTypeInfo(typeof(RepairKitModule), TimeSpan.FromMilliseconds(1000)));
             ModuleRegistry.Register("garage/module/module/tank/active/1/turbospeed", new ModuleTypeInfo(typeof(TurbospeedModule), TimeSpan.FromMilliseconds(5000)));
         }
