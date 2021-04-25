@@ -438,7 +438,7 @@ namespace TXServer.Core.Commands
 	        string kickbackWritten = kickback == null ? "back to normal" : $"to {kickback}";
 	        return targets.Count > 1 
 		        ? $"Set turret kickback for multiple players {kickbackWritten}" 
-		        : $"Set '{targets[0]}'s turret kickback {kickbackWritten}";
+		        : $"Set '{targets[0].Player.Data.Username}'s turret kickback {kickbackWritten}";
         }
         
         private static string KillPlayer(Player player, string[] args)
