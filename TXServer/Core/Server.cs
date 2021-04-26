@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using TXServer.Core.Battles;
+using TXServer.Core.Battles.Effect;
 using TXServer.Core.Battles.Module;
 using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;

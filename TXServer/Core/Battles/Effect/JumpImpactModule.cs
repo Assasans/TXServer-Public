@@ -1,6 +1,6 @@
 ﻿using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
-using TXServer.ECSSystem.EntityTemplates.Battle.Module;
 
 namespace TXServer.Core.Battles.Module {
 	public class JumpImpactModule : BattleModule {

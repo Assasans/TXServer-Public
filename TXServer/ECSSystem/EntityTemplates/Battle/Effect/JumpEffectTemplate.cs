@@ -1,14 +1,11 @@
-﻿using System.Linq;
-
-using TXServer.Core.Battles;
+﻿using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.Components.Battle.Tank;
 
-namespace TXServer.ECSSystem.EntityTemplates.Battle.Module {
+namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect {
 	[SerialVersionUID(1538451741218L)]
 	public class JumpEffectTemplate : IEntityTemplate {
 		public static Entity CreateEntity(MatchPlayer matchPlayer) {

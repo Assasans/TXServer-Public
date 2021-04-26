@@ -16,6 +16,8 @@ namespace TXServer.Core.Battles
         public SupplyEffect(BonusType bonusType, MatchPlayer matchPlayer, bool cheat = false, long duration = 30)
         {
             if (matchPlayer.TankState != TankState.Active) return;
+            if (duration == 30 && bonusType == BonusType.REPAIR)
+                duration = 3;
 
             BonusType = bonusType;
             MatchPlayer = matchPlayer;
