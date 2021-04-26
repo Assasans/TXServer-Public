@@ -11,8 +11,11 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
         public static Entity CreateEntity(Entity tank, BattlePlayer battlePlayer)
         {
             Entity entity = CreateEntity(new RicochetBattleItemTemplate(), "battle/weapon/ricochet", tank, battlePlayer);
-            entity.Components.Add(new WeaponBulletShotComponent(0.8f, 110f));
             entity.Components.Add(new RicochetComponent());
+            
+            entity.Components.Add(battlePlayer.BulletSpeed == null
+                ? new WeaponBulletShotComponent(0.5f, 110f)
+                : new WeaponBulletShotComponent(0.5f, (float) battlePlayer.BulletSpeed));
 
             return entity;
         }

@@ -11,8 +11,11 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
         public static Entity CreateEntity(Entity tank, BattlePlayer battlePlayer)
         {
             Entity entity = CreateEntity(new TwinsBattleItemTemplate(), "battle/weapon/twins", tank, battlePlayer);
-            entity.Components.Add(new WeaponBulletShotComponent(0.5f, 150f));
             entity.Components.Add(new TwinsComponent());
+            
+            entity.Components.Add(battlePlayer.BulletSpeed == null
+                ? new WeaponBulletShotComponent(0.5f, 150f)
+                : new WeaponBulletShotComponent(0.5f, (float) battlePlayer.BulletSpeed));
 
             return entity;
         }

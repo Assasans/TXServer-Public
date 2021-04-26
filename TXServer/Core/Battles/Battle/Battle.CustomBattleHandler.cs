@@ -23,6 +23,7 @@ namespace TXServer.Core.Battles
 
             public bool IsOpen { get; private set; }
             public bool HackBattle { get; set; }
+            public bool HackBattleDemocracy { get; set; } = true;
 
             public void OpenBattle()
             {

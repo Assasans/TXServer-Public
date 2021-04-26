@@ -33,8 +33,10 @@ namespace TXServer.Core.Battles
         public bool WaitingForExit { get; set; }
         public bool Rejoin { get; set; }
         
+        public float? BulletSpeed { get; set; }
         public float? TurretKickback { get; set; }
         public float? TurretRotationSpeed { get; set; }
         public float? TurretUnloadEnergyPerShot { get; set; }
+        public bool IsCheatImmune { get; set; }
     }
 }

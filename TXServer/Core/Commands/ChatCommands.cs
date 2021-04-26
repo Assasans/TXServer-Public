@@ -33,16 +33,18 @@ namespace TXServer.Core.Commands
 			{ "stats", (null, ChatCommandConditions.Tester, Stats) },
 			{ "spawnInfo", (null, ChatCommandConditions.Tester | ChatCommandConditions.InMatch, SpawnInfo) },
 
-			{ "hackBattle", (null, ChatCommandConditions.BattleOwner, HackBattle) },
+			{ "hackBattle", ("hackBattle [everyone/onlyme]", ChatCommandConditions.BattleOwner, HackBattle) },
+			{ "bulletSpeed", ("bulletSpeed [max/stuck/norm/number] [target]", ChatCommandConditions.HackBattle, BulletSpeed) },
 			{ "cheat", ("cheat [supply] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.ActiveTank, Cheat) },
 			{ "flag", ("flag [color] [deliver/drop/return/give] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, FlagAction) },
 			{ "goldrain", ("goldrain [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, GoldboxRain) },
 			{ "gravity", ("gravity [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.BattleOwner, Gravity) },
-			{ "kickback", ("kickback [number]", ChatCommandConditions.HackBattle, Kickback) },
+			{ "immune", (null, ChatCommandConditions.InBattle | ChatCommandConditions.Admin, Immune) },
+			{ "kickback", ("kickback [number] [target]", ChatCommandConditions.HackBattle, Kickback) },
 			{ "kill", ("kill [target]", ChatCommandConditions.InMatch | ChatCommandConditions.Admin, KillPlayer) },
 			{ "supplyrain", ("supplyrain", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, SupplyRain) },
 			{ "turretReload", ("turretReload [instant/never] [target]", ChatCommandConditions.HackBattle, ReloadTime) },
-			{ "turretRotation", ("turretRotation [number]", ChatCommandConditions.HackBattle, TurretRotation) }
+			{ "turretRotation", ("turretRotation [instant/stuck/number]", ChatCommandConditions.HackBattle, TurretRotation) }
 		};
 
 		private static readonly Dictionary<ChatCommandConditions, string> ConditionErrors = new()
@@ -51,7 +53,7 @@ namespace TXServer.Core.Commands
 			{ ChatCommandConditions.Tester, "You are not a tester" },
 			{ ChatCommandConditions.InBattle, "You are not in battle" },
 			{ ChatCommandConditions.BattleOwner, "You do not own this battle" },
-			{ ChatCommandConditions.HackBattle, "HackBattle is not enabled in this battle" },
+			{ ChatCommandConditions.HackBattle, "HackBattle is not enabled or you don't have permission to it" },
 			{ ChatCommandConditions.InMatch, "You are not in match" },
 			{ ChatCommandConditions.ActiveTank, "Your tank is not active" },
 		};
@@ -124,7 +126,7 @@ namespace TXServer.Core.Commands
 				        break;
 			        case "target":
 				        message = "Valid arguments for 'target' in HackBattle arguments: 'username', 'all', " +
-				                  "'blue'/'red' (only in team battles)";
+				                  "'blue'/'red' (only in team battles), 'others'";
 				        return message;
 			        case "test":
 				        condition = ChatCommandConditions.Tester;
@@ -142,7 +144,70 @@ namespace TXServer.Core.Commands
 	        }
 	        return message;
         }
-        
+
+
+        private static string BulletSpeed(Player player, string[] args)
+        {
+	        float? bulletSpeed;
+	        string targetName;
+	        Battle battle = player.BattlePlayer.Battle;
+	        
+	        switch (args.Length)
+	        {
+		        case < 1:
+				        return "Parsing error, '/bulletSpeed' needs 'max/stuck/norm' or numbers as argument";
+		        case < 2:
+			        targetName = player.Data.Username;
+			        break;
+		        default:
+			        targetName = args[1];
+			        break;
+	        }
+	        switch (args[0])
+	        {
+		        case "norm":
+			        bulletSpeed = null;
+			        break;
+		        case "max":
+			        bulletSpeed = 1000;
+			        break;
+		        case "stuck":
+			        bulletSpeed = 0;
+			        break;
+		        default:
+			        bool successfullyParsed = float.TryParse(args[0], out float floatyKickback);
+			        if (!successfullyParsed)
+				        return "Parsing error, '/bulletSpeed' only allows 'max/stuck/norm' or numbers as argument";
+			        if (floatyKickback < 0 || floatyKickback > 1000)
+				        return "Command error, '/bulletSpeed' is limited to a range from 0 to 1000";
+			        bulletSpeed = floatyKickback;
+			        break;
+	        }
+	        
+	        List<BattlePlayer> targets = FindTargets(targetName, player);
+	        if (!targets.Any()) return $"Error, the target '{targetName}' wasn't found in this battle";
+	        foreach (BattlePlayer target in targets)
+	        {
+		        target.BulletSpeed = bulletSpeed;
+		        
+		        if (!target.Player.IsInMatch) continue;
+		        if (bulletSpeed == null)
+		        {
+			        battle.KeepRunning = true;
+			        target.Rejoin = true;
+			        target.Player.SendEvent(new KickFromBattleEvent(), target.MatchPlayer.BattleUser);
+			        continue;
+		        }
+		        
+		        target.MatchPlayer.Weapon.ChangeComponent<WeaponBulletShotComponent>(component =>
+			        component.BulletSpeed = (float) bulletSpeed);
+	        }
+
+	        string bulletSpeedWritten = bulletSpeed == null ? "back to normal" : $"to {bulletSpeed}";
+	        return targets.Count > 1 
+		        ? $"Set the bullet speed for multiple players {bulletSpeedWritten}" 
+		        : $"Set '{targets[0].Player.Data.Username}'s bullet speed {bulletSpeedWritten}";
+        }
         
         private static string Cheat(Player player, string[] args)
         {
@@ -152,7 +217,7 @@ namespace TXServer.Core.Commands
 	        string targetName = args.Length > 1 ? args[1] : player.Data.Username;
 	        List<BattlePlayer> targets = FindTargets(targetName, player);
 	        if (!targets.Any())
-		        return $"Error, the user '{targetName}' wasn't found in this battle";
+		        return $"Error, the target '{targetName}' wasn't found in this battle";
 	        
 	        switch (args[0].ToUpper())
 	        {
@@ -166,11 +231,15 @@ namespace TXServer.Core.Commands
 			        foreach (BattlePlayer target in targets)
 			        foreach (BonusType bonusCheat in cheats)
 				        _ = new SupplyEffect(bonusCheat, target.MatchPlayer, true);
-
-			        string cheat = char.ToUpper(bonusType.ToString().First()) + bonusType.ToString().Substring(1).ToLower();
-			        return targets.Count > 1
-				        ? $"{cheat} cheat has been activated for multiple people"
-				        : $"{cheat} cheat has been activated for '{targets[0].Player.Data.Username}'";
+			        
+			        string cheatWritten = cheats.Count == 1
+				        ? char.ToUpper(bonusType.ToString().First()) + bonusType.ToString().Substring(1).ToLower() +
+				          " cheat"
+				        : "Multiple cheats";
+			        string hasHaveWritten = cheats.Count == 1 ? "has" : "have";
+			        return targets.Count <= 1
+				        ? $"{cheatWritten} {hasHaveWritten} been activated for '{targets[0].Player.Data.Username}'"
+				        : $"{cheatWritten} {hasHaveWritten} been activated for multiple people";
 		        case "DISABLE":
 			        int amount = 0;
 			        foreach (SupplyEffect supplyEffect in targets.SelectMany(target => 
@@ -180,9 +249,10 @@ namespace TXServer.Core.Commands
 				        supplyEffect.Remove();
 			        }
 			        string cheatString = amount == 1 ? "cheat" : "cheats";
+			        string hasHaveString = amount == 1 ? "has" : "have";
 			        return targets.Count > 1
-				        ? $"{amount} {cheatString} has been deactivated for multiple people"
-				        : $"{amount} {cheatString} has been deactivated for '{targets[0].Player.Data.Username}'";
+				        ? $"{amount} {cheatString} {hasHaveString} deactivated for multiple people"
+				        : $"{amount} {cheatString} {hasHaveString} been deactivated for '{targets[0].Player.Data.Username}'";
 		        default:
 			        return "Parsing error, valid cheats are only: 'armor', 'damage', 'repair', & 'speed'";
 	        }
@@ -265,8 +335,10 @@ namespace TXServer.Core.Commands
 					string targetName;
 					targetName = args.Length < 3 ? player.Data.Username : args[2];
 					List<BattlePlayer> targets = FindTargets(targetName, player);
-					if (targets.Count != 1)
-						return $"Error, the user '{targetName}' wasn't found in this battle";
+					if (targets.Count == 0)
+						return $"Error, the target '{targetName}' wasn't found in this battle";
+					if (targets.Count > 1)
+						return $"Logical error, found {targets.Count} targets but expected one";
 					if (targets[0].Team == flag.Team)
 						return $"Logical error, {targetName} can't capture the flag of this team";
 					if (flag.Carrier == player.BattlePlayer)
@@ -366,19 +438,50 @@ namespace TXServer.Core.Commands
 		        return "HackBattle cannot be enabled in matchmaking battles";
 
 	        CustomBattleHandler handler = (CustomBattleHandler) player.BattlePlayer.Battle.TypeHandler;
-	        string notification = handler.HackBattle ? "HackBattle was disabled" 
-		        : "This is now a \"HackBattle\"! The owner can cheat & change a lot of things. Note: this is very experimental.";
-
+	        string permissionInfo = "";
+	        
+	        if (args.Length == 1)
+	        {
+		        switch (args[0])
+		        {
+			        case "everyone":
+				        handler.HackBattleDemocracy = true;
+				        permissionInfo = " for everyone to use";
+				        break;
+			        case "onlyme":
+				        handler.HackBattleDemocracy = false;
+				        permissionInfo = " for only you to use";
+				        break;
+			        default:
+				        return "";
+		        }
+		        if (handler.HackBattle) 
+			        return "Changed HackBattle's permissions";
+		        handler.HackBattle = true;
+	        }
+	        else 
+		        handler.HackBattle = !handler.HackBattle;
+	        
 	        Dictionary<List<BattlePlayer>, Entity> targets = new()
 	        {
 		        { player.BattlePlayer.Battle.AllBattlePlayers.ToList(), player.BattlePlayer.Battle.BattleLobbyChatEntity }
 	        };
 	        if (player.BattlePlayer.Battle.MatchPlayers.Any())
 		        targets.Add(player.BattlePlayer.Battle.MatchPlayers, player.BattlePlayer.Battle.GeneralBattleChatEntity);
+	        string notification = handler.HackBattle
+		        ? "This is now a \"HackBattle\"! The owner can cheat & change a lot of things. Note: this is very experimental."
+		        : "HackBattle was disabled";
 	        MessageOtherPlayers(notification, player, targets);
+	        
+	        return handler.HackBattle ? $"HackBattle was enabled{permissionInfo}" : $"HackBattle was disabled{permissionInfo}";
+        }
 
-	        handler.HackBattle = !handler.HackBattle;
-	        return handler.HackBattle ? "HackBattle was enabled" : "HackBattle was disabled";
+        private static string Immune(Player player, string[] args)
+        {
+	        player.BattlePlayer.IsCheatImmune = !player.BattlePlayer.IsCheatImmune;
+	        return player.BattlePlayer.IsCheatImmune
+		        ? "You are now immune to cheats from other players"
+		        : "You can again get affected by other players' cheats";
         }
 
         private static string Kickback(Player player, string[] args)
@@ -646,7 +749,12 @@ namespace TXServer.Core.Commands
 
 				if (player.IsBattleOwner || player.Data.Admin)
 					conditions |= ChatCommandConditions.BattleOwner;
-				if (player.BattlePlayer.Battle.TypeHandler is CustomBattleHandler {HackBattle: true} || player.Data.Admin)
+				if (player.BattlePlayer.Battle.TypeHandler is CustomBattleHandler handler)
+				{
+					if (handler.HackBattle && player.IsBattleOwner || handler.HackBattle && handler.HackBattleDemocracy)
+						conditions |= ChatCommandConditions.HackBattle;
+				}
+				if (player.Data.Admin)
 					conditions |= ChatCommandConditions.HackBattle;
 
 				if (player.IsInMatch)
@@ -678,20 +786,36 @@ namespace TXServer.Core.Commands
 			switch (targetName)
 			{
 				case "all":
-					return battle.MatchPlayers;
+					targets.AddRange(battle.MatchPlayers);
+					break;
 				case "blue" or "red":
 					if (player.BattlePlayer.Battle.Params.BattleMode != BattleMode.CTF) return targets;
 					CTFHandler modeHandler = (CTFHandler)battle.ModeHandler;
 					BattleView teamView = modeHandler.BattleViewFor(player.BattlePlayer);
 					targets.AddRange(targetName.ToUpper() == "BLUE" ? teamView.AllyTeamPlayers : teamView.EnemyTeamPlayers);
 					break;
+				case "others":
+					targets.AddRange(battle.MatchPlayers.Where(p => p.Player != player));
+					break;
 				default:
 					Player target = battle.FindPlayerByUid(targetName);
-					if (target != null)
+					if (target != null && !target.BattlePlayer.IsCheatImmune || target == player)
 						targets.Add(target.BattlePlayer);
 					break;
 			}
-			return targets;
+			
+			return FilterImmunePlayers(targets, player);
+		}
+		
+		/// <summary>
+		/// Filters out cheat immune players
+		/// </summary>
+		/// <param name="potentialPlayers">All potential players for the cheat, including the immune</param>
+		/// <param name="player">Cheat caller (can apply a cheat on himself, no matter if immune)</param>
+		private static List<BattlePlayer> FilterImmunePlayers(List<BattlePlayer> potentialPlayers, Player player)
+		{
+			potentialPlayers = potentialPlayers.Where(t => !t.IsCheatImmune || t.Player == player).ToList();
+			return potentialPlayers;
 		}
 	}
 }
