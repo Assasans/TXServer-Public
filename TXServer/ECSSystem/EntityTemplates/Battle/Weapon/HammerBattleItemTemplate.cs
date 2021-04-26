@@ -11,7 +11,9 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
         public static Entity CreateEntity(Entity tank, BattlePlayer battlePlayer)
         {
             Entity entity = CreateEntity(new HammerBattleItemTemplate(), "battle/weapon/hammer", tank, battlePlayer);
-            entity.Components.Add(new HammerPelletConeComponent(1f, 1f, 1));
+            entity.Components.Add(new HammerPelletConeComponent(15f, 15f, 9));
+            entity.Components.Add(new MagazineStorageComponent(1));
+            entity.Components.Add(new MagazineWeaponComponent(1, 1f));
             entity.Components.Add(new HammerComponent());
             return entity;
         }
