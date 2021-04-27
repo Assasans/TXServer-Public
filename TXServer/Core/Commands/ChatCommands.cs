@@ -185,7 +185,17 @@ namespace TXServer.Core.Commands
 	        }
 	        
 	        List<BattlePlayer> targets = FindTargets(targetName, player);
-	        if (!targets.Any()) return $"Error, the target '{targetName}' wasn't found in this battle";
+	        if (!targets.Any()) 
+		        return $"Error, the target '{targetName}' wasn't found in this battle";
+	        if (targets.Count == 1 &&
+	            targets[0].MatchPlayer.Weapon.TemplateAccessor.Template is not RicochetBattleItemTemplate or
+		            TwinsBattleItemTemplate)
+	        {
+		        targets[0].BulletSpeed = bulletSpeed;
+		        return $"Error, '{targets[0].Player.Data.Username}' isn't equipped with Ricochet or Twins. Cheat gets applied as soon the target equips a bullet shooting turret";
+	        }
+
+	        bool targetWithoutBulletTurret = false;
 	        foreach (BattlePlayer target in targets)
 	        {
 		        target.BulletSpeed = bulletSpeed;
@@ -198,15 +208,24 @@ namespace TXServer.Core.Commands
 			        target.Player.SendEvent(new KickFromBattleEvent(), target.MatchPlayer.BattleUser);
 			        continue;
 		        }
-		        
-		        target.MatchPlayer.Weapon.ChangeComponent<WeaponBulletShotComponent>(component =>
-			        component.BulletSpeed = (float) bulletSpeed);
+
+		        if (target.MatchPlayer.Weapon.TemplateAccessor.Template is RicochetBattleItemTemplate or
+			        TwinsBattleItemTemplate)
+		        {
+			        target.MatchPlayer.Weapon.ChangeComponent<WeaponBulletShotComponent>(component =>
+				        component.BulletSpeed = (float) bulletSpeed);
+		        }
+		        else
+			        targetWithoutBulletTurret = true;
 	        }
 
-	        string bulletSpeedWritten = bulletSpeed == null ? "back to normal" : $"to {bulletSpeed}";
-	        return targets.Count > 1 
-		        ? $"Set the bullet speed for multiple players {bulletSpeedWritten}" 
+	        string bulletSpeedWritten = bulletSpeed == null ? "back to normal" : $"to {bulletSpeed}"; 
+	        string message = targets.Count > 1 
+		        ? $"Set the bullet speed for {targets.Count} players {bulletSpeedWritten}" 
 		        : $"Set '{targets[0].Player.Data.Username}'s bullet speed {bulletSpeedWritten}";
+	        return targetWithoutBulletTurret 
+		        ? message + ". Warning: At least one target isn't equipped with a bullet shooting turret (Ricochet/Twins)"
+		        : message;
         }
         
         private static string Cheat(Player player, string[] args)
@@ -804,18 +823,8 @@ namespace TXServer.Core.Commands
 					break;
 			}
 			
-			return FilterImmunePlayers(targets, player);
-		}
-		
-		/// <summary>
-		/// Filters out cheat immune players
-		/// </summary>
-		/// <param name="potentialPlayers">All potential players for the cheat, including the immune</param>
-		/// <param name="player">Cheat caller (can apply a cheat on himself, no matter if immune)</param>
-		private static List<BattlePlayer> FilterImmunePlayers(List<BattlePlayer> potentialPlayers, Player player)
-		{
-			potentialPlayers = potentialPlayers.Where(t => !t.IsCheatImmune || t.Player == player).ToList();
-			return potentialPlayers;
+			targets = targets.Where(t => !t.IsCheatImmune || t.Player == player).ToList();
+			return targets;
 		}
 	}
 }
