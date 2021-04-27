@@ -188,11 +188,12 @@ namespace TXServer.Core.Commands
 	        if (!targets.Any()) 
 		        return $"Error, the target '{targetName}' wasn't found in this battle";
 	        if (targets.Count == 1 &&
-	            targets[0].MatchPlayer.Weapon.TemplateAccessor.Template is not RicochetBattleItemTemplate or
+	            targets[0].MatchPlayer.Weapon.TemplateAccessor.Template is not RicochetBattleItemTemplate and not
 		            TwinsBattleItemTemplate)
 	        {
 		        targets[0].BulletSpeed = bulletSpeed;
-		        return $"Error, '{targets[0].Player.Data.Username}' isn't equipped with Ricochet or Twins. Cheat gets applied as soon the target equips a bullet shooting turret";
+		        return $"Error, '{targets[0].Player.Data.Username}' isn't equipped with Ricochet or Twins. " +
+		               "Cheat gets applied as soon the target equips a bullet shooting turret";
 	        }
 
 	        bool targetWithoutBulletTurret = false;
