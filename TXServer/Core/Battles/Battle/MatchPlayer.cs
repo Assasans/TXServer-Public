@@ -222,6 +222,14 @@ namespace TXServer.Core.Battles
             {
                 module.ModuleTick();
             }
+
+            if (Paused && DateTime.UtcNow > IdleKickTime)
+            {
+                Paused = false;
+                IdleKickTime = null;
+                Player.SendEvent(new KickFromBattleEvent(), BattleUser);
+                Player.BattlePlayer.WaitingForExit = true;
+            }
         }
 
         public readonly Battle Battle;
@@ -298,7 +306,9 @@ namespace TXServer.Core.Battles
         public Vector3 TankPosition { get; set; }
         public Vector3 PrevTankPosition { get; set; }
 
-        public bool Paused { get; set; } = false;
+        public bool Paused { get; set; }
+        public DateTime? IdleKickTime { get; set; }
+        
         public List<SupplyEffect> SupplyEffects { get; } = new();
         public Dictionary<MatchPlayer, int> DamageAssisters { get; set; } = new();
         public int AlreadyAddedExperience { get; set; } = 0;

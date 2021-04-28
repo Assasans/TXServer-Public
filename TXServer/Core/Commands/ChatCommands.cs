@@ -44,7 +44,7 @@ namespace TXServer.Core.Commands
 			{ "kill", ("kill [target]", ChatCommandConditions.InMatch | ChatCommandConditions.Admin, KillPlayer) },
 			{ "supplyrain", ("supplyrain", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, SupplyRain) },
 			{ "turretReload", ("turretReload [instant/never] [target]", ChatCommandConditions.HackBattle, ReloadTime) },
-			{ "turretRotation", ("turretRotation [instant/stuck/number]", ChatCommandConditions.HackBattle, TurretRotation) }
+			{ "turretRotation", ("turretRotation [instant/stuck/norm/number]", ChatCommandConditions.HackBattle, TurretRotation) }
 		};
 
 		private static readonly Dictionary<ChatCommandConditions, string> ConditionErrors = new()
@@ -724,7 +724,7 @@ namespace TXServer.Core.Commands
 		
 		private static string TurretRotation(Player player, string[] args)
 		{
-			string notification = "Changed turret rotation ";
+			string notification = "Changed turret rotation speed";
 			float? rotationSpeed;
 
 			if (args.Length == 0)
@@ -734,22 +734,38 @@ namespace TXServer.Core.Commands
 			}
 			else
 			{
-				bool successfullyParsed = float.TryParse(args[0], out float temp);
-				
-				if (!successfullyParsed)
-					return "Parsing error, '/turretRotation' only allows numbers or nothing as argument";
-				if (temp > 1000 || temp < 0)
-					return "Out of range, '/turretRotation' only allows range from 0 to 1000";
-				
-				rotationSpeed = temp;
-				notification += $"to {rotationSpeed}";
+				switch (args[0])
+				{
+					case "instant":
+						rotationSpeed = 1000;
+						notification += "to instant";
+						break;
+					case "norm":
+						rotationSpeed = null;
+						notification += "to normal";
+						break;
+					case "stuck":
+						rotationSpeed = 0;
+						notification += "to be stuck";
+						break;
+					default:
+						bool successfullyParsed = float.TryParse(args[0], out float temp);
+						if (!successfullyParsed)
+							return "Parsing error, '/turretRotation' only allows 'instant/norm/stuck' or a number as argument";
+						if (temp is > 1000 or < 0)
+							return "Out of range, '/turretRotation' only allows a range from 0 to 1000";
+						rotationSpeed = temp;
+						notification += $"to {rotationSpeed}";
+						break;
+				}
 			}
+			
+			player.BattlePlayer.TurretRotationSpeed = rotationSpeed;
 			
 			player.BattlePlayer.Battle.KeepRunning = true;
 			player.BattlePlayer.Rejoin = true;
 			player.BattlePlayer.Player.SendEvent(new KickFromBattleEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
-
-			player.BattlePlayer.TurretRotationSpeed = rotationSpeed;
+			
 			return notification;
 		}
 

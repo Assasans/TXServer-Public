@@ -1,4 +1,5 @@
-﻿using TXServer.Core;
+﻿using System;
+using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
@@ -10,12 +11,14 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			//TODO: pause counter + kick user after given time
-			if (!player.BattlePlayer.MatchPlayer.Paused)
-				entity.AddComponent(new PauseComponent());
-			else
-				entity.RemoveComponent<PauseComponent>();
-			player.BattlePlayer.MatchPlayer.Paused = !player.BattlePlayer.MatchPlayer.Paused;
+			if (player.BattlePlayer.MatchPlayer.Paused) return;
+			
+			player.BattlePlayer.MatchPlayer.Paused = true;
+			player.BattlePlayer.MatchPlayer.IdleKickTime = DateTime.UtcNow.AddMinutes(2);
+			
+			player.BattlePlayer.MatchPlayer.BattleUser.AddComponent(new PauseComponent());
+			player.BattlePlayer.MatchPlayer.BattleUser.AddComponent(new IdleCounterComponent(0));
+			player.SendEvent(new IdleBeginTimeSyncEvent(DateTime.Now), player.BattlePlayer.MatchPlayer.BattleUser);
 		}
 	}
 }

@@ -10,11 +10,13 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			// double check needed
-			if (player.BattlePlayer.MatchPlayer.Paused)
-				entity.RemoveComponent<PauseComponent>();
+			if (!player.BattlePlayer.MatchPlayer.Paused) return;
 			
 			player.BattlePlayer.MatchPlayer.Paused = false;
+			player.BattlePlayer.MatchPlayer.IdleKickTime = null;
+			
+			entity.RemoveComponent<PauseComponent>();
+			entity.RemoveComponent<IdleCounterComponent>();
 		}
 	}
 }
