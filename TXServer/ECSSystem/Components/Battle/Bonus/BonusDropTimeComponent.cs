@@ -7,11 +7,11 @@ namespace TXServer.ECSSystem.Components.Battle.Bonus
     [SerialVersionUID(-7944772313373733709)]
     public class BonusDropTimeComponent : Component
     {
-        public BonusDropTimeComponent(DateTimeOffset dropTime)
+        public BonusDropTimeComponent(DateTime dropTime)
         {
-            DropTime = dropTime.ToUnixTimeMilliseconds();
+            DropTime = dropTime;
         }
 
-        public long DropTime { get; set; }
+        public DateTime DropTime { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Bonus
         {
             Entity entity = new Entity(new TemplateAccessor(new SupplyBonusTemplate(), "battle/bonus/" + bonusType.ToString().ToLower()),
                 new BonusComponent(),
-                new BonusDropTimeComponent(new DateTimeOffset(DateTime.Now)),
+                new BonusDropTimeComponent(DateTime.UtcNow),
                 new PositionComponent(position),
                 new RotationComponent(new Vector3(0, 0, 0)),
                 new BonusRegionGroupComponent(bonusRegion),

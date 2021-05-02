@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Battle
@@ -23,7 +23,8 @@ namespace TXServer.ECSSystem.Events.Battle
 			{
 				BattlePlayer victim = battle.MatchPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
 
-				if (victim.Player.User.GetComponent<TeamColorComponent>().TeamColor == player.User.GetComponent<TeamColorComponent>().TeamColor && !battle.Params.FriendlyFire)
+				if (player.BattlePlayer.Battle.Params.BattleMode != BattleMode.DM &&
+				    victim.Team == player.BattlePlayer.Team && !battle.Params.FriendlyFire)
 					return;
 
 				Damage.DealDamage(victim.MatchPlayer, player.BattlePlayer.MatchPlayer, hitTarget, 900);
@@ -33,12 +34,10 @@ namespace TXServer.ECSSystem.Events.Battle
 			{
 				BattlePlayer hitPlayer = battle.MatchPlayers.Single(p => p.MatchPlayer.Incarnation == splashTarget.IncarnationEntity);
 
-				if (hitPlayer.Player.User.GetComponent<TeamColorComponent>().TeamColor == player.User.GetComponent<TeamColorComponent>().TeamColor)
-                {
-					if (hitPlayer.Player != player && !battle.Params.FriendlyFire)
-						return;
-				}
-					
+				if (player.BattlePlayer.Battle.Params.BattleMode != BattleMode.DM &&
+				    hitPlayer.Team == player.BattlePlayer.Team && hitPlayer != player.BattlePlayer &&
+				    !battle.Params.FriendlyFire)
+					return;
 
 				Damage.DealDamage(hitPlayer.MatchPlayer, player.BattlePlayer.MatchPlayer, splashTarget, 500);
 			}

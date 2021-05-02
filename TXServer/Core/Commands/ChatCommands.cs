@@ -188,7 +188,7 @@ namespace TXServer.Core.Commands
 	        if (!targets.Any()) 
 		        return $"Error, the target '{targetName}' wasn't found in this battle";
 	        if (targets.Count == 1 &&
-	            targets[0].MatchPlayer.Weapon.TemplateAccessor.Template is not RicochetBattleItemTemplate and not
+	            targets[0].MatchPlayer?.Weapon.TemplateAccessor.Template is not RicochetBattleItemTemplate and not
 		            TwinsBattleItemTemplate)
 	        {
 		        targets[0].BulletSpeed = bulletSpeed;
@@ -210,7 +210,7 @@ namespace TXServer.Core.Commands
 			        continue;
 		        }
 
-		        if (target.MatchPlayer.Weapon.TemplateAccessor.Template is RicochetBattleItemTemplate or
+		        if (target.MatchPlayer?.Weapon.TemplateAccessor.Template is RicochetBattleItemTemplate or
 			        TwinsBattleItemTemplate)
 		        {
 			        target.MatchPlayer.Weapon.ChangeComponent<WeaponBulletShotComponent>(component =>
