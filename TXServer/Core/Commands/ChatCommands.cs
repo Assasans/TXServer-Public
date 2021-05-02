@@ -9,6 +9,7 @@ using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates.Battle;
+using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
@@ -44,7 +45,8 @@ namespace TXServer.Core.Commands
 			{ "kill", ("kill [target]", ChatCommandConditions.InMatch | ChatCommandConditions.Admin, KillPlayer) },
 			{ "supplyrain", ("supplyrain", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, SupplyRain) },
 			{ "turretReload", ("turretReload [instant/never] [target]", ChatCommandConditions.HackBattle, ReloadTime) },
-			{ "turretRotation", ("turretRotation [instant/stuck/norm/number]", ChatCommandConditions.HackBattle, TurretRotation) }
+			{ "turretRotation", ("turretRotation [instant/stuck/norm/number]", ChatCommandConditions.HackBattle, TurretRotation) },
+			{ "jump", ("jump [multiplier]", ChatCommandConditions.InMatch | ChatCommandConditions.HackBattle, Jump) }
 		};
 
 		private static readonly Dictionary<ChatCommandConditions, string> ConditionErrors = new()
@@ -767,6 +769,39 @@ namespace TXServer.Core.Commands
 			player.BattlePlayer.Player.SendEvent(new KickFromBattleEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
 			
 			return notification;
+		}
+		
+		private static string Jump(Player player, string[] args)
+		{
+			MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
+			
+			float multiplier;
+			if (args.Length == 0)
+			{
+				multiplier = 15.0f;
+			}
+			else
+			{
+				bool successfullyParsed = float.TryParse(args[0], out multiplier);
+				if (!successfullyParsed)
+					return "Parsing error, '/jump' only allows numbers or nothing as argument";
+				if (multiplier is > 200 or < -200)
+					return "Out of range, '/jump' only allows a range from -200 to 200";
+			}
+			
+			Entity effect = JumpEffectTemplate.CreateEntity(matchPlayer, multiplier);
+
+			foreach(BattlePlayer battlePlayer in matchPlayer.Battle.MatchPlayers) {
+				battlePlayer.Player.ShareEntities(effect);
+			}
+
+			matchPlayer.Battle.Schedule(() => {
+				foreach(BattlePlayer battlePlayer in matchPlayer.Battle.MatchPlayers) {
+					battlePlayer.Player.UnshareEntities(effect);
+				}
+			});
+
+			return $"Jumped successfully (multiplier: {multiplier})";
 		}
 
 

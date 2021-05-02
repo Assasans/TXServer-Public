@@ -38,6 +38,9 @@ namespace TXServer.Core.Battles
             CreateBattle();
             BattleLobbyChatEntity = BattleLobbyChatTemplate.CreateEntity();
             GeneralBattleChatEntity = GeneralBattleChatTemplate.CreateEntity();
+
+            tickHandlers = new List<TickHandler>();
+            nextTickHandlers = new List<Action>();
         }
         
         public void CreateBattle()
@@ -412,6 +415,18 @@ namespace TXServer.Core.Battles
 
                 ProcessMatchPlayers();
                 ProcessBonuses(deltaTime);
+                
+                foreach(TickHandler handler in tickHandlers.Where(handler => DateTimeOffset.Now >= handler.Time).ToArray()) {
+                    tickHandlers.Remove(handler);
+
+                    handler.Action();
+                }
+			
+                foreach(Action handler in nextTickHandlers.ToArray()) {
+                    nextTickHandlers.Remove(handler);
+
+                    handler();
+                }
             }
         }
 
@@ -540,6 +555,36 @@ namespace TXServer.Core.Battles
                 _BattleState = value;
             }
         }
+        
+        /// <summary>
+        /// Schedules an action to run at next battle tick
+        /// </summary>
+        /// <param name="handler">Action to run at next battle tick</param>
+        public void Schedule(Action handler) {
+            nextTickHandlers.Add(handler);
+        }
+
+        /// <summary>
+        /// Schedules an action to run at specified time
+        /// </summary>
+        /// <param name="time">Time at which action should run</param>
+        /// <param name="handler">Action to run at specified time</param>
+        public void Schedule(DateTimeOffset time, Action handler) {
+            tickHandlers.Add(new TickHandler(time, handler));
+        }
+
+        /// <summary>
+        /// Schedules an action to run after specified time
+        /// </summary>
+        /// <param name="timeSpan">TimeSpan after which action should run</param>
+        /// <param name="handler">Action to run at specified time</param>
+        public void Schedule(TimeSpan timeSpan, Action handler) {
+            Schedule(DateTimeOffset.Now + timeSpan, handler);
+        }
+        
+        private readonly List<TickHandler> tickHandlers;
+        private readonly List<Action> nextTickHandlers;
+        
         private BattleState _BattleState;
         public bool KeepRunning { get; set; }
 
