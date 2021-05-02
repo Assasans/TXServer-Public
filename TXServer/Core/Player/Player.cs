@@ -21,10 +21,19 @@ using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.Core
 {
+	public class MockedPlayer : Player {
+		public MockedPlayer(Server server) : base(server, null) {
+			Connection = new MockedPlayerConnection(this);
+			Connection.StartPlayerThreads();
+		}
+		
+		public override string ToString() => $"MOCKED{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : "")})" : "")}";
+	}  
+	
     /// <summary>
     /// Player connection.
     /// </summary>
-    public sealed class Player : IDisposable
+    public class Player : IDisposable
     {
 		public bool IsLoggedIn => User != null;
 		public bool IsInBattle => BattlePlayer != null;
@@ -47,15 +56,17 @@ namespace TXServer.Core
 		public string UniqueId => Data?.UniqueId;
 
 		public Server Server { get; }
-		public PlayerConnection Connection { get; }
+		public PlayerConnection Connection { get; set; }
 		public PlayerData Data { get; set; }
 		public Player(Server server, Socket socket)
         {
             Server = server;
-            Connection = new PlayerConnection(this, socket);
-			Connection.StartPlayerThreads();
+            if(socket != null) {
+	            Connection = new PlayerConnection(this, socket);
+	            Connection.StartPlayerThreads();
+            }
 
-			Logger.Log($"{this} has connected.");
+            Logger.Log($"{this} has connected.");
 		}
 
         public void Dispose()

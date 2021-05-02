@@ -18,6 +18,93 @@ using TXServer.Library;
 
 namespace TXServer.Core
 {
+    public class MockedPlayerConnection : PlayerConnection {
+        public MockedPlayerConnection(Player player) : base(player, null)
+        {
+        }
+        
+        public override void StartPlayerThreads()
+        {
+            new Thread(ServerSideEvents)
+            {
+                Name = "ServerSide #MOCKED"
+            }.Start();
+
+            new Thread(ClientSideEvents)
+            {
+                Name = "ClientSide #MOCKED"
+            }.Start();
+        }
+        
+        public override void Dispose()
+        {
+            if (!TryDeactivate()) return;
+
+            QueuedCommands.CompleteAdding();
+
+            Interlocked.Decrement(ref Server.Instance.Connection.PlayerCount);
+        }
+        
+        public override void ServerSideEvents()
+        {
+            try
+            {
+                PlayerData data = Player.Server.Database.FetchPlayerData("Bot_test");
+                Player.Data = data;
+                
+                Player.ClientSession = new(new TemplateAccessor(new ClientSessionTemplate(), null),
+                    new ClientSessionComponent(),
+                    new SessionSecurityPublicComponent());
+
+                SendCommands(new InitTimeCommand());
+                Player.ShareEntity(Player.ClientSession);
+                
+                Player.LogIn(Player.ClientSession);
+
+                while (IsActive)
+                {
+                    ICommand command;
+                    try
+                    {
+                        command = QueuedCommands.Take();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        return;
+                    }
+
+                    int count = QueuedCommands.Count + 1;
+                    ICommand[] commands = new ICommand[count];
+
+                    commands[0] = command;
+                    for (int i = 1; i < count; i++)
+                        commands[i] = QueuedCommands.Take();
+
+                    if (!IsActive) return;
+                    SendCommands(commands);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"{Player}: {e}");
+                Player.Dispose();
+                Player.User?.TryRemoveComponent<UserOnlineComponent>();
+            }
+        }
+        
+        protected override void ReceiveAndExecuteCommands(PlayerConnection connection)
+        {
+        }
+        
+        protected override void SendCommands(params ICommand[] commands)
+        {
+#if DEBUG
+            LastServerPacket = commands;
+            Logger.Trace($"Sent to {Player}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}");
+#endif
+        }
+    }
+        
     public class PlayerConnection : IDisposable
     {
         public bool IsActive => Convert.ToBoolean(_Active);
@@ -41,13 +128,13 @@ namespace TXServer.Core
 
         public PlayerConnection(Player player, Socket socket)
         {
-            Socket = socket ?? throw new ArgumentNullException(nameof(Socket));
+            Socket = socket /* ?? throw new ArgumentNullException(nameof(Socket)) */;
             Player = player;
 
             Interlocked.Increment(ref Server.Instance.Connection.PlayerCount);
         }
 
-        public void StartPlayerThreads()
+        public virtual void StartPlayerThreads()
         {
             new Thread(ServerSideEvents)
             {
@@ -60,7 +147,7 @@ namespace TXServer.Core
             }.Start();
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (!TryDeactivate()) return;
 
@@ -79,7 +166,7 @@ namespace TXServer.Core
         /// <summary>
         /// Handle server -> client events.
         /// </summary>
-        public void ServerSideEvents()
+        public virtual void ServerSideEvents()
         {
             try
             {
@@ -157,7 +244,7 @@ namespace TXServer.Core
         /// <summary>
         /// Receive data from client.
         /// </summary>
-        private void ReceiveAndExecuteCommands(PlayerConnection connection)
+        protected virtual void ReceiveAndExecuteCommands(PlayerConnection connection)
         {
             using NetworkStream stream = new(connection.Socket);
             using BinaryReader reader = new BigEndianBinaryReader(stream);
@@ -186,7 +273,7 @@ namespace TXServer.Core
         /// <summary>
         /// Send commands to client.
         /// </summary>
-        private void SendCommands(params ICommand[] commands)
+        protected virtual void SendCommands(params ICommand[] commands)
         {
 #if DEBUG
             LastServerPacket = commands;

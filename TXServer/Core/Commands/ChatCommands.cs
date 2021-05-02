@@ -7,6 +7,7 @@ using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
+using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
@@ -46,7 +47,9 @@ namespace TXServer.Core.Commands
 			{ "supplyrain", ("supplyrain", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, SupplyRain) },
 			{ "turretReload", ("turretReload [instant/never] [target]", ChatCommandConditions.HackBattle, ReloadTime) },
 			{ "turretRotation", ("turretRotation [instant/stuck/norm/number]", ChatCommandConditions.HackBattle, TurretRotation) },
-			{ "jump", ("jump [multiplier]", ChatCommandConditions.InMatch | ChatCommandConditions.HackBattle, Jump) }
+			{ "jump", ("jump [multiplier]", ChatCommandConditions.InMatch | ChatCommandConditions.HackBattle, Jump) },
+			
+			{ "ba", (null, ChatCommandConditions.InMatch, BadApple) }
 		};
 
 		private static readonly Dictionary<ChatCommandConditions, string> ConditionErrors = new()
@@ -802,6 +805,43 @@ namespace TXServer.Core.Commands
 			});
 
 			return $"Jumped successfully (multiplier: {multiplier})";
+		}
+		
+		private static string BadApple(Player player, string[] args)
+		{
+			// MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
+
+			MockedPlayer mockedPlayer = new MockedPlayer(player.Server);
+
+			while(mockedPlayer.User == null) {
+				System.Threading.Thread.Sleep(100);
+			}
+			
+			// BattlePlayer battlePlayer = new BattlePlayer(player.BattlePlayer.Battle, mockedPlayer, player.BattlePlayer.Team, false);
+			player.BattlePlayer.Battle.AddPlayer(mockedPlayer, false);
+			
+			mockedPlayer.BattlePlayer.Rejoin = true;
+			
+			while(mockedPlayer.BattlePlayer.MatchPlayer == null) {
+				System.Threading.Thread.Sleep(100);
+			}
+			
+			MatchPlayer matchPlayer = mockedPlayer.BattlePlayer.MatchPlayer;
+			
+			matchPlayer.EnableTank();
+			
+			player.SendEvent(new MoveCommandServerEvent() {
+				MoveCommand = new MoveCommand() {
+					Movement = new Movement(new Vector3(10, 10, 10), new Vector3(10, 10, 10), new Vector3(10, 10, 10), new Quaternion(10, 10, 10, 10)),
+					WeaponRotation = 10,
+					TankControlHorizontal = 10,
+					TankControlVertical = 10,
+					WeaponRotationControl = 10,
+					ClientTime = 10
+				}
+			});
+
+			return $"Started";
 		}
 
 
