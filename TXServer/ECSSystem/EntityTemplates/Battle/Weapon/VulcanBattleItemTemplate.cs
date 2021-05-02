@@ -8,7 +8,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(-3936735916503799349L)]
     public class VulcanBattleItemTemplate : DiscreteWeaponTemplate
     {
-        public static Entity CreateEntity(Entity tank, BattlePlayer battlePlayer)
+        public static Entity CreateEntity(Entity tank, BattleTankPlayer battlePlayer)
         {
             Entity entity = CreateEntity(new VulcanBattleItemTemplate(), "battle/weapon/vulcan", tank, battlePlayer);
             entity.Components.Add(new VulcanWeaponComponent(1, 1, 1, 1, 1, 1, 1));

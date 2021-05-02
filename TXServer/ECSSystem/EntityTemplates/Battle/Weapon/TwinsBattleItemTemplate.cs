@@ -8,7 +8,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(583528765588657091L)]
 	public class TwinsBattleItemTemplate : DiscreteWeaponTemplate
 	{
-        public static Entity CreateEntity(Entity tank, BattlePlayer battlePlayer)
+        public static Entity CreateEntity(Entity tank, BattleTankPlayer battlePlayer)
         {
             Entity entity = CreateEntity(new TwinsBattleItemTemplate(), "battle/weapon/twins", tank, battlePlayer);
             entity.Components.Add(new TwinsComponent());

@@ -1,7 +1,6 @@
 ﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
 
 namespace TXServer.ECSSystem.Events.Battle
 {
@@ -10,7 +9,10 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity battleUser)
         {
-			player.BattlePlayer.WaitingForExit = true;
+			if (player.BattlePlayer != null)
+				player.BattlePlayer.WaitingForExit = true;
+			else
+				player.Spectator.WaitingForExit = true;
         }
 	}
 }

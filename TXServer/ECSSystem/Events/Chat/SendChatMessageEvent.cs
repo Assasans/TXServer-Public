@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
+using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
@@ -15,7 +13,7 @@ using TXServer.ECSSystem.Types.Punishments;
 
 namespace TXServer.ECSSystem.Events.Chat
 {
-    [SerialVersionUID(1446035600297L)]
+	[SerialVersionUID(1446035600297L)]
 	public class SendChatMessageEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity chat)
@@ -86,13 +84,13 @@ namespace TXServer.ECSSystem.Events.Chat
 					player.SquadPlayer.Squad.Participants.Select(p => p.Player).SendEvent(evt, chat);
 					break;
 				case BattleLobbyChatTemplate _:
-					battle?.AllBattlePlayers.Concat(battle.Spectators).Select(p => p.Player).SendEvent(evt, chat);
+					battle?.JoinedTankPlayers.Select(x => x.Player).SendEvent(evt, chat);
 					break;
 				case GeneralBattleChatTemplate _:
-					battle?.MatchPlayers.Concat(battle.Spectators).Select(p => p.Player).SendEvent(evt, chat);
+					battle?.PlayersInMap.Select(x => x.Player).SendEvent(evt, chat);
 					break;
 				case TeamBattleChatTemplate _:
-					battle?.MatchPlayers.Where(x => x.Team == player.BattlePlayer.Team).Select(p => p.Player).SendEvent(evt, chat);
+					battle?.MatchTankPlayers.Where(x => x.Team == player.BattlePlayer.Team).Select(p => p.Player).SendEvent(evt, chat);
 					break;
 			}
 		}

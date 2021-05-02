@@ -13,8 +13,8 @@ namespace TXServer.Core.Battles
         public Entity AllyTeamEntity { get; init; }
         public Entity EnemyTeamEntity { get; init; }
 
-        public List<BattlePlayer> AllyTeamPlayers { get; init; }
-        public List<BattlePlayer> EnemyTeamPlayers { get; init; }
+        public List<BattleTankPlayer> AllyTeamPlayers { get; init; }
+        public List<BattleTankPlayer> EnemyTeamPlayers { get; init; }
 
         public IEnumerable<UserResult> AllyTeamResults { get; init; }
         public IEnumerable<UserResult> EnemyTeamResults { get; init; }

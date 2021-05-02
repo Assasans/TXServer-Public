@@ -1,10 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
-using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Data.Database.Impl;
-using TXServer.Core.Commands;
-using System.Collections.Generic;
 
 namespace TXServerConsole
 {
@@ -22,9 +20,11 @@ namespace TXServerConsole
 
         static void Help()
         {
-            Console.WriteLine("-r, --run\t\tip, port, maxPlayers\tStart server.\n" +
-                "-t, --enable-tracing\t\t\t\tEnable packet tracing (works only in debug builds).\n" +
-                "-h, --help\t\t\t\t\tDisplay this help.");
+            Console.WriteLine("-r,  --run                ip, port, maxPlayers Start server.\n" +
+                              "-np, --disable-ping                            Disable sending of ping messages.\n" +
+                              "-t,  --enable-tracing                          Enable packet tracing (works only in debug builds).\n" +
+                              "-st, --enable-stack-trace                      Enable outputting command stack trace of commands (works only with packet tracing enabled).\n" +
+                              "-h,  --help                                    Display this help.");
         }
 
         static void Main(string[] args)
@@ -66,10 +66,20 @@ namespace TXServerConsole
                             settings.Port = Int16.Parse(pair.Value[1]);
                             settings.MaxPlayers = Int32.Parse(pair.Value[2]);
                             break;
+                        case "np":
+                        case "-disable-ping":
+                            if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
+                            settings.DisablePingMessages = true;
+                            break;
                         case "t":
                         case "-enable-tracing":
                             if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
                             settings.TraceModeEnabled = true;
+                            break;
+                        case "st":
+                        case "-enable-stack-trace":
+                            if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
+                            settings.CommandStackTraceEnabled = true;
                             break;
                         case "h":
                         case "-help":

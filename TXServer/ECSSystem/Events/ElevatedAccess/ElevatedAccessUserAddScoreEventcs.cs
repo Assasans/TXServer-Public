@@ -4,7 +4,7 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Events.ElevatedAccess
 {
-	[SerialVersionUID(1514369648926L)]
+    [SerialVersionUID(1514369648926L)]
 	public class ElevatedAccessUserAddScoreEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity entity)

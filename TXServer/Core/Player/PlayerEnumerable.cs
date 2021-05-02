@@ -1,10 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TXServer.ECSSystem.Base;
 
 namespace TXServer.Core
 {
     public static class PlayerEnumerable
     {
+		public static void SharePlayers(this IEnumerable<Player> players, params Player[] toShare) => SharePlayers(players, (IEnumerable<Player>)toShare);
+		public static void SharePlayers(this IEnumerable<Player> players, IEnumerable<Player> toShare)
+		{
+			foreach (Player player in players)
+				player.SharePlayers(toShare);
+		}
+
+		public static void UnsharePlayers(this IEnumerable<Player> players, params Player[] toShare) => UnsharePlayers(players, (IEnumerable<Player>)toShare);
+		public static void UnsharePlayers(this IEnumerable<Player> players, IEnumerable<Player> toShare)
+		{
+			foreach (Player player in players)
+				player.UnsharePlayers(toShare);
+		}
+
+		[Obsolete("Use ShareEntities instead.")]
 		public static void ShareEntity(this IEnumerable<Player> players, Entity entity)
 		{
 			foreach (Player player in players)
@@ -18,6 +34,7 @@ namespace TXServer.Core
 				player.ShareEntities(entities);
 		}
 
+		[Obsolete("Use UnshareEntities instead.")]
 		public static void UnshareEntity(this IEnumerable<Player> players, Entity entity)
 		{
 			foreach (Player player in players)

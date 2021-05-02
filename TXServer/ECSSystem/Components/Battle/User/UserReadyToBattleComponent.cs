@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Components.Battle
     {
 		public void OnAttached(Player player, Entity battleUser)
 		{
-			if (!player.BattlePlayer.IsSpectator)
+			if (player.BattlePlayer != null)
 			    player.BattlePlayer.MatchPlayer.TankState = TankState.Spawn;
 		}
 	}

@@ -84,8 +84,8 @@ namespace TXServer.Core
             try
             {
                 Player.ClientSession = new(new TemplateAccessor(new ClientSessionTemplate(), null),
-                                                    new ClientSessionComponent(),
-                                                    new SessionSecurityPublicComponent());
+                    new ClientSessionComponent(),
+                    new SessionSecurityPublicComponent());
                 if (!((IPEndPoint)Socket.RemoteEndPoint).Address.Equals(IPAddress.Loopback))
                     Player.ClientSession.AddComponent(new InviteComponent(true, null));
 
@@ -178,6 +178,11 @@ namespace TXServer.Core
         public void QueueCommands(params ICommand[] commands)
         {
             if (!IsActive) return;
+
+#if DEBUG
+            if (Server.Instance.Settings.CommandStackTraceEnabled)
+                Logger.Trace($"Queued commands for {Player}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}\n{Environment.StackTrace}");
+#endif
 
             foreach (ICommand command in commands)
                 QueuedCommands.TryAdd(command);

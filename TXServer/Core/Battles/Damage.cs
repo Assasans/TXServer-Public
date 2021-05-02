@@ -32,12 +32,12 @@ namespace TXServer.Core.Battles
                     if (damager.Player != victim.Player)
                     {
                         int killScore = 10;
-                        battle.MatchPlayers.Select(x => x.Player).SendEvent(new KillEvent(damager.Player.CurrentPreset.Weapon, hitTarget.Entity), damager.BattleUser);
+                        battle.PlayersInMap.Select(x => x.Player).SendEvent(new KillEvent(damager.Player.CurrentPreset.Weapon, hitTarget.Entity), damager.BattleUser);
                         damager.Player.SendEvent(new VisualScoreKillEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid, victim.Player.User.GetComponent<UserRankComponent>().Rank, damager.GetScoreWithPremium(killScore)), damager.BattleUser);
                         damager.UpdateStatistics(killScore, additiveKills: 1, 0, 0, null);
                     }
                     else
-                        battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), victim.BattleUser);
+                        battle.PlayersInMap.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), victim.BattleUser);
                     victim.UpdateStatistics(0, 0, 0, 1, damager);
 
                     if (battle.ModeHandler is TDMHandler)
@@ -63,7 +63,7 @@ namespace TXServer.Core.Battles
                 }
 
                 damager.Player.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false, false), victim.Tank);
-                victim.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), victim.Tank);
+                victim.Battle.PlayersInMap.Select(x => x.Player).SendEvent(new HealthChangedEvent(), victim.Tank);
             });
         }
 
@@ -95,8 +95,8 @@ namespace TXServer.Core.Battles
 
             if (healed)
             {
-                target.Player.BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new HealthChangedEvent(), target.Tank);
-                healer.Player.SendEvent(new DamageInfoEvent(900, hitTarget.LocalHitPoint, false, true), target.Tank);
+                target.Player.BattlePlayer.Battle.PlayersInMap.Select(x => x.Player).SendEvent(new HealthChangedEvent(), target.Tank);
+                healer.Battle.Spectators.Select(x => x.Player).Concat(new[] { healer.Player }).SendEvent(new DamageInfoEvent(900, hitTarget.LocalHitPoint, false, true), target.Tank);
                 healer.Player.SendEvent(new VisualScoreHealEvent(healer.GetScoreWithPremium(4)), healer.BattleUser);
                 healer.UpdateStatistics(additiveScore: 4, 0, 0, 0, null);
             }

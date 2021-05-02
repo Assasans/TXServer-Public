@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.ServerMapInformation;
-using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle.Round;
-using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles
@@ -17,12 +13,12 @@ namespace TXServer.Core.Battles
         {
             public Battle Battle { get; init; }
 
-            public IEnumerable<BattlePlayer> Players => _Players;
-            private List<BattlePlayer> _Players = new();
+            public IEnumerable<BattleTankPlayer> Players => _Players;
+            private List<BattleTankPlayer> _Players = new();
 
             public IEnumerable<UserResult> Results => Players.Where(x => x.MatchPlayer != null).Select(x => x.MatchPlayer.UserResult);
-            public int EnemyCountFor(BattlePlayer battlePlayer) => _Players.Count - Convert.ToInt32(_Players.Contains(battlePlayer));
-            public TeamBattleResult TeamBattleResultFor(BattlePlayer battlePlayer) => TeamBattleResult.DRAW;
+            public int EnemyCountFor(BattleTankPlayer battlePlayer) => _Players.Count - Convert.ToInt32(_Players.Contains(battlePlayer));
+            public TeamBattleResult TeamBattleResultFor(BattleTankPlayer battlePlayer) => TeamBattleResult.DRAW;
             public void SortRoundUsers() => ((IBattleModeHandler)this).SortRoundUsers(_Players);
 
             public bool IsEnoughPlayers => _Players.Count > 2;
@@ -41,7 +37,7 @@ namespace TXServer.Core.Battles
 
                 _Players = prevHandler.Players.ToList();
 
-                foreach (BattlePlayer battlePlayer in prevHandler.Players)
+                foreach (BattleTankPlayer battlePlayer in prevHandler.Players)
                 {
                     battlePlayer.Team = null;
                     battlePlayer.Player.User.ChangeComponent(new TeamColorComponent(TeamColor.NONE));
@@ -60,12 +56,10 @@ namespace TXServer.Core.Battles
             {
             }
 
-            public BattlePlayer AddPlayer(Player player, bool isSpectator)
+            public BattleTankPlayer AddPlayer(Player player)
             {
-                BattlePlayer battlePlayer = new(Battle, player, null, isSpectator);
+                BattleTankPlayer battlePlayer = new(Battle, player, null);
                 player.BattlePlayer = battlePlayer;
-
-                if (isSpectator) return battlePlayer;
                 
                 player.User.AddComponent(new TeamColorComponent(TeamColor.NONE));
 
@@ -74,20 +68,19 @@ namespace TXServer.Core.Battles
                 return battlePlayer;
             }
 
-            public void RemovePlayer(BattlePlayer battlePlayer)
+            public void RemovePlayer(BattleTankPlayer battlePlayer)
             {
                 _Players.Remove(battlePlayer);
 
-                if (!battlePlayer.IsSpectator) 
-                    battlePlayer.User.RemoveComponent<TeamColorComponent>();
+                battlePlayer.User.RemoveComponent<TeamColorComponent>();
                 battlePlayer.Player.BattlePlayer = null;
             }
 
-            public void OnMatchJoin(BattlePlayer battlePlayer)
+            public void OnMatchJoin(BaseBattlePlayer battlePlayer)
             {
             }
 
-            public void OnMatchLeave(BattlePlayer battlePlayer)
+            public void OnMatchLeave(BaseBattlePlayer battlePlayer)
             {
             }
         }

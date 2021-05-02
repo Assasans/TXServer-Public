@@ -8,7 +8,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(1430285569243L)]
     public class StreamWeaponTemplate : WeaponTemplate
     {
-        protected static new Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank, BattlePlayer battlePlayer)
+        protected static new Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank, BattleTankPlayer battlePlayer)
         {
             Entity entity = WeaponTemplate.CreateEntity(template, configPath, tank, battlePlayer);
             entity.Components.Add(new StreamWeaponComponent());

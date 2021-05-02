@@ -16,7 +16,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 		public static Player GetPunishedPlayer(Core.Battles.Battle battle, string punishedPlayerUid)
         {
 			string uid = "";
-			foreach (BattlePlayer battleLobbyPlayer in battle.MatchPlayers)
+			foreach (BattleTankPlayer battleLobbyPlayer in battle.PlayersInMap)
 			{
 				try { uid = battleLobbyPlayer.User.GetComponent<UserUidComponent>().Uid; }
 				catch { }

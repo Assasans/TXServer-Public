@@ -8,6 +8,9 @@ namespace TXServer.Core
         public short Port { get; set; }
         public int MaxPlayers { get; set; }
 
+        public bool DisablePingMessages { get; set; }
+
         public bool TraceModeEnabled { get; set; }
+        public bool CommandStackTraceEnabled { get; set; }
     }
 }

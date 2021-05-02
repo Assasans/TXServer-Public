@@ -28,7 +28,7 @@ namespace TXServer.Core.Battles
         {
             State = BonusState.RegionShared;
             BonusRegion = BonusRegionTemplate.CreateEntity(BonusType, Position);
-            Battle.MatchPlayers.Select(x => x.Player).ShareEntity(BonusRegion);
+            Battle.PlayersInMap.Select(x => x.Player).ShareEntity(BonusRegion);
         }
 
         public void CreateBonus(Entity battleEntity)
@@ -37,19 +37,21 @@ namespace TXServer.Core.Battles
                 BonusEntity = SupplyBonusTemplate.CreateEntity(BonusType, BonusRegion, new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity);
             else
                 BonusEntity = GoldBonusWithCrystalsTemplate.CreateEntity(BonusType, BonusRegion, new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity);
-            Battle.MatchPlayers.Select(x => x.Player).ShareEntity(BonusEntity);
+            Battle.PlayersInMap.Select(x => x.Player).ShareEntity(BonusEntity);
             State = BonusState.Spawned;
         }
 
         public void Take(Player player)
         {
-            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new BonusTakenEvent(), BonusEntity);
+            var battlePlayer = player.BattlePlayer;
+
+            Battle.PlayersInMap.Select(x => x.Player).SendEvent(new BonusTakenEvent(), BonusEntity);
             if (BonusType == BonusType.GOLD)
-                Battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
-            Battle.MatchPlayers.Select(x => x.Player).UnshareEntity(BonusEntity);
+                Battle.PlayersInMap.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), battlePlayer.MatchPlayer.BattleUser);
+            Battle.PlayersInMap.Select(x => x.Player).UnshareEntity(BonusEntity);
             
             State = BonusType == BonusType.GOLD ? BonusState.Unused : BonusState.Redrop;
-            player.BattlePlayer.MatchPlayer.UserResult.BonusesTaken += 1;
+            battlePlayer.MatchPlayer.UserResult.BonusesTaken += 1;
             
             switch (BonusType)
             {
@@ -57,7 +59,7 @@ namespace TXServer.Core.Battles
                     player.Data.SetCrystals(player.Data.Crystals + CurrentCrystals);
                     break;
                 default:
-                    _ = new SupplyEffect(BonusType, player.BattlePlayer.MatchPlayer, cheat:false);
+                    _ = new SupplyEffect(BonusType, battlePlayer.MatchPlayer, cheat:false);
                     break;
             }
         }

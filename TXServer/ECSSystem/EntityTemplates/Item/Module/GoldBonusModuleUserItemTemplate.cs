@@ -11,7 +11,7 @@ using TXServer.ECSSystem.Components.Battle.Module;
 namespace TXServer.ECSSystem.EntityTemplates {
 	[SerialVersionUID(1531929899999L)]
 	public class GoldBonusModuleUserItemTemplate : IEntityTemplate {
-		public static Entity CreateEntity(Entity garageModule, BattlePlayer battlePlayer) {
+		public static Entity CreateEntity(Entity garageModule, BattleTankPlayer battlePlayer) {
 			Entity slot = battlePlayer.Player.CurrentPreset.Modules.SingleOrDefault(x => x.Value == garageModule).Key;
 			Component slotUserItemInfoComponent = slot != null
 				? slot.GetComponent<SlotUserItemInfoComponent>()

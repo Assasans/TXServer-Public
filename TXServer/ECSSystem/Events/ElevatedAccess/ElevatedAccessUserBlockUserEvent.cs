@@ -27,7 +27,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 				return;
 			}
 
-			foreach (BattlePlayer battleLobbyPlayer in battle.MatchPlayers)
+			foreach (BattleTankPlayer battleLobbyPlayer in battle.PlayersInMap)
             {
 				string playerLanguage = battleLobbyPlayer.User.GetComponent<UserCountryComponent>().CountryCode;
 				string message = playerLanguage switch

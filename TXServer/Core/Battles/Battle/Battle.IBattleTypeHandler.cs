@@ -9,8 +9,8 @@
             void SetupBattle();
             void Tick();
 
-            void OnPlayerAdded(BattlePlayer battlePlayer);
-            void OnPlayerRemoved(BattlePlayer battlePlayer);
+            void OnPlayerAdded(BattleTankPlayer battlePlayer);
+            void OnPlayerRemoved(BattleTankPlayer battlePlayer);
         }
     }
 }

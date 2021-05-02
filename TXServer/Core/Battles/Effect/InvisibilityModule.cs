@@ -20,14 +20,14 @@ namespace TXServer.Core.Battles.Effect {
 			EffectEntity = InvisibilityEffectTemplate.CreateEntity(MatchPlayer);
 
 			// TODO(Assasans): Doesn't have effect on new joined players
-			MatchPlayer.Battle.MatchPlayers.Select(x => x.Player).ShareEntity(EffectEntity);
+			MatchPlayer.Battle.PlayersInMap.Select(x => x.Player).ShareEntity(EffectEntity);
 
 			Schedule(TimeSpan.FromMilliseconds(15000), Deactivate);
 		}
 
 		public override void Deactivate() {
 			if (EffectEntity != null) {
-				MatchPlayer.Battle.MatchPlayers.Select(x => x.Player).UnshareEntity(EffectEntity);
+				MatchPlayer.Battle.PlayersInMap.Select(x => x.Player).UnshareEntity(EffectEntity);
 
 				EffectEntity = null;
 			}

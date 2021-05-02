@@ -24,8 +24,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 			if (player.BattlePlayer.Battle.Params.BattleMode == BattleMode.CTF)
 			{
 				Flag flag = TeamColor == TeamColor.BLUE ? teamView.AllyTeamFlag : teamView.EnemyTeamFlag;
-				player.BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), flag.FlagEntity);
-				
+				player.BattlePlayer.Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), flag.FlagEntity);
 			}
 		}
 		public TeamColor TeamColor { get; set; }

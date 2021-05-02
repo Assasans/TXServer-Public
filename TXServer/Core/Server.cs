@@ -45,9 +45,7 @@ namespace TXServer.Core
             foreach (Player player in Connection.Pool)
             {
                 if (player.IsLoggedIn && player.User.EntityId == entityId)
-                {
                     return player;
-                }
             }
 
             return null;
@@ -60,14 +58,15 @@ namespace TXServer.Core
             return searchedPlayer;
         }
 
-        public Battle FindBattleById(long lobbyId, long battleId)
+        public Battle FindBattleById(long? lobbyId = null, long? battleId = null)
         {
+            if (lobbyId == null && battleId == null)
+                throw new ArgumentNullException("No valid argument is specified.");
+
             foreach (Battle battle in ServerConnection.BattlePool)
             {
                 if (battle.BattleLobbyEntity.EntityId == lobbyId || battle.BattleEntity.EntityId == battleId)
-                {
                     return battle;
-                }
             }
 
             return null;

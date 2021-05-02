@@ -20,19 +20,11 @@ namespace TXServer.Core.Battles
                 _ => TeamColor.NONE
             };
 
-            public override BattleView BattleViewFor(BattlePlayer battlePlayer)
+            public override BattleView BattleViewFor(BattleTankPlayer battlePlayer)
             {
                 BattleView view = base.BattleViewFor(battlePlayer);
-                if (!battlePlayer.IsSpectator)
-                {
-                    view.AllyTeamFlag = Flags[battlePlayer.Team];
-                    view.EnemyTeamFlag = Flags.First(x => x.Key != battlePlayer.Team).Value;
-                }
-                else
-                {
-                    view.AllyTeamFlag = Flags.Values.ToList()[0];
-                    view.EnemyTeamFlag = Flags.Values.ToList()[1];
-                }
+                view.AllyTeamFlag = Flags[battlePlayer.Team];
+                view.EnemyTeamFlag = Flags.First(x => x.Key != battlePlayer.Team).Value;
                 return view;
             }
 
@@ -50,7 +42,7 @@ namespace TXServer.Core.Battles
             {
                 base.CompleteWarmUp();
 
-                Battle.MatchPlayers.Select(x => x.Player).ShareEntities(Flags.Values.Select(x => x.FlagEntity));
+                Battle.PlayersInMap.Select(x => x.Player).ShareEntities(Flags.Values.Select(x => x.FlagEntity));
                 Battle.IsWarmUpCompleted = true;
             }
 
@@ -76,7 +68,7 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            public override void OnMatchJoin(BattlePlayer battlePlayer)
+            public override void OnMatchJoin(BaseBattlePlayer battlePlayer)
             {
                 base.OnMatchJoin(battlePlayer);
 
@@ -87,7 +79,7 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            public override void OnMatchLeave(BattlePlayer battlePlayer)
+            public override void OnMatchLeave(BaseBattlePlayer battlePlayer)
             {
                 base.OnMatchLeave(battlePlayer);
 

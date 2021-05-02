@@ -15,14 +15,15 @@ namespace TXServer.ECSSystem.Events.Battle
     {
         public void Execute(Player player, Entity weapon) {
             SelfEvent.Execute(this, player, weapon);
+            var battlePlayer = player.BattlePlayer;
 
-            if (player.BattlePlayer.MatchPlayer.TankState == TankState.Dead)
+            if (battlePlayer.MatchPlayer.TankState == TankState.Dead)
                 return;
 
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
             foreach (HitTarget hitTarget in Targets)
             {
-                BattlePlayer victim = battle.MatchPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
+                BattleTankPlayer victim = battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
 
                 if (battle.Params.BattleMode != BattleMode.DM)
                 {
@@ -30,7 +31,7 @@ namespace TXServer.ECSSystem.Events.Battle
                     {
                         if (weapon.TemplateAccessor.Template.GetType() == typeof(IsisBattleItemTemplate))
                         {
-                            Damage.IsisHeal(victim.MatchPlayer, player.BattlePlayer.MatchPlayer, hitTarget);
+                            Damage.IsisHeal(victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget);
                             return;
                         }
                         if (!battle.Params.FriendlyFire)
@@ -48,7 +49,7 @@ namespace TXServer.ECSSystem.Events.Battle
                     };
                 });
 
-                Damage.DealDamage(victim.MatchPlayer, player.BattlePlayer.MatchPlayer, hitTarget, 900);
+                Damage.DealDamage(victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget, 900);
             }
         }
 

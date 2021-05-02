@@ -8,7 +8,7 @@ namespace TXServer.Core.Battles
     {
         public static void FindBattle(Player player)
         {
-            Battle battle = ServerConnection.BattlePool.OrderBy(b => b.AllBattlePlayers).LastOrDefault(IsValidToEnter) ??
+            Battle battle = ServerConnection.BattlePool.OrderBy(b => b.JoinedTankPlayers).LastOrDefault(IsValidToEnter) ??
                             CreateMatchMakingBattle();
 
             battle.AddPlayer(player, false);
@@ -16,7 +16,7 @@ namespace TXServer.Core.Battles
 
         public static void FindSquadBattle(Squad squad)
         {
-            Battle battle = ServerConnection.BattlePool.OrderBy(b => b.AllBattlePlayers).LastOrDefault(b => IsValidForSquad(b, squad)) ??
+            Battle battle = ServerConnection.BattlePool.OrderBy(b => b.JoinedTankPlayers).LastOrDefault(b => IsValidForSquad(b, squad)) ??
                             CreateMatchMakingBattle();
 
             foreach (SquadPlayer participant in squad.Participants)
@@ -34,7 +34,7 @@ namespace TXServer.Core.Battles
         
         private static bool IsValidToEnter(Battle battle)
         {
-            if (!battle.IsMatchMaking || battle.AllBattlePlayers.Count() == battle.Params.MaxPlayers || battle.BattleState == BattleState.Ended)
+            if (!battle.IsMatchMaking || battle.JoinedTankPlayers.Count() == battle.Params.MaxPlayers || battle.BattleState == BattleState.Ended)
                 return false;
 
             if (battle.BattleState == BattleState.Running)

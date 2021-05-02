@@ -15,7 +15,6 @@ using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.GlobalEntities;
-using TXServer.ECSSystem.Types;
 using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 
@@ -27,12 +26,14 @@ namespace TXServer.Core
     public sealed class Player : IDisposable
     {
 		public bool IsLoggedIn => User != null;
-		public bool IsInBattle => BattlePlayer != null;
-		public bool IsInMatch => BattlePlayer?.MatchPlayer != null;
-		public bool IsInSquad => SquadPlayer != null;
 		public bool IsPremium => Data.PremiumExpirationDate > DateTime.UtcNow;
 
-		public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
+		public bool IsInSquad => SquadPlayer != null;
+		public bool IsSquadLeader => IsInSquad && SquadPlayer.IsLeader;
+
+		public bool IsInBattle => BattlePlayer != null;
+		public bool IsBattleOwner => (BattlePlayer?.Battle.TypeHandler as CustomBattleHandler)?.Owner == this;
+		public bool IsInMatch => BattlePlayer?.MatchPlayer != null;		
 
 		//todo add those three in PlayerData
 		public Entity CurrentAvatar { get; set; }
@@ -41,8 +42,13 @@ namespace TXServer.Core
 
 		public Entity ClientSession { get; set; }
 		public Entity User { get; set; }
-		public BattlePlayer BattlePlayer { get; set; }
+		public BattleTankPlayer BattlePlayer { get; set; }
+		public Spectator Spectator { get; set; }
 		public SquadPlayer SquadPlayer { get; set; }
+
+		public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
+		public IReadOnlyCollection<Player> SharedPlayers => (IReadOnlyCollection<Player>)_SharedPlayers.Keys;
+		private readonly ConcurrentDictionary<Player, int> _SharedPlayers = new();
 
 		public string UniqueId => Data?.UniqueId;
 
@@ -69,6 +75,7 @@ namespace TXServer.Core
 				lock (entity.PlayerReferences)
 					entity.PlayerReferences.Remove(this);
             }
+
 			EntityList.Clear();
 
 			Logger.Log($"{this} has disconnected.");
@@ -200,10 +207,12 @@ namespace TXServer.Core
 				1729800, 1767200, 1805000, 1843200, 1881800, 1920800, 1960200, 2000000
 			};
 
+			MatchPlayer matchPlayer = BattlePlayer.MatchPlayer;
+
 			long totalExperience = User.GetComponent<UserExperienceComponent>().Experience;
 			if (IsInMatch)
             {
-				int battleExperience = BattlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
+				int battleExperience = matchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
 				if (IsPremium) 
 					totalExperience += battleExperience * 2;
 				else 
@@ -218,15 +227,15 @@ namespace TXServer.Core
 			ShareEntity(UserRankRewardNotificationTemplate.CreateEntity(100, 5000, correctRank));
 
 			if (!IsInMatch) return;
-			BattlePlayer.Battle.MatchPlayers.Select(x => x.Player).SendEvent(new UpdateRankEvent(), User);
-			int currentScoreInBattle = BattlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
-			Data.SetExperience(Data.Experience + BattlePlayer.MatchPlayer.GetScoreWithPremium(currentScoreInBattle));
-			BattlePlayer.MatchPlayer.AlreadyAddedExperience += currentScoreInBattle;
+			BattlePlayer.Battle.PlayersInMap.Select(x => x.Player).SendEvent(new UpdateRankEvent(), User);
+			int currentScoreInBattle = matchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
+			Data.SetExperience(Data.Experience + matchPlayer.GetScoreWithPremium(currentScoreInBattle));
+			matchPlayer.AlreadyAddedExperience += currentScoreInBattle;
         }
 
 		public bool IsInBattleWith(Player player)
 		{
-			return IsInBattle && BattlePlayer.Battle.AllBattlePlayers.Contains(player.BattlePlayer);
+			return IsInBattle && BattlePlayer.Battle.JoinedTankPlayers.Contains(player.BattlePlayer);
 		}
 
 		public bool IsInSquadWith(Player player)
@@ -234,14 +243,56 @@ namespace TXServer.Core
 			return IsInSquad && SquadPlayer.Squad.Participants.Contains(player.SquadPlayer);
 		}
 
-		public bool IsBattleOwner => (BattlePlayer?.Battle.TypeHandler as CustomBattleHandler)?.Owner == this;
-		public bool IsSquadLeader => IsInSquad && SquadPlayer.IsLeader;
+		/// <summary>
+		/// Shares users of players.
+		/// </summary>
+		/// <param name="players">Players with users to be shared.</param>
+		public void SharePlayers(params Player[] players) => SharePlayers((IEnumerable<Player>)players);
+		/// <summary>
+		/// Shares users of players.
+		/// </summary>
+		/// <param name="players">Players with users to be shared.</param>
+		public void SharePlayers(IEnumerable<Player> players)
+        {
+			foreach (Player player in players)
+			{
+				if (player.User == User)
+					throw new ArgumentException("Self player cannot be shared.");
+
+                if (_SharedPlayers.AddOrUpdate(player, 1, (key, value) => ++value) == 1 && IsActive)
+                    ShareEntity(player.User);
+            }
+        }
+
+		/// <summary>
+		/// Unshares users of players.
+		/// </summary>
+		/// <param name="players">Players with users to be unshared.</param>
+		public void UnsharePlayers(params Player[] players) => UnsharePlayers((IEnumerable<Player>)players);
+		/// <summary>
+		/// Unshares users of players.
+		/// </summary>
+		/// <param name="players">Players with users to be unshared.</param>
+		public void UnsharePlayers(IEnumerable<Player> players)
+        {
+			foreach (Player player in players)
+			{
+				if (player.User == User)
+					throw new ArgumentException("Self player cannot be unshared.");
+
+				if (_SharedPlayers.TryRemove(new KeyValuePair<Player, int>(player, 1)))
+					if (IsActive) UnshareEntity(player.User);
+				else
+					_SharedPlayers.AddOrUpdate(player, player => throw new InvalidOperationException("Player is not shared."), (key, value) => --value);
+			}
+        }
 
         public void SendEvent(ECSEvent @event, params Entity[] entities)
         {
 			Connection.QueueCommands(new SendEventCommand(@event, entities));
         }
 
+		[Obsolete("Use ShareEntities instead.")]
 		public void ShareEntity(Entity entity)
 		{
 			AddEntity(entity);
@@ -255,6 +306,7 @@ namespace TXServer.Core
 				ShareEntity(entity);
         }
 
+		[Obsolete("Use UnshareEntities instead.")]
 		public void UnshareEntity(Entity entity)
 		{
 			RemoveEntity(entity);
@@ -280,7 +332,7 @@ namespace TXServer.Core
 			entity.PlayerReferences.Remove(this);
 		}
 
-		public override string ToString() => $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : "")})" : "")}";
+		public override string ToString() => $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : null)})" : null)}";
 		private EndPoint _EndPoint;
 	}
 }

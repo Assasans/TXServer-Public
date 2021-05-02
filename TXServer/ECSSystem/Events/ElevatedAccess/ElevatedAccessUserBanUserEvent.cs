@@ -12,28 +12,28 @@ using TXServer.ECSSystem.Types.Punishments;
 
 namespace TXServer.ECSSystem.Events.ElevatedAccess
 {
-	[SerialVersionUID(1503470104769L)]
-	public class ElevatedAccessUserBanUserEvent : ElevatedAccessUserBasePunishEvent, ECSEvent
-	{
-		// TODO(Assasans): Difficult to understand, rewrite?
-		public void Execute(Player player, Entity entity)
-		{
-			Core.Battles.Battle battle = GetBattle(player);
-			Player punishedPlayer = GetPunishedPlayer(battle, Uid);
+    [SerialVersionUID(1503470104769L)]
+    public class ElevatedAccessUserBanUserEvent : ElevatedAccessUserBasePunishEvent, ECSEvent
+    {
+        // TODO(Assasans): Difficult to understand, rewrite?
+        public void Execute(Player player, Entity entity)
+        {
+            Core.Battles.Battle battle = GetBattle(player);
+            Player punishedPlayer = GetPunishedPlayer(battle, Uid);
 
-			List<string> availableUnits = new() { "minute", "hour", "day", "warn" };
-			if (!availableUnits.Contains(Regex.Replace(Type, "[0-9]", "").Replace("S", "").ToLower()) && !String.IsNullOrEmpty(Type))
-			{
-				string errorMessage = GetErrorMsg("unknownType", Type, player);
-                SendMessage(player, errorMessage, battle);
-				return;
-			}
-			if (punishedPlayer == null)
+            List<string> availableUnits = new() { "minute", "hour", "day", "warn" };
+            if (!availableUnits.Contains(Regex.Replace(Type, "[0-9]", "").Replace("S", "").ToLower()) && !String.IsNullOrEmpty(Type))
             {
-				string errorMsg = GetErrorMsg("playerNotFound", Uid, player);
-				SendMessage(player, errorMsg, battle);
-				return;
-			}
+                string errorMessage = GetErrorMsg("unknownType", Type, player);
+                SendMessage(player, errorMessage, battle);
+                return;
+            }
+            if (punishedPlayer == null)
+            {
+                string errorMsg = GetErrorMsg("playerNotFound", Uid, player);
+                SendMessage(player, errorMsg, battle);
+                return;
+            }
             if (punishedPlayer.User.GetComponent<UserAdminComponent>() == null)
             {
                 string errorMsg = GetErrorMsg("adminPlayer", Uid, player);
@@ -123,40 +123,41 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
                     _ => $"{Uid} was {punishment}{durationIfNeeded}. Reason: {TranslateReason(Reason, translation.Key)}",
                 };
             }
-            
-            foreach (BattlePlayer battleLobbyPlayer in battle.MatchPlayers)
+
+            foreach (BattleTankPlayer battleLobbyPlayer in battle.PlayersInMap)
             {
                 SendMessage(battleLobbyPlayer.Player, languages[battleLobbyPlayer.User.GetComponent<UserCountryComponent>().CountryCode], battle);
-      }
+            }
 
-      if(Type != "WARN")
-      {
-        int intDuration = Convert.ToInt32(duration);
-        if (intDuration == 0) intDuration = 1;
+            if (Type != "WARN")
+            {
+                int intDuration = Convert.ToInt32(duration);
+                if (intDuration == 0) intDuration = 1;
 
-        ChatMute mute = new ChatMute(punishedPlayer.Data, DateTimeOffset.Now)
-        {
-          Duration = Type != "FOREVER" ? new TimeSpan(
-            Regex.Replace(Type, "[0-9S]", "") == "DAY" ? intDuration : 0,
-            Regex.Replace(Type, "[0-9S]", "") == "HOUR" ? intDuration : 0,
-            Regex.Replace(Type, "[0-9S]", "") == "MINUTE" ? intDuration : 0,
-            Regex.Replace(Type, "[0-9S]", "") == "SECOND" ? intDuration : 0
-          ) : null,
-          Reason = Reason
-        };
+                ChatMute mute = new ChatMute(punishedPlayer.Data, DateTimeOffset.Now)
+                {
+                    Duration = Type != "FOREVER" ? new TimeSpan(
+                    Regex.Replace(Type, "[0-9S]", "") == "DAY" ? intDuration : 0,
+                    Regex.Replace(Type, "[0-9S]", "") == "HOUR" ? intDuration : 0,
+                    Regex.Replace(Type, "[0-9S]", "") == "MINUTE" ? intDuration : 0,
+                    Regex.Replace(Type, "[0-9S]", "") == "SECOND" ? intDuration : 0
+                  ) : null,
+                    Reason = Reason
+                };
 
-        punishedPlayer.Data.Punishments.Add(mute);
-      } else
-      {
-        ChatWarning warn = new ChatWarning(punishedPlayer.Data, DateTimeOffset.Now)
-        {
-          Reason = Reason
-        };
+                punishedPlayer.Data.Punishments.Add(mute);
+            }
+            else
+            {
+                ChatWarning warn = new ChatWarning(punishedPlayer.Data, DateTimeOffset.Now)
+                {
+                    Reason = Reason
+                };
 
-        punishedPlayer.Data.Punishments.Add(warn);
-      }
+                punishedPlayer.Data.Punishments.Add(warn);
+            }
+        }
+
+        public string Type { get; set; }
     }
-
-		public string Type { get; set; }
-	}
 }

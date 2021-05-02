@@ -19,7 +19,7 @@ namespace TXServer.Core.Battles
         {
             public Battle Battle { get; init; }
 
-            private readonly List<BattlePlayer> WaitingToJoinPlayers = new();
+            private readonly List<BattleTankPlayer> WaitingToJoinPlayers = new();
 
             private WarmUpState WarmUpState;
 
@@ -98,7 +98,7 @@ namespace TXServer.Core.Battles
                             case WarmUpState.WarmingUp:
                                 if (Battle.CountdownTimer <= 4)
                                 {
-                                    foreach (BattlePlayer battlePlayer in Battle.MatchPlayers.Where(x => !x.IsSpectator))
+                                    foreach (BattleTankPlayer battlePlayer in Battle.MatchTankPlayers)
                                     {
                                         battlePlayer.MatchPlayer.KeepDisabled = true;
                                         battlePlayer.MatchPlayer.DisableTank();
@@ -111,7 +111,7 @@ namespace TXServer.Core.Battles
                             case WarmUpState.MatchBegins:
                                 if (Battle.CountdownTimer <= 0)
                                 {
-                                    foreach (BattlePlayer battlePlayer in Battle.MatchPlayers)
+                                    foreach (BattleTankPlayer battlePlayer in Battle.MatchTankPlayers)
                                     {
                                         battlePlayer.MatchPlayer.KeepDisabled = false;
                                         battlePlayer.MatchPlayer.TankState = TankState.Spawn;
@@ -156,7 +156,7 @@ namespace TXServer.Core.Battles
                         Battle.RoundEntity.ChangeComponent(StopTimeBeforeDomination);
                         StopTimeBeforeDomination = null;
 
-                        Battle.MatchPlayers.Select(x => x.Player).SendEvent(new RoundBalanceRestoredEvent(), Battle.BattleEntity);
+                        Battle.PlayersInMap.Select(x => x.Player).SendEvent(new RoundBalanceRestoredEvent(), Battle.BattleEntity);
                         Battle.BattleEntity.RemoveComponent<RoundComponent>();
                         Battle.BattleEntity.RemoveComponent<RoundDisbalancedComponent>();
                     }
@@ -170,7 +170,7 @@ namespace TXServer.Core.Battles
                     Battle.FinishBattle();
             }
 
-            public void OnPlayerAdded(BattlePlayer battlePlayer)
+            public void OnPlayerAdded(BattleTankPlayer battlePlayer)
             {
                 battlePlayer.User.AddComponent(new MatchMakingUserComponent());
                 if (Battle.BattleState is BattleState.WarmUp or BattleState.Running && !Battle.ForcePause)
@@ -180,7 +180,7 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            public void OnPlayerRemoved(BattlePlayer battlePlayer)
+            public void OnPlayerRemoved(BattleTankPlayer battlePlayer)
             {
                 WaitingToJoinPlayers.Remove(battlePlayer);
                 battlePlayer.User.RemoveComponent<MatchMakingUserComponent>();

@@ -8,7 +8,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(-8770103861152493981L)]
 	public class ThunderBattleItemTemplate : DiscreteWeaponTemplate
 	{
-        public static Entity CreateEntity(Entity tank, BattlePlayer battlePlayer)
+        public static Entity CreateEntity(Entity tank, BattleTankPlayer battlePlayer)
         {
             Entity entity = CreateEntity(new ThunderBattleItemTemplate(), "battle/weapon/thunder", tank, battlePlayer);
             entity.Components.Add(new SplashImpactComponent(4f));

@@ -44,7 +44,7 @@ namespace TXServer.Core.Battles
                 switch (Battle.BattleState)
                 {
                     case BattleState.Starting:
-                        if (!Battle.AllBattlePlayers.Any())
+                        if (!Battle.JoinedTankPlayers.Any())
                         {
                             Battle.BattleState = BattleState.CustomNotStarted;
                             break;
@@ -58,7 +58,7 @@ namespace TXServer.Core.Battles
                         }
                         break;
                     case BattleState.Running:
-                        if (!Battle.MatchPlayers.Any() && !Battle.KeepRunning)
+                        if (!Battle.MatchTankPlayers.Any() && !Battle.KeepRunning)
                         {
                             Battle.BattleLobbyEntity.RemoveComponent<BattleGroupComponent>();
                             Battle.BattleState = BattleState.CustomNotStarted;
@@ -70,17 +70,17 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            public void OnPlayerAdded(BattlePlayer battlePlayer)
+            public void OnPlayerAdded(BattleTankPlayer battlePlayer)
             {
             }
 
-            public void OnPlayerRemoved(BattlePlayer battlePlayer)
+            public void OnPlayerRemoved(BattleTankPlayer battlePlayer)
             {
                 if (battlePlayer.Player == Owner)
                 {
-                    if (Battle.AllBattlePlayers.Any())
+                    if (Battle.JoinedTankPlayers.Any())
                     {
-                        var allBattlePlayers = Battle.AllBattlePlayers.ToList();
+                        var allBattlePlayers = Battle.JoinedTankPlayers.ToList();
                         _Owner = allBattlePlayers[new Random().Next(allBattlePlayers.Count)].Player;
                         Battle.BattleLobbyEntity.RemoveComponent<UserGroupComponent>();
                         Battle.BattleLobbyEntity.AddComponent(new UserGroupComponent(Owner.User));

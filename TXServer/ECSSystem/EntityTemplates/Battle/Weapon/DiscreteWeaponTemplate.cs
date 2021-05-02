@@ -8,7 +8,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(-1716200834009238305L)]
     public class DiscreteWeaponTemplate : WeaponTemplate
     {
-        protected static new Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank, BattlePlayer battlePlayer)
+        protected static new Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank, BattleTankPlayer battlePlayer)
         {
             Entity entity = WeaponTemplate.CreateEntity(template, configPath, tank, battlePlayer);
             // todo: read from configs

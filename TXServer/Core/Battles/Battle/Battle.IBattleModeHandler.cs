@@ -16,18 +16,18 @@ namespace TXServer.Core.Battles
             void SetupBattle();
             void Tick();
 
-            IEnumerable<BattlePlayer> Players { get; }
+            IEnumerable<BattleTankPlayer> Players { get; }
             bool IsEnoughPlayers { get; }
             TeamColor LosingTeam { get; }
-            int EnemyCountFor(BattlePlayer battlePlayer);
-            TeamBattleResult TeamBattleResultFor(BattlePlayer battlePlayer);
+            int EnemyCountFor(BattleTankPlayer battlePlayer);
+            TeamBattleResult TeamBattleResultFor(BattleTankPlayer battlePlayer);
             void SortRoundUsers();
-            void SortRoundUsers(List<BattlePlayer> list)
+            void SortRoundUsers(List<BattleTankPlayer> list)
             {
                 list.Sort(new ScoreComparer());
 
                 int place = 1;
-                foreach (BattlePlayer battlePlayer in list)
+                foreach (BattleTankPlayer battlePlayer in list)
                 {
                     if (battlePlayer.MatchPlayer == null) continue;
 
@@ -38,7 +38,7 @@ namespace TXServer.Core.Battles
                     {
                         component.Place = place;
                         roundUser.ChangeComponent(component);
-                        Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SetScoreTablePositionEvent(place), roundUser);
+                        Battle.PlayersInMap.Select(x => x.Player).SendEvent(new SetScoreTablePositionEvent(place), roundUser);
                     }
 
                     place++;
@@ -49,10 +49,10 @@ namespace TXServer.Core.Battles
             void CompleteWarmUp();
             void OnFinish();
 
-            BattlePlayer AddPlayer(Player player, bool isSpectator);
-            void RemovePlayer(BattlePlayer battlePlayer);
-            void OnMatchJoin(BattlePlayer battlePlayer);
-            void OnMatchLeave(BattlePlayer battlePlayer);
+            BattleTankPlayer AddPlayer(Player player);
+            void RemovePlayer(BattleTankPlayer battlePlayer);
+            void OnMatchJoin(BaseBattlePlayer battlePlayer);
+            void OnMatchLeave(BaseBattlePlayer battlePlayer);
         }
     }
 }

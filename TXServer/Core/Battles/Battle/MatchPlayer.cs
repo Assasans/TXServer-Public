@@ -22,14 +22,12 @@ namespace TXServer.Core.Battles
 {
     public class MatchPlayer
     {
-        public MatchPlayer(BattlePlayer battlePlayer, Entity battleEntity, IEnumerable<UserResult> userResults)
+        public MatchPlayer(BattleTankPlayer battlePlayer, Entity battleEntity, IEnumerable<UserResult> userResults)
         {
             Battle = battlePlayer.Battle;
             Player = battlePlayer.Player;
 
             BattleUser = BattleUserTemplate.CreateEntity(battlePlayer.Player, battleEntity, battlePlayer.Team);
-
-            if (battlePlayer.IsSpectator) return;
             
             Tank = TankTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullItem, BattleUser);
             Weapon = WeaponTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponItem, Tank, battlePlayer);
@@ -81,7 +79,7 @@ namespace TXServer.Core.Battles
             UserResult.Deaths += additiveDeath;
 
             Damage.ProcessKillStreak(additiveKills, additiveDeath > 0, this, killer);
-            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new RoundUserStatisticsUpdatedEvent(), RoundUser);
+            Battle.PlayersInMap.Select(x => x.Player).SendEvent(new RoundUserStatisticsUpdatedEvent(), RoundUser);
             Battle.SortRoundUsers();
             Player.CheckRankUp();
         }
@@ -150,7 +148,7 @@ namespace TXServer.Core.Battles
                 if (TankState != TankState.Dead)
                 {
                     TankState = TankState.Dead;
-                    Battle.MatchPlayers.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
+                    Battle.PlayersInMap.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
                     UpdateStatistics(-10, -1, 0, 1, null);
 
                     TankPosition = new();
@@ -199,10 +197,10 @@ namespace TXServer.Core.Battles
 
             foreach (KeyValuePair<Type, TranslatedEvent> pair in TranslatedEvents)
             {
-                (from matchPlayer in Battle.MatchPlayers
-                 where matchPlayer.MatchPlayer != this
+                (from matchPlayer in Battle.PlayersInMap
+                 where (matchPlayer as BattleTankPlayer)?.MatchPlayer != this
                  select matchPlayer.Player).SendEvent(pair.Value.Event, pair.Value.TankPart);
-                TranslatedEvents.TryRemove(pair.Key, out _);
+                TranslatedEvents.TryRemove(pair);
             }
 
             // supply effects

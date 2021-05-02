@@ -5,9 +5,9 @@ namespace TXServer.Core.Battles
 {
     public partial class Battle
     {
-        private class ScoreComparer : IComparer<BattlePlayer>
+        private class ScoreComparer : IComparer<BattleTankPlayer>
         {
-            public int Compare(BattlePlayer x, BattlePlayer y)
+            public int Compare(BattleTankPlayer x, BattleTankPlayer y)
             {
                 int xv = x.MatchPlayer?.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses ?? 0;
                 int yv = y.MatchPlayer?.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses ?? 0;

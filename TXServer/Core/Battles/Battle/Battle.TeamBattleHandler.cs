@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.EntityTemplates.Battle;
-using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles
@@ -24,18 +21,18 @@ namespace TXServer.Core.Battles
             public Entity TeamBattleChatEntity { get; private set; }
             public TeamSpawnPointList SpawnPoints { get; private set; }
 
-            public List<BattlePlayer> RedTeamPlayers { get; private set; } = new List<BattlePlayer>();
-            public List<BattlePlayer> BlueTeamPlayers { get; private set; } = new List<BattlePlayer>();
-            public IEnumerable<BattlePlayer> Players => RedTeamPlayers.Concat(BlueTeamPlayers);
+            public List<BattleTankPlayer> RedTeamPlayers { get; private set; } = new List<BattleTankPlayer>();
+            public List<BattleTankPlayer> BlueTeamPlayers { get; private set; } = new List<BattleTankPlayer>();
+            public IEnumerable<BattleTankPlayer> Players => RedTeamPlayers.Concat(BlueTeamPlayers);
 
             public bool IsEnoughPlayers => Players.Any() && RedTeamPlayers.Count == BlueTeamPlayers.Count;
             public abstract TeamColor LosingTeam { get; }
 
-            private static IEnumerable<UserResult> GetTeamResults(List<BattlePlayer> players) => players.Where(x => x.MatchPlayer != null).Select(x => x.MatchPlayer.UserResult);
+            private static IEnumerable<UserResult> GetTeamResults(List<BattleTankPlayer> players) => players.Where(x => x.MatchPlayer != null).Select(x => x.MatchPlayer.UserResult);
             public IEnumerable<UserResult> RedTeamResults => GetTeamResults(RedTeamPlayers);
             public IEnumerable<UserResult> BlueTeamResults => GetTeamResults(BlueTeamPlayers);
 
-            public virtual BattleView BattleViewFor(BattlePlayer battlePlayer)
+            public virtual BattleView BattleViewFor(BattleTankPlayer battlePlayer)
             {
                 bool isRed = battlePlayer.Team == RedTeamEntity;
                 return new BattleView
@@ -55,8 +52,8 @@ namespace TXServer.Core.Battles
                     SpawnPoints = isRed ? SpawnPoints.RedTeam : SpawnPoints.BlueTeam
                 };
             }
-            public int EnemyCountFor(BattlePlayer battlePlayer) => BattleViewFor(battlePlayer).EnemyTeamPlayers.Count;
-            public TeamBattleResult TeamBattleResultFor(BattlePlayer battlePlayer) => (RedTeamEntity.GetComponent<TeamScoreComponent>().Score - BlueTeamEntity.GetComponent<TeamScoreComponent>().Score) switch
+            public int EnemyCountFor(BattleTankPlayer battlePlayer) => BattleViewFor(battlePlayer).EnemyTeamPlayers.Count;
+            public TeamBattleResult TeamBattleResultFor(BattleTankPlayer battlePlayer) => (RedTeamEntity.GetComponent<TeamScoreComponent>().Score - BlueTeamEntity.GetComponent<TeamScoreComponent>().Score) switch
             {
                 > 0 => battlePlayer.Team == RedTeamEntity ? TeamBattleResult.WIN : TeamBattleResult.DEFEAT,
                 < 0 => battlePlayer.Team == BlueTeamEntity ? TeamBattleResult.WIN : TeamBattleResult.DEFEAT,
@@ -65,7 +62,7 @@ namespace TXServer.Core.Battles
 
             public void SortRoundUsers()
             {
-                foreach (List<BattlePlayer> list in new[] { RedTeamPlayers, BlueTeamPlayers })
+                foreach (List<BattleTankPlayer> list in new[] { RedTeamPlayers, BlueTeamPlayers })
                     ((IBattleModeHandler)this).SortRoundUsers(list);
             }
 
@@ -93,15 +90,15 @@ namespace TXServer.Core.Battles
                     RedTeamPlayers = teamBattleHandler.RedTeamPlayers;
                     BlueTeamPlayers = teamBattleHandler.BlueTeamPlayers;
 
-                    foreach (BattlePlayer battlePlayer in Players)
+                    foreach (BattleTankPlayer battlePlayer in Players)
                         battlePlayer.Team = battlePlayer.Team.GetComponent<TeamColorComponent>().TeamColor == TeamColor.RED ? RedTeamEntity : BlueTeamEntity;
                 }
                 else
                 {
-                    foreach (BattlePlayer battlePlayer in prevHandler.Players)
+                    foreach (BattleTankPlayer battlePlayer in prevHandler.Players)
                     {
                         Entity teamEntity;
-                        List<BattlePlayer> teamPlayerList;
+                        List<BattleTankPlayer> teamPlayerList;
 
                         if (RedTeamPlayers.Count < BlueTeamPlayers.Count)
                         {
@@ -134,70 +131,65 @@ namespace TXServer.Core.Battles
             {
             }
 
-            public BattlePlayer AddPlayer(Player player, bool isSpectator)
+            public BattleTankPlayer AddPlayer(Player player)
             {
-                List<BattlePlayer> teamPlayerList = null;
+                List<BattleTankPlayer> teamPlayerList = null;
                 Entity teamEntity = null;
-                
-                if (!isSpectator)
-                {
-                    List<List<BattlePlayer>> teamPlayerLists = new() {RedTeamPlayers, BlueTeamPlayers};
-                    Dictionary<List<BattlePlayer>, Entity> entityPlayersDict = new()
-                        {{RedTeamPlayers, RedTeamEntity}, {BlueTeamPlayers, BlueTeamEntity}};
+
+                List<List<BattleTankPlayer>> teamPlayerLists = new() { RedTeamPlayers, BlueTeamPlayers };
+                Dictionary<List<BattleTankPlayer>, Entity> entityPlayersDict = new()
+                    {{RedTeamPlayers, RedTeamEntity}, {BlueTeamPlayers, BlueTeamEntity}};
                     
-                    if (Battle.IsMatchMaking)
+                if (Battle.IsMatchMaking)
+                {
+                    foreach (var playersList in teamPlayerLists.Where(y => player.IsInSquad).Where(
+                        playersList => player.SquadPlayer.Squad.Participants.Select(x => x.Player.BattlePlayer)
+                            .Intersect(playersList).Any()))
                     {
-                        foreach (var playersList in teamPlayerLists.Where(y => player.IsInSquad).Where(
-                            playersList => player.SquadPlayer.Squad.Participants.Select(x => x.Player.BattlePlayer)
-                                .Intersect(playersList).Any()))
-                        {
-                            teamEntity = entityPlayersDict[playersList];
-                            teamPlayerList = playersList;
-                            break;
-                        }
+                        teamEntity = entityPlayersDict[playersList];
+                        teamPlayerList = playersList;
+                        break;
                     }
-
-                    if (teamEntity == null)
-                    {
-                        if (RedTeamPlayers.Count < BlueTeamPlayers.Count)
-                        {
-                            teamEntity = RedTeamEntity;
-                            teamPlayerList = RedTeamPlayers;
-                        }
-                        else
-                        {
-                            teamEntity = BlueTeamEntity;
-                            teamPlayerList = BlueTeamPlayers;
-                        }
-                    }
-
-                    player.User.AddComponent(teamEntity.GetComponent<TeamColorComponent>());
                 }
 
-                BattlePlayer battlePlayer = new(Battle, player, teamEntity, isSpectator);
+                if (teamEntity == null)
+                {
+                    if (RedTeamPlayers.Count < BlueTeamPlayers.Count)
+                    {
+                        teamEntity = RedTeamEntity;
+                        teamPlayerList = RedTeamPlayers;
+                    }
+                    else
+                    {
+                        teamEntity = BlueTeamEntity;
+                        teamPlayerList = BlueTeamPlayers;
+                    }
+                }
+
+                player.User.AddComponent(teamEntity.GetComponent<TeamColorComponent>());
+
+                BattleTankPlayer battlePlayer = new(Battle, player, teamEntity);
+                teamPlayerList.Add(battlePlayer);
+
                 player.BattlePlayer = battlePlayer;
-
-                if (!isSpectator) teamPlayerList.Add(battlePlayer);
-
                 return battlePlayer;
             }
 
-            public void RemovePlayer(BattlePlayer battlePlayer)
+            public void RemovePlayer(BattleTankPlayer battlePlayer)
             {
                 if (!RedTeamPlayers.Remove(battlePlayer))
                     BlueTeamPlayers.Remove(battlePlayer);
 
-                if (!battlePlayer.IsSpectator)
-                    battlePlayer.User.RemoveComponent<TeamColorComponent>();
+                battlePlayer.User.RemoveComponent<TeamColorComponent>();
                 battlePlayer.Player.BattlePlayer = null;
             }
 
-            public virtual void OnMatchJoin(BattlePlayer battlePlayer)
+            public virtual void OnMatchJoin(BaseBattlePlayer battlePlayer)
             {
                 battlePlayer.Player.ShareEntities(RedTeamEntity, BlueTeamEntity, TeamBattleChatEntity);
             }
 
-            public virtual void OnMatchLeave(BattlePlayer battlePlayer)
+            public virtual void OnMatchLeave(BaseBattlePlayer battlePlayer)
             {
                 battlePlayer.Player.UnshareEntities(BlueTeamEntity, RedTeamEntity, TeamBattleChatEntity);
             }

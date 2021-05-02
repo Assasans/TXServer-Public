@@ -42,7 +42,8 @@ namespace TXServer.Core
             new Thread(() => StateServer(ip)) { Name = "State Server" }.Start();
 
             new Thread(BattleLoop) { Name = "Battle Thread" }.Start();
-            new Thread(PingChecker) { Name = "Ping Checker" }.Start();
+            if (!Server.Instance.Settings.DisablePingMessages)
+                new Thread(PingChecker) { Name = "Ping Checker" }.Start();
 
             Logger.Log("Server is started.");
         }

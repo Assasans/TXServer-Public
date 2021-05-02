@@ -186,7 +186,7 @@ namespace TXServer.Core.Commands
 			        break;
 	        }
 	        
-	        List<BattlePlayer> targets = FindTargets(targetName, player);
+	        List<BattleTankPlayer> targets = FindTargets(targetName, player);
 	        if (!targets.Any()) 
 		        return $"Error, the target '{targetName}' wasn't found in this battle";
 	        if (targets.Count == 1 &&
@@ -199,7 +199,7 @@ namespace TXServer.Core.Commands
 	        }
 
 	        bool targetWithoutBulletTurret = false;
-	        foreach (BattlePlayer target in targets)
+	        foreach (BattleTankPlayer target in targets)
 	        {
 		        target.BulletSpeed = bulletSpeed;
 		        
@@ -237,7 +237,7 @@ namespace TXServer.Core.Commands
 		        return "Parsing error, '/cheat' needs at least the desired cheat as argument";
 	        
 	        string targetName = args.Length > 1 ? args[1] : player.Data.Username;
-	        List<BattlePlayer> targets = FindTargets(targetName, player);
+	        List<BattleTankPlayer> targets = FindTargets(targetName, player);
 	        if (!targets.Any())
 		        return $"Error, the target '{targetName}' wasn't found in this battle";
 	        
@@ -250,7 +250,7 @@ namespace TXServer.Core.Commands
 			        else if (args[0].ToUpper() == "ALL")
 				        cheats = new List<BonusType>((BonusType[]) Enum.GetValues(typeof(SupplyType)));
 
-			        foreach (BattlePlayer target in targets)
+			        foreach (BattleTankPlayer target in targets)
 			        foreach (BonusType bonusCheat in cheats)
 				        _ = new SupplyEffect(bonusCheat, target.MatchPlayer, true);
 			        
@@ -330,7 +330,7 @@ namespace TXServer.Core.Commands
 							break;
 					}
 					
-					battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), flag.FlagEntity);
+					battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), flag.FlagEntity);
 					battle.UpdateScore(enemyTeamOfFlag);
 					return $"Delivered the {args[0].ToLower()} flag";
 				case "drop":
@@ -356,7 +356,7 @@ namespace TXServer.Core.Commands
 				case "give":
 					string targetName;
 					targetName = args.Length < 3 ? player.Data.Username : args[2];
-					List<BattlePlayer> targets = FindTargets(targetName, player);
+					List<BattleTankPlayer> targets = FindTargets(targetName, player);
 					if (targets.Count == 0)
 						return $"Error, the target '{targetName}' wasn't found in this battle";
 					if (targets.Count > 1)
@@ -404,18 +404,18 @@ namespace TXServer.Core.Commands
 				notification += $"to {gravity}";
 			}
 
-			foreach (BattlePlayer battlePlayer in battle.MatchPlayers)
+			foreach (BaseBattlePlayer battlePlayer in battle.PlayersInMap)
             {
 				battle.KeepRunning = true;
 				battlePlayer.Rejoin = true;
-				battlePlayer.Player.SendEvent(new KickFromBattleEvent(), battlePlayer.MatchPlayer.BattleUser);
+				battlePlayer.Player.SendEvent(new KickFromBattleEvent(), (battlePlayer as BattleTankPlayer)?.MatchPlayer.BattleUser ?? ((Spectator)battlePlayer).BattleUser);
 			}
 
 			battle.BattleEntity.ChangeComponent<GravityComponent>(component => component.Gravity = gravity);
 			
-			Dictionary<List<BattlePlayer>, Entity> targets = new()
+			Dictionary<IEnumerable<BaseBattlePlayer>, Entity> targets = new()
 			{
-				{ battle.AllBattlePlayers.ToList(), battle.BattleLobbyChatEntity }
+				{ battle.JoinedTankPlayers, battle.BattleLobbyChatEntity }
 			};
 
 			MessageOtherPlayers(notification, player, targets);
@@ -447,7 +447,7 @@ namespace TXServer.Core.Commands
 			{
 				goldBonus.CurrentCrystals = 0;
 				goldBonus.State = BonusState.New;
-				battle.MatchPlayers.Select(x => x.Player).SendEvent(new GoldScheduleNotificationEvent(""), 
+				battle.PlayersInMap.Select(x => x.Player).SendEvent(new GoldScheduleNotificationEvent(""), 
 					battle.RoundEntity);
 			}
 			
@@ -483,13 +483,13 @@ namespace TXServer.Core.Commands
 	        }
 	        else 
 		        handler.HackBattle = !handler.HackBattle;
-	        
-	        Dictionary<List<BattlePlayer>, Entity> targets = new()
-	        {
-		        { player.BattlePlayer.Battle.AllBattlePlayers.ToList(), player.BattlePlayer.Battle.BattleLobbyChatEntity }
+
+			Dictionary<IEnumerable<BaseBattlePlayer>, Entity> targets = new()
+			{
+		        { player.BattlePlayer.Battle.JoinedTankPlayers, player.BattlePlayer.Battle.BattleLobbyChatEntity }
 	        };
-	        if (player.BattlePlayer.Battle.MatchPlayers.Any())
-		        targets.Add(player.BattlePlayer.Battle.MatchPlayers, player.BattlePlayer.Battle.GeneralBattleChatEntity);
+	        if (player.BattlePlayer.Battle.PlayersInMap.Any())
+		        targets.Add(player.BattlePlayer.Battle.PlayersInMap, player.BattlePlayer.Battle.GeneralBattleChatEntity);
 	        string notification = handler.HackBattle
 		        ? "This is now a \"HackBattle\"! The owner can cheat & change a lot of things. Note: this is very experimental."
 		        : "HackBattle was disabled";
@@ -541,9 +541,9 @@ namespace TXServer.Core.Commands
 			        break;
 	        }
 	        
-	        List<BattlePlayer> targets = FindTargets(targetName, player);
+	        List<BattleTankPlayer> targets = FindTargets(targetName, player);
 	        if (!targets.Any()) return $"Error, the user '{targetName}' wasn't found in this battle";
-	        foreach (BattlePlayer target in targets)
+	        foreach (BattleTankPlayer target in targets)
 	        {
 		        target.TurretKickback = kickback;
 		        
@@ -570,9 +570,9 @@ namespace TXServer.Core.Commands
         {
 	        string targetName = args.Length < 1 ? player.Data.Username : args[0];
 	        
-	        List<BattlePlayer> targets = FindTargets(targetName, player);
+	        List<BattleTankPlayer> targets = FindTargets(targetName, player);
 	        if (!targets.Any()) return $"Error, the user '{targetName}' wasn't found in this battle";
-	        foreach (BattlePlayer target in targets)
+	        foreach (BattleTankPlayer target in targets)
 		        target.MatchPlayer.SelfDestructionTime = DateTime.Now.AddSeconds(0);
 
 	        return targets.Count > 1
@@ -642,9 +642,9 @@ namespace TXServer.Core.Commands
 					       "as first argument";
 			}
 
-			List<BattlePlayer> targets = FindTargets(targetName, player);
+			List<BattleTankPlayer> targets = FindTargets(targetName, player);
 			if (!targets.Any()) return $"Error, the user '{targetName}' wasn't found in this battle";
-			foreach (BattlePlayer target in targets)
+			foreach (BattleTankPlayer target in targets)
 			{
 				target.TurretUnloadEnergyPerShot = unloadEnergyPerShot;
 				
@@ -791,12 +791,12 @@ namespace TXServer.Core.Commands
 			
 			Entity effect = JumpEffectTemplate.CreateEntity(matchPlayer, multiplier);
 
-			foreach(BattlePlayer battlePlayer in matchPlayer.Battle.MatchPlayers) {
+			foreach(BaseBattlePlayer battlePlayer in matchPlayer.Battle.PlayersInMap) {
 				battlePlayer.Player.ShareEntities(effect);
 			}
 
 			matchPlayer.Battle.Schedule(() => {
-				foreach(BattlePlayer battlePlayer in matchPlayer.Battle.MatchPlayers) {
+				foreach(BaseBattlePlayer battlePlayer in matchPlayer.Battle.PlayersInMap) {
 					battlePlayer.Player.UnshareEntities(effect);
 				}
 			});
@@ -830,15 +830,15 @@ namespace TXServer.Core.Commands
 
 				if (player.IsInMatch)
 					conditions |= ChatCommandConditions.InMatch;
-				if (player.BattlePlayer.MatchPlayer?.TankState == TankState.Active)
+				if (player.BattlePlayer?.MatchPlayer?.TankState == TankState.Active)
 					conditions |= ChatCommandConditions.ActiveTank;
 			}
 
 			return conditions;
 		}
-		private static void MessageOtherPlayers(string message, Player selfPlayer, Dictionary<List<BattlePlayer>, Entity> targets)
+		private static void MessageOtherPlayers(string message, Player selfPlayer, Dictionary<IEnumerable<BaseBattlePlayer>, Entity> targets)
         {
-			foreach (KeyValuePair<List<BattlePlayer>, Entity> target in targets)
+			foreach (var target in targets)
 			{
 				target.Key.Where(battlePlayer => battlePlayer.Player != selfPlayer).Select(x => x.Player).SendEvent(new ChatMessageReceivedEvent
 				{
@@ -850,14 +850,14 @@ namespace TXServer.Core.Commands
 				}, target.Value);
 			}
 		}
-		private static List<BattlePlayer> FindTargets(string targetName, Player player)
+		private static List<BattleTankPlayer> FindTargets(string targetName, Player player)
 		{
 			Battle battle = player.BattlePlayer.Battle;
-			List<BattlePlayer> targets = new();
+			List<BattleTankPlayer> targets = new();
 			switch (targetName)
 			{
 				case "all":
-					targets.AddRange(battle.MatchPlayers);
+					targets.AddRange(battle.MatchTankPlayers);
 					break;
 				case "blue" or "red":
 					if (player.BattlePlayer.Battle.Params.BattleMode != BattleMode.CTF) return targets;
@@ -866,7 +866,7 @@ namespace TXServer.Core.Commands
 					targets.AddRange(targetName.ToUpper() == "BLUE" ? teamView.AllyTeamPlayers : teamView.EnemyTeamPlayers);
 					break;
 				case "others":
-					targets.AddRange(battle.MatchPlayers.Where(p => p.Player != player));
+					targets.AddRange(battle.MatchTankPlayers.Where(p => p.Player != player));
 					break;
 				default:
 					Player target = battle.FindPlayerByUid(targetName);

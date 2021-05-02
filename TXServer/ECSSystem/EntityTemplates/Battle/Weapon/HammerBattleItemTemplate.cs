@@ -8,7 +8,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(4939169559170921259L)]
     public class HammerBattleItemTemplate : DiscreteWeaponTemplate
     {
-        public static Entity CreateEntity(Entity tank, BattlePlayer battlePlayer)
+        public static Entity CreateEntity(Entity tank, BattleTankPlayer battlePlayer)
         {
             Entity entity = CreateEntity(new HammerBattleItemTemplate(), "battle/weapon/hammer", tank, battlePlayer);
             entity.Components.Add(new HammerPelletConeComponent(15f, 15f, 9));

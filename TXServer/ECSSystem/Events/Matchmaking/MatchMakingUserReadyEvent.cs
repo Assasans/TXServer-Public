@@ -15,8 +15,7 @@ namespace TXServer.ECSSystem.Events.Matchmaking
             //todo handle it in the lobby
             player.User.AddComponent(new MatchMakingUserReadyComponent());
 
-            Core.Battles.Battle battle = player.BattlePlayer.Battle;
-            if (battle.BattleState == BattleState.Running)
+            if (player.BattlePlayer.Battle.BattleState == BattleState.Running)
                 player.BattlePlayer.MatchMakingJoinCountdown = DateTime.Now.AddSeconds(2);
         }
     }

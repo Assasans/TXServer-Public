@@ -36,7 +36,7 @@ namespace TXServer.Core.Battles
             refs.ShareEntity(FlagEntity);
         }
 
-        public void Capture(BattlePlayer battlePlayer)
+        public void Capture(BattleTankPlayer battlePlayer)
         {
             State = FlagState.Captured;
             Carrier = battlePlayer;
@@ -44,13 +44,13 @@ namespace TXServer.Core.Battles
 
             FlagEntity.AddComponent(new TankGroupComponent(tank));
 
-            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagPickupEvent(), FlagEntity);
+            Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagPickupEvent(), FlagEntity);
             CurrentAssists.Add(battlePlayer);
 
             FlagEntity.RemoveComponent<FlagHomeStateComponent>();
         }
 
-        public void Pickup(BattlePlayer battlePlayer)
+        public void Pickup(BattleTankPlayer battlePlayer)
         {
             if (battlePlayer == LastCarrier && LastCarrierMinTime > DateTime.Now) return;
 
@@ -60,7 +60,7 @@ namespace TXServer.Core.Battles
 
             FlagEntity.AddComponent(new TankGroupComponent(tank));
 
-            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagPickupEvent(), FlagEntity);
+            Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagPickupEvent(), FlagEntity);
             if (!CurrentAssists.Contains(battlePlayer))
                 CurrentAssists.Add(battlePlayer);
             
@@ -79,14 +79,14 @@ namespace TXServer.Core.Battles
             Carrier = null;
 
             if (!silent)
-                Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
+                Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
             FlagEntity.RemoveComponent<TankGroupComponent>();
 
             FlagEntity.ChangeComponent(new FlagPositionComponent(flagPosition));
             FlagEntity.AddComponent(new FlagGroundedStateComponent());
         }
 
-        public void Return(BattlePlayer battlePlayer = null, bool silent = false)
+        public void Return(BattleTankPlayer battlePlayer = null, bool silent = false)
         {
             State = FlagState.Home;
             if (battlePlayer != null)
@@ -97,7 +97,7 @@ namespace TXServer.Core.Battles
             } 
 
             if (!silent)
-                Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagReturnEvent(), FlagEntity);
+                Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagReturnEvent(), FlagEntity);
 
             if (battlePlayer != null)
             {
@@ -113,7 +113,7 @@ namespace TXServer.Core.Battles
             LastCarrier = null;
         }
 
-        public (BattlePlayer, IEnumerable<UserResult>) Deliver()
+        public (BattleTankPlayer, IEnumerable<UserResult>) Deliver()
         {
             State = FlagState.Home;
             
@@ -124,7 +124,7 @@ namespace TXServer.Core.Battles
             FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
             
             FlagEntity.AddComponent(new FlagHomeStateComponent());
-            Battle.MatchPlayers.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), FlagEntity);
+            Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), FlagEntity);
             Reshare();
 
             foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(Carrier).AllyTeamResults)
@@ -165,10 +165,10 @@ namespace TXServer.Core.Battles
         public DateTime ReturnStartTime { get; set; }
 
 
-        public BattlePlayer Carrier;
-        private readonly List<BattlePlayer> CurrentAssists = new();
+        public BattleTankPlayer Carrier;
+        private readonly List<BattleTankPlayer> CurrentAssists = new();
 
-        private BattlePlayer LastCarrier;
+        private BattleTankPlayer LastCarrier;
         private DateTime LastCarrierMinTime;
     }
 }

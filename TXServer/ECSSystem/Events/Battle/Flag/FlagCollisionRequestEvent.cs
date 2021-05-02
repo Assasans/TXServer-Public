@@ -37,7 +37,7 @@ namespace TXServer.ECSSystem.Events.Battle
                         if (carriedFlag.State != FlagState.Captured) return;
                         if (carriedFlag.FlagEntity.GetComponent<TankGroupComponent>()?.Key != tank.EntityId) return;
 
-                        (BattlePlayer carrier, IEnumerable<UserResult> assistResults) = carriedFlag.Deliver();
+                        (BattleTankPlayer carrier, IEnumerable<UserResult> assistResults) = carriedFlag.Deliver();
                         battle.UpdateScore(carrier.Team);
                         int deliverScore = view.EnemyTeamPlayers.Count * 10;
                         if (deliverScore > 0)
