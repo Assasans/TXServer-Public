@@ -6,18 +6,18 @@ using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 
 namespace TXServer.Core.Battles.Effect {
-	public class InvisibilityModule : BattleModule {
+	public class ForceFieldModule : BattleModule {
 		public Entity? EffectEntity { get; private set; }
-		
-		public InvisibilityModule(MatchPlayer matchPlayer, Entity garageModule) : base(
+
+		public ForceFieldModule(MatchPlayer matchPlayer, Entity garageModule) : base(
 			matchPlayer,
 			ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
 		) { }
 
 		public override void Activate() {
 			if(EffectEntity != null) Deactivate();
-			
-			EffectEntity = InvisibilityEffectTemplate.CreateEntity(MatchPlayer);
+
+			EffectEntity = ForceFieldTemplate.CreateEntity(MatchPlayer);
 
 			// TODO(Assasans): Doesn't have effect on new joined players
 			MatchPlayer.Battle.PlayersInMap.Select(x => x.Player).ShareEntities(EffectEntity);
