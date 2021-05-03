@@ -34,7 +34,7 @@ namespace TXServer.ECSSystem.Events.Battle
             SelfEvent.Execute(this, player, tank);
 
             MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
-            if (matchPlayer.TankState == TankState.Dead) return;
+            if (matchPlayer == null || matchPlayer.TankState == TankState.Dead) return;
 
             Vector3? position = MoveCommand.Movement?.Position;
             if (!position.HasValue) return;

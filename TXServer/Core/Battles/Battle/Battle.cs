@@ -264,9 +264,9 @@ namespace TXServer.Core.Battles
             {
                 foreach (BattleBonus battleBonus in BattleBonuses.Where(b => b.State != BonusState.Unused && b.State != BonusState.New))
                 {
-                    battlePlayer.Player.ShareEntity(battleBonus.BonusRegion);
+                    battlePlayer.Player.ShareEntities(battleBonus.BonusRegion);
                     if (battleBonus.State == BonusState.Spawned)
-                        battlePlayer.Player.ShareEntity(battleBonus.BonusEntity);
+                        battlePlayer.Player.ShareEntities(battleBonus.BonusEntity);
                 }
                 foreach (BattleTankPlayer battlePlayer1 in MatchTankPlayers)
                     battlePlayer.Player.ShareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
@@ -347,9 +347,9 @@ namespace TXServer.Core.Battles
             {
                 foreach (BattleBonus battleBonus in BattleBonuses.Where(b => b.State != BonusState.Unused && b.State != BonusState.New))
                 {
-                    player.UnshareEntity(battleBonus.BonusRegion);
+                    player.UnshareEntities(battleBonus.BonusRegion);
                     if (battleBonus.State == BonusState.Spawned)
-                        player.UnshareEntity(battleBonus.BonusEntity);
+                        player.UnshareEntities(battleBonus.BonusEntity);
                 }
                 foreach (BattleTankPlayer battlePlayer1 in MatchTankPlayers.Where(x => x != baseBattlePlayer))
                     baseBattlePlayer.Player.UnshareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
@@ -461,14 +461,16 @@ namespace TXServer.Core.Battles
 
                 ProcessMatchPlayers();
                 ProcessBonuses(deltaTime);
-                
-                foreach(TickHandler handler in tickHandlers.Where(handler => DateTimeOffset.Now >= handler.Time).ToArray()) {
+
+                foreach (TickHandler handler in tickHandlers.Where(handler => DateTimeOffset.Now >= handler.Time).ToArray())
+                {
                     tickHandlers.Remove(handler);
 
                     handler.Action();
                 }
-			
-                foreach(Action handler in nextTickHandlers.ToArray()) {
+
+                foreach (Action handler in nextTickHandlers.ToArray())
+                {
                     nextTickHandlers.Remove(handler);
 
                     handler();
@@ -601,12 +603,13 @@ namespace TXServer.Core.Battles
                 _BattleState = value;
             }
         }
-        
+
         /// <summary>
         /// Schedules an action to run at next battle tick
         /// </summary>
         /// <param name="handler">Action to run at next battle tick</param>
-        public void Schedule(Action handler) {
+        public void Schedule(Action handler)
+        {
             nextTickHandlers.Add(handler);
         }
 
@@ -615,7 +618,8 @@ namespace TXServer.Core.Battles
         /// </summary>
         /// <param name="time">Time at which action should run</param>
         /// <param name="handler">Action to run at specified time</param>
-        public void Schedule(DateTimeOffset time, Action handler) {
+        public void Schedule(DateTimeOffset time, Action handler)
+        {
             tickHandlers.Add(new TickHandler(time, handler));
         }
 
@@ -624,13 +628,14 @@ namespace TXServer.Core.Battles
         /// </summary>
         /// <param name="timeSpan">TimeSpan after which action should run</param>
         /// <param name="handler">Action to run at specified time</param>
-        public void Schedule(TimeSpan timeSpan, Action handler) {
+        public void Schedule(TimeSpan timeSpan, Action handler)
+        {
             Schedule(DateTimeOffset.Now + timeSpan, handler);
         }
-        
+
         private readonly List<TickHandler> tickHandlers;
         private readonly List<Action> nextTickHandlers;
-        
+
         private BattleState _BattleState;
         public bool KeepRunning { get; set; }
 
@@ -640,7 +645,6 @@ namespace TXServer.Core.Battles
         public double CountdownTimer { get; set; }
 
         public IEnumerable<BattleTankPlayer> JoinedTankPlayers => ModeHandler.Players;
-
         public List<BattleTankPlayer> MatchTankPlayers { get; } = new();
         public List<Spectator> Spectators { get; } = new();
         public IEnumerable<BaseBattlePlayer> PlayersInMap => MatchTankPlayers.Cast<BaseBattlePlayer>().Concat(Spectators.Cast<BaseBattlePlayer>());

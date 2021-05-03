@@ -55,13 +55,13 @@ namespace TXServer.Core.Battles
                    select (Entity)property.GetValue(this);
         }
 
-        private static readonly Dictionary<TankState, Type> StateComponents = new()
+        private static readonly Dictionary<TankState, (Type, double)> TankStates = new()
         {
-            { TankState.New, typeof(TankNewStateComponent) },
-            { TankState.Spawn, typeof(TankSpawnStateComponent) },
-            { TankState.SemiActive, typeof(TankSemiActiveStateComponent) },
-            { TankState.Active, typeof(TankActiveStateComponent) },
-            { TankState.Dead, typeof(TankDeadStateComponent) },
+            { TankState.New, (typeof(TankNewStateComponent), 0) },
+            { TankState.Spawn, (typeof(TankSpawnStateComponent), 1.5) },
+            { TankState.SemiActive, (typeof(TankSemiActiveStateComponent), .25) },
+            { TankState.Active, (typeof(TankActiveStateComponent), 0) },
+            { TankState.Dead, (typeof(TankDeadStateComponent), 3) },
         };
 
         public void UpdateStatistics(int additiveScore, int additiveKills, int additiveKillAssists, int additiveDeath, MatchPlayer killer)
@@ -101,8 +101,8 @@ namespace TXServer.Core.Battles
 
                 foreach (Player player in prevIncarnation.PlayerReferences.ToArray())
                 {
-                    player.UnshareEntity(prevIncarnation);
-                    player.ShareEntity(Incarnation);
+                    player.UnshareEntities(prevIncarnation);
+                    player.ShareEntities(Incarnation);
                 }
             }
 
@@ -128,7 +128,7 @@ namespace TXServer.Core.Battles
         public void DisableTank()
         {
             if (KeepDisabled)
-                Tank.TryRemoveComponent(StateComponents[_TankState]);
+                Tank.TryRemoveComponent(TankStates[_TankState].Item1);
             Tank.TryRemoveComponent<SelfDestructionComponent>();
 
             foreach (SupplyEffect supplyEffect in SupplyEffects.ToArray())
@@ -279,17 +279,11 @@ namespace TXServer.Core.Battles
                         break;
                 }
 
-                Tank.TryRemoveComponent(StateComponents[_TankState]);
-                Tank.AddComponent((Component)Activator.CreateInstance(StateComponents[value]));
+                Tank.TryRemoveComponent(TankStates[_TankState].Item1);
+                Tank.AddComponent((Component)Activator.CreateInstance(TankStates[value].Item1));
                 _TankState = value;
 
-                TankStateChangeTime = DateTime.Now.AddSeconds(value switch
-                {
-                    TankState.Spawn => 2,
-                    TankState.SemiActive => .5,
-                    TankState.Dead => 3,
-                    _ => 0,
-                });
+                TankStateChangeTime = DateTime.Now.AddSeconds(TankStates[value].Item2);
             }
         }
         private TankState _TankState;

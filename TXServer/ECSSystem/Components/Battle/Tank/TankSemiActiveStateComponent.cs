@@ -8,7 +8,7 @@ namespace TXServer.ECSSystem.Components.Battle.Tank
     {
         public TankSemiActiveStateComponent()
         {
-            ActivationTime = .5f;
+            ActivationTime = .25f;
         }
 
         public TankSemiActiveStateComponent(float activationTime)
