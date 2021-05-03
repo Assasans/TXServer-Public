@@ -11,14 +11,12 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     {
         public static Entity CreateEntity(Vector3 position, Entity team, Entity battle)
         {
-            Entity entity = new Entity(new TemplateAccessor(new FlagTemplate(), "battle/modes/ctf"),
+            return new(new TemplateAccessor(new FlagTemplate(), "battle/modes/ctf"),
                 new FlagComponent(),
                 team.GetComponent<TeamGroupComponent>(),
                 battle.GetComponent<BattleGroupComponent>(),
                 new FlagHomeStateComponent(),
-                new FlagPositionComponent(position)
-            );
-            return entity;
+                new FlagPositionComponent(position));
         }
     }
 }

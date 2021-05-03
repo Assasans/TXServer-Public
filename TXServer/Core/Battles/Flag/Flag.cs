@@ -24,7 +24,7 @@ namespace TXServer.Core.Battles
             Battle = battle;
 
             PedestalEntity = PedestalTemplate.CreateEntity(position, team, battle.BattleEntity);
-            FlagEntity = FlagTemplate.CreateEntity(position, Team, Battle.BattleEntity);
+            FlagEntity = FlagTemplate.CreateEntity(position, team, battle.BattleEntity);
 
             State = FlagState.Home;
         }
@@ -32,8 +32,8 @@ namespace TXServer.Core.Battles
         private void Reshare()
         {
             List<Player> refs = new(FlagEntity.PlayerReferences);
-            refs.UnshareEntity(FlagEntity);
-            refs.ShareEntity(FlagEntity);
+            refs.UnshareEntities(FlagEntity);
+            refs.ShareEntities(FlagEntity);
         }
 
         public void Capture(BattleTankPlayer battlePlayer)
@@ -63,7 +63,7 @@ namespace TXServer.Core.Battles
             Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagPickupEvent(), FlagEntity);
             if (!CurrentAssists.Contains(battlePlayer))
                 CurrentAssists.Add(battlePlayer);
-            
+
             FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
         }
 
@@ -94,7 +94,7 @@ namespace TXServer.Core.Battles
                 FlagEntity.AddComponent(new TankGroupComponent(battlePlayer.MatchPlayer.Tank));
                 // todo: calculate flag return score
                 battlePlayer.Player.SendEvent(new VisualScoreFlagReturnEvent(battlePlayer.MatchPlayer.GetScoreWithPremium(5)), battlePlayer.MatchPlayer.BattleUser);
-            } 
+            }
 
             if (!silent)
                 Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagReturnEvent(), FlagEntity);
@@ -116,15 +116,15 @@ namespace TXServer.Core.Battles
         public (BattleTankPlayer, IEnumerable<UserResult>) Deliver()
         {
             State = FlagState.Home;
-            
+
+            Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), FlagEntity);
             FlagEntity.RemoveComponent<TankGroupComponent>();
 
             FlagEntity.ChangeComponent(new FlagPositionComponent(BasePosition));
             FlagEntity.AddComponent(new FlagGroundedStateComponent());
             FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
-            
+
             FlagEntity.AddComponent(new FlagHomeStateComponent());
-            Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), FlagEntity);
             Reshare();
 
             foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(Carrier).AllyTeamResults)
@@ -160,7 +160,7 @@ namespace TXServer.Core.Battles
 
         public Entity Team { get; }
         public TeamColor TeamColor { get; }
-        
+
         public FlagState State { get; private set; }
         public DateTime ReturnStartTime { get; set; }
 
