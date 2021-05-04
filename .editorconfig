@@ -1,25 +1,18 @@
-﻿[*.cs]
+﻿# top-most EditorConfig file
+root = true
 
-# CA2208: Правильно создавайте экземпляры исключений аргументов
-dotnet_diagnostic.CA2208.severity = none
+# Windows-style newlines with a newline ending every file
+[*]
+end_of_line = crlf
+insert_final_newline = true
 
-# CA2227: Свойства коллекций должны быть доступны только для чтения
-dotnet_diagnostic.CA2227.severity = none
+# Set default charset
+[*.cs]
+charset = utf-8
 
-# IDE0049: Упрощение имен
-dotnet_style_predefined_type_for_member_access = true:none
+# 4 space indentation
+indent_style = space
+indent_size = 4
 
-# IDE0049: Упрощение имен
-dotnet_style_predefined_type_for_locals_parameters_members = true:none
-
-# CA1040: Не используйте пустые интерфейсы
-dotnet_diagnostic.CA1040.severity = none
-
-# CA1710: Идентификаторы должны иметь правильные суффиксы
-dotnet_diagnostic.CA1710.severity = none
-
-# CA1062: Проверить аргументы или открытые методы
-dotnet_diagnostic.CA1062.severity = none
-
-# IDE0055: Исправить форматирование
-dotnet_diagnostic.IDE0055.severity = none
+# Remove whitespace after line
+trim_trailing_whitespace = true
