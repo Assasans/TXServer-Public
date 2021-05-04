@@ -117,14 +117,11 @@ namespace TXServer.Core.Battles
         {
             State = FlagState.Home;
 
+            FlagEntity.AddComponent(new FlagHomeStateComponent());
             Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), FlagEntity);
             FlagEntity.RemoveComponent<TankGroupComponent>();
 
             FlagEntity.ChangeComponent(new FlagPositionComponent(BasePosition));
-            FlagEntity.AddComponent(new FlagGroundedStateComponent());
-            FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
-
-            FlagEntity.AddComponent(new FlagHomeStateComponent());
             Reshare();
 
             foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(Carrier).AllyTeamResults)
