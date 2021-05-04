@@ -167,7 +167,7 @@ namespace TXServer.Core
 			if (Data.Beta) user.Components.Add(new ClosedBetaQuestAchievementComponent());
 
 
-			ShareEntity(user);
+			ShareEntities(user);
 			clientSession.AddComponent(new UserGroupComponent(user));
 
 			ShareEntities(ResourceManager.GetEntities(this, user));
@@ -224,7 +224,7 @@ namespace TXServer.Core
 			if (User.GetComponent<UserRankComponent>().Rank >= correctRank) return;
 			User.ChangeComponent(new UserRankComponent(correctRank));
 			// todo: load rank rewards from configs (https://vignette2.wikia.nocookie.net/tanki-x/images/f/fb/Rankit.png/revision/latest?cb=20170629172052)
-			ShareEntity(UserRankRewardNotificationTemplate.CreateEntity(100, 5000, correctRank));
+			ShareEntities(UserRankRewardNotificationTemplate.CreateEntity(100, 5000, correctRank));
 
 			if (!IsInMatch) return;
 			BattlePlayer.Battle.PlayersInMap.Select(x => x.Player).SendEvent(new UpdateRankEvent(), User);
@@ -260,7 +260,7 @@ namespace TXServer.Core
 					throw new ArgumentException("Self player cannot be shared.");
 
                 if (_SharedPlayers.AddOrUpdate(player, 1, (key, value) => ++value) == 1 && IsActive)
-                    ShareEntity(player.User);
+                    ShareEntities(player.User);
             }
         }
 
@@ -281,7 +281,7 @@ namespace TXServer.Core
 					throw new ArgumentException("Self player cannot be unshared.");
 
 				if (_SharedPlayers.TryRemove(new KeyValuePair<Player, int>(player, 1)))
-					if (IsActive) UnshareEntity(player.User);
+					if (IsActive) UnshareEntities(player.User);
 				else
 					_SharedPlayers.AddOrUpdate(player, player => throw new InvalidOperationException("Player is not shared."), (key, value) => --value);
 			}

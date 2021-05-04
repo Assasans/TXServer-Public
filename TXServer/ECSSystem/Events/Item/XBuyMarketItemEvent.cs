@@ -18,7 +18,7 @@ namespace TXServer.ECSSystem.Events
 			newItem.Components.Add(new UserGroupComponent(user));
 			((IUserItemTemplate)newItem.TemplateAccessor.Template).AddUserItemComponents(player, newItem);
 
-			player.ShareEntity(newItem);
+			player.ShareEntities(newItem);
 			player.Data.SetXCrystals(player.Data.XCrystals - Price);
 
 			if (newItem.TemplateAccessor.Template is IMountableItemTemplate)

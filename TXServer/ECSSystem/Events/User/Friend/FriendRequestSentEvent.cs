@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Events.User.Friend
     {
         public void Execute(Player player, Entity entity)
         {
-            player.ShareEntity(FriendSentNotificationTemplate.CreateEntity(entity));
+            player.ShareEntities(FriendSentNotificationTemplate.CreateEntity(entity));
             player.SendEvent(new ShowNotificationGroupEvent(1), entity);
         }
     }

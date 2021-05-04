@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.Events
             Player remotePlayer = Server.Instance.FindPlayerById(UserId);
 
             if (!player.EntityList.Contains(remotePlayer.User))
-                player.ShareEntity(remotePlayer.User);
+                player.ShareEntities(remotePlayer.User);
             player.SendEvent(new UserProfileLoadedEvent(), remotePlayer.User);
         }
 

@@ -26,7 +26,7 @@ namespace TXServer.ECSSystem.Events
 				component.Count -= Amount;
 			});
 
-			player.ShareEntity(notification);
+			player.ShareEntities(notification);
 			player.SendEvent(new ShowNotificationGroupEvent(1), container);
         }
 

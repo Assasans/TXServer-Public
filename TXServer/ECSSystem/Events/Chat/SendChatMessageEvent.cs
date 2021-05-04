@@ -68,16 +68,16 @@ namespace TXServer.ECSSystem.Events.Chat
                         {
 							if (!p.EntityList.Contains(player.User))
 							{
-								p.ShareEntity(player.User);
+								p.ShareEntities(player.User);
 								isShared = true;
 							}
 
-							p.ShareEntity(chat);
+							p.ShareEntities(chat);
                         }
 						p.SendEvent(evt, chat);
 
 						if (isShared)
-							p.UnshareEntity(player.User);
+							p.UnshareEntities(player.User);
 					}
 					break;
 				case SquadChatTemplate _:

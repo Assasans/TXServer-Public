@@ -27,14 +27,14 @@ namespace TXServer.Core.Battles
             if (CheckForDuplicate()) return;
             ApplyEffect(duration * 1000);
 
-            MatchPlayer.Battle.PlayersInMap.Select(x => x.Player).ShareEntity(SupplyEffectEntity);
+            MatchPlayer.Battle.PlayersInMap.Select(x => x.Player).ShareEntities(SupplyEffectEntity);
             MatchPlayer.SupplyEffects.Add(this);
         }
 
         public void Remove()
         {
             MatchPlayer.SupplyEffects.Remove(this);
-            MatchPlayer.Battle.PlayersInMap.Select(x => x.Player).UnshareEntity(SupplyEffectEntity);
+            MatchPlayer.Battle.PlayersInMap.Select(x => x.Player).UnshareEntities(SupplyEffectEntity);
 
             if (BonusType == BonusType.SPEED)
             {

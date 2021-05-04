@@ -29,7 +29,7 @@ namespace TXServer.Core.Squads
 
             player.SquadPlayer = new SquadPlayer(player, Leader == player, this);
             player.ShareEntities(Participants.Select(x => x.Player.User));
-            Participants.Select(x => x.Player).Where(x => !x.EntityList.Contains(player.User)).ShareEntity(player.User);
+            Participants.Select(x => x.Player).Where(x => !x.EntityList.Contains(player.User)).ShareEntities(player.User);
             
             if (SquadChatEntity == null)
                 SquadChatEntity = SquadChatTemplate.CreateEntity(player);
@@ -38,7 +38,7 @@ namespace TXServer.Core.Squads
                 SquadChatEntity.ChangeComponent<ChatParticipantsComponent>(component =>
                 { component.Users.Add(player.User); });
             }
-            player.ShareEntity(SquadChatEntity);
+            player.ShareEntities(SquadChatEntity);
 
             Participants.Add(player.SquadPlayer);
         }
@@ -49,7 +49,7 @@ namespace TXServer.Core.Squads
 
             Participants.Remove(player.SquadPlayer);
             player.UnshareEntities(Participants.Where(y => !player.IsInBattleWith(y.Player)).Select(x => x.Player.User));
-            Participants.Where(y => !y.Player.IsInBattleWith(player)).Select(x => x.Player).UnshareEntity(player.User);
+            Participants.Where(y => !y.Player.IsInBattleWith(player)).Select(x => x.Player).UnshareEntities(player.User);
             
             player.UnshareEntities(SquadEntity, SquadChatEntity);
             player.User.RemoveComponent<SquadGroupComponent>();

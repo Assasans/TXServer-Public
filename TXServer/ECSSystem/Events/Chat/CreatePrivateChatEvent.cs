@@ -41,7 +41,7 @@ namespace TXServer.ECSSystem.Events
 			}
 
 			if (!player.EntityList.Contains(goalUser))
-				player.ShareEntity(goalUser);
+				player.ShareEntities(goalUser);
 			if (chat == null)
             {
 				chat = new Entity(new TemplateAccessor(new PersonalChatTemplate(), "chat"),
@@ -54,8 +54,8 @@ namespace TXServer.ECSSystem.Events
 			}
 
 			if (!player.EntityList.Contains(chat))
-				player.ShareEntity(chat);
-			player.UnshareEntity(goalUser);
+				player.ShareEntities(chat);
+			player.UnshareEntities(goalUser);
         }
 
 		public string UserUid { get; set; }

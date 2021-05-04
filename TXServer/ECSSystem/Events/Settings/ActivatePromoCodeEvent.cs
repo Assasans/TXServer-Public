@@ -75,7 +75,7 @@ namespace TXServer.ECSSystem.Events
 				    new NotificationGroupComponent(entity),
 				    new NewItemNotificationComponent(item.Key, item.Value),
 				    new NotificationComponent(NotificationPriority.MESSAGE));
-				player.ShareEntity(notification);
+				player.ShareEntities(notification);
 
 				if (item.Key == ExtraItems.GlobalItems.Crystal)
 					player.Data.SetCrystals(player.Data.Crystals + item.Value);

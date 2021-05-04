@@ -16,7 +16,7 @@ namespace TXServer.ECSSystem.Events.Battle
 			player.SendEvent(new CompleteBuyUIDChangeEvent(true), entity);
 
 			Entity notification = UIDChangedNotificationTemplate.CreateEntity(Uid, entity);
-			player.ShareEntity(notification);
+			player.ShareEntities(notification);
 			player.SendEvent(new ShowNotificationGroupEvent(1), entity);
 		}
 		public string Uid { get; set; }

@@ -90,7 +90,7 @@ namespace TXServer.Core
                     Player.ClientSession.AddComponent(new InviteComponent(true, null));
 
                 SendCommands(new InitTimeCommand());
-                Player.ShareEntity(Player.ClientSession);
+                Player.ShareEntities(Player.ClientSession);
 
                 while (IsActive)
                 {

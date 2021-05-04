@@ -11,7 +11,7 @@ namespace TXServer.Core.Squads
             Squad = squad;
             Player = player;
             
-            player.ShareEntity(Squad.SquadEntity);
+            player.ShareEntities(Squad.SquadEntity);
             player.User.AddComponent(Squad.SquadEntity.GetComponent<SquadGroupComponent>());
             if (isLeader)
                 player.User.AddComponent(new SquadLeaderComponent());
