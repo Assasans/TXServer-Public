@@ -17,7 +17,7 @@ namespace TXServer.ECSSystem.Events.User.Friend
             }
 
             player.Data.AddOutgoingFriend(User.EntityId);
-            player.UnshareEntities(remotePlayer.User);
+            player.UnsharePlayers(remotePlayer);
             player.SendEvent(new OutgoingFriendAddedEvent(remotePlayer.User.EntityId), clientSession);
         }
     }

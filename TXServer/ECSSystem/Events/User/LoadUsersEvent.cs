@@ -12,16 +12,7 @@ namespace TXServer.ECSSystem.Events.Friend
         public void Execute(Player player, Entity entity)
         {
             foreach (long id in UsersId)
-            {
-                Player toShare = Server.Instance.FindPlayerById(id);
-
-                if (player.SharedPlayers.Contains(toShare))
-                {
-                    player.UnshareEntities(toShare.User);
-                    player.ShareEntities(toShare.User);
-                }
-                player.SharePlayers(toShare);
-            }
+                player.SharePlayers(Server.Instance.FindPlayerById(id));
 
             player.SendEvent(new UsersLoadedEvent(RequestEntityId), entity);
         }

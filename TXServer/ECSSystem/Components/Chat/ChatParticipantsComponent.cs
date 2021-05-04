@@ -22,9 +22,9 @@ namespace TXServer.ECSSystem.Components
 
         public List<Entity> Users { get; set; }
 
-        public List<Player> GetPlayers()
+        public IEnumerable<Player> GetPlayers()
         {
-            return Enumerable.Select(Users, user => Server.Instance.FindPlayerById(user.EntityId)).ToList();
+            return Enumerable.Select(Users, user => Server.Instance.FindPlayerById(user.EntityId));
         }
     }
 }
