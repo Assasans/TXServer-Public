@@ -10,9 +10,14 @@ insert_final_newline = true
 [*.cs]
 charset = utf-8
 
-# 4 space indentation
+# 4 space indentation for code files
 indent_style = space
 indent_size = 4
 
 # Remove whitespace after line
 trim_trailing_whitespace = true
+
+# 2 space indentation for project files
+[*.csproj]
+indent_style = space
+indent_size = 2

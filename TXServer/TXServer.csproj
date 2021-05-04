@@ -36,14 +36,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-	<None Include="StateServer/**">
-		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="ECSSystem\Components\Battle\Score\**" />
-    <EmbeddedResource Remove="ECSSystem\Components\Battle\Score\**" />
-    <None Remove="ECSSystem\Components\Battle\Score\**" />
+    <None Include="StateServer/**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.3" />
