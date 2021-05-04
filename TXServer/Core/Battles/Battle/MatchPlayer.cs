@@ -20,7 +20,7 @@ using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.Core.Battles
 {
-    public class MatchPlayer
+    public class MatchPlayer : IPlayerPart
     {
         public MatchPlayer(BattleTankPlayer battlePlayer, Entity battleEntity, IEnumerable<UserResult> userResults)
         {
@@ -79,7 +79,7 @@ namespace TXServer.Core.Battles
             UserResult.Deaths += additiveDeath;
 
             Damage.ProcessKillStreak(additiveKills, additiveDeath > 0, this, killer);
-            Battle.PlayersInMap.Select(x => x.Player).SendEvent(new RoundUserStatisticsUpdatedEvent(), RoundUser);
+            Battle.PlayersInMap.SendEvent(new RoundUserStatisticsUpdatedEvent(), RoundUser);
             Battle.SortRoundUsers();
             Player.CheckRankUp();
         }
@@ -148,7 +148,7 @@ namespace TXServer.Core.Battles
                 if (TankState != TankState.Dead)
                 {
                     TankState = TankState.Dead;
-                    Battle.PlayersInMap.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
+                    Battle.PlayersInMap.SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
                     UpdateStatistics(-10, -1, 0, 1, null);
 
                     TankPosition = new();

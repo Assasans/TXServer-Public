@@ -156,7 +156,7 @@ namespace TXServer.Core.Battles
                         Battle.RoundEntity.ChangeComponent(StopTimeBeforeDomination);
                         StopTimeBeforeDomination = null;
 
-                        Battle.PlayersInMap.Select(x => x.Player).SendEvent(new RoundBalanceRestoredEvent(), Battle.BattleEntity);
+                        Battle.PlayersInMap.SendEvent(new RoundBalanceRestoredEvent(), Battle.BattleEntity);
                         Battle.BattleEntity.RemoveComponent<RoundComponent>();
                         Battle.BattleEntity.RemoveComponent<RoundDisbalancedComponent>();
                     }
@@ -175,7 +175,7 @@ namespace TXServer.Core.Battles
                 battlePlayer.User.AddComponent(new MatchMakingUserComponent());
                 if (Battle.BattleState is BattleState.WarmUp or BattleState.Running && !Battle.ForcePause)
                 {
-                    battlePlayer.Player.SendEvent(new MatchMakingLobbyStartTimeEvent { StartTime = DateTime.Now.AddSeconds(10) }, battlePlayer.User);
+                    battlePlayer.SendEvent(new MatchMakingLobbyStartTimeEvent { StartTime = DateTime.Now.AddSeconds(10) }, battlePlayer.User);
                     WaitingToJoinPlayers.Add(battlePlayer);
                 }
             }

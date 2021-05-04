@@ -12,10 +12,10 @@ namespace TXServer.Core.Battles.Module {
 		public override void Activate() {
 			Entity effect = JumpEffectTemplate.CreateEntity(MatchPlayer);
 
-			MatchPlayer.Player.ShareEntities(effect);
+			MatchPlayer.ShareEntities(effect);
 
 			Schedule(() => {
-				MatchPlayer.Player.UnshareEntities(effect);
+				MatchPlayer.UnshareEntities(effect);
 			});
 		}
 	}

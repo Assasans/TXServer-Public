@@ -84,10 +84,10 @@ namespace TXServer.ECSSystem.Events.Chat
 					player.SquadPlayer.Squad.Participants.Select(p => p.Player).SendEvent(evt, chat);
 					break;
 				case BattleLobbyChatTemplate _:
-					battle?.JoinedTankPlayers.Select(x => x.Player).SendEvent(evt, chat);
+					battle?.JoinedTankPlayers.SendEvent(evt, chat);
 					break;
 				case GeneralBattleChatTemplate _:
-					battle?.PlayersInMap.Select(x => x.Player).SendEvent(evt, chat);
+					battle?.PlayersInMap.SendEvent(evt, chat);
 					break;
 				case TeamBattleChatTemplate _:
 					battle?.MatchTankPlayers.Where(x => x.Team == player.BattlePlayer.Team).Select(p => p.Player).SendEvent(evt, chat);

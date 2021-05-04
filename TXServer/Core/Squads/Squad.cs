@@ -28,8 +28,8 @@ namespace TXServer.Core.Squads
             Logger.Log($"{player}: Joined squad {SquadEntity.EntityId}");
 
             player.SquadPlayer = new SquadPlayer(player, Leader == player, this);
-            player.ShareEntities(Participants.Select(x => x.Player.User));
-            Participants.Select(x => x.Player).Where(x => !x.EntityList.Contains(player.User)).ShareEntities(player.User);
+            player.SharePlayers(Participants.Select(x => x.Player));
+            Participants.SharePlayers(player);
             
             if (SquadChatEntity == null)
                 SquadChatEntity = SquadChatTemplate.CreateEntity(player);
@@ -48,8 +48,8 @@ namespace TXServer.Core.Squads
             Logger.Log($"{player}: Left squad {SquadEntity.EntityId}");
 
             Participants.Remove(player.SquadPlayer);
-            player.UnshareEntities(Participants.Where(y => !player.IsInBattleWith(y.Player)).Select(x => x.Player.User));
-            Participants.Where(y => !y.Player.IsInBattleWith(player)).Select(x => x.Player).UnshareEntities(player.User);
+            player.UnsharePlayers(Participants.Select(x => x.Player));
+            Participants.UnsharePlayers(player);
             
             player.UnshareEntities(SquadEntity, SquadChatEntity);
             player.User.RemoveComponent<SquadGroupComponent>();

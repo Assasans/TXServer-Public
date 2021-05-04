@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.Events.MatchMaking
         public void Execute(Player player, Entity entity)
         {
             foreach (SquadPlayer squadPlayer in player.SquadPlayer.Squad.Participants)
-                squadPlayer.Player.SendEvent(new EnteredToMatchMakingEvent(), MatchmakingModes.GlobalItems.Rating);
+                squadPlayer.SendEvent(new EnteredToMatchMakingEvent(), MatchmakingModes.GlobalItems.Rating);
 
             Core.Battles.MatchMaking.FindSquadBattle(player.SquadPlayer.Squad);
         }

@@ -38,7 +38,7 @@ namespace TXServer.Core.Battles
                     {
                         component.Place = place;
                         roundUser.ChangeComponent(component);
-                        Battle.PlayersInMap.Select(x => x.Player).SendEvent(new SetScoreTablePositionEvent(place), roundUser);
+                        Battle.PlayersInMap.SendEvent(new SetScoreTablePositionEvent(place), roundUser);
                     }
 
                     place++;

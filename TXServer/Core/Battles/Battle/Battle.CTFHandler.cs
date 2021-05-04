@@ -42,7 +42,7 @@ namespace TXServer.Core.Battles
             {
                 base.CompleteWarmUp();
 
-                Battle.PlayersInMap.Select(x => x.Player).ShareEntities(Flags.Values.Select(x => x.FlagEntity));
+                Battle.PlayersInMap.ShareEntities(Flags.Values.Select(x => x.FlagEntity));
                 Battle.IsWarmUpCompleted = true;
             }
 
@@ -72,10 +72,10 @@ namespace TXServer.Core.Battles
             {
                 base.OnMatchJoin(battlePlayer);
 
-                battlePlayer.Player.ShareEntities(Flags.Select(p => p.Value.PedestalEntity));
+                battlePlayer.ShareEntities(Flags.Select(p => p.Value.PedestalEntity));
                 if (!Battle.IsMatchMaking || Battle.IsWarmUpCompleted)
                 {
-                    battlePlayer.Player.ShareEntities(Flags.Select(f => f.Value.FlagEntity));
+                    battlePlayer.ShareEntities(Flags.Select(f => f.Value.FlagEntity));
                 }
             }
 
@@ -83,7 +83,7 @@ namespace TXServer.Core.Battles
             {
                 base.OnMatchLeave(battlePlayer);
 
-                battlePlayer.Player.UnshareEntities(Flags.Select(p => p.Value.PedestalEntity));
+                battlePlayer.UnshareEntities(Flags.Select(p => p.Value.PedestalEntity));
 
                 if (!Battle.IsMatchMaking || Battle.IsWarmUpCompleted)
                 {
@@ -94,7 +94,7 @@ namespace TXServer.Core.Battles
                         flag.Value.FlagEntity.PlayerReferences.Remove(battlePlayer.Player);
                         flag.Value.Drop(false);
                     }
-                    battlePlayer.Player.UnshareEntities(Flags.Select(f => f.Value.FlagEntity));
+                    battlePlayer.UnshareEntities(Flags.Select(f => f.Value.FlagEntity));
                 }
             }
         }

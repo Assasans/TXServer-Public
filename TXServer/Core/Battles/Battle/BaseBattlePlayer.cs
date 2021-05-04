@@ -2,7 +2,7 @@
 
 namespace TXServer.Core.Battles
 {
-    public abstract class BaseBattlePlayer
+    public abstract class BaseBattlePlayer : IPlayerPart
     {
         public virtual void Reset()
         {

@@ -3,7 +3,7 @@ using TXServer.ECSSystem.Components.Squad;
 
 namespace TXServer.Core.Squads
 {
-    public class SquadPlayer
+    public class SquadPlayer : IPlayerPart
     {
         public SquadPlayer(Player player, bool isLeader, Squad squad)
         {

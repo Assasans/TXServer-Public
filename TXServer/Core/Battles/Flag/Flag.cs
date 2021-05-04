@@ -44,7 +44,7 @@ namespace TXServer.Core.Battles
 
             FlagEntity.AddComponent(new TankGroupComponent(tank));
 
-            Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagPickupEvent(), FlagEntity);
+            Battle.PlayersInMap.SendEvent(new FlagPickupEvent(), FlagEntity);
             CurrentAssists.Add(battlePlayer);
 
             FlagEntity.RemoveComponent<FlagHomeStateComponent>();
@@ -60,7 +60,7 @@ namespace TXServer.Core.Battles
 
             FlagEntity.AddComponent(new TankGroupComponent(tank));
 
-            Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagPickupEvent(), FlagEntity);
+            Battle.PlayersInMap.SendEvent(new FlagPickupEvent(), FlagEntity);
             if (!CurrentAssists.Contains(battlePlayer))
                 CurrentAssists.Add(battlePlayer);
 
@@ -79,7 +79,7 @@ namespace TXServer.Core.Battles
             Carrier = null;
 
             if (!silent)
-                Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
+                Battle.PlayersInMap.SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
             FlagEntity.RemoveComponent<TankGroupComponent>();
 
             FlagEntity.ChangeComponent(new FlagPositionComponent(flagPosition));
@@ -93,11 +93,11 @@ namespace TXServer.Core.Battles
             {
                 FlagEntity.AddComponent(new TankGroupComponent(battlePlayer.MatchPlayer.Tank));
                 // todo: calculate flag return score
-                battlePlayer.Player.SendEvent(new VisualScoreFlagReturnEvent(battlePlayer.MatchPlayer.GetScoreWithPremium(5)), battlePlayer.MatchPlayer.BattleUser);
+                battlePlayer.SendEvent(new VisualScoreFlagReturnEvent(battlePlayer.MatchPlayer.GetScoreWithPremium(5)), battlePlayer.MatchPlayer.BattleUser);
             }
 
             if (!silent)
-                Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagReturnEvent(), FlagEntity);
+                Battle.PlayersInMap.SendEvent(new FlagReturnEvent(), FlagEntity);
 
             if (battlePlayer != null)
             {
@@ -118,7 +118,7 @@ namespace TXServer.Core.Battles
             State = FlagState.Home;
 
             FlagEntity.AddComponent(new FlagHomeStateComponent());
-            Battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), FlagEntity);
+            Battle.PlayersInMap.SendEvent(new FlagDeliveryEvent(), FlagEntity);
             FlagEntity.RemoveComponent<TankGroupComponent>();
 
             FlagEntity.ChangeComponent(new FlagPositionComponent(BasePosition));

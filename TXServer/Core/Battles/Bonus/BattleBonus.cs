@@ -28,7 +28,7 @@ namespace TXServer.Core.Battles
         {
             State = BonusState.RegionShared;
             BonusRegion = BonusRegionTemplate.CreateEntity(BonusType, Position);
-            Battle.PlayersInMap.Select(x => x.Player).ShareEntities(BonusRegion);
+            Battle.PlayersInMap.ShareEntities(BonusRegion);
         }
 
         public void CreateBonus(Entity battleEntity)
@@ -37,7 +37,7 @@ namespace TXServer.Core.Battles
                 BonusEntity = SupplyBonusTemplate.CreateEntity(BonusType, BonusRegion, new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity);
             else
                 BonusEntity = GoldBonusWithCrystalsTemplate.CreateEntity(BonusType, BonusRegion, new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity);
-            Battle.PlayersInMap.Select(x => x.Player).ShareEntities(BonusEntity);
+            Battle.PlayersInMap.ShareEntities(BonusEntity);
             State = BonusState.Spawned;
         }
 
@@ -45,10 +45,10 @@ namespace TXServer.Core.Battles
         {
             var battlePlayer = player.BattlePlayer;
 
-            Battle.PlayersInMap.Select(x => x.Player).SendEvent(new BonusTakenEvent(), BonusEntity);
+            Battle.PlayersInMap.SendEvent(new BonusTakenEvent(), BonusEntity);
             if (BonusType == BonusType.GOLD)
-                Battle.PlayersInMap.Select(x => x.Player).SendEvent(new GoldTakenNotificationEvent(), battlePlayer.MatchPlayer.BattleUser);
-            Battle.PlayersInMap.Select(x => x.Player).UnshareEntities(BonusEntity);
+                Battle.PlayersInMap.SendEvent(new GoldTakenNotificationEvent(), battlePlayer.MatchPlayer.BattleUser);
+            Battle.PlayersInMap.UnshareEntities(BonusEntity);
             
             State = BonusType == BonusType.GOLD ? BonusState.Unused : BonusState.Redrop;
             battlePlayer.MatchPlayer.UserResult.BonusesTaken += 1;

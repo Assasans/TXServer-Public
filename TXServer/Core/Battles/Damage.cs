@@ -32,12 +32,12 @@ namespace TXServer.Core.Battles
                     if (damager.Player != victim.Player)
                     {
                         int killScore = 10;
-                        battle.PlayersInMap.Select(x => x.Player).SendEvent(new KillEvent(damager.Player.CurrentPreset.Weapon, hitTarget.Entity), damager.BattleUser);
-                        damager.Player.SendEvent(new VisualScoreKillEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid, victim.Player.User.GetComponent<UserRankComponent>().Rank, damager.GetScoreWithPremium(killScore)), damager.BattleUser);
+                        battle.PlayersInMap.SendEvent(new KillEvent(damager.Player.CurrentPreset.Weapon, hitTarget.Entity), damager.BattleUser);
+                        damager.SendEvent(new VisualScoreKillEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid, victim.Player.User.GetComponent<UserRankComponent>().Rank, damager.GetScoreWithPremium(killScore)), damager.BattleUser);
                         damager.UpdateStatistics(killScore, additiveKills: 1, 0, 0, null);
                     }
                     else
-                        battle.PlayersInMap.Select(x => x.Player).SendEvent(new SelfDestructionBattleUserEvent(), victim.BattleUser);
+                        battle.PlayersInMap.SendEvent(new SelfDestructionBattleUserEvent(), victim.BattleUser);
                     victim.UpdateStatistics(0, 0, 0, 1, damager);
 
                     if (battle.ModeHandler is TDMHandler)
@@ -50,7 +50,7 @@ namespace TXServer.Core.Battles
                         int assistScore = 5;
                         assist.Key.UpdateStatistics(additiveScore: assistScore, 0, additiveKillAssists: 1, 0, null);
                         int percent = (int)(assist.Value / component.MaxHealth * 100);
-                        assist.Key.Player.SendEvent(new VisualScoreAssistEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid, percent, assist.Key.GetScoreWithPremium(assistScore)), assist.Key.BattleUser);
+                        assist.Key.SendEvent(new VisualScoreAssistEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid, percent, assist.Key.GetScoreWithPremium(assistScore)), assist.Key.BattleUser);
                     }
                     victim.DamageAssisters.Clear();
                 }
@@ -62,8 +62,8 @@ namespace TXServer.Core.Battles
                         victim.DamageAssisters.Add(damager, damage);
                 }
 
-                damager.Player.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false, false), victim.Tank);
-                victim.Battle.PlayersInMap.Select(x => x.Player).SendEvent(new HealthChangedEvent(), victim.Tank);
+                damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false, false), victim.Tank);
+                victim.Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), victim.Tank);
             });
         }
 
@@ -95,9 +95,9 @@ namespace TXServer.Core.Battles
 
             if (healed)
             {
-                target.Player.BattlePlayer.Battle.PlayersInMap.Select(x => x.Player).SendEvent(new HealthChangedEvent(), target.Tank);
-                healer.Battle.Spectators.Select(x => x.Player).Concat(new[] { healer.Player }).SendEvent(new DamageInfoEvent(900, hitTarget.LocalHitPoint, false, true), target.Tank);
-                healer.Player.SendEvent(new VisualScoreHealEvent(healer.GetScoreWithPremium(4)), healer.BattleUser);
+                target.Player.BattlePlayer.Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), target.Tank);
+                healer.Battle.Spectators.Cast<IPlayerPart>().Concat(new[] { (IPlayerPart)healer }).SendEvent(new DamageInfoEvent(900, hitTarget.LocalHitPoint, false, true), target.Tank);
+                healer.SendEvent(new VisualScoreHealEvent(healer.GetScoreWithPremium(4)), healer.BattleUser);
                 healer.UpdateStatistics(additiveScore: 4, 0, 0, 0, null);
             }
         }
@@ -130,9 +130,9 @@ namespace TXServer.Core.Battles
                         if (component.Kills > 40) streakScore = 70;
                         victim.Player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(statistics => statistics.ScoreWithoutBonuses += streakScore);
                         if (component.Kills < 5 || component.Kills % 5 == 0)
-                            victim.Player.SendEvent(new KillStreakEvent(streakScore), victim.Incarnation);
+                            victim.SendEvent(new KillStreakEvent(streakScore), victim.Incarnation);
                         if (component.Kills > 2)
-                            victim.Player.SendEvent(new VisualScoreStreakEvent(victim.GetScoreWithPremium(streakScore)), victim.BattleUser);
+                            victim.SendEvent(new VisualScoreStreakEvent(victim.GetScoreWithPremium(streakScore)), victim.BattleUser);
                     }
                 });
             }
@@ -142,7 +142,7 @@ namespace TXServer.Core.Battles
                 victim.Incarnation.ChangeComponent<TankIncarnationKillStatisticsComponent>(component =>
                 {
                     if (component.Kills >= 2)
-                        killer.Player.SendEvent(new StreakTerminationEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid), killer.BattleUser);
+                        killer.SendEvent(new StreakTerminationEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid), killer.BattleUser);
                     component.Kills = 0;
                 });
             }

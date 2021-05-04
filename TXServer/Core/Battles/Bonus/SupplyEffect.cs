@@ -27,14 +27,14 @@ namespace TXServer.Core.Battles
             if (CheckForDuplicate()) return;
             ApplyEffect(duration * 1000);
 
-            MatchPlayer.Battle.PlayersInMap.Select(x => x.Player).ShareEntities(SupplyEffectEntity);
+            MatchPlayer.Battle.PlayersInMap.ShareEntities(SupplyEffectEntity);
             MatchPlayer.SupplyEffects.Add(this);
         }
 
         public void Remove()
         {
             MatchPlayer.SupplyEffects.Remove(this);
-            MatchPlayer.Battle.PlayersInMap.Select(x => x.Player).UnshareEntities(SupplyEffectEntity);
+            MatchPlayer.Battle.PlayersInMap.UnshareEntities(SupplyEffectEntity);
 
             if (BonusType == BonusType.SPEED)
             {
@@ -67,7 +67,7 @@ namespace TXServer.Core.Battles
                 case BonusType.REPAIR:
                     MatchPlayer.Tank.ChangeComponent(new TemperatureComponent(0));
                     MatchPlayer.Tank.ChangeComponent<HealthComponent>(component => component.CurrentHealth = component.MaxHealth);
-                    MatchPlayer.Battle.PlayersInMap.Select(x => x.Player).SendEvent(new HealthChangedEvent(), MatchPlayer.Tank);
+                    MatchPlayer.Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), MatchPlayer.Tank);
 
                     SupplyEffectEntity = HealingEffectTemplate.CreateEntity(MatchPlayer.Tank);
                     break;

@@ -208,7 +208,7 @@ namespace TXServer.Core.Commands
                 {
                     battle.KeepRunning = true;
                     target.Rejoin = true;
-                    target.Player.SendEvent(new KickFromBattleEvent(), target.MatchPlayer.BattleUser);
+                    target.SendEvent(new KickFromBattleEvent(), target.MatchPlayer.BattleUser);
                     continue;
                 }
 
@@ -330,7 +330,7 @@ namespace TXServer.Core.Commands
                             break;
                     }
 
-                    battle.PlayersInMap.Select(x => x.Player).SendEvent(new FlagDeliveryEvent(), flag.FlagEntity);
+                    battle.PlayersInMap.SendEvent(new FlagDeliveryEvent(), flag.FlagEntity);
                     battle.UpdateScore(enemyTeamOfFlag);
                     return $"Delivered the {args[0].ToLower()} flag";
                 case "drop":
@@ -408,7 +408,7 @@ namespace TXServer.Core.Commands
             {
                 battle.KeepRunning = true;
                 battlePlayer.Rejoin = true;
-                battlePlayer.Player.SendEvent(new KickFromBattleEvent(), (battlePlayer as BattleTankPlayer)?.MatchPlayer.BattleUser ?? ((Spectator)battlePlayer).BattleUser);
+                battlePlayer.SendEvent(new KickFromBattleEvent(), (battlePlayer as BattleTankPlayer)?.MatchPlayer.BattleUser ?? ((Spectator)battlePlayer).BattleUser);
             }
 
             battle.BattleEntity.ChangeComponent<GravityComponent>(component => component.Gravity = gravity);
@@ -447,7 +447,7 @@ namespace TXServer.Core.Commands
             {
                 goldBonus.CurrentCrystals = 0;
                 goldBonus.State = BonusState.New;
-                battle.PlayersInMap.Select(x => x.Player).SendEvent(new GoldScheduleNotificationEvent(""),
+                battle.PlayersInMap.SendEvent(new GoldScheduleNotificationEvent(""),
                     battle.RoundEntity);
             }
 
@@ -552,7 +552,7 @@ namespace TXServer.Core.Commands
                 {
                     battle.KeepRunning = true;
                     target.Rejoin = true;
-                    target.Player.SendEvent(new KickFromBattleEvent(), target.MatchPlayer.BattleUser);
+                    target.SendEvent(new KickFromBattleEvent(), target.MatchPlayer.BattleUser);
                     continue;
                 }
 
@@ -653,7 +653,7 @@ namespace TXServer.Core.Commands
                 {
                     battle.KeepRunning = true;
                     target.Rejoin = true;
-                    target.Player.SendEvent(new KickFromBattleEvent(), target.MatchPlayer.BattleUser);
+                    target.SendEvent(new KickFromBattleEvent(), target.MatchPlayer.BattleUser);
                     continue;
                 }
 
@@ -766,7 +766,7 @@ namespace TXServer.Core.Commands
 
             player.BattlePlayer.Battle.KeepRunning = true;
             player.BattlePlayer.Rejoin = true;
-            player.BattlePlayer.Player.SendEvent(new KickFromBattleEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
+            player.BattlePlayer.SendEvent(new KickFromBattleEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
 
             return notification;
         }
@@ -793,14 +793,14 @@ namespace TXServer.Core.Commands
 
             foreach (BaseBattlePlayer battlePlayer in matchPlayer.Battle.PlayersInMap)
             {
-                battlePlayer.Player.ShareEntities(effect);
+                battlePlayer.ShareEntities(effect);
             }
 
             matchPlayer.Battle.Schedule(() =>
             {
                 foreach (BaseBattlePlayer battlePlayer in matchPlayer.Battle.PlayersInMap)
                 {
-                    battlePlayer.Player.UnshareEntities(effect);
+                    battlePlayer.UnshareEntities(effect);
                 }
             });
 
@@ -843,7 +843,7 @@ namespace TXServer.Core.Commands
         {
             foreach (var target in targets)
             {
-                target.Key.Where(battlePlayer => battlePlayer.Player != selfPlayer).Select(x => x.Player).SendEvent(new ChatMessageReceivedEvent
+                target.Key.Where(battlePlayer => battlePlayer.Player != selfPlayer).SendEvent(new ChatMessageReceivedEvent
                 {
                     Message = message,
                     SystemMessage = true,

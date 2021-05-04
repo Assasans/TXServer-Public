@@ -123,7 +123,7 @@ namespace TXServer.Core.Battles
                 player.User.AddComponent(new BattleLobbyGroupComponent(BattleLobbyEntity));
                 player.User.AddComponent(new UserEquipmentComponent(player.CurrentPreset.Weapon.EntityId, player.CurrentPreset.Hull.EntityId));
 
-                JoinedTankPlayers.Select(x => x.Player).SharePlayers(player);
+                JoinedTankPlayers.SharePlayers(player);
 
                 BattleTankPlayer battlePlayer = ModeHandler.AddPlayer(player);
                 TypeHandler.OnPlayerAdded(battlePlayer);
@@ -153,7 +153,7 @@ namespace TXServer.Core.Battles
                 ModeHandler.RemovePlayer(battlePlayer1);
 
                 battlePlayer.User.RemoveComponent<UserEquipmentComponent>();
-                battlePlayer.Player.UnshareEntities(BattleLobbyChatEntity, BattleLobbyEntity);
+                battlePlayer.UnshareEntities(BattleLobbyChatEntity, BattleLobbyEntity);
                 battlePlayer.User.RemoveComponent<BattleLobbyGroupComponent>();
 
                 if (battlePlayer.User.GetComponent<MatchMakingUserReadyComponent>() != null)
@@ -162,7 +162,7 @@ namespace TXServer.Core.Battles
                 if (battlePlayer.Player.IsInSquad)
                     battlePlayer.Player.SquadPlayer.Squad.ProcessBattleLeave(battlePlayer.Player, this);
 
-                JoinedTankPlayers.Select(x => x.Player).UnsharePlayers(battlePlayer.Player);
+                JoinedTankPlayers.UnsharePlayers(battlePlayer.Player);
 
                 Logger.Log($"{battlePlayer.Player}: Left battle {BattleEntity.EntityId}");
             }
@@ -228,7 +228,7 @@ namespace TXServer.Core.Battles
 
                 PersonalBattleResultForClient personalResult = new(battlePlayer.Player, ModeHandler.TeamBattleResultFor(battlePlayer));
                 BattleResultForClient battleResultForClient = new(this, ModeHandler, personalResult);
-                battlePlayer.Player.SendEvent(new BattleResultForClientEvent(battleResultForClient), battlePlayer.Player.User);
+                battlePlayer.SendEvent(new BattleResultForClientEvent(battleResultForClient), battlePlayer.Player.User);
 
                 battlePlayer.Player.User.ChangeComponent<BattleLeaveCounterComponent>(component =>
                 {
@@ -257,19 +257,19 @@ namespace TXServer.Core.Battles
 
         public void InitMatchPlayer(BaseBattlePlayer battlePlayer)
         {
-            battlePlayer.Player.ShareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
+            battlePlayer.ShareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
 
             // Supply boxes and everyone else's supply effects
             if (!Params.DisabledModules)
             {
                 foreach (BattleBonus battleBonus in BattleBonuses.Where(b => b.State != BonusState.Unused && b.State != BonusState.New))
                 {
-                    battlePlayer.Player.ShareEntities(battleBonus.BonusRegion);
+                    battlePlayer.ShareEntities(battleBonus.BonusRegion);
                     if (battleBonus.State == BonusState.Spawned)
-                        battlePlayer.Player.ShareEntities(battleBonus.BonusEntity);
+                        battlePlayer.ShareEntities(battleBonus.BonusEntity);
                 }
                 foreach (BattleTankPlayer battlePlayer1 in MatchTankPlayers)
-                    battlePlayer.Player.ShareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
+                    battlePlayer.ShareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
             }
 
             // Enter battle and add critical entities
@@ -278,7 +278,7 @@ namespace TXServer.Core.Battles
 
             if (battlePlayer is Spectator spectator)
             {
-                battlePlayer.Player.ShareEntities(spectator.BattleUser);
+                battlePlayer.ShareEntities(spectator.BattleUser);
             }
             else
             {
@@ -305,7 +305,7 @@ namespace TXServer.Core.Battles
                                 );
 
                             matchPlayer.Modules.Add(module);
-                            battlePlayer.Player.ShareEntities(module.SlotEntity, module.ModuleEntity);
+                            battlePlayer.ShareEntities(module.SlotEntity, module.ModuleEntity);
                         }
                         catch (Exception exception)
                         {
@@ -321,19 +321,19 @@ namespace TXServer.Core.Battles
                         if (module == null) throw new InvalidOperationException($"Failed to create module '{Modules.GlobalItems.Gold.EntityId}'");
 
                         matchPlayer.Modules.Add(module);
-                        battlePlayer.Player.ShareEntities(module.SlotEntity, module.ModuleEntity);
+                        battlePlayer.ShareEntities(module.SlotEntity, module.ModuleEntity);
                     }
                 }
 
                 // Add and share self to players in list
                 MatchTankPlayers.Add(tankPlayer);
-                PlayersInMap.Select(x => x.Player).ShareEntities(tankPlayer.MatchPlayer.GetEntities());
+                PlayersInMap.ShareEntities(tankPlayer.MatchPlayer.GetEntities());
 
                 SortRoundUsers();
             }
 
             // Add other players' entities
-            battlePlayer.Player.ShareEntities(MatchTankPlayers.Where(x => x != battlePlayer).SelectMany(x => x.MatchPlayer.GetEntities()));
+            battlePlayer.ShareEntities(MatchTankPlayers.Where(x => x != battlePlayer).SelectMany(x => x.MatchPlayer.GetEntities()));
         }
 
         private void RemoveMatchPlayer(BaseBattlePlayer baseBattlePlayer)
@@ -352,7 +352,7 @@ namespace TXServer.Core.Battles
                         player.UnshareEntities(battleBonus.BonusEntity);
                 }
                 foreach (BattleTankPlayer battlePlayer1 in MatchTankPlayers.Where(x => x != baseBattlePlayer))
-                    baseBattlePlayer.Player.UnshareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
+                    baseBattlePlayer.UnshareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
             }
 
             // Remove other players' entities and leave battle
@@ -362,7 +362,7 @@ namespace TXServer.Core.Battles
 
             if (baseBattlePlayer is Spectator spectator)
             {
-                baseBattlePlayer.Player.UnshareEntities(spectator.BattleUser);
+                baseBattlePlayer.UnshareEntities(spectator.BattleUser);
                 if (baseBattlePlayer.Rejoin) return;
 
                 RemovePlayer(baseBattlePlayer);
@@ -380,11 +380,11 @@ namespace TXServer.Core.Battles
                 foreach (SupplyEffect supplyEffect in battlePlayer.MatchPlayer.SupplyEffects.ToArray())
                     supplyEffect.Remove();
                 foreach (BattleModule module in battlePlayer.MatchPlayer.Modules.ToArray())
-                    battlePlayer.Player.UnshareEntities(module.SlotEntity, module.ModuleEntity);
+                    battlePlayer.UnshareEntities(module.SlotEntity, module.ModuleEntity);
             }
 
             // Unshare and remove self from list
-            PlayersInMap.Select(x => x.Player).UnshareEntities(battlePlayer.MatchPlayer.GetEntities());
+            PlayersInMap.UnshareEntities(battlePlayer.MatchPlayer.GetEntities());
             MatchTankPlayers.Remove(battlePlayer);
 
             // Keep in match if need
@@ -396,7 +396,7 @@ namespace TXServer.Core.Battles
             {
                 foreach (Spectator _spectator in Spectators.ToArray())
                 {
-                    _spectator.Player.SendEvent(new KickFromBattleEvent(), _spectator.BattleUser);
+                    _spectator.SendEvent(new KickFromBattleEvent(), _spectator.BattleUser);
                     RemoveMatchPlayer(_spectator);
                 }
             }
@@ -485,7 +485,7 @@ namespace TXServer.Core.Battles
             var scoreComponent = team.GetComponent<TeamScoreComponent>();
             scoreComponent.Score = Math.Clamp(scoreComponent.Score + additiveScore, 0, int.MaxValue);
             team.ChangeComponent(scoreComponent);
-            PlayersInMap.Select(x => x.Player).SendEvent(new RoundScoreUpdatedEvent(), RoundEntity);
+            PlayersInMap.SendEvent(new RoundScoreUpdatedEvent(), RoundEntity);
         }
 
         public void DropSpecificBonusType(BonusType bonusType, string sender)
@@ -511,7 +511,7 @@ namespace TXServer.Core.Battles
             {
                 BattleBonuses[supplyIndex].State = BonusState.New;
                 if (String.IsNullOrWhiteSpace(sender)) sender = "";
-                PlayersInMap.Select(x => x.Player).SendEvent(new GoldScheduleNotificationEvent(sender), RoundEntity);
+                PlayersInMap.SendEvent(new GoldScheduleNotificationEvent(sender), RoundEntity);
             }
         }
 

@@ -186,12 +186,12 @@ namespace TXServer.Core.Battles
 
             public virtual void OnMatchJoin(BaseBattlePlayer battlePlayer)
             {
-                battlePlayer.Player.ShareEntities(RedTeamEntity, BlueTeamEntity, TeamBattleChatEntity);
+                battlePlayer.ShareEntities(RedTeamEntity, BlueTeamEntity, TeamBattleChatEntity);
             }
 
             public virtual void OnMatchLeave(BaseBattlePlayer battlePlayer)
             {
-                battlePlayer.Player.UnshareEntities(BlueTeamEntity, RedTeamEntity, TeamBattleChatEntity);
+                battlePlayer.UnshareEntities(BlueTeamEntity, RedTeamEntity, TeamBattleChatEntity);
             }
         }
     }
