@@ -29,7 +29,7 @@ namespace TXServer.ECSSystem.Events.MatchMaking
 
             player.SendEvent(new EnteredToMatchMakingEvent(), mode);
 
-            Core.Battles.MatchMaking.FindBattle(player);
+            Core.Battles.Matchmaking.MatchMaking.FindBattle(player);
         }
     }
 }

@@ -14,13 +14,15 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 	{
 		public void Execute(Player player, Entity entity)
 		{
+            if (!player.Data.Admin) return;
+
 			if (player.BattlePlayer?.Battle.ModeHandler is not TeamBattleHandler handler) return;
 
             BattleView teamView = handler.BattleViewFor(player.BattlePlayer);
 			Entity team = TeamColor == TeamColor.BLUE ? teamView.AllyTeamEntity : teamView.EnemyTeamEntity;
 
 			player.BattlePlayer.Battle.UpdateScore(team, Amount);
-			
+
 			if (player.BattlePlayer.Battle.Params.BattleMode == BattleMode.CTF)
 			{
 				Flag flag = TeamColor == TeamColor.BLUE ? teamView.AllyTeamFlag : teamView.EnemyTeamFlag;

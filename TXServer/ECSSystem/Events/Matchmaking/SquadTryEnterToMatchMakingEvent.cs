@@ -14,7 +14,7 @@ namespace TXServer.ECSSystem.Events.MatchMaking
             foreach (SquadPlayer squadPlayer in player.SquadPlayer.Squad.Participants)
                 squadPlayer.SendEvent(new EnteredToMatchMakingEvent(), MatchmakingModes.GlobalItems.Rating);
 
-            Core.Battles.MatchMaking.FindSquadBattle(player.SquadPlayer.Squad);
+            Core.Battles.Matchmaking.MatchMaking.FindSquadBattle(player.SquadPlayer.Squad);
         }
         
         public long MatchMakingModeId { get; set; }

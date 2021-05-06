@@ -9,6 +9,8 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 	{
 		public void Execute(Player player, Entity entity)
 		{
+            if (!player.Data.Admin) return;
+
 			player.BattlePlayer?.MatchPlayer.UpdateStatistics(additiveScore:Count, 0, 0, 0, null);
 		}
 		public int Count { get; set; }

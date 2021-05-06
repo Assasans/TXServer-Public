@@ -9,6 +9,8 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 	{
 		public void Execute(Player player, Entity entity)
 		{
+            if (!player.Data.Admin) return;
+
 			if (player.BattlePlayer != null)
 			    player.BattlePlayer.Battle.FinishBattle();
 			else

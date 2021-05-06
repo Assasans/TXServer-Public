@@ -10,8 +10,8 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 	public class ElevatedAccessUserAddKillsEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity entity)
-		{
-			if (player.BattlePlayer == null) return;
+        {
+            if (!player.IsInMatch || !player.Data.Admin) return;
 			var battlePlayer = (BattleTankPlayer)player.BattlePlayer;
 
 			battlePlayer.MatchPlayer.UpdateStatistics(0, additiveKills:Count, 0, 0, null);

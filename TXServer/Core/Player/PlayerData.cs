@@ -45,10 +45,11 @@ namespace TXServer.Core
         public List<long> ReportedPlayerIds { get; protected set; }
 
         public List<Punishment> Punishments { get; protected set; }
+        public List<bool> DeserterLog { get; protected set; }
 
         public ReadOnlyCollection<ChatMute> GetChatMutes(bool expired = false)
         {
-            return Punishments.Where((ban) => 
+            return Punishments.Where((ban) =>
             {
                 if (ban is not ChatMute chatMute) return false;
                 return expired || !chatMute.IsExpired;
@@ -113,7 +114,7 @@ namespace TXServer.Core
                 Player.User.Components.Remove(new ClosedBetaQuestAchievementComponent());
             Beta = beta;
         }
-        
+
         public void SetCrystals(long value)
         {
             Crystals = value;
@@ -197,7 +198,7 @@ namespace TXServer.Core
                 Logger.Debug($"{Player}: Updated user value \"{info.Name}\"");
                 info.SetValue(component, value);
             }
-            
+
             return component;
         }
 
@@ -213,45 +214,45 @@ namespace TXServer.Core
         {
             Entity user = Player.User;
             List<ICommand> commands = new List<ICommand>();
-            
+
             foreach (var change in RawChanges(Original))
             {
                 FieldInfo info = typeof(PlayerData).GetField(change.Key);
                 LinkedComponent link = info.GetCustomAttribute(typeof(LinkedComponent)) as LinkedComponent;
-                
+
                 if (link != null)
                 {
                     Component component;
                     Player.User.Components.TryGetValue(link.instance, out component);
 
                     bool isNew = info.GetValue(Original) == null;
-                    
+
                     if (component != null)
                     {
-                        commands.Add(isNew ? 
-                            (ICommand) new ComponentChangeCommand(user, component) : 
+                        commands.Add(isNew ?
+                            (ICommand) new ComponentChangeCommand(user, component) :
                             new ComponentAddCommand(user, component));
                         continue;
                     }
-                    commands.Add(isNew ? 
-                        (ICommand) new ComponentAddCommand(user, component) : 
+                    commands.Add(isNew ?
+                        (ICommand) new ComponentAddCommand(user, component) :
                         new ComponentRemoveCommand(user, component.GetType())
                     );
                 }
             }
         }
-        
+
         protected IDictionary<string, object> RawChanges(PlayerData originalData)
         {
             IDictionary<string, object> changes = new Dictionary<string, object>();
-        
+
             foreach (var field in typeof(PlayerData).GetFields(BindingFlags.GetField))
             {
                 var value = field.GetValue(this);
                 if (value.Equals(field.GetValue(originalData))) continue;
                 changes.Add(field.Name, value);
             }
-        
+
             return changes;
         }
 
@@ -263,7 +264,7 @@ namespace TXServer.Core
         public object Clone()
         {
             PlayerData clone = (PlayerData) Activator.CreateInstance(GetType(), UniqueId);
-            
+
             foreach (var field in typeof(PlayerData).GetFields())
             {
                 if (field.Name.Equals("Original")) continue;

@@ -3,6 +3,7 @@ using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Events.Chat;
 
 namespace TXServer.ECSSystem.Events.ElevatedAccess
 {
@@ -11,19 +12,21 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 	{
 		public void Execute(Player player, Entity entity)
 		{
+            if (!player.Data.Admin) return;
+
 			Core.Battles.Battle battle = player.BattlePlayer.Battle;
 			Player punishedPlayer = GetPunishedPlayer(battle, Uid);
 
 			if (punishedPlayer == null)
 			{
 				string errorMsg = GetErrorMsg("playerNotFound", Uid, player);
-				SendMessage(player, errorMsg, battle);
+				ChatMessageReceivedEvent.SystemMessageTarget(errorMsg, battle.GeneralBattleChatEntity, player);
 				return;
 			}
 			if (punishedPlayer.User.GetComponent<UserAdminComponent>() == null)
 			{
 				string errorMsg = GetErrorMsg("adminPlayer", Uid, player);
-				SendMessage(player, errorMsg, battle);
+                ChatMessageReceivedEvent.SystemMessageTarget(errorMsg, battle.GeneralBattleChatEntity, player);
 				return;
 			}
 
@@ -35,7 +38,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 					"RU" => $"{Uid} был заблокирован. Причина: {TranslateReason(Reason, playerLanguage)}",
 					_ => $"{Uid} was banned. Reason: {TranslateReason(Reason, playerLanguage)}",
 				};
-				SendMessage(battleLobbyPlayer.Player, message, battle);
+                ChatMessageReceivedEvent.SystemMessageTarget(message, battle.GeneralBattleChatEntity, battleLobbyPlayer.Player);
 				// todo: ban account
 			}
 		}

@@ -11,6 +11,7 @@ using TXServer.Core.Squads;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Round;
+using TXServer.ECSSystem.Components.User;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.Events.Battle;

@@ -8,6 +8,7 @@ using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.Types.Punishments;
 
 namespace TXServer.ECSSystem.Events.ElevatedAccess
@@ -18,6 +19,8 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
         // TODO(Assasans): Difficult to understand, rewrite?
         public void Execute(Player player, Entity entity)
         {
+            if (!player.Data.Admin) return;
+
             Core.Battles.Battle battle = GetBattle(player);
             Player punishedPlayer = GetPunishedPlayer(battle, Uid);
 
@@ -25,19 +28,19 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
             if (!availableUnits.Contains(Regex.Replace(Type, "[0-9]", "").Replace("S", "").ToLower()) && !String.IsNullOrEmpty(Type))
             {
                 string errorMessage = GetErrorMsg("unknownType", Type, player);
-                SendMessage(player, errorMessage, battle);
+                ChatMessageReceivedEvent.SystemMessageTarget(errorMessage, battle.GeneralBattleChatEntity, player);
                 return;
             }
             if (punishedPlayer == null)
             {
                 string errorMsg = GetErrorMsg("playerNotFound", Uid, player);
-                SendMessage(player, errorMsg, battle);
+                ChatMessageReceivedEvent.SystemMessageTarget(errorMsg, battle.GeneralBattleChatEntity, player);
                 return;
             }
             if (punishedPlayer.User.GetComponent<UserAdminComponent>() == null)
             {
                 string errorMsg = GetErrorMsg("adminPlayer", Uid, player);
-                SendMessage(player, errorMsg, battle);
+                ChatMessageReceivedEvent.SystemMessageTarget(errorMsg, battle.GeneralBattleChatEntity, player);
                 return;
             }
 
@@ -125,9 +128,9 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
             }
 
             foreach (BattleTankPlayer battleLobbyPlayer in battle.PlayersInMap)
-            {
-                SendMessage(battleLobbyPlayer.Player, languages[battleLobbyPlayer.User.GetComponent<UserCountryComponent>().CountryCode], battle);
-            }
+                ChatMessageReceivedEvent.SystemMessageTarget(
+                    languages[battleLobbyPlayer.User.GetComponent<UserCountryComponent>().CountryCode],
+                    battle.GeneralBattleChatEntity, battleLobbyPlayer.Player);
 
             if (Type != "WARN")
             {

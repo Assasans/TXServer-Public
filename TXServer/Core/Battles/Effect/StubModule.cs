@@ -3,6 +3,7 @@
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
+using TXServer.ECSSystem.Events.Chat;
 
 namespace TXServer.Core.Battles.Module
 {
@@ -18,17 +19,8 @@ namespace TXServer.Core.Battles.Module
         {
             string name = ModuleEntity.TemplateAccessor.ConfigPath.Split('/').Last();
 
-            MatchPlayer.SendEvent(
-                new ChatMessageReceivedEvent()
-                {
-                    UserId = 1,
-                    UserUid = "System",
-                    UserAvatarId = "",
-                    Message = $"[StubModule] This module is not implemented yet ({name})",
-                    SystemMessage = true
-                },
-                MatchPlayer.Battle.GeneralBattleChatEntity
-            );
+            ChatMessageReceivedEvent.SystemMessageTarget($"[StubModule] This module is not implemented yet ({name})",
+                MatchPlayer.Battle.GeneralBattleChatEntity, MatchPlayer.Player);
         }
     }
 }

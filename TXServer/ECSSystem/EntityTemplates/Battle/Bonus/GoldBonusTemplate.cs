@@ -17,7 +17,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Bonus
 
             Entity entity = new Entity(new TemplateAccessor(new GoldBonusWithCrystalsTemplate(), "battle/bonus/gold/cry"),
                 new BonusComponent(),
-                new BonusDropTimeComponent(DateTime.UtcNow.AddMinutes(1)),
+                new BonusDropTimeComponent(DateTime.UtcNow),
                 new PositionComponent(position),
                 new RotationComponent(new Vector3(0, 0, 0)),
                 new BonusRegionGroupComponent(bonusRegion),

@@ -54,7 +54,7 @@ namespace TXServer.Core.Battles
                         battlePlayer.MatchMakingJoinCountdown = DateTime.Now.AddSeconds(10);
                         return false;
                     }
-                    
+
                     Battle.InitMatchPlayer(battlePlayer);
 
                     // Prevent joining and immediate exiting
@@ -184,16 +184,6 @@ namespace TXServer.Core.Battles
             {
                 WaitingToJoinPlayers.Remove(battlePlayer);
                 battlePlayer.User.RemoveComponent<MatchMakingUserComponent>();
-
-                if (battlePlayer.Player.IsInMatch && Battle.EnemyCountFor(battlePlayer) > 0)
-                {
-                    // TODO: add deserter status only when player leaves 2 out of 4 last battles prematurely & conditions above
-                    battlePlayer.Player.User.ChangeComponent<BattleLeaveCounterComponent>(component =>
-                    {
-                        component.Value += 1;
-                        component.NeedGoodBattles += 2;
-                    });
-                }
             }
         }
     }

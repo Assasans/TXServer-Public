@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using TXServer.Core.Battles;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
@@ -10,9 +9,8 @@ using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
-using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.Events.Battle;
-using TXServer.ECSSystem.Events.Battle.Bonus;
+using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -25,12 +23,6 @@ namespace TXServer.Core.Commands
             { "help", ("help [opt: hackBattle]", ChatCommandConditions.None, Help) },
             { "ping", (null, ChatCommandConditions.None, Ping) },
 
-            { "open", (null, ChatCommandConditions.Admin | ChatCommandConditions.InBattle, Open) },
-            { "start", (null, ChatCommandConditions.Admin | ChatCommandConditions.InBattle, Start) },
-            { "pause", (null, ChatCommandConditions.Admin | ChatCommandConditions.InBattle, Pause) },
-            { "finish", (null, ChatCommandConditions.Admin | ChatCommandConditions.InBattle, Finish) },
-            { "positionInfo", (null, ChatCommandConditions.Admin | ChatCommandConditions.InMatch, PositionInfo) },
-
             { "stats", (null, ChatCommandConditions.Tester, Stats) },
             { "spawnInfo", (null, ChatCommandConditions.Tester | ChatCommandConditions.InMatch, SpawnInfo) },
 
@@ -38,15 +30,12 @@ namespace TXServer.Core.Commands
             { "bulletSpeed", ("bulletSpeed [max/stuck/norm/number] [target]", ChatCommandConditions.HackBattle, BulletSpeed) },
             { "cheat", ("cheat [supply] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.ActiveTank, Cheat) },
             { "flag", ("flag [color] [deliver/drop/return/give] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, FlagAction) },
-            { "goldrain", ("goldrain [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, GoldboxRain) },
             { "gravity", ("gravity [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.BattleOwner, Gravity) },
-            { "immune", (null, ChatCommandConditions.InBattle | ChatCommandConditions.Admin, Immune) },
             { "kickback", ("kickback [number] [target]", ChatCommandConditions.HackBattle, Kickback) },
             { "kill", ("kill [target]", ChatCommandConditions.InMatch | ChatCommandConditions.Admin, KillPlayer) },
-            { "supplyrain", ("supplyrain", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, SupplyRain) },
             { "turretReload", ("turretReload [instant/never] [target]", ChatCommandConditions.HackBattle, ReloadTime) },
             { "turretRotation", ("turretRotation [instant/stuck/norm/number]", ChatCommandConditions.HackBattle, TurretRotation) },
-            { "jump", ("jump [multiplier]", ChatCommandConditions.InMatch | ChatCommandConditions.HackBattle, Jump) }
+            { "jump", ("jump [multiplier]", ChatCommandConditions.HackBattle | ChatCommandConditions.InMatch, Jump) }
         };
 
         private static readonly Dictionary<ChatCommandConditions, string> ConditionErrors = new()
@@ -129,6 +118,8 @@ namespace TXServer.Core.Commands
                     case "target":
                         message = "Valid arguments for 'target' in HackBattle arguments: 'username', 'all', " +
                                   "'blue'/'red' (only in team battles), 'others'";
+                        if (player.Data.Admin)
+                            message += "\nFor battles: 'all/custom/mm/others/this' or nothing";
                         return message;
                     case "test":
                         condition = ChatCommandConditions.Tester;
@@ -280,12 +271,6 @@ namespace TXServer.Core.Commands
             }
         }
 
-        private static string Finish(Player player, string[] args)
-        {
-            player.BattlePlayer.Battle.FinishBattle();
-            return "Finished";
-        }
-
         private static string FlagAction(Player player, string[] args)
         {
             if (player.BattlePlayer?.Battle.Params.BattleMode is not BattleMode.CTF)
@@ -413,45 +398,14 @@ namespace TXServer.Core.Commands
 
             battle.BattleEntity.ChangeComponent<GravityComponent>(component => component.Gravity = gravity);
 
-            Dictionary<IEnumerable<BaseBattlePlayer>, Entity> targets = new()
+            Dictionary<IEnumerable<Player>, Entity> targets = new()
             {
-                { battle.JoinedTankPlayers, battle.BattleLobbyChatEntity }
+                { battle.JoinedTankPlayers.Select(b => b.Player), battle.BattleLobbyChatEntity }
             };
 
-            MessageOtherPlayers(notification, player, targets);
+            ChatMessageReceivedEvent.SystemMessageOtherPlayers(notification, targets, player);
 
             return notification;
-        }
-
-        private static string GoldboxRain(Player player, string[] args)
-        {
-            Battle battle = player.BattlePlayer.Battle;
-            IEnumerable<BattleBonus> unusedGolds = battle.GoldBonuses
-                .Where(b => b.State == BonusState.Unused).ToArray();
-
-            if (!unusedGolds.Any())
-                return "Weather error, it's not cloudy enough";
-            if (args.Length != 0)
-            {
-                bool successfullyParsed = int.TryParse(args[0], out int amount);
-                if (!successfullyParsed)
-                    return "Parsing error, '/goldrain' only allows integer or nothing as argument";
-
-                if (unusedGolds.Count() < amount)
-                    return $"Weather error, not enough goldboxes available: {unusedGolds.Count()}";
-                Random random = new();
-                unusedGolds = unusedGolds.OrderBy(_ => random.Next()).Take(amount);
-            }
-
-            foreach (BattleBonus goldBonus in unusedGolds)
-            {
-                goldBonus.CurrentCrystals = 0;
-                goldBonus.State = BonusState.New;
-                battle.PlayersInMap.SendEvent(new GoldScheduleNotificationEvent(""),
-                    battle.RoundEntity);
-            }
-
-            return "It'll start raining gold soon, get an umbrella!";
         }
 
         private static string HackBattle(Player player, string[] args)
@@ -484,26 +438,22 @@ namespace TXServer.Core.Commands
             else
                 handler.HackBattle = !handler.HackBattle;
 
-            Dictionary<IEnumerable<BaseBattlePlayer>, Entity> targets = new()
+            Dictionary<IEnumerable<Player>, Entity> targets = new()
             {
-                { player.BattlePlayer.Battle.JoinedTankPlayers, player.BattlePlayer.Battle.BattleLobbyChatEntity }
+                {
+                    player.BattlePlayer.Battle.JoinedTankPlayers.Select(b => b.Player),
+                    player.BattlePlayer.Battle.BattleLobbyChatEntity
+                }
             };
             if (player.BattlePlayer.Battle.PlayersInMap.Any())
-                targets.Add(player.BattlePlayer.Battle.PlayersInMap, player.BattlePlayer.Battle.GeneralBattleChatEntity);
+                targets.Add(player.BattlePlayer.Battle.PlayersInMap.Select(b => b.Player),
+                    player.BattlePlayer.Battle.GeneralBattleChatEntity);
             string notification = handler.HackBattle
                 ? "This is now a \"HackBattle\"! The owner can cheat & change a lot of things. Note: this is very experimental."
                 : "HackBattle was disabled";
-            MessageOtherPlayers(notification, player, targets);
+            ChatMessageReceivedEvent.SystemMessageOtherPlayers(notification, targets, player);
 
             return handler.HackBattle ? $"HackBattle was enabled{permissionInfo}" : $"HackBattle was disabled{permissionInfo}";
-        }
-
-        private static string Immune(Player player, string[] args)
-        {
-            player.BattlePlayer.IsCheatImmune = !player.BattlePlayer.IsCheatImmune;
-            return player.BattlePlayer.IsCheatImmune
-                ? "You are now immune to cheats from other players"
-                : "You can again get affected by other players' cheats";
         }
 
         private static string Kickback(Player player, string[] args)
@@ -580,33 +530,7 @@ namespace TXServer.Core.Commands
                 : $"'{targets[0].Player.Data.Username}' has been killed'";
         }
 
-        private static string Open(Player player, string[] args)
-        {
-            if (player.BattlePlayer.Battle.ForceOpen)
-                return "Already opened";
-            player.BattlePlayer.Battle.ForceOpen = true;
-            return "Opened";
-        }
-
-        private static string Pause(Player player, string[] args)
-        {
-            Battle battle = player.BattlePlayer.Battle;
-
-            if (!battle.ForceOpen && battle.ForcePause)
-                return "Already paused";
-
-            player.BattlePlayer.Battle.ForceStart = false;
-            player.BattlePlayer.Battle.ForcePause = true;
-            return "Paused battle entry";
-        }
-
         private static string Ping(Player player, string[] args) => $"Network latency: {player.Connection.Ping} ms";
-
-        private static string PositionInfo(Player player, string[] args)
-        {
-            Vector3 tankPosition = player.BattlePlayer.MatchPlayer.TankPosition;
-            return $"X: {tankPosition.X}, Y: {tankPosition.Y}, Z: {tankPosition.Z}";
-        }
 
         private static string ReloadTime(Player player, string[] args)
         {
@@ -694,34 +618,11 @@ namespace TXServer.Core.Commands
                    $"{player.User.GetComponent<TeamColorComponent>().TeamColor}, Number: {lastSpawnPoint.Number}";
         }
 
-        private static string Start(Player player, string[] args)
-        {
-            if (!player.BattlePlayer.Battle.IsMatchMaking)
-            {
-                player.BattlePlayer.Battle.BattleState = BattleState.Starting;
-            }
-            player.BattlePlayer.Battle.ForcePause = false;
-            player.BattlePlayer.Battle.ForceStart = true;
-            return "Started";
-        }
-
         private static string Stats(Player player, string[] args)
         {
             return $"Online players: {Server.Instance.Connection.Pool.Count(x => x.IsActive)}\n" +
                 $"MM battles: {ServerConnection.BattlePool.Count(b => b.IsMatchMaking)}\n" +
                 $"Custom battles: {ServerConnection.BattlePool.Count(b => !b.IsMatchMaking)}\n";
-        }
-
-        private static string SupplyRain(Player player, string[] args)
-        {
-            Battle battle = player.BattlePlayer.Battle;
-            if (player.BattlePlayer.Battle.Params.DisabledModules)
-                return "Logical error, '/supplyrain' is only available when supplies are activated";
-
-            foreach (BattleBonus battleBonus in battle.BattleBonuses)
-                battleBonus.StateChangeCountdown = 20;
-
-            return "It'll start raining soon, get an umbrella!";
         }
 
         private static string TurretRotation(Player player, string[] args)
@@ -774,12 +675,11 @@ namespace TXServer.Core.Commands
         private static string Jump(Player player, string[] args)
         {
             MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
+            Battle battle = player.BattlePlayer.Battle;
 
             float multiplier;
             if (args.Length == 0)
-            {
                 multiplier = 15.0f;
-            }
             else
             {
                 bool successfullyParsed = float.TryParse(args[0], out multiplier);
@@ -789,19 +689,19 @@ namespace TXServer.Core.Commands
                     return "Out of range, '/jump' only allows a range from -200 to 200";
             }
 
+            if (battle.BattleState is BattleState.WarmUp && battle.CountdownTimer <= 4 ||
+                player.BattlePlayer.MatchPlayer.TankState != TankState.Active)
+                return "Command error, you can't do that yet";
+
             Entity effect = JumpEffectTemplate.CreateEntity(matchPlayer, multiplier);
 
-            foreach (BaseBattlePlayer battlePlayer in matchPlayer.Battle.PlayersInMap)
-            {
+            foreach (BaseBattlePlayer battlePlayer in battle.PlayersInMap)
                 battlePlayer.ShareEntities(effect);
-            }
 
             matchPlayer.Battle.Schedule(() =>
             {
-                foreach (BaseBattlePlayer battlePlayer in matchPlayer.Battle.PlayersInMap)
-                {
+                foreach (BaseBattlePlayer battlePlayer in battle.PlayersInMap)
                     battlePlayer.UnshareEntities(effect);
-                }
             });
 
             return $"Jumped successfully (multiplier: {multiplier})";
@@ -839,20 +739,7 @@ namespace TXServer.Core.Commands
 
             return conditions;
         }
-        private static void MessageOtherPlayers(string message, Player selfPlayer, Dictionary<IEnumerable<BaseBattlePlayer>, Entity> targets)
-        {
-            foreach (var target in targets)
-            {
-                target.Key.Where(battlePlayer => battlePlayer.Player != selfPlayer).SendEvent(new ChatMessageReceivedEvent
-                {
-                    Message = message,
-                    SystemMessage = true,
-                    UserId = selfPlayer.User.EntityId,
-                    UserUid = selfPlayer.User.GetComponent<UserUidComponent>().Uid,
-                    UserAvatarId = selfPlayer.User.GetComponent<UserAvatarComponent>().Id
-                }, target.Value);
-            }
-        }
+
         private static List<BattleTankPlayer> FindTargets(string targetName, Player player)
         {
             Battle battle = player.BattlePlayer.Battle;

@@ -88,19 +88,8 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 			};
 			return char.ToUpper(translatedReason[0]) + translatedReason[1..];
         }
-		public static void SendMessage(Player player, string message, Core.Battles.Battle battle)
-		{
-			player.SendEvent(new ChatMessageReceivedEvent
-			{
-				Message = message,
-				SystemMessage = true,
-				UserId = player.User.EntityId,
-				UserUid = player.User.GetComponent<UserUidComponent>().Uid,
-				UserAvatarId = player.User.GetComponent<UserAvatarComponent>().Id
-			}, battle.GeneralBattleChatEntity);
-		}
-		
-		public string Uid { get; set; }
+
+        public string Uid { get; set; }
 		public string Reason { get; set; }
 	}
 }

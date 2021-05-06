@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using TXServer.Core.Battles.Matchmaking;
 using TXServer.Core.Battles.Module;
 using TXServer.Core.Logging;
 using TXServer.Core.ServerMapInformation;
@@ -12,6 +13,7 @@ using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Time;
+using TXServer.ECSSystem.Components.User;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Chat;
 using TXServer.ECSSystem.Events.Battle;
@@ -230,14 +232,6 @@ namespace TXServer.Core.Battles
                 BattleResultForClient battleResultForClient = new(this, ModeHandler, personalResult);
                 battlePlayer.SendEvent(new BattleResultForClientEvent(battleResultForClient), battlePlayer.Player.User);
 
-                battlePlayer.Player.User.ChangeComponent<BattleLeaveCounterComponent>(component =>
-                {
-                    if (component.Value > 0)
-                        component.Value -= 1;
-                    if (component.NeedGoodBattles > 0)
-                        component.NeedGoodBattles -= 1;
-                });
-
                 battlePlayer.MatchPlayer.UserResult.ScoreWithoutPremium = battlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
                 battlePlayer.Player.User.ChangeComponent<UserExperienceComponent>(component =>
                     component.Experience += battlePlayer.MatchPlayer.UserResult.ScoreWithoutPremium - battlePlayer.MatchPlayer.AlreadyAddedExperience);
@@ -339,6 +333,8 @@ namespace TXServer.Core.Battles
         private void RemoveMatchPlayer(BaseBattlePlayer baseBattlePlayer)
         {
             Player player = baseBattlePlayer.Player;
+
+            MatchMaking.ProcessDeserterState(player, this);
 
             player.UnshareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
 
@@ -526,7 +522,7 @@ namespace TXServer.Core.Battles
             return searchedPlayer;
         }
 
-        private int EnemyCountFor(BattleTankPlayer battlePlayer) => ModeHandler.EnemyCountFor(battlePlayer);
+        public int EnemyCountFor(BattleTankPlayer battlePlayer) => ModeHandler.EnemyCountFor(battlePlayer);
 
         private static readonly Dictionary<BattleMode, Func<Entity, int, int, int, Entity>> BattleEntityCreators = new()
         {

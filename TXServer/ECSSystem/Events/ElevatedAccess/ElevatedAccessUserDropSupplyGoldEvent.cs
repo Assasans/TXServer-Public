@@ -11,8 +11,10 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			if (player.BattlePlayer != null) player.BattlePlayer.Battle.DropSpecificBonusType(BonusType.GOLD, player.User.GetComponent<UserUidComponent>().Uid);
-		}
+            if (!player.Data.Admin) return;
+
+            player.BattlePlayer?.Battle.DropSpecificBonusType(BonusType.GOLD, player.User.GetComponent<UserUidComponent>().Uid);
+        }
 		public GoldType GoldType { get; set; }
 	}
 }
