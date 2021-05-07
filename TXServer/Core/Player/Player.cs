@@ -378,9 +378,14 @@ namespace TXServer.Core
                     throw new ArgumentException("Self player cannot be unshared.");
 
                 if (_SharedPlayers.TryRemove(new KeyValuePair<Player, int>(player, 1)))
-                    if (IsActive) UnshareEntities(player.User);
-                    else
-                        _SharedPlayers.AddOrUpdate(player, player => throw new InvalidOperationException("Player is not shared."), (key, value) => --value);
+                {
+                    if (IsActive)
+                        UnshareEntities(player.User);
+                }
+                else
+                {
+                    _SharedPlayers.AddOrUpdate(player, player => throw new InvalidOperationException("Player is not shared."), (key, value) => --value);
+                }
             }
         }
 
