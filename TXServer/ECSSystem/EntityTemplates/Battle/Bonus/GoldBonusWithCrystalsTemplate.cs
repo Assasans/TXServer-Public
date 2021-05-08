@@ -1,11 +1,5 @@
-﻿using System;
-using System.Numerics;
-using TXServer.Core.Protocol;
+﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Components.Battle.Bonus;
-using TXServer.ECSSystem.Components.Battle.Location;
-using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.EntityTemplates.Battle.Bonus
 {

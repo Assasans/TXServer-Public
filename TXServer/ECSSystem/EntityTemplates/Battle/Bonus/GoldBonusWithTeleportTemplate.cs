@@ -6,5 +6,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Bonus
 	[SerialVersionUID(636404649605276028L)]
 	public class GoldBonusWithTeleportTemplate : GoldBonusTemplate, IEntityTemplate
 	{
+        // not in use anymore
 	}
 }

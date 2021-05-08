@@ -33,30 +33,32 @@ namespace TXServer.Core.Battles
 
         public void CreateBonus(Entity battleEntity)
         {
-            if (BonusType != BonusType.GOLD)
-                BonusEntity = SupplyBonusTemplate.CreateEntity(BonusType, BonusRegion, new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity);
-            else
-                BonusEntity = GoldBonusWithCrystalsTemplate.CreateEntity(BonusType, BonusRegion, new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity);
+            BonusEntity = BonusType != BonusType.GOLD
+                ? SupplyBonusTemplate.CreateEntity(BonusType, BonusRegion,
+                    new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity)
+                : GoldBonusWithCrystalsTemplate.CreateEntity(BonusType, BonusRegion,
+                    new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity);
             Battle.PlayersInMap.ShareEntities(BonusEntity);
             State = BonusState.Spawned;
         }
 
         public void Take(Player player)
         {
-            var battlePlayer = player.BattlePlayer;
+            BattleTankPlayer battlePlayer = player.BattlePlayer;
 
             Battle.PlayersInMap.SendEvent(new BonusTakenEvent(), BonusEntity);
             if (BonusType == BonusType.GOLD)
                 Battle.PlayersInMap.SendEvent(new GoldTakenNotificationEvent(), battlePlayer.MatchPlayer.BattleUser);
             Battle.PlayersInMap.UnshareEntities(BonusEntity);
-            
-            State = BonusType == BonusType.GOLD ? BonusState.Unused : BonusState.Redrop;
+
+            State = BonusType == BonusType.GOLD ? BonusState.Unused : BonusState.ReDrop;
             battlePlayer.MatchPlayer.UserResult.BonusesTaken += 1;
-            
+
             switch (BonusType)
             {
                 case BonusType.GOLD:
                     player.Data.SetCrystals(player.Data.Crystals + CurrentCrystals);
+                    Battle.PlayersInMap.UnshareEntities(BonusRegion);
                     break;
                 default:
                     _ = new SupplyEffect(BonusType, battlePlayer.MatchPlayer, cheat:false);
@@ -88,7 +90,7 @@ namespace TXServer.Core.Battles
                         if (BonusType == BonusType.GOLD)
                             StateChangeCountdown = 20;
                         break;
-                    case BonusState.Redrop:
+                    case BonusState.ReDrop:
                         StateChangeCountdown = 180;
                         break;
                     case BonusState.Unused:

@@ -1,10 +1,10 @@
-﻿using TXServer.Core.Protocol;
+﻿using System.Numerics;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Bonus;
 using TXServer.ECSSystem.Types;
-using System.Numerics;
 
-namespace TXServer.ECSSystem.EntityTemplates.Battle
+namespace TXServer.ECSSystem.EntityTemplates.Battle.Bonus
 {
     [SerialVersionUID(8116072916726390829L)]
     public class BonusRegionTemplate : IEntityTemplate

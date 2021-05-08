@@ -3,8 +3,6 @@ using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Battle.Bonus
 {

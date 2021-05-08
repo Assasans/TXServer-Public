@@ -6,6 +6,6 @@
         New,
         RegionShared,
         Spawned,
-        Redrop
+        ReDrop
     }
 }

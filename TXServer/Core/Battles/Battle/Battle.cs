@@ -432,14 +432,15 @@ namespace TXServer.Core.Battles
 
                 if (battleBonus.StateChangeCountdown < 0 || battleBonus.State == BonusState.New)
                 {
-                    if (battleBonus.State == BonusState.New)
+                    switch (battleBonus.State)
                     {
-                        battleBonus.CreateRegion();
-
-                        continue;
+                        case BonusState.New:
+                            battleBonus.CreateRegion();
+                            continue;
+                        case BonusState.ReDrop or BonusState.RegionShared:
+                            battleBonus.CreateBonus(BattleEntity);
+                            break;
                     }
-                    if (battleBonus.State == BonusState.Redrop || battleBonus.State == BonusState.RegionShared)
-                        battleBonus.CreateBonus(BattleEntity);
                 }
             }
         }
@@ -506,7 +507,7 @@ namespace TXServer.Core.Battles
             else
             {
                 BattleBonuses[supplyIndex].State = BonusState.New;
-                if (String.IsNullOrWhiteSpace(sender)) sender = "";
+                if (string.IsNullOrWhiteSpace(sender)) sender = "";
                 PlayersInMap.SendEvent(new GoldScheduleNotificationEvent(sender), RoundEntity);
             }
         }

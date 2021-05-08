@@ -20,8 +20,10 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Bonus
                 new BonusDropTimeComponent(DateTime.UtcNow),
                 new PositionComponent(position),
                 new RotationComponent(new Vector3(0, 0, 0)),
-                new BonusRegionGroupComponent(bonusRegion),
-                new BattleGroupComponent(battleEntity)
+
+                bonusRegion.GetComponent<BonusRegionGroupComponent>(),
+                bonusRegion.GetComponent<GoldBonusRegionComponent>(),
+                battleEntity.GetComponent<BattleGroupComponent>()
             );
 
             return entity;
