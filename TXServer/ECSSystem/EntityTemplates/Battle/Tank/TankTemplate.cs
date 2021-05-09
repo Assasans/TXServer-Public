@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Protocol;
+using TXServer.Core.Configuration;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
@@ -14,17 +15,27 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     {
         public static Entity CreateEntity(Entity hullUserItem, Entity battleUser)
         {
-            Entity entity = new Entity(new TemplateAccessor(new TankTemplate(), hullUserItem.TemplateAccessor.ConfigPath.Replace("garage", "battle")),
+            string configPath = hullUserItem.TemplateAccessor.ConfigPath;
+            var health = Config.LoadComponent<ServerComponents.HealthComponent>(configPath);
+
+            Entity entity = new(new TemplateAccessor(new TankTemplate(), configPath.Replace("garage", "battle")),
                 new TankComponent(),
                 new TankPartComponent(),
                 battleUser.GetComponent<UserGroupComponent>(),
                 battleUser.GetComponent<BattleGroupComponent>(),
-                new HealthComponent(2500, 2500),
-                new HealthConfigComponent(2500),
-                new DampingComponent(1500),
-                new SpeedComponent(9.967f, 98f, 13.205f),
-                new SpeedConfigComponent(112.854f, 19.96f, 10.719f, 226.333f),
-                new WeightComponent(2986.667f),
+                Config.LoadComponent<HealthComponent>(configPath),
+                new HealthConfigComponent(health.FinalValue),
+                Config.LoadComponent<DampingComponent>(configPath),
+                new SpeedComponent(
+                    Config.LoadComponent<ServerComponents.Speed.SpeedComponent>(configPath).FinalValue,
+                    Config.LoadComponent<ServerComponents.Speed.TurnSpeedComponent>(configPath).FinalValue,
+                    Config.LoadComponent<ServerComponents.Speed.AccelerationComponent>(configPath).FinalValue),
+                new SpeedConfigComponent(
+                    Config.LoadComponent<ServerComponents.SpeedConfig.TurnAccelerationComponent>(configPath).FinalValue,
+                    Config.LoadComponent<ServerComponents.SpeedConfig.SideAccelerationComponent>(configPath).FinalValue,
+                    Config.LoadComponent<ServerComponents.SpeedConfig.ReverseAccelerationComponent>(configPath).FinalValue,
+                    Config.LoadComponent<ServerComponents.SpeedConfig.ReverseTurnAccelerationComponent>(configPath).FinalValue),
+                Config.LoadComponent<WeightComponent>(configPath),
                 new TemperatureComponent(0),
                 new TankNewStateComponent());
 

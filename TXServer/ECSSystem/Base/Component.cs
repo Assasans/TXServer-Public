@@ -1,10 +1,11 @@
-﻿namespace TXServer.ECSSystem.Base
+using System;
+
+namespace TXServer.ECSSystem.Base
 {
-    public abstract class Component
+    public abstract class Component : ICloneable
     {
-        public override int GetHashCode()
-        {
-            return GetType().GetHashCode();
-        }
+        public object Clone() => MemberwiseClone();
+
+        public override int GetHashCode() => GetType().GetHashCode();
     }
 }

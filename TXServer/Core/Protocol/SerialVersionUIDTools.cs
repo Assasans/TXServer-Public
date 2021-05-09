@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.Core.Protocol
 {
@@ -49,7 +48,7 @@ namespace TXServer.Core.Protocol
         /// <summary>
         /// Get Type by SerialVersionUID.
         /// </summary>
-        public static Type FindType(Int64 id)
+        public static Type FindType(long id)
         {
             try
             {

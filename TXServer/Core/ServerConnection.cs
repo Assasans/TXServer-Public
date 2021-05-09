@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using TXServer.Core.Battles;
+using TXServer.Core.Configuration;
 using TXServer.Core.Logging;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Events.Ping;
@@ -37,6 +38,8 @@ namespace TXServer.Core
             });
 
             MaxPoolSize = poolSize;
+
+            Config.Init();
 
             new Thread(() => AcceptPlayers(ip, port, MaxPoolSize)) { Name = "Acceptor" }.Start();
             new Thread(() => StateServer(ip)) { Name = "State Server" }.Start();

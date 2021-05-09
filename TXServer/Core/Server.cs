@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using TXServer.Core.Battles;
 using TXServer.Core.Battles.Effect;
@@ -11,7 +11,7 @@ namespace TXServer.Core
     public class Server
     {
         public static Server Instance { get; set; }
-        
+
         public ServerConnection Connection { get; private set; }
 
         public ServerSettings Settings { get; init; }
@@ -19,9 +19,10 @@ namespace TXServer.Core
         public Action UserErrorHandler { get; init; }
         public ModuleRegistry ModuleRegistry { get; }
 
-        public Server() {
+        public Server()
+        {
             ModuleRegistry = new ModuleRegistry();
-            
+
             ModuleRegistry.Register("garage/module/module/tank/active/1/absorbingarmor", new ModuleTypeInfo(typeof(EnhancedArmorModule), TimeSpan.FromMilliseconds(5000)));
             ModuleRegistry.Register("garage/module/prebuildmodule/common/active/1/gold", new ModuleTypeInfo(typeof(GoldModule), TimeSpan.FromMilliseconds(500)));
             ModuleRegistry.Register("garage/module/module/weapon/active/2/increaseddamage", new ModuleTypeInfo(typeof(IncreasedDamageModule), TimeSpan.FromMilliseconds(5000)));
@@ -51,7 +52,7 @@ namespace TXServer.Core
 
             return null;
         }
-        
+
         public Player FindPlayerByUid(string uid)
         {
             Player searchedPlayer = Connection.Pool.FirstOrDefault(controlledPlayer =>
@@ -78,7 +79,7 @@ namespace TXServer.Core
             if (!Connection.IsStarted) return;
 
             Logger.Log("Stopping server...");
-            
+
             Connection.StopServer();
             Database.Shutdown();
 
