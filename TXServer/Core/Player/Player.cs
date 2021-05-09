@@ -304,10 +304,10 @@ namespace TXServer.Core
                 2000000
             };
 
-            MatchPlayer matchPlayer = BattlePlayer.MatchPlayer;
+            MatchPlayer matchPlayer = BattlePlayer?.MatchPlayer;
 
             long totalExperience = User.GetComponent<UserExperienceComponent>().Experience;
-            if (IsInMatch)
+            if (IsInMatch && matchPlayer != null)
             {
                 int battleExperience = matchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
                 if (IsPremium)
@@ -323,7 +323,7 @@ namespace TXServer.Core
             // todo: load rank rewards from configs (https://vignette2.wikia.nocookie.net/tanki-x/images/f/fb/Rankit.png/revision/latest?cb=20170629172052)
             ShareEntities(UserRankRewardNotificationTemplate.CreateEntity(100, 5000, correctRank));
 
-            if (!IsInMatch) return;
+            if (!IsInMatch || matchPlayer == null) return;
             BattlePlayer.Battle.PlayersInMap.SendEvent(new UpdateRankEvent(), User);
             int currentScoreInBattle = matchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
             Data.SetExperience(Data.Experience + matchPlayer.GetScoreWithPremium(currentScoreInBattle));
