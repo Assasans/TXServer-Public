@@ -530,7 +530,17 @@ namespace TXServer.Core.Commands
                 : $"'{targets[0].Player.Data.Username}' has been killed'";
         }
 
-        private static string Ping(Player player, string[] args) => $"Network latency: {player.Connection.Ping} ms";
+        private static string Ping(Player player, string[] args)
+        {
+            if (args.Length <= 0 || args[0] == player.Data.Username) return $"Network latency: {player.Connection.Ping} ms";
+            if (!player.Data.Admin)
+                return ConditionErrors[ChatCommandConditions.Admin];
+
+            Player targetPlayer = Server.Instance.FindPlayerByUid(args[0]);
+            return targetPlayer == null
+                ? $"Error, the user '{args[0]}' wasn't found or isn't online yet"
+                : $"Network latency of '{args[0]}': {targetPlayer.Connection.Ping} ms";
+        }
 
         private static string ReloadTime(Player player, string[] args)
         {

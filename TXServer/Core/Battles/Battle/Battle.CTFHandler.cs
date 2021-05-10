@@ -89,7 +89,7 @@ namespace TXServer.Core.Battles
                 {
                     foreach (KeyValuePair<Entity, Flag> flag in Flags)
                     {
-                        if (flag.Value.State != FlagState.Captured)
+                        if (flag.Value.State != FlagState.Captured || flag.Value.Carrier != battlePlayer)
                             continue;
                         flag.Value.FlagEntity.PlayerReferences.Remove(battlePlayer.Player);
                         flag.Value.Drop(false);

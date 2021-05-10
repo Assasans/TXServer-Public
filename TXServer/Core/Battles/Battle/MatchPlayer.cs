@@ -28,7 +28,7 @@ namespace TXServer.Core.Battles
             Player = battlePlayer.Player;
 
             BattleUser = BattleUserTemplate.CreateEntity(battlePlayer.Player, battleEntity, battlePlayer.Team);
-            
+
             Tank = TankTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullItem, BattleUser);
             Weapon = WeaponTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponItem, Tank, battlePlayer);
             HullSkin = HullSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullSkins[battlePlayer.Player.CurrentPreset.HullItem], Tank);
@@ -41,7 +41,7 @@ namespace TXServer.Core.Battles
             Incarnation = TankIncarnationTemplate.CreateEntity(Tank);
             RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, Tank);
             UserResult = new UserResult(battlePlayer, userResults);
-                
+
             if (Battle.ModeHandler is TeamBattleHandler handler)
                 SpawnCoordinates = handler.BattleViewFor(Player.BattlePlayer).SpawnPoints;
             else
@@ -68,13 +68,16 @@ namespace TXServer.Core.Battles
         {
             Player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(component =>
             {
-                component.ScoreWithoutBonuses = Math.Clamp(component.ScoreWithoutBonuses + additiveScore, 0, int.MaxValue);
+                if (Battle.IsMatchMaking)
+                    component.ScoreWithoutBonuses =
+                        Math.Clamp(component.ScoreWithoutBonuses + additiveScore, 0, int.MaxValue);
                 component.Kills = Math.Clamp(component.Kills + additiveKills, 0, int.MaxValue);
                 component.KillAssists = Math.Clamp(component.KillAssists + additiveKillAssists, 0, int.MaxValue);
                 component.Deaths = Math.Clamp(component.Deaths + additiveDeath, 0, int.MaxValue);
             });
 
-            UserResult.Kills += additiveKills;
+            // KillStrike = Kills, Kills = KillStrike
+            UserResult.KillStrike += additiveKills;
             UserResult.KillAssists += additiveKillAssists;
             UserResult.Deaths += additiveDeath;
 
@@ -111,7 +114,7 @@ namespace TXServer.Core.Battles
             else
                 LastSpawnPoint = SpawnCoordinates.Where(spawnCoordinate => spawnCoordinate.Number != LastSpawnPoint.Number).ElementAt(new Random().Next(SpawnCoordinates.Count - 1));
 
-            /* in case you want to set another json for testing a SINGLE spawn coordinate  
+            /* in case you want to set another json for testing a SINGLE spawn coordinate
             string CoordinatesJson = File.ReadAllText("YourPath\\test.json");
             coordinate = JsonSerializer.Deserialize<Coordinates.spawnCoordinate>(CoordinatesJson); */
 
@@ -212,7 +215,7 @@ namespace TXServer.Core.Battles
                         supplyEffect.ExtendTime();
                     else
                         supplyEffect.Remove();
-                } 
+                }
             }
 
             // battle modules
@@ -300,7 +303,7 @@ namespace TXServer.Core.Battles
 
         public bool Paused { get; set; }
         public DateTime? IdleKickTime { get; set; }
-        
+
         public List<SupplyEffect> SupplyEffects { get; } = new();
         public Dictionary<MatchPlayer, int> DamageAssisters { get; set; } = new();
         public int AlreadyAddedExperience { get; set; } = 0;
