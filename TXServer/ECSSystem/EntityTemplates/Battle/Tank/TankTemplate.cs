@@ -26,15 +26,8 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 Config.LoadComponent<HealthComponent>(configPath),
                 new HealthConfigComponent(health.FinalValue),
                 Config.LoadComponent<DampingComponent>(configPath),
-                new SpeedComponent(
-                    Config.LoadComponent<ServerComponents.Speed.SpeedComponent>(configPath).FinalValue,
-                    Config.LoadComponent<ServerComponents.Speed.TurnSpeedComponent>(configPath).FinalValue,
-                    Config.LoadComponent<ServerComponents.Speed.AccelerationComponent>(configPath).FinalValue),
-                new SpeedConfigComponent(
-                    Config.LoadComponent<ServerComponents.SpeedConfig.TurnAccelerationComponent>(configPath).FinalValue,
-                    Config.LoadComponent<ServerComponents.SpeedConfig.SideAccelerationComponent>(configPath).FinalValue,
-                    Config.LoadComponent<ServerComponents.SpeedConfig.ReverseAccelerationComponent>(configPath).FinalValue,
-                    Config.LoadComponent<ServerComponents.SpeedConfig.ReverseTurnAccelerationComponent>(configPath).FinalValue),
+                Config.LoadComponent<SpeedComponent>(configPath),
+                Config.LoadComponent<SpeedConfigComponent>(configPath),
                 Config.LoadComponent<WeightComponent>(configPath),
                 new TemperatureComponent(0),
                 new TankNewStateComponent());

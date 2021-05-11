@@ -1,15 +1,18 @@
-﻿namespace TXServer.ECSSystem.ServerComponents
+namespace TXServer.ECSSystem.ServerComponents
 {
     public static class Speed
     {
-        public class SpeedComponent : RangedComponent
+        public class SpeedComponent : RangedComponent, IConvertibleComponent<Components.Battle.Chassis.SpeedComponent>
         {
+            public void Convert(Components.Battle.Chassis.SpeedComponent component) => component.Speed = FinalValue;
         }
-        public class TurnSpeedComponent : RangedComponent
+        public class TurnSpeedComponent : RangedComponent, IConvertibleComponent<Components.Battle.Chassis.SpeedComponent>
         {
+            public void Convert(Components.Battle.Chassis.SpeedComponent component) => component.TurnSpeed = FinalValue;
         }
-        public class AccelerationComponent : RangedComponent
+        public class AccelerationComponent : RangedComponent, IConvertibleComponent<Components.Battle.Chassis.SpeedComponent>
         {
+            public void Convert(Components.Battle.Chassis.SpeedComponent component) => component.Acceleration = FinalValue;
         }
     }
 }

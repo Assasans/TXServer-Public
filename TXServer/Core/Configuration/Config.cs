@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
@@ -86,16 +87,27 @@ namespace TXServer.Core.Configuration
                 {
                     if (obj is not Component component) continue;
 
-                    if (component is IConvertibleComponent convertible)
-                    {
-                        var convertedComponent = convertible.Convert();
-                        currentNode.Components.Add(convertedComponent.GetType(), convertedComponent);
-                    }
-
                     if (Attribute.IsDefined(component.GetType(), typeof(SerialVersionUIDAttribute)))
                         currentNode.Components.Add(component.GetType(), component);
                     else
                         currentNode.ServerComponents.Add(component.GetType(), component);
+                }
+
+                // Convert server-only components to shared components
+                foreach (Component component in currentNode.ServerComponents.Values)
+                {
+                    foreach (Type type in component.GetType().GetInterfaces()
+                        .Where(iType => iType.IsGenericType && iType.GetGenericTypeDefinition() == typeof(IConvertibleComponent<>)))
+                    {
+                        Type resultType = type.GetGenericArguments()[0];
+
+                        currentNode.Components.TryGetValue(resultType, out Component resultComponent);
+                        resultComponent ??= (Component)FormatterServices.GetUninitializedObject(resultType);
+
+                        type.GetMethod("Convert").Invoke(component, new[] { resultComponent });
+
+                        currentNode.Components.TryAdd(resultType, resultComponent);
+                    }
                 }
             }
 

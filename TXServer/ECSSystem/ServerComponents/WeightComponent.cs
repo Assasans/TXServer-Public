@@ -1,9 +1,10 @@
-﻿using TXServer.ECSSystem.Base;
-
 namespace TXServer.ECSSystem.ServerComponents
 {
-    public class WeightComponent : RangedComponent, IConvertibleComponent
+    public class WeightComponent : RangedComponent, IConvertibleComponent<Components.Battle.Chassis.WeightComponent>
     {
-        public Component Convert() => new Components.Battle.Chassis.WeightComponent(FinalValue);
+        public void Convert(Components.Battle.Chassis.WeightComponent component)
+        {
+            component.Weight = FinalValue;
+        }
     }
 }

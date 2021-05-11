@@ -1,4 +1,4 @@
-﻿using TXServer.ECSSystem.Types;
+using TXServer.ECSSystem.Types;
 using System;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Tank;
@@ -8,6 +8,7 @@ using TXServer.ECSSystem.Components.Battle.Chassis;
 using System.Linq;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.EntityTemplates.Effects;
+using TXServer.Core.Configuration;
 
 namespace TXServer.Core.Battles
 {
@@ -38,8 +39,8 @@ namespace TXServer.Core.Battles
 
             if (BonusType == BonusType.SPEED)
             {
-                // todo: load from configs
-                MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.Speed = 9.967f);
+                MatchPlayer.Tank.ChangeComponent(_prevSpeedComponent);
+                _prevSpeedComponent = null;
             }
         }
 
@@ -74,8 +75,11 @@ namespace TXServer.Core.Battles
                 case BonusType.SPEED:
                     MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component =>
                     {
-                        if (Cheat) component.Speed = float.MaxValue;
-                        else component.Speed = (float)(component.Speed * 1.5);
+                        _prevSpeedComponent = (SpeedComponent)component.Clone();
+                        if (Cheat)
+                            component.Speed = float.MaxValue;
+                        else
+                            component.Speed *= 1.5f;
                     });
                     SupplyEffectEntity = TurboSpeedEffectTemplate.CreateEntity(durationMillis, MatchPlayer.Tank);
                     break;
@@ -99,6 +103,7 @@ namespace TXServer.Core.Battles
 
         public BonusType BonusType { get; set; }
         public Entity SupplyEffectEntity { get; set; }
+        private SpeedComponent _prevSpeedComponent;
         public DateTime StopTime { get; set; }
         public bool Cheat { get; set; }
         private MatchPlayer MatchPlayer { get; set; }

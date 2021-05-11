@@ -1,9 +1,9 @@
-﻿using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.ServerComponents
 {
-    public interface IConvertibleComponent
+    public interface IConvertibleComponent<T> where T : Component
     {
-        Component Convert();
+        void Convert(T component);
     }
 }

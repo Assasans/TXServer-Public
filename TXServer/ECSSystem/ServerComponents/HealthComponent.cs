@@ -1,9 +1,10 @@
-﻿using TXServer.ECSSystem.Base;
-
 namespace TXServer.ECSSystem.ServerComponents
 {
-    public class HealthComponent : RangedComponent, IConvertibleComponent
+    public class HealthComponent : RangedComponent, IConvertibleComponent<Components.Battle.Health.HealthComponent>
     {
-        public Component Convert() => new Components.Battle.Health.HealthComponent(FinalValue, FinalValue);
+        public void Convert(Components.Battle.Health.HealthComponent component)
+        {
+            (component.CurrentHealth, component.MaxHealth) = (FinalValue, FinalValue);
+        }
     }
 }

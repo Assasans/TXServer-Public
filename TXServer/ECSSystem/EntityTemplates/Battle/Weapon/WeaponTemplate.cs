@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using TXServer.Core.Battles;
+using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -40,24 +41,28 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
 
         protected static Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank, BattleTankPlayer battlePlayer)
         {
-            Entity weapon = new Entity(new TemplateAccessor(template, configPath.Replace("garage", "battle")),
+            string garageConfigPath = configPath.Replace("battle", "garage");
+
+            Entity weapon = new Entity(new TemplateAccessor(template, configPath),
                 tank.GetComponent<TankPartComponent>(),
                 new WeaponComponent(),
                 // These components should be gotten from configs.
-                new WeaponEnergyComponent(1.3f),
+                Config.LoadComponent<WeaponEnergyComponent>(garageConfigPath),
                 tank.GetComponent<UserGroupComponent>(),
                 tank.GetComponent<TankGroupComponent>(),
                 tank.GetComponent<BattleGroupComponent>());
             
             weapon.Components.Add(battlePlayer.TurretUnloadEnergyPerShot == null
-                ? new WeaponCooldownComponent(1.3f)
+                ? Config.LoadComponent<WeaponCooldownComponent>(garageConfigPath)
                 : new WeaponCooldownComponent((float) battlePlayer.TurretUnloadEnergyPerShot));
-            
+
             if (battlePlayer.TurretRotationSpeed == null)
-                weapon.AddComponent(new WeaponRotationComponent(113.667f, 113.333f, 113.333f));
+            {
+                weapon.AddComponent(Config.LoadComponent<WeaponRotationComponent>(tank.TemplateAccessor.ConfigPath.Replace("battle", "garage")));
+            }
             else
             {
-                float turretRotation = (float) battlePlayer.TurretRotationSpeed;
+                float turretRotation = (float)battlePlayer.TurretRotationSpeed;
                 weapon.AddComponent(new WeaponRotationComponent(turretRotation, turretRotation, turretRotation));
             }
 
