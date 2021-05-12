@@ -19,8 +19,6 @@ namespace TXServer.Core
 {
     public class ServerConnection
     {
-        private const int COR_E_FILENOTFOUND = unchecked((int)0x80070002);
-
         public Server Server { get; }
 
         public ServerConnection(Server server)
@@ -199,17 +197,15 @@ namespace TXServer.Core
                         {
                             data = Array.Empty<byte>();
 
-                            switch (e.HResult)
+                            response.StatusCode = e switch
                             {
-                                case COR_E_FILENOTFOUND:
-                                    response.StatusCode = 404;
-                                    break;
+                                FileNotFoundException or DirectoryNotFoundException => 404,
+                                UnauthorizedAccessException => 403,
+                                _ => 500
+                            };
 
-                                default:
-                                    response.StatusCode = 500;
-                                    Logger.Error(e);
-                                    break;
-                            }
+                            if (response.StatusCode == 500)
+                                Logger.Error(e);
                         }
 
                         response.ContentLength64 = data.Length;
