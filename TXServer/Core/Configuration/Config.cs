@@ -39,22 +39,25 @@ namespace TXServer.Core.Configuration
 
             // Read config file
             Logger.Debug("Reading config files...");
-            TarInputStream stream = new(new GZipInputStream(new FileStream(_configPath, FileMode.Open)), Encoding.UTF8);
-            while (true)
+            using (FileStream fileStream = new FileStream(_configPath, FileMode.Open))
             {
-                TarEntry entry = stream.GetNextEntry();
-                if (entry == null) break;
-
-                if (entry.Name.EndsWith("id.yml"))
+                TarInputStream stream = new(new GZipInputStream(fileStream), Encoding.UTF8);
+                while (true)
                 {
-                    var reader = new StreamReader(stream);
-                    reader.Read(new char[4]);
-                    ids[entry.Name[0..^7]] = long.Parse(reader.ReadLine());
-                }
+                    TarEntry entry = stream.GetNextEntry();
+                    if (entry == null) break;
 
-                if (!entry.Name.EndsWith("public.yml")) continue;
-                Logger.Trace($"Reading {entry.Name}...");
-                components.Add(entry.Name[0..^11], deserializer.Deserialize(new StreamReader(stream)));
+                    if (entry.Name.EndsWith("id.yml"))
+                    {
+                        var reader = new StreamReader(stream);
+                        reader.Read(new char[4]);
+                        ids[entry.Name[0..^7]] = long.Parse(reader.ReadLine());
+                    }
+
+                    if (!entry.Name.EndsWith("public.yml")) continue;
+                    Logger.Trace($"Reading {entry.Name}...");
+                    components.Add(entry.Name[0..^11], deserializer.Deserialize(new StreamReader(stream)));
+                }
             }
 
 

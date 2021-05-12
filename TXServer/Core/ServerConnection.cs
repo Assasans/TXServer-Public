@@ -19,6 +19,8 @@ namespace TXServer.Core
 {
     public class ServerConnection
     {
+        private const int COR_E_FILENOTFOUND = unchecked((int)0x80070002);
+
         public Server Server { get; }
 
         public ServerConnection(Server server)
@@ -193,10 +195,21 @@ namespace TXServer.Core
                                 data = File.ReadAllBytes(rootPath + request.Url.LocalPath);
                             }
                         }
-                        catch
+                        catch (Exception e)
                         {
                             data = Array.Empty<byte>();
-                            response.StatusCode = 404;
+
+                            switch (e.HResult)
+                            {
+                                case COR_E_FILENOTFOUND:
+                                    response.StatusCode = 404;
+                                    break;
+
+                                default:
+                                    response.StatusCode = 500;
+                                    Logger.Error(e);
+                                    break;
+                            }
                         }
 
                         response.ContentLength64 = data.Length;
