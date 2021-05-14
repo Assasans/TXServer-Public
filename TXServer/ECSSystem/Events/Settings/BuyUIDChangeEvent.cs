@@ -1,10 +1,9 @@
 ﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
 
-namespace TXServer.ECSSystem.Events.Battle
+namespace TXServer.ECSSystem.Events.Settings
 {
 	[SerialVersionUID(1474537061794L)]
 	public class BuyUIDChangeEvent : ECSEvent

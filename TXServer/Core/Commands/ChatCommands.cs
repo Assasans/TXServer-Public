@@ -35,7 +35,7 @@ namespace TXServer.Core.Commands
             { "gravity", ("gravity [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.BattleOwner, Gravity) },
             { "kickback", ("kickback [number] [target]", ChatCommandConditions.HackBattle, Kickback) },
             { "kill", ("kill [target]", ChatCommandConditions.InMatch | ChatCommandConditions.Admin, KillPlayer) },
-            { "teleport", ("teleport [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.Premium, Teleport) },
+            { "tp", ("teleport [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.Premium, Teleport) },
             { "turretReload", ("turretReload [instant/never] [target]", ChatCommandConditions.HackBattle, ReloadTime) },
             { "turretRotation", ("turretRotation [instant/stuck/norm/number]", ChatCommandConditions.HackBattle, TurretRotation) },
             { "jump", ("jump [multiplier]", ChatCommandConditions.HackBattle | ChatCommandConditions.InMatch, Jump) }
@@ -125,7 +125,7 @@ namespace TXServer.Core.Commands
                         if (player.Data.Admin)
                             message += "\nFor battles: 'all/custom/mm/others/this' or nothing";
                         return message;
-                    case "teleport":
+                    case "tp":
                         condition = ChatCommandConditions.Premium;
                         if (!playerConditions.HasFlag(condition))
                             return ConditionErrors[condition];
@@ -357,18 +357,23 @@ namespace TXServer.Core.Commands
                     string targetName;
                     targetName = args.Length < 3 ? player.Data.Username : args[2];
                     List<BattleTankPlayer> targets = FindTargets(targetName, player);
-                    if (targets.Count == 0)
-                        return $"Error, the target '{targetName}' wasn't found in this battle";
-                    if (targets.Count > 1)
-                        return $"Logical error, found {targets.Count} targets but expected one";
+
+                    switch (targets.Count)
+                    {
+                        case 0:
+                            return $"Error, the target '{targetName}' wasn't found in this battle";
+                        case > 1:
+                            return $"Logical error, found {targets.Count} targets but expected one";
+                    }
                     if (targets[0].Team == flag.Team)
                         return $"Logical error, {targetName} can't capture the flag of this team";
-                    if (flag.Carrier == player.BattlePlayer)
+                    if (flag.State == FlagState.Captured && flag.Carrier.Player.Data.Username == targetName)
                         return $"Logical error, {targetName} already has the {args[0].ToLower()} flag";
 
                     switch (flag.State)
                     {
                         case FlagState.Captured:
+                            if (flag.Carrier.IsCheatImmune) return "Command error, not possible with this carrier";
                             flag.Drop(false);
                             flag.Pickup(targets[0]);
                             break;
@@ -379,6 +384,7 @@ namespace TXServer.Core.Commands
                             flag.Pickup(targets[0]);
                             break;
                     }
+
                     return $"Gave flag to user '{targetName}'";
                 default:
                     return $"Parsing error, '/flag' doesn't have an argument named '{args[1]}'";

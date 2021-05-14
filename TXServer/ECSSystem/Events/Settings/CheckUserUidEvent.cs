@@ -9,9 +9,8 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			// TODO: check if uid is occupied
-			bool emailIsOccupied = false;
-			if (emailIsOccupied) 
+			// TODO: check if uid is occupied in db
+            if (Server.Instance.FindPlayerByUid(Uid) != null)
 			{
 				player.SendEvent(new UserUidOccupiedEvent(Uid), entity);
 				return;

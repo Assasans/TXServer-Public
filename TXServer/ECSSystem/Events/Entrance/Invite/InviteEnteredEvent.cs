@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events.Entrance.Invite
 		public void Execute(Player player, Entity entity)
 		{
 			// Todo: database immigration
-			List<string> AllowedUids = new()
+			List<string> allowedUids = new()
 			{
 				"NoNick", "Tim203", "M8", "Kaveman", "Assasans",
 				"Concodroid", "Corpserdefg",
@@ -23,7 +23,7 @@ namespace TXServer.ECSSystem.Events.Entrance.Invite
 			};
 
 			string inviteCode = entity.GetComponent<InviteComponent>().InviteCode;
-			if (AllowedUids.Contains(inviteCode) || AllowedUids.Contains(inviteCode.ToLower()))
+			if (allowedUids.Contains(inviteCode) || allowedUids.Contains(inviteCode.ToLower()))
 			{
 				player.SendEvent(new CommenceRegistrationEvent(), entity);
 				Logger.Log($"{player}: New session with invite code \"{inviteCode}\"");

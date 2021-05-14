@@ -44,13 +44,7 @@ namespace TXServer.Core
 
         public Player FindPlayerById(long entityId)
         {
-            foreach (Player player in Connection.Pool)
-            {
-                if (player.IsLoggedIn && player.User.EntityId == entityId)
-                    return player;
-            }
-
-            return null;
+            return Connection.Pool.FirstOrDefault(player => player.IsLoggedIn && player.User.EntityId == entityId);
         }
 
         public Player FindPlayerByUid(string uid)
