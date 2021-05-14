@@ -126,7 +126,7 @@ namespace TXServer.Core.Commands
                             message += "\nFor battles: 'all/custom/mm/others/this' or nothing";
                         return message;
                     case "teleport":
-                        condition = ChatCommandConditions.Admin;
+                        condition = ChatCommandConditions.Premium;
                         if (!playerConditions.HasFlag(condition))
                             return ConditionErrors[condition];
                         if (!player.IsInBattle)
