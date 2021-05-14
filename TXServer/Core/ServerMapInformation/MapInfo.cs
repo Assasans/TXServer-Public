@@ -13,6 +13,7 @@ namespace TXServer.Core.ServerMapInformation
         public MapFlags Flags { get; set; }
         public IList<PuntativeGeometry> PuntativeGeoms { get; set; }
         public MapSpawnPointInfo SpawnPoints { get; set; }
+        public IList<TeleportPoint> TeleportPoints { get; set; }
         public MapBonusInfo BonusRegions { get; set; }
     }
 }

@@ -46,6 +46,7 @@ namespace TXServer.ECSSystem.Events.Battle
             Vector3 velocity = matchPlayer.TankPosition - matchPlayer.PrevTankPosition;
             matchPlayer.PrevTankPosition = matchPlayer.TankPosition;
             matchPlayer.TankPosition = position.Value;
+            matchPlayer.TankQuaternion = MoveCommand.Movement?.Orientation;
 
             if (CheckOverflow(position.Value + velocity))
                 matchPlayer.SelfDestructionTime = DateTime.Now;

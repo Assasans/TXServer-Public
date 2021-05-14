@@ -68,9 +68,7 @@ namespace TXServer.Core.Battles
         {
             Player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(component =>
             {
-                if (Battle.IsMatchMaking)
-                    component.ScoreWithoutBonuses =
-                        Math.Clamp(component.ScoreWithoutBonuses + additiveScore, 0, int.MaxValue);
+                component.ScoreWithoutBonuses = Math.Clamp(component.ScoreWithoutBonuses + additiveScore, 0, int.MaxValue);
                 component.Kills = Math.Clamp(component.Kills + additiveKills, 0, int.MaxValue);
                 component.KillAssists = Math.Clamp(component.KillAssists + additiveKillAssists, 0, int.MaxValue);
                 component.Deaths = Math.Clamp(component.Deaths + additiveDeath, 0, int.MaxValue);
@@ -84,7 +82,7 @@ namespace TXServer.Core.Battles
             Damage.ProcessKillStreak(additiveKills, additiveDeath > 0, this, killer);
             Battle.PlayersInMap.SendEvent(new RoundUserStatisticsUpdatedEvent(), RoundUser);
             Battle.SortRoundUsers();
-            Player.CheckRankUp();
+            if (Battle.IsMatchMaking) Player.CheckRankUp();
         }
 
         public int GetScoreWithPremium(int score)
@@ -109,16 +107,30 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            if (SpawnCoordinates.Count == 1)
-                LastSpawnPoint = SpawnCoordinates[0];
+            LastSpawnPoint = null;
+            LastTeleportPoint = null;
+
+            if (NextTeleportPoint == null)
+            {
+                LastSpawnPoint = SpawnCoordinates.Count == 1
+                    ? SpawnCoordinates[0]
+                    : SpawnCoordinates.Where(spawnCoordinate => spawnCoordinate.Number != LastSpawnPoint?.Number)
+                        .ElementAt(new Random().Next(SpawnCoordinates.Count - 1));
+            }
             else
-                LastSpawnPoint = SpawnCoordinates.Where(spawnCoordinate => spawnCoordinate.Number != LastSpawnPoint.Number).ElementAt(new Random().Next(SpawnCoordinates.Count - 1));
+            {
+                LastTeleportPoint = NextTeleportPoint;
+                NextTeleportPoint = null;
+            }
+
+            Vector3 position = LastSpawnPoint?.Position ?? LastTeleportPoint.Position;
+            Quaternion rotation = LastSpawnPoint?.Rotation ?? LastTeleportPoint.Rotation;
 
             /* in case you want to set another json for testing a SINGLE spawn coordinate
             string CoordinatesJson = File.ReadAllText("YourPath\\test.json");
             coordinate = JsonSerializer.Deserialize<Coordinates.spawnCoordinate>(CoordinatesJson); */
 
-            Tank.AddComponent(new TankMovementComponent(new Movement(LastSpawnPoint.Position, Vector3.Zero, Vector3.Zero, LastSpawnPoint.Rotation), new MoveControl(), 0, 0));
+            Tank.AddComponent(new TankMovementComponent(new Movement(position, Vector3.Zero, Vector3.Zero, rotation), new MoveControl(), 0, 0));
         }
 
         public void EnableTank()
@@ -300,6 +312,7 @@ namespace TXServer.Core.Battles
 
         public Vector3 TankPosition { get; set; }
         public Vector3 PrevTankPosition { get; set; }
+        public Quaternion? TankQuaternion { get; set; }
 
         public bool Paused { get; set; }
         public DateTime? IdleKickTime { get; set; }
@@ -309,6 +322,8 @@ namespace TXServer.Core.Battles
         public int AlreadyAddedExperience { get; set; } = 0;
 
         private readonly IList<SpawnPoint> SpawnCoordinates;
-        public SpawnPoint LastSpawnPoint { get; set; } = new SpawnPoint();
+        public SpawnPoint LastSpawnPoint { get; set; }
+        public TeleportPoint LastTeleportPoint { get; set; }
+        public TeleportPoint NextTeleportPoint { get; set; }
     }
 }

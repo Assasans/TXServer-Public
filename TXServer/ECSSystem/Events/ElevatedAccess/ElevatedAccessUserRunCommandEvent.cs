@@ -101,9 +101,8 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
         {
             if (!player.IsInMatch) return;
 
-            Vector3 tankPosition = player.BattlePlayer.MatchPlayer.TankPosition;
-
-            ChatMessageReceivedEvent.SystemMessageTarget($"X: {tankPosition.X}, Y: {tankPosition.Y}, Z: {tankPosition.Z}",
+            MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
+            ChatMessageReceivedEvent.SystemMessageTarget($"Vector3: {matchPlayer.TankPosition} || Quaternion: {matchPlayer.TankQuaternion}",
                 player.BattlePlayer.Battle.GeneralBattleChatEntity, player);
         }
 

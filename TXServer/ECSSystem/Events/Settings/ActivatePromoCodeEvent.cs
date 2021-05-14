@@ -1,16 +1,15 @@
-﻿using TXServer.Core;
-using TXServer.Core.Commands;
+﻿using System;
+using System.Collections.Generic;
+using TXServer.Core;
+using TXServer.Core.Logging;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
-using TXServer.ECSSystem.Types;
 using TXServer.ECSSystem.GlobalEntities;
-using System.Collections.Generic;
-using System;
-using TXServer.Core.Logging;
+using TXServer.ECSSystem.Types;
 
-namespace TXServer.ECSSystem.Events
+namespace TXServer.ECSSystem.Events.Settings
 {
 	[SerialVersionUID(1490877430206L)]
 	public class ActivatePromoCodeEvent : ECSEvent
@@ -26,24 +25,23 @@ namespace TXServer.ECSSystem.Events
 					{ "c", ExtraItems.GlobalItems.Crystal },
 					{ "x", ExtraItems.GlobalItems.Xcrystal }
 				};
-				
+
 				// cheat codes
-				int var;
-				if (currencyCodes.ContainsKey(Convert.ToString(Code[0])))
+                if (currencyCodes.ContainsKey(Convert.ToString(Code[0])))
                 {
-					if (int.TryParse(Code[1..], out var))
+					if (int.TryParse(Code[1..], out int _))
 						rewards.Add(currencyCodes[Convert.ToString(Code[0])], Convert.ToInt32(Code[1..]));
                 }
 				if (Code.StartsWith("xp"))
 				{
-					if (int.TryParse(Code[2..], out var))
+					if (int.TryParse(Code[2..], out int _))
 					{
 						player.User.ChangeComponent<UserExperienceComponent>(component =>
 						{
 							component.Experience += Convert.ToInt32(Code[2..]);
 							Logger.Debug($"{player}: Changed experience to {component.Experience}");
 						});
-						
+
 						player.CheckRankUp();
 					}
 				}
@@ -64,9 +62,15 @@ namespace TXServer.ECSSystem.Events
 					    component.Experience += 5000;
 					    Logger.Debug($"{player}: Changed experience to {component.Experience}");
 				    });
-				    
+
 				    player.CheckRankUp();
 				    break;
+                case "teleport":
+                    // for teleport command testing
+                    // TODO: remove later when premium is fully integrated
+                    rewards.Add(ExtraItems.GlobalItems.Premiumboost, 2);
+                    player.Data.RenewPremium(new TimeSpan(1, 0, 0, 0));
+                    break;
 			}
 
 			foreach (KeyValuePair<Entity, int> item in rewards)
@@ -88,7 +92,7 @@ namespace TXServer.ECSSystem.Events
 			if (rewards.Count > 0)
 				player.SendEvent(new ShowNotificationGroupEvent(1), entity);
 		}
-		
+
 		public string Code { get; set; }
 	}
 }

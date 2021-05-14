@@ -15,7 +15,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
         public static Entity CreateEntity(BattleTankPlayer battlePlayer, Entity battle, Entity tank)
         {
             Entity entity = new Entity(new TemplateAccessor(new RoundUserTemplate(), "battle/round/rounduser"),
-                new RoundUserStatisticsComponent(place:1, scoreWithoutBonuses:0, kills:0, killAssists:0, deaths:0),
+                new RoundUserStatisticsComponent(1, 0, 0, 0, 0),
                 new RoundUserComponent(),
                 new UserGroupComponent(battlePlayer.User),
                 new BattleGroupComponent(battle));

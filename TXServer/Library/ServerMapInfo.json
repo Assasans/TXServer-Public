@@ -614,6 +614,78 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "hangar",
+        "position": {
+          "x": -128.8,
+          "y": 9.65,
+          "z": 27.75
+        },
+        "rotation": {
+          "w": 0.577,
+          "x": 0,
+          "y": 0.8166,
+          "z": 0
+        }
+      },
+      {
+        "name": "middle",
+        "position": {
+          "x": -4.66,
+          "y": 3.77,
+          "z": -4.94
+        },
+        "rotation": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      {
+        "name": "brokenTower",
+        "position": {
+          "x": -30.5,
+          "y": 15.6,
+          "z": 20.4
+        },
+        "rotation": {
+          "w": 0.4629,
+          "x": 0,
+          "y": 0.8857,
+          "z": 0.034
+        }
+      },
+      {
+        "name": "waterTower",
+        "position": {
+          "x": -22.7,
+          "y": 32.57,
+          "z": -124.323
+        },
+        "rotation": {
+          "w": 1,
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "name": "strangeTower",
+        "position": {
+          "x": -52.3,
+          "y": 41.06,
+          "z": 192.69
+        },
+        "rotation": {
+          "w": 1,
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -1882,6 +1954,78 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "hangar",
+        "position": {
+          "x": -128.8,
+          "y": 9.65,
+          "z": 27.75
+        },
+        "rotation": {
+          "w": 0.577,
+          "x": 0,
+          "y": 0.8166,
+          "z": 0
+        }
+      },
+      {
+        "name": "middle",
+        "position": {
+          "x": -4.66,
+          "y": 3.77,
+          "z": -4.94
+        },
+        "rotation": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      {
+        "name": "brokenTower",
+        "position": {
+          "x": -30.5,
+          "y": 15.6,
+          "z": 20.4
+        },
+        "rotation": {
+          "w": 0.4629,
+          "x": 0,
+          "y": 0.8857,
+          "z": 0.034
+        }
+      },
+      {
+        "name": "waterTower",
+        "position": {
+          "x": -22.7,
+          "y": 32.57,
+          "z": -124.323
+        },
+        "rotation": {
+          "w": 1,
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "name": "strangeTower",
+        "position": {
+          "x": -52.3,
+          "y": 41.06,
+          "z": 192.69
+        },
+        "rotation": {
+          "w": 1,
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -3146,6 +3290,92 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "blueBuilding",
+        "position": {
+          "x": -61.23,
+          "y": 13.25,
+          "z": 0.18
+        },
+        "rotation": {
+          "w": 0.7,
+          "x": 0,
+          "y": 0.7,
+          "z": 0
+        }
+      },
+      {
+        "name": "generator",
+        "position": {
+          "x": 56,
+          "y": 16,
+          "z": 0
+        },
+        "rotation": {
+          "w": 0,
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "name": "redPiston",
+        "position": {
+          "x": 55.8,
+          "y": 27.05,
+          "z": 19.97
+        },
+        "rotation": {
+          "w": 0.7,
+          "x": 0,
+          "y": -0.7,
+          "z": 0
+        }
+      },
+      {
+        "name": "circleLamp",
+        "position": {
+          "x": -1.11,
+          "y": 25.35,
+          "z": 16.78
+        },
+        "rotation": {
+          "w": 0.7,
+          "x": 0,
+          "y": 0.7,
+          "z": 0
+        }
+      },
+      {
+        "name": "parkingSpot",
+        "position": {
+          "x": -56.52,
+          "y": 19.65,
+          "z": -20.06
+        },
+        "rotation": {
+          "w": 0.7,
+          "x": 0,
+          "y": 0.7,
+          "z": 0
+        }
+      },
+      {
+        "name": "rockRoof",
+        "position": {
+          "x": 48.41,
+          "y": 36.45,
+          "z": -21.87
+        },
+        "rotation": {
+          "w": 0.8846,
+          "x": 0,
+          "y": -0.4663,
+          "z": 0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -4310,6 +4540,106 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "hangar",
+        "position": {
+          "x": 76.68,
+          "y": 7.34,
+          "z": 71.27
+        },
+        "rotation": {
+          "w": 0.3817,
+          "x": 0.03833,
+          "y": -0.923,
+          "z": -0.01489
+        }
+      },
+      {
+        "name": "middleHouse",
+        "position": {
+          "x": 12.87,
+          "y": 10.8,
+          "z": 13.34
+        },
+        "rotation": {
+          "w": 0.7049,
+          "x": -0.0437,
+          "y": 0.7065,
+          "z": -0.0439
+        }
+      },
+      {
+        "name": "middleTower",
+        "position": {
+          "x": 18.69,
+          "y": 15.45,
+          "z": -21.93
+        },
+        "rotation": {
+          "w": 0.7822,
+          "x": -0.14,
+          "y": 0.593,
+          "z": -0.1289
+        }
+      },
+      {
+        "name": "grassyArea",
+        "position": {
+          "x": -31.46,
+          "y": -0.7299,
+          "z": -45.16
+        },
+        "rotation": {
+          "w": 0.927,
+          "x": 0,
+          "y": 0.3725,
+          "z": 0
+        }
+      },
+      {
+        "name": "anotherHouse",
+        "position": {
+          "x": 92.1,
+          "y": 8.05,
+          "z": -57.76
+        },
+        "rotation": {
+          "w": 0.697,
+          "x": -0.102,
+          "y": -0.701,
+          "z": -0.105
+        }
+      },
+      {
+        "name": "container",
+        "position": {
+          "x": 45.82,
+          "y": 0.31,
+          "z": 36.27
+        },
+        "rotation": {
+          "w": 0.4729,
+          "x": 0,
+          "y": -0.881,
+          "z": 0
+        }
+      },
+      {
+        "name": "chimney",
+        "position": {
+          "x": -34.22,
+          "y": 25.86,
+          "z": -83.3
+        },
+        "rotation": {
+          "w": 0.95,
+          "x": -0,
+          "y": 0.31,
+          "z": -0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -6289,6 +6619,36 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "smallTower",
+        "position": {
+          "x": 13.29,
+          "y": 13.98,
+          "z": -49.78
+        },
+        "rotation": {
+          "w": 1,
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "name": "pond",
+        "position": {
+          "x": 118.9,
+          "y": -4.53,
+          "z": 108.66
+        },
+        "rotation": {
+          "w": 0.3835,
+          "x": 0.0522,
+          "y": -0.921,
+          "z": -0.028
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -8400,6 +8760,78 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "wideHouse",
+        "position": {
+          "x": 199.41,
+          "y": 30.58,
+          "z": -33.78
+        },
+        "rotation": {
+          "w": 0.7074,
+          "x": 0,
+          "y": -0.7067,
+          "z": 0
+        }
+      },
+      {
+        "name": "flagHouse",
+        "position": {
+          "x": -24.31,
+          "y": 23.75,
+          "z": -114.06
+        },
+        "rotation": {
+          "w": 1,
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "name": "chimney",
+        "position": {
+          "x": 220.05,
+          "y": 80.65,
+          "z": 45.66
+        },
+        "rotation": {
+          "w": 0.6168,
+          "x": 0,
+          "y": -0.7871,
+          "z": 0
+        }
+      },
+      {
+        "name": "behindBarrier",
+        "position": {
+          "x": -20.16,
+          "y": 17.07,
+          "z": 156.91
+        },
+        "rotation": {
+          "w": 0,
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      {
+        "name": "brokenTower",
+        "position": {
+          "x": 129.07,
+          "y": 21.56,
+          "z": 84.41
+        },
+        "rotation": {
+          "w": 0.628,
+          "x": -0.021,
+          "y": -0.7775,
+          "z": -0.021
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -10537,6 +10969,64 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "tower",
+        "position": {
+          "x": 99.32,
+          "y": 17.95,
+          "z": 124.63
+        },
+        "rotation": {
+          "w": 0.3768,
+          "x": 0,
+          "y": -0.9262,
+          "z": 0
+        }
+      },
+      {
+        "name": "mine",
+        "position": {
+          "x": -135.74,
+          "y": 0.78,
+          "z": -18.83
+        },
+        "rotation": {
+          "w": 0.7025,
+          "x": 0,
+          "y": -0.7116,
+          "z": 0
+        }
+      },
+      {
+        "name": "bridge",
+        "position": {
+          "x": 137.33,
+          "y": 10.02,
+          "z": -22.73
+        },
+        "rotation": {
+          "w": 0.701,
+          "x": 0,
+          "y": -0.712,
+          "z": 0
+        }
+      },
+      {
+        "name": "middle",
+        "position": {
+          "x": 3.81,
+          "y": 0.85,
+          "z": -19.28
+        },
+        "rotation": {
+          "w": 0.701,
+          "x": 0,
+          "y": -0.712,
+          "z": 0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -12955,6 +13445,106 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "roof",
+        "position": {
+          "x": -0.57,
+          "y": 182,
+          "z": -23.33
+        },
+        "rotation": {
+          "w": 0.3094,
+          "x": 0,
+          "y": -0.9509,
+          "z": 0
+        }
+      },
+      {
+        "name": "beton",
+        "position": {
+          "x": -168.3,
+          "y": 66.8,
+          "z": -22.4
+        },
+        "rotation": {
+          "w": 0.70595,
+          "x": 0,
+          "y": 0.70825,
+          "z": 0
+        }
+      },
+      {
+        "name": "ufo",
+        "position": {
+          "x": -2.18,
+          "y": 69.85,
+          "z": 122.57
+        },
+        "rotation": {
+          "w": 0.022,
+          "x": 0,
+          "y": -0.9997,
+          "z": 0
+        }
+      },
+      {
+        "name": "platform",
+        "position": {
+          "x": 109.85,
+          "y": 41.39,
+          "z": 94.44
+        },
+        "rotation": {
+          "w": 0.891,
+          "x": 0,
+          "y": -0.4538,
+          "z": 0
+        }
+      },
+      {
+        "name": "parkingSpot",
+        "position": {
+          "x": 126.31,
+          "y": 42.34,
+          "z": 72.94
+        },
+        "rotation": {
+          "w": 0.3048,
+          "x": 0,
+          "y": 0.95239,
+          "z": 0
+        }
+      },
+      {
+        "name": "longTrack1",
+        "position": {
+          "x": 149.87,
+          "y": 35.13,
+          "z": 87.99
+        },
+        "rotation": {
+          "w": 0.89094,
+          "x": 0,
+          "y": 0.4541,
+          "z": 0
+        }
+      },
+      {
+        "name": "longTrack2",
+        "position": {
+          "x": -111.84,
+          "y": 35.13,
+          "z": -174.22
+        },
+        "rotation": {
+          "w": 0.3094,
+          "x": 0,
+          "y": -0.9509,
+          "z": 0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -15488,6 +16078,36 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "smallTower",
+        "position": {
+          "x": 13.8,
+          "y": 14.4,
+          "z": 47.5
+        },
+        "rotation": {
+          "w": 0,
+          "x": 0,
+          "y": -1,
+          "z": 0
+        }
+      },
+      {
+        "name": "driedPond",
+        "position": {
+          "x": 118.9,
+          "y": -4.53,
+          "z": 108.66
+        },
+        "rotation": {
+          "w": 0.3835,
+          "x": 0.0522,
+          "y": -0.921,
+          "z": -0.028
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -17159,6 +17779,36 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "roof1",
+        "position": {
+          "x": 1.08,
+          "y": 22.32,
+          "z": 0.1
+        },
+        "rotation": {
+          "w": 0.7074,
+          "x": 0,
+          "y": -0.7067,
+          "z": 0
+        }
+      },
+      {
+        "name": "roof2",
+        "position": {
+          "x": -173.34,
+          "y": 22.32,
+          "z": -0.15
+        },
+        "rotation": {
+          "w": 0.7076,
+          "x": 0,
+          "y": 0.7065,
+          "z": 0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -19107,6 +19757,50 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "highestTower",
+        "position": {
+          "x": -74.72,
+          "y": 85.07,
+          "z": 246.41
+        },
+        "rotation": {
+          "w": 0.1,
+          "x": 0,
+          "y": 0.995,
+          "z": 0
+        }
+      },
+      {
+        "name": "middleTower",
+        "position": {
+          "x": -14.15,
+          "y": 73.08,
+          "z": 5.47
+        },
+        "rotation": {
+          "w": 0.862,
+          "x": 0,
+          "y": 0.505,
+          "z": 0
+        }
+      },
+      {
+        "name": "roof",
+        "position": {
+          "x": 2.99,
+          "y": 25.37,
+          "z": 128.2
+        },
+        "rotation": {
+          "w": 0.022,
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -20958,6 +21652,64 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "hangar",
+        "position": {
+          "x": -128.8,
+          "y": 9.65,
+          "z": 27.75
+        },
+        "rotation": {
+          "w": 0.577,
+          "x": 0,
+          "y": 0.8166,
+          "z": 0
+        }
+      },
+      {
+        "name": "middle",
+        "position": {
+          "x": -4.66,
+          "y": 3.77,
+          "z": -4.94
+        },
+        "rotation": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      {
+        "name": "brokenTower",
+        "position": {
+          "x": -30.5,
+          "y": 15.6,
+          "z": 20.4
+        },
+        "rotation": {
+          "w": 0.4629,
+          "x": 0,
+          "y": 0.8857,
+          "z": 0.034
+        }
+      },
+      {
+        "name": "waterTower",
+        "position": {
+          "x": -22.7,
+          "y": 32.57,
+          "z": -124.323
+        },
+        "rotation": {
+          "w": 1,
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -22356,6 +23108,50 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "tunnel",
+        "position": {
+          "x": 43.05,
+          "y": 0.85,
+          "z": -32.81
+        },
+        "rotation": {
+          "w": 0.022,
+          "x": 0,
+          "y": -1,
+          "z": 0
+        }
+      },
+      {
+        "name": "chimney",
+        "position": {
+          "x": 68.89,
+          "y": 86.1,
+          "z": -37.91
+        },
+        "rotation": {
+          "w": 0.7094,
+          "x": 0.0057,
+          "y": -0.7045,
+          "z": 0.0124
+        }
+      },
+      {
+        "name": "house",
+        "position": {
+          "x": -21.7,
+          "y": 14.85,
+          "z": -69.5
+        },
+        "rotation": {
+          "w": 1,
+          "x": 0,
+          "y": 0.005,
+          "z": 0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -24118,6 +24914,50 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "tunnel",
+        "position": {
+          "x": 43.05,
+          "y": 0.85,
+          "z": -32.81
+        },
+        "rotation": {
+          "w": 0.022,
+          "x": 0,
+          "y": -1,
+          "z": 0
+        }
+      },
+      {
+        "name": "highestHouse",
+        "position": {
+          "x": 42.48,
+          "y": 31.82,
+          "z": -48
+        },
+        "rotation": {
+          "w": 0.7094,
+          "x": 0.0057,
+          "y": -0.7045,
+          "z": 0.0124
+        }
+      },
+      {
+        "name": "house",
+        "position": {
+          "x": -18.27,
+          "y": 14.9,
+          "z": -67.2
+        },
+        "rotation": {
+          "w": 1,
+          "x": 0,
+          "y": 0.005,
+          "z": 0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -25113,6 +25953,78 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "hangar",
+        "position": {
+          "x": -128.8,
+          "y": 9.65,
+          "z": 27.75
+        },
+        "rotation": {
+          "w": 0.577,
+          "x": 0,
+          "y": 0.8166,
+          "z": 0
+        }
+      },
+      {
+        "name": "middle",
+        "position": {
+          "x": -4.66,
+          "y": 3.77,
+          "z": -4.94
+        },
+        "rotation": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      {
+        "name": "brokenTower",
+        "position": {
+          "x": -30.5,
+          "y": 15.6,
+          "z": 20.4
+        },
+        "rotation": {
+          "w": 0.4629,
+          "x": 0,
+          "y": 0.8857,
+          "z": 0.034
+        }
+      },
+      {
+        "name": "waterTower",
+        "position": {
+          "x": -22.7,
+          "y": 32.57,
+          "z": -124.323
+        },
+        "rotation": {
+          "w": 1,
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      },
+      {
+        "name": "platform",
+        "position": {
+          "x": 41.74,
+          "y": 15.8,
+          "z": -30.45
+        },
+        "rotation": {
+          "w": 0.7118,
+          "x": 0,
+          "y": -0.7034,
+          "z": 0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [
@@ -26425,6 +27337,64 @@
         ]
       }
     },
+    "teleportPoints": [
+      {
+        "name": "energySource",
+        "position": {
+          "x": 168.17,
+          "y": 9.07,
+          "z": -18.91
+        },
+        "rotation": {
+          "w": 0.7062,
+          "x": 0,
+          "y": -0.708,
+          "z": 0
+        }
+      },
+      {
+        "name": "tunnel",
+        "position": {
+          "x": 9,
+          "y": -7.67,
+          "z": -40.64
+        },
+        "rotation": {
+          "w": 0.70767,
+          "x": 0,
+          "y": -0.7065,
+          "z": 0
+        }
+      },
+      {
+        "name": "containers",
+        "position": {
+          "x": -29.8,
+          "y": 11.84,
+          "z": -72.1
+        },
+        "rotation": {
+          "w": 0.91,
+          "x": 0,
+          "y": 0.41455,
+          "z": 0
+        }
+      },
+      {
+        "name": "roof",
+        "position": {
+          "x": 58.16,
+          "y": 51.43,
+          "z": 58.42
+        },
+        "rotation": {
+          "w": 0.5382,
+          "x": 0,
+          "y": 0.8427,
+          "z": 0
+        }
+      }
+    ],
     "bonusRegions": {
       "deathmatch": {
         "repair": [

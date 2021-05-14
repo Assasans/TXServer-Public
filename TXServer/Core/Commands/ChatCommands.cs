@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using TXServer.Core.Battles;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
@@ -33,6 +35,7 @@ namespace TXServer.Core.Commands
             { "gravity", ("gravity [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.BattleOwner, Gravity) },
             { "kickback", ("kickback [number] [target]", ChatCommandConditions.HackBattle, Kickback) },
             { "kill", ("kill [target]", ChatCommandConditions.InMatch | ChatCommandConditions.Admin, KillPlayer) },
+            { "teleport", ("teleport [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.Premium, Teleport) },
             { "turretReload", ("turretReload [instant/never] [target]", ChatCommandConditions.HackBattle, ReloadTime) },
             { "turretRotation", ("turretRotation [instant/stuck/norm/number]", ChatCommandConditions.HackBattle, TurretRotation) },
             { "jump", ("jump [multiplier]", ChatCommandConditions.HackBattle | ChatCommandConditions.InMatch, Jump) }
@@ -40,13 +43,14 @@ namespace TXServer.Core.Commands
 
         private static readonly Dictionary<ChatCommandConditions, string> ConditionErrors = new()
         {
+            { ChatCommandConditions.ActiveTank, "Your tank is not active" },
             { ChatCommandConditions.Admin, "You are not an admin" },
-            { ChatCommandConditions.Tester, "You are not a tester" },
-            { ChatCommandConditions.InBattle, "You are not in battle" },
             { ChatCommandConditions.BattleOwner, "You do not own this battle" },
             { ChatCommandConditions.HackBattle, "HackBattle is not enabled or you don't have permission to it" },
+            { ChatCommandConditions.InBattle, "You are not in battle" },
             { ChatCommandConditions.InMatch, "You are not in match" },
-            { ChatCommandConditions.ActiveTank, "Your tank is not active" },
+            { ChatCommandConditions.Premium, "You don't have an active premium pass" },
+            { ChatCommandConditions.Tester, "You are not a tester" },
         };
 
         /// <summary>
@@ -120,6 +124,17 @@ namespace TXServer.Core.Commands
                                   "'blue'/'red' (only in team battles), 'others'";
                         if (player.Data.Admin)
                             message += "\nFor battles: 'all/custom/mm/others/this' or nothing";
+                        return message;
+                    case "teleport":
+                        condition = ChatCommandConditions.Admin;
+                        if (!playerConditions.HasFlag(condition))
+                            return ConditionErrors[condition];
+                        if (!player.IsInBattle)
+                            return "Teleport your tank to a player or a teleport point. Use '/help teleport' " +
+                                   "in-battle to view available teleport points";
+                        message = player.BattlePlayer.Battle.CurrentMapInfo.TeleportPoints.Aggregate(
+                            "Available teleport points on this map: ", (current, tp) => current + $"{tp.Name}, ");
+                        message = message.Remove(message.Length - 2);
                         return message;
                     case "test":
                         condition = ChatCommandConditions.Tester;
@@ -456,6 +471,41 @@ namespace TXServer.Core.Commands
             return handler.HackBattle ? $"HackBattle was enabled{permissionInfo}" : $"HackBattle was disabled{permissionInfo}";
         }
 
+        private static string Jump(Player player, string[] args)
+        {
+            MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
+            Battle battle = player.BattlePlayer.Battle;
+
+            float multiplier;
+            if (args.Length == 0)
+                multiplier = 15.0f;
+            else
+            {
+                bool successfullyParsed = float.TryParse(args[0], out multiplier);
+                if (!successfullyParsed)
+                    return "Parsing error, '/jump' only allows numbers or nothing as argument";
+                if (multiplier is > 200 or < -200)
+                    return "Out of range, '/jump' only allows a range from -200 to 200";
+            }
+
+            if (battle.BattleState is BattleState.WarmUp && battle.CountdownTimer <= 4 ||
+                player.BattlePlayer.MatchPlayer.TankState != TankState.Active)
+                return "Command error, you can't do that yet";
+
+            Entity effect = JumpEffectTemplate.CreateEntity(matchPlayer, multiplier);
+
+            foreach (BaseBattlePlayer battlePlayer in battle.PlayersInMap)
+                battlePlayer.ShareEntities(effect);
+
+            matchPlayer.Battle.Schedule(() =>
+            {
+                foreach (BaseBattlePlayer battlePlayer in battle.PlayersInMap)
+                    battlePlayer.UnshareEntities(effect);
+            });
+
+            return $"Jumped successfully (multiplier: {multiplier})";
+        }
+
         private static string Kickback(Player player, string[] args)
         {
             if (args.Length < 1)
@@ -623,9 +673,15 @@ namespace TXServer.Core.Commands
 
         private static string SpawnInfo(Player player, string[] args)
         {
-            SpawnPoint lastSpawnPoint = player.BattlePlayer.MatchPlayer.LastSpawnPoint;
-            return $"{player.BattlePlayer.Battle.CurrentMapInfo.Name}, {player.BattlePlayer.Battle.Params.BattleMode}, " +
-                   $"{player.User.GetComponent<TeamColorComponent>().TeamColor}, Number: {lastSpawnPoint.Number}";
+            SpawnPoint lastSp = player.BattlePlayer.MatchPlayer.LastSpawnPoint;
+            TeleportPoint lasTp = player.BattlePlayer.MatchPlayer.LastTeleportPoint;
+
+            if (lastSp != null)
+                return
+                    $"{player.BattlePlayer.Battle.CurrentMapInfo.Name}, {player.BattlePlayer.Battle.Params.BattleMode}, " +
+                    $"{player.User.GetComponent<TeamColorComponent>().TeamColor}, SP: {lastSp.Number}";
+
+            return $"{player.BattlePlayer.Battle.CurrentMapInfo.Name}, TP: {lasTp.Name}";
         }
 
         private static string Stats(Player player, string[] args)
@@ -682,40 +738,76 @@ namespace TXServer.Core.Commands
             return notification;
         }
 
-        private static string Jump(Player player, string[] args)
+        private static string Teleport(Player player, string[] args)
         {
-            MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
-            Battle battle = player.BattlePlayer.Battle;
+            string message = "Successfully teleported to ";
 
-            float multiplier;
-            if (args.Length == 0)
-                multiplier = 15.0f;
-            else
+            if (args.Length > 0)
             {
-                bool successfullyParsed = float.TryParse(args[0], out multiplier);
-                if (!successfullyParsed)
-                    return "Parsing error, '/jump' only allows numbers or nothing as argument";
-                if (multiplier is > 200 or < -200)
-                    return "Out of range, '/jump' only allows a range from -200 to 200";
+                TeleportPoint teleportPoint = null;
+
+                if (player.BattlePlayer.Battle.Params.BattleMode is BattleMode.CTF)
+                {
+                    TeamBattleHandler teamHandler = player.BattlePlayer.Battle.ModeHandler as TeamBattleHandler;
+                    Debug.Assert(teamHandler != null, nameof(teamHandler) + " != null");
+                    BattleView teamView = teamHandler.BattleViewFor(player.BattlePlayer);
+
+                    teleportPoint = args[0].ToLower() switch
+                    {
+                        "blueflag" => new TeleportPoint("allyFlag", GetFlagPosition(teamView.AllyTeamFlag),
+                            new Quaternion()),
+                        "bluepedestal" => new TeleportPoint("allyPedestal",
+                            teamView.AllyTeamFlag.PedestalEntity.GetComponent<FlagPedestalComponent>().Position,
+                            new Quaternion()),
+                        "redflag" => new TeleportPoint("enemyFlag", GetFlagPosition(teamView.EnemyTeamFlag)
+                            ,
+                            new Quaternion()),
+                        "redpedestal" => new TeleportPoint("enemyPedestal",
+                            teamView.EnemyTeamFlag.PedestalEntity.GetComponent<FlagPedestalComponent>().Position,
+                            new Quaternion()),
+                        _ => null
+                    };
+
+                    if (teleportPoint != null)
+                    {
+                        teleportPoint.Position = new Vector3(teleportPoint.Position.X, teleportPoint.Position.Y + 1,
+                            teleportPoint.Position.Z);
+                    }
+                }
+
+                teleportPoint ??=
+                    player.BattlePlayer.Battle.CurrentMapInfo.TeleportPoints.SingleOrDefault(tp => tp.Name == args[0]);
+
+                if (teleportPoint == null)
+                {
+                    List<BattleTankPlayer> targets = FindTargets(args[0], player);
+                    if (targets.Count == 1)
+                    {
+                        if (targets[0].MatchPlayer.TankState is TankState.Spawn)
+                            return "Command error, targeted player is currently spawning. Try again in a second";
+                        if (targets[0] == player.BattlePlayer)
+                            return "Nope";
+
+                        teleportPoint = new TeleportPoint($"Player {targets[0].Player.Data.Username}",
+                            targets[0].MatchPlayer.TankPosition, new Quaternion());
+                    }
+                }
+
+                if (teleportPoint == null)
+                    return $"Command error, didn't find target '{args[0]}'";
+
+                message += teleportPoint.Name;
+                player.BattlePlayer.MatchPlayer.NextTeleportPoint = teleportPoint;
             }
+            else
+                message += "the next spawn point";
 
-            if (battle.BattleState is BattleState.WarmUp && battle.CountdownTimer <= 4 ||
-                player.BattlePlayer.MatchPlayer.TankState != TankState.Active)
-                return "Command error, you can't do that yet";
+            player.BattlePlayer.MatchPlayer.KeepDisabled = false;
+            player.BattlePlayer.MatchPlayer.TankState = TankState.Spawn;
 
-            Entity effect = JumpEffectTemplate.CreateEntity(matchPlayer, multiplier);
-
-            foreach (BaseBattlePlayer battlePlayer in battle.PlayersInMap)
-                battlePlayer.ShareEntities(effect);
-
-            matchPlayer.Battle.Schedule(() =>
-            {
-                foreach (BaseBattlePlayer battlePlayer in battle.PlayersInMap)
-                    battlePlayer.UnshareEntities(effect);
-            });
-
-            return $"Jumped successfully (multiplier: {multiplier})";
+            return message;
         }
+
 
 
         private static ChatCommandConditions GetConditionsFor(Player player)
@@ -726,6 +818,8 @@ namespace TXServer.Core.Commands
                 conditions |= ChatCommandConditions.Admin;
             if (player.Data.Beta || player.Data.Admin)
                 conditions |= ChatCommandConditions.Tester;
+            if (player.IsPremium)
+                conditions |= ChatCommandConditions.Premium;
 
             if (player.IsInBattle)
             {
@@ -748,6 +842,12 @@ namespace TXServer.Core.Commands
             }
 
             return conditions;
+        }
+        private static Vector3 GetFlagPosition(Flag flag)
+        {
+            return flag.State is FlagState.Captured
+                ? flag.Carrier.MatchPlayer.TankPosition
+                : flag.FlagEntity.GetComponent<FlagPositionComponent>().Position;
         }
 
         private static List<BattleTankPlayer> FindTargets(string targetName, Player player)

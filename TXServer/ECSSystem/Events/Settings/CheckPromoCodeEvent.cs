@@ -16,33 +16,24 @@ namespace TXServer.ECSSystem.Events.Settings
 			if (player.Data.Admin)
             {
 				// for testing
-				switch (Code)
-				{
-					case "valid":
-						result = PromoCodeCheckResult.VALID;
-						break;
-					case "notFound":
-						result = PromoCodeCheckResult.NOT_FOUND;
-						break;
-					case "used":
-						result = PromoCodeCheckResult.USED;
-						break;
-					case "expired":
-						result = PromoCodeCheckResult.EXPIRED;
-						break;
-					case "owned":
-						result = PromoCodeCheckResult.OWNED;
-						break;
-				}
+                result = Code switch
+                {
+                    "valid" => PromoCodeCheckResult.VALID,
+                    "notFound" => PromoCodeCheckResult.NOT_FOUND,
+                    "used" => PromoCodeCheckResult.USED,
+                    "expired" => PromoCodeCheckResult.EXPIRED,
+                    "owned" => PromoCodeCheckResult.OWNED,
+                    _ => result
+                };
 
-				// cheat codes
+                // cheat codes
 				if (Code.StartsWith("c") | Code.StartsWith("x")) {
 					if (int.TryParse(Code.Substring(1, Code.Length-1), out _))
                     {
 						result = PromoCodeCheckResult.VALID;
-                    } 
+                    }
 				}
-				if (Code.StartsWith("xp"))
+				else if (Code.StartsWith("xp"))
                 {
 					if (int.TryParse(Code.Substring(2, Code.Length - 2), out _))
 					{
@@ -63,7 +54,12 @@ namespace TXServer.ECSSystem.Events.Settings
 					if (player.User.GetComponent<UserExperienceComponent>().Experience < 5000)
 					    result = PromoCodeCheckResult.VALID;
 					break;
-			}
+                case "teleport":
+                    // for teleport command testing
+                    // TODO: remove later when premium is fully integrated
+                    result = PromoCodeCheckResult.VALID;
+                    break;
+            }
 
 			player.SendEvent(new PromoCodeCheckResultEvent(Code, result), entity);
 		}

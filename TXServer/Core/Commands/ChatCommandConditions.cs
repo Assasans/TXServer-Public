@@ -9,11 +9,12 @@ namespace TXServer.Core.Commands
         Admin = 1,
         Tester = 2,
         InBattle = 4,
+        Premium = 8,
 
         // InBattle is implicit for these below
-        BattleOwner = 8,
-        HackBattle = 16,
-        InMatch = 32,
-        ActiveTank = 64,
+        BattleOwner = 16,
+        HackBattle = 32,
+        InMatch = 64,
+        ActiveTank = 128,
     }
 }
