@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     {
         public static Entity CreateEntity(Entity tank, BattleTankPlayer battlePlayer)
         {
-            Entity entity = CreateEntity(new FreezeBattleItemTemplate(), "battle/weapon/freeze", tank, battlePlayer);
+            Entity entity = CreateEntity(new FreezeBattleItemTemplate(), "garage/weapon/freeze", tank, battlePlayer);
             entity.Components.Add(new FreezeComponent());
 
             return entity;

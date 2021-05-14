@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -108,8 +108,9 @@ namespace TXServer.Core.Configuration
                         resultComponent ??= (Component)FormatterServices.GetUninitializedObject(resultType);
 
                         type.GetMethod("Convert").Invoke(component, new[] { resultComponent });
-
                         currentNode.Components.TryAdd(resultType, resultComponent);
+
+                        Logger.Trace($"{pair.Key}: {component.GetType().Name} -> {resultType.Name}");
                     }
                 }
             }
@@ -126,13 +127,23 @@ namespace TXServer.Core.Configuration
             return currentNode;
         }
 
-        public static T LoadComponent<T>(string path) where T : Component
+        /// <summary>
+        /// Gets component by config path.
+        /// </summary>
+        /// <typeparam name="T">Type of component to get.</typeparam>
+        /// <param name="path">Search path for component.</param>
+        /// <param name="throwOnError">Whether to throw if component was not found.</param>
+        /// <returns>Requested component, or null if it was not found.</returns>
+        public static T GetComponent<T>(string path, bool throwOnError = true) where T : Component
         {
             var node = GetNodeByPath(path);
             if (!node.Components.TryGetValue(typeof(T), out Component component))
-                component = node.ServerComponents[typeof(T)];
+                node.ServerComponents.TryGetValue(typeof(T), out component);
 
-            return (T)component.Clone();
+            if (component == null && throwOnError)
+                throw new InvalidOperationException($"Could not find component {typeof(T)} at path {path}");
+
+            return component?.Clone() as T;
         }
 
         public static IEnumerable<string> GetSubPaths(string path)

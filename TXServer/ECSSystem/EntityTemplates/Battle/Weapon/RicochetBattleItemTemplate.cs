@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     {
         public static Entity CreateEntity(Entity tank, BattleTankPlayer battlePlayer)
         {
-            Entity entity = CreateEntity(new RicochetBattleItemTemplate(), "battle/weapon/ricochet", tank, battlePlayer);
+            Entity entity = CreateEntity(new RicochetBattleItemTemplate(), "garage/weapon/ricochet", tank, battlePlayer);
             entity.Components.Add(new RicochetComponent());
             
             entity.Components.Add(battlePlayer.BulletSpeed == null

@@ -1,4 +1,4 @@
-using TXServer.ECSSystem.Types;
+﻿using TXServer.ECSSystem.Types;
 using System;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Tank;

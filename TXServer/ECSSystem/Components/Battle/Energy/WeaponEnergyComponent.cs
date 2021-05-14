@@ -3,6 +3,9 @@ using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Components.Battle.Energy
 {
+    /// <summary>
+    /// Energy of a weapon within 0..1 range.
+    /// </summary>
     [SerialVersionUID(8236491228938594733)]
     public class WeaponEnergyComponent : Component
     {

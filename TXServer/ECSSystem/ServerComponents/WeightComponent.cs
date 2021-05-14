@@ -1,4 +1,4 @@
-namespace TXServer.ECSSystem.ServerComponents
+﻿namespace TXServer.ECSSystem.ServerComponents
 {
     public class WeightComponent : RangedComponent, IConvertibleComponent<Components.Battle.Chassis.WeightComponent>
     {

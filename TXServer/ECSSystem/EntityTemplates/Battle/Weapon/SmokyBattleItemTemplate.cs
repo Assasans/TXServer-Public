@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     {
         public static Entity CreateEntity(Entity tank, BattleTankPlayer battlePlayer)
         {
-            Entity entity = CreateEntity(new SmokyBattleItemTemplate(), "battle/weapon/smoky", tank, battlePlayer);
+            Entity entity = CreateEntity(new SmokyBattleItemTemplate(), "garage/weapon/smoky", tank, battlePlayer);
             entity.Components.Add(new SmokyComponent());
 
             return entity;

@@ -1,4 +1,4 @@
-using TXServer.ECSSystem.Base;
+﻿using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.ServerComponents
 {

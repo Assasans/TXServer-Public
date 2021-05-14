@@ -1,4 +1,4 @@
-namespace TXServer.ECSSystem.ServerComponents
+﻿namespace TXServer.ECSSystem.ServerComponents
 {
     public static class SpeedConfig
     {

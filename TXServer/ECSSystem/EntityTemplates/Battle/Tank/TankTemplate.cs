@@ -1,4 +1,4 @@
-using TXServer.Core.Configuration;
+﻿using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -16,19 +16,18 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
         public static Entity CreateEntity(Entity hullUserItem, Entity battleUser)
         {
             string configPath = hullUserItem.TemplateAccessor.ConfigPath;
-            var health = Config.LoadComponent<ServerComponents.HealthComponent>(configPath);
 
             Entity entity = new(new TemplateAccessor(new TankTemplate(), configPath.Replace("garage", "battle")),
                 new TankComponent(),
                 new TankPartComponent(),
                 battleUser.GetComponent<UserGroupComponent>(),
                 battleUser.GetComponent<BattleGroupComponent>(),
-                Config.LoadComponent<HealthComponent>(configPath),
-                new HealthConfigComponent(health.FinalValue),
-                Config.LoadComponent<DampingComponent>(configPath),
-                Config.LoadComponent<SpeedComponent>(configPath),
-                Config.LoadComponent<SpeedConfigComponent>(configPath),
-                Config.LoadComponent<WeightComponent>(configPath),
+                Config.GetComponent<HealthComponent>(configPath),
+                Config.GetComponent<HealthConfigComponent>(configPath),
+                Config.GetComponent<DampingComponent>(configPath),
+                Config.GetComponent<SpeedComponent>(configPath),
+                Config.GetComponent<SpeedConfigComponent>(configPath),
+                Config.GetComponent<WeightComponent>(configPath),
                 new TemperatureComponent(0),
                 new TankNewStateComponent());
 

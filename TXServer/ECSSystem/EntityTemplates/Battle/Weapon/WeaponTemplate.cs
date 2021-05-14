@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using TXServer.Core.Battles;
 using TXServer.Core.Configuration;
@@ -41,24 +41,21 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
 
         protected static Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank, BattleTankPlayer battlePlayer)
         {
-            string garageConfigPath = configPath.Replace("battle", "garage");
-
-            Entity weapon = new Entity(new TemplateAccessor(template, configPath),
+            Entity weapon = new(new TemplateAccessor(template, configPath.Replace("garage", "battle")),
                 tank.GetComponent<TankPartComponent>(),
                 new WeaponComponent(),
-                // These components should be gotten from configs.
-                Config.LoadComponent<WeaponEnergyComponent>(garageConfigPath),
+                new WeaponEnergyComponent(1),
                 tank.GetComponent<UserGroupComponent>(),
                 tank.GetComponent<TankGroupComponent>(),
                 tank.GetComponent<BattleGroupComponent>());
             
             weapon.Components.Add(battlePlayer.TurretUnloadEnergyPerShot == null
-                ? Config.LoadComponent<WeaponCooldownComponent>(garageConfigPath)
+                ? Config.GetComponent<WeaponCooldownComponent>(configPath)
                 : new WeaponCooldownComponent((float) battlePlayer.TurretUnloadEnergyPerShot));
 
             if (battlePlayer.TurretRotationSpeed == null)
             {
-                weapon.AddComponent(Config.LoadComponent<WeaponRotationComponent>(tank.TemplateAccessor.ConfigPath.Replace("battle", "garage")));
+                weapon.AddComponent(Config.GetComponent<WeaponRotationComponent>(tank.TemplateAccessor.ConfigPath.Replace("battle", "garage")));
             }
             else
             {

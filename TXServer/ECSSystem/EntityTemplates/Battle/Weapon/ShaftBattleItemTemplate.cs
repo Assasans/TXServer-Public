@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     {
         public static Entity CreateEntity(Entity tank, BattleTankPlayer battlePlayer)
         {
-            Entity entity = CreateEntity(new ShaftBattleItemTemplate(), "battle/weapon/shaft", tank, battlePlayer);
+            Entity entity = CreateEntity(new ShaftBattleItemTemplate(), "garage/weapon/shaft", tank, battlePlayer);
             entity.Components.Add(new ShaftComponent());
             entity.Components.Add(new ShaftStateConfigComponent(1, 1, 1));
             entity.Components.Add(new ShaftAimingImpactComponent(1));

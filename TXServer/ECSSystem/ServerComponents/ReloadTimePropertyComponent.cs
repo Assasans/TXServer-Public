@@ -1,12 +1,15 @@
 ﻿using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Components.Battle.Energy;
+using TXServer.ECSSystem.Components.Battle.Weapon;
 
 namespace TXServer.ECSSystem.ServerComponents
 {
-    public class ReloadTimePropertyComponent : RangedComponent, IConvertibleComponent<WeaponEnergyComponent>, IConvertibleComponent<WeaponCooldownComponent>
+    public class ReloadTimePropertyComponent : RangedComponent, IConvertibleComponent<WeaponCooldownComponent>, IConvertibleComponent<DiscreteWeaponEnergyComponent>
     {
-        public void Convert(WeaponEnergyComponent component) => component.Energy = FinalValue;
+        public void Convert(WeaponCooldownComponent component) => component.CooldownIntervalSec = 0f;
 
-        public void Convert(WeaponCooldownComponent component) => component.CooldownIntervalSec = FinalValue;
+        public void Convert(DiscreteWeaponEnergyComponent component)
+        {
+            (component.ReloadEnergyPerSec, component.UnloadEnergyPerShot) = (1f / FinalValue, 1f);
+        }
     }
 }
