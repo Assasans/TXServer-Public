@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Battles;
+using System.Linq;
+using TXServer.Core.Battles;
 using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -16,14 +17,14 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
             entity.Components.UnionWith(new Component[] {
                 Config.GetComponent<ImpactComponent>(configPath),
                 new DiscreteWeaponComponent(),
-                Config.GetComponent<DamageWeakeningByDistanceComponent>(configPath),
+                Config.GetComponent<DamageWeakeningByDistanceComponent>(configPath, false),
                 battlePlayer.TurretKickback == null
                     ? Config.GetComponent<KickbackComponent>(configPath)
                     : new KickbackComponent((float)battlePlayer.TurretKickback),
                 battlePlayer.TurretUnloadEnergyPerShot == null
                     ? Config.GetComponent<DiscreteWeaponEnergyComponent>(configPath)
                     : new DiscreteWeaponEnergyComponent(1f, 1f / (float)battlePlayer.TurretUnloadEnergyPerShot)
-            });
+            }.Where(x => x != null));
 
             return entity;
         }

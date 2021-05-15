@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using TXServer.Core.Battles;
 using TXServer.Core.Configuration;
@@ -48,10 +48,13 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 tank.GetComponent<UserGroupComponent>(),
                 tank.GetComponent<TankGroupComponent>(),
                 tank.GetComponent<BattleGroupComponent>());
-            
-            weapon.Components.Add(battlePlayer.TurretUnloadEnergyPerShot == null
-                ? Config.GetComponent<WeaponCooldownComponent>(configPath)
-                : new WeaponCooldownComponent((float) battlePlayer.TurretUnloadEnergyPerShot));
+
+            if (Config.GetComponent<WeaponCooldownComponent>(configPath, false) is Component component)
+            {
+                if (battlePlayer.TurretUnloadEnergyPerShot != null)
+                    component = new WeaponCooldownComponent((float)battlePlayer.TurretUnloadEnergyPerShot);
+                weapon.Components.Add(component);
+            }
 
             if (battlePlayer.TurretRotationSpeed == null)
             {
