@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -255,7 +255,8 @@ namespace TXServer.Core.Protocol
                     map.Add(value == null);
                     if (value == null) continue;
                 }
-                else if (value == null) throw new ArgumentNullException(nameof(value), "From class " + info.ReflectedType.FullName);
+                else if (value == null)
+                    throw new ArgumentNullException(info.Name, "From " + info.ReflectedType.FullName);
 
                 SelectEncode(value);
             }
