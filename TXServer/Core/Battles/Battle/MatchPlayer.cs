@@ -133,7 +133,7 @@ namespace TXServer.Core.Battles
             Tank.AddComponent(new TankMovementComponent(new Movement(position, Vector3.Zero, Vector3.Zero, rotation), new MoveControl(), 0, 0));
         }
 
-        public void EnableTank()
+        private void EnableTank()
         {
             if (KeepDisabled) return;
             Tank.AddComponent(new TankMovableComponent());
@@ -147,7 +147,10 @@ namespace TXServer.Core.Battles
             Tank.TryRemoveComponent<SelfDestructionComponent>();
 
             foreach (SupplyEffect supplyEffect in SupplyEffects.ToArray())
+            {
+                SupplyEffectsAfterSpawn.Add(supplyEffect.BonusType);
                 supplyEffect.Remove();
+            }
 
             foreach (BattleModule module in Modules.ToArray())
                 module.Deactivate();
@@ -208,6 +211,10 @@ namespace TXServer.Core.Battles
                 Tank.RemoveComponent<HealthComponent>();
                 component.CurrentHealth = component.MaxHealth;
                 Tank.AddComponent(component);
+
+                foreach (BonusType bonusType in SupplyEffectsAfterSpawn)
+                    _ = new SupplyEffect(bonusType, this, true);
+                SupplyEffectsAfterSpawn.Clear();
             }
 
             foreach (KeyValuePair<Type, TranslatedEvent> pair in TranslatedEvents)
@@ -250,7 +257,7 @@ namespace TXServer.Core.Battles
         public Entity BattleUser { get; }
         public Entity RoundUser { get; }
 
-        public Entity Incarnation { get; set; }
+        public Entity Incarnation { get; private set; }
         public Entity Tank { get; }
         public Entity Weapon { get; }
         public Entity HullSkin { get; }
@@ -285,10 +292,11 @@ namespace TXServer.Core.Battles
                         Player.SendEvent(new SelfTankExplosionEvent(), Tank);
                         if (Battle.ModeHandler is CTFHandler handler)
                         {
-                            foreach (Flag flag in handler.Flags.Values)
+                            foreach (Flag flag in handler.Flags.Values.Where(flag =>
+                                flag is {State: FlagState.Captured} &&
+                                flag.FlagEntity.GetComponent<TankGroupComponent>().Key == Tank.EntityId))
                             {
-                                if (flag != null && flag.State == FlagState.Captured && flag.FlagEntity.GetComponent<TankGroupComponent>().Key == Tank.EntityId)
-                                    flag.Drop(false);
+                                flag.Drop(false);
                             }
                         }
                         break;
@@ -304,22 +312,24 @@ namespace TXServer.Core.Battles
         private TankState _TankState;
         public bool KeepDisabled { get; set; }
 
-        public DateTime TankStateChangeTime { get; set; }
+        private DateTime TankStateChangeTime { get; set; }
         public DateTime? SelfDestructionTime { get; set; }
-        public bool WaitingForTankActivation { get; set; }
+        private bool WaitingForTankActivation { get; set; }
 
         public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new ConcurrentDictionary<Type, TranslatedEvent>();
 
         public Vector3 TankPosition { get; set; }
         public Vector3 PrevTankPosition { get; set; }
-        public Quaternion? TankQuaternion { get; set; }
+        public Quaternion TankQuaternion { get; set; }
 
         public bool Paused { get; set; }
         public DateTime? IdleKickTime { get; set; }
 
         public List<SupplyEffect> SupplyEffects { get; } = new();
-        public Dictionary<MatchPlayer, int> DamageAssisters { get; set; } = new();
-        public int AlreadyAddedExperience { get; set; } = 0;
+        private List<BonusType> SupplyEffectsAfterSpawn { get; } = new();
+
+        public Dictionary<MatchPlayer, int> DamageAssistants { get; } = new();
+        public int AlreadyAddedExperience { get; set; }
 
         private readonly IList<SpawnPoint> SpawnCoordinates;
         public SpawnPoint LastSpawnPoint { get; set; }

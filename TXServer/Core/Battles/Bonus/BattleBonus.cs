@@ -1,19 +1,14 @@
 ﻿using System.Numerics;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Types;
-using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.EntityTemplates.Battle.Bonus;
-using System.Text.Json;
-using System.IO;
-using System.Linq;
 using TXServer.ECSSystem.Events.Battle.Bonus;
 
 namespace TXServer.Core.Battles
 {
     public class BattleBonus
     {
-        public BattleBonus(BonusType bonusType, Bonus bonus, Battle battle)
+        public BattleBonus(BonusType bonusType, ServerMapInformation.Bonus bonus, Battle battle)
         {
             BonusType = bonusType;
             Position = bonus.Position;
@@ -36,7 +31,7 @@ namespace TXServer.Core.Battles
             BonusEntity = BonusType != BonusType.GOLD
                 ? SupplyBonusTemplate.CreateEntity(BonusType, BonusRegion,
                     new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity)
-                : GoldBonusWithCrystalsTemplate.CreateEntity(BonusType, BonusRegion,
+                : GoldBonusWithCrystalsTemplate.CreateEntity(BonusRegion,
                     new Vector3(Position.X, Position.Y + SpawnHeight, Position.Z), battleEntity);
             Battle.PlayersInMap.ShareEntities(BonusEntity);
             State = BonusState.Spawned;

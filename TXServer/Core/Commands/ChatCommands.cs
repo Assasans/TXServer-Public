@@ -618,7 +618,7 @@ namespace TXServer.Core.Commands
             }
             switch (args[0])
             {
-                case "instant" or "0":
+                case "instant" or "0" or "istant":
                     unloadEnergyPerShot = 0;
                     break;
                 case "never":
@@ -651,10 +651,12 @@ namespace TXServer.Core.Commands
                     target.MatchPlayer.Weapon.ChangeComponent<StreamWeaponEnergyComponent>(component =>
                         component.UnloadEnergyPerSec = (float)unloadEnergyPerShot);
                 else
+                {
                     target.MatchPlayer.Weapon.ChangeComponent<DiscreteWeaponEnergyComponent>(component =>
                         component.UnloadEnergyPerShot = (float)unloadEnergyPerShot);
-                target.MatchPlayer.Weapon.ChangeComponent<WeaponCooldownComponent>(component =>
-                    component.CooldownIntervalSec = (float)unloadEnergyPerShot);
+                    target.MatchPlayer.Weapon.ChangeComponent<WeaponCooldownComponent>(component =>
+                        component.CooldownIntervalSec = (float)unloadEnergyPerShot);
+                }
 
                 switch (target.MatchPlayer.Weapon.TemplateAccessor.Template)
                 {
@@ -695,6 +697,74 @@ namespace TXServer.Core.Commands
             return $"Online players: {Server.Instance.Connection.Pool.Count(x => x.IsActive)}\n" +
                 $"MM battles: {ServerConnection.BattlePool.Count(b => b.IsMatchMaking)}\n" +
                 $"Custom battles: {ServerConnection.BattlePool.Count(b => !b.IsMatchMaking)}\n";
+        }
+
+        private static string Teleport(Player player, string[] args)
+        {
+            string message = "Successfully teleported to ";
+
+            if (args.Length > 0)
+            {
+                TeleportPoint teleportPoint = null;
+
+                if (player.BattlePlayer.Battle.Params.BattleMode is BattleMode.CTF)
+                {
+                    TeamBattleHandler teamHandler = player.BattlePlayer.Battle.ModeHandler as TeamBattleHandler;
+                    Debug.Assert(teamHandler != null, nameof(teamHandler) + " != null");
+                    BattleView teamView = teamHandler.BattleViewFor(player.BattlePlayer);
+
+                    teleportPoint = args[0].ToLower() switch
+                    {
+                        "blueflag" => new TeleportPoint("allyFlag", GetFlagPosition(teamView.AllyTeamFlag),
+                            new Quaternion()),
+                        "bluepedestal" => new TeleportPoint("allyPedestal",
+                            teamView.AllyTeamFlag.PedestalEntity.GetComponent<FlagPedestalComponent>().Position,
+                            new Quaternion()),
+                        "redflag" => new TeleportPoint("enemyFlag", GetFlagPosition(teamView.EnemyTeamFlag)
+                            ,
+                            new Quaternion()),
+                        "redpedestal" => new TeleportPoint("enemyPedestal",
+                            teamView.EnemyTeamFlag.PedestalEntity.GetComponent<FlagPedestalComponent>().Position,
+                            new Quaternion()),
+                        _ => null
+                    };
+
+                    if (teleportPoint != null)
+                        teleportPoint.Position = new Vector3(teleportPoint.Position.X, teleportPoint.Position.Y + 1,
+                            teleportPoint.Position.Z);
+                }
+
+                teleportPoint ??=
+                    player.BattlePlayer.Battle.CurrentMapInfo.TeleportPoints.SingleOrDefault(tp => tp.Name == args[0]);
+
+                if (teleportPoint == null)
+                {
+                    List<BattleTankPlayer> targets = FindTargets(args[0], player);
+                    if (targets.Count == 1)
+                    {
+                        if (targets[0].MatchPlayer.TankState is TankState.Dead or TankState.Spawn)
+                            return "Command error, targeted player is currently spawning";
+                        if (targets[0] == player.BattlePlayer)
+                            return "Nope";
+
+                        teleportPoint = new TeleportPoint($"Player {targets[0].Player.Data.Username}",
+                            targets[0].MatchPlayer.TankPosition, targets[0].MatchPlayer.TankQuaternion);
+                    }
+                }
+
+                if (teleportPoint == null)
+                    return $"Command error, didn't find target '{args[0]}'";
+
+                message += teleportPoint.Name;
+                player.BattlePlayer.MatchPlayer.NextTeleportPoint = teleportPoint;
+            }
+            else
+                message += "the next spawn point";
+
+            player.BattlePlayer.MatchPlayer.KeepDisabled = false;
+            player.BattlePlayer.MatchPlayer.TankState = TankState.Spawn;
+
+            return message;
         }
 
         private static string TurretRotation(Player player, string[] args)
@@ -742,76 +812,6 @@ namespace TXServer.Core.Commands
             player.BattlePlayer.SendEvent(new KickFromBattleEvent(), player.BattlePlayer.MatchPlayer.BattleUser);
 
             return notification;
-        }
-
-        private static string Teleport(Player player, string[] args)
-        {
-            string message = "Successfully teleported to ";
-
-            if (args.Length > 0)
-            {
-                TeleportPoint teleportPoint = null;
-
-                if (player.BattlePlayer.Battle.Params.BattleMode is BattleMode.CTF)
-                {
-                    TeamBattleHandler teamHandler = player.BattlePlayer.Battle.ModeHandler as TeamBattleHandler;
-                    Debug.Assert(teamHandler != null, nameof(teamHandler) + " != null");
-                    BattleView teamView = teamHandler.BattleViewFor(player.BattlePlayer);
-
-                    teleportPoint = args[0].ToLower() switch
-                    {
-                        "blueflag" => new TeleportPoint("allyFlag", GetFlagPosition(teamView.AllyTeamFlag),
-                            new Quaternion()),
-                        "bluepedestal" => new TeleportPoint("allyPedestal",
-                            teamView.AllyTeamFlag.PedestalEntity.GetComponent<FlagPedestalComponent>().Position,
-                            new Quaternion()),
-                        "redflag" => new TeleportPoint("enemyFlag", GetFlagPosition(teamView.EnemyTeamFlag)
-                            ,
-                            new Quaternion()),
-                        "redpedestal" => new TeleportPoint("enemyPedestal",
-                            teamView.EnemyTeamFlag.PedestalEntity.GetComponent<FlagPedestalComponent>().Position,
-                            new Quaternion()),
-                        _ => null
-                    };
-
-                    if (teleportPoint != null)
-                    {
-                        teleportPoint.Position = new Vector3(teleportPoint.Position.X, teleportPoint.Position.Y + 1,
-                            teleportPoint.Position.Z);
-                    }
-                }
-
-                teleportPoint ??=
-                    player.BattlePlayer.Battle.CurrentMapInfo.TeleportPoints.SingleOrDefault(tp => tp.Name == args[0]);
-
-                if (teleportPoint == null)
-                {
-                    List<BattleTankPlayer> targets = FindTargets(args[0], player);
-                    if (targets.Count == 1)
-                    {
-                        if (targets[0].MatchPlayer.TankState is TankState.Spawn)
-                            return "Command error, targeted player is currently spawning. Try again in a second";
-                        if (targets[0] == player.BattlePlayer)
-                            return "Nope";
-
-                        teleportPoint = new TeleportPoint($"Player {targets[0].Player.Data.Username}",
-                            targets[0].MatchPlayer.TankPosition, new Quaternion());
-                    }
-                }
-
-                if (teleportPoint == null)
-                    return $"Command error, didn't find target '{args[0]}'";
-
-                message += teleportPoint.Name;
-                player.BattlePlayer.MatchPlayer.NextTeleportPoint = teleportPoint;
-            }
-            else
-                message += "the next spawn point";
-
-            player.BattlePlayer.MatchPlayer.KeepDisabled = false;
-            player.BattlePlayer.MatchPlayer.TankState = TankState.Spawn;
-
-            return message;
         }
 
 

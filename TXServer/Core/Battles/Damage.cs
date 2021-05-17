@@ -48,7 +48,7 @@ namespace TXServer.Core.Battles
 
                     damager.UserResult.Damage += damage;
 
-                    foreach (KeyValuePair<MatchPlayer, int> assist in victim.DamageAssisters.Where(assist =>
+                    foreach (KeyValuePair<MatchPlayer, int> assist in victim.DamageAssistants.Where(assist =>
                         assist.Key != damager && assist.Key != victim))
                     {
                         assist.Key.UpdateStatistics(additiveScore: 5, 0, additiveKillAssists: 1, 0, null);
@@ -57,14 +57,14 @@ namespace TXServer.Core.Battles
                             new VisualScoreAssistEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid, percent,
                                 assist.Key.GetScoreWithPremium(5)), assist.Key.BattleUser);
                     }
-                    victim.DamageAssisters.Clear();
+                    victim.DamageAssistants.Clear();
                 }
                 else
                 {
-                    if (victim.DamageAssisters.ContainsKey(damager))
-                        victim.DamageAssisters[damager] += damage;
+                    if (victim.DamageAssistants.ContainsKey(damager))
+                        victim.DamageAssistants[damager] += damage;
                     else
-                        victim.DamageAssisters.Add(damager, damage);
+                        victim.DamageAssistants.Add(damager, damage);
                 }
 
                 damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false, false), victim.Tank);
@@ -101,7 +101,7 @@ namespace TXServer.Core.Battles
             if (healed)
             {
                 target.Player.BattlePlayer.Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), target.Tank);
-                healer.Battle.Spectators.Cast<IPlayerPart>().Concat(new[] {(IPlayerPart) healer})
+                healer.Battle.Spectators.Concat(new[] {(IPlayerPart) healer})
                     .SendEvent(new DamageInfoEvent(900, hitTarget.LocalHitPoint, false, true), target.Tank);
                 healer.SendEvent(new VisualScoreHealEvent(healer.GetScoreWithPremium(4)), healer.BattleUser);
                 healer.UpdateStatistics(additiveScore: 4, 0, 0, 0, null);

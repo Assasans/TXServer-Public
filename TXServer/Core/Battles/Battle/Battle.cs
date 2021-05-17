@@ -13,7 +13,6 @@ using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Time;
-using TXServer.ECSSystem.Components.User;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Chat;
 using TXServer.ECSSystem.Events.Battle;
@@ -187,7 +186,7 @@ namespace TXServer.Core.Battles
                     BattleMode newMode = modeBonusRegions.Keys.First(mode => modeBonusRegions[mode] != null && mode != BattleMode.DM);
                     modeBonusRegions[Params.BattleMode] = modeBonusRegions[newMode];
                 }
-                var bonusTypeSpawnPoints = new Dictionary<BonusType, IList<Bonus>> {
+                var bonusTypeSpawnPoints = new Dictionary<BonusType, IList<ServerMapInformation.Bonus>> {
                     { BonusType.ARMOR,  modeBonusRegions[Params.BattleMode].Armor },
                     { BonusType.DAMAGE,  modeBonusRegions[Params.BattleMode].Damage },
                     { BonusType.GOLD,  modeBonusRegions[Params.BattleMode].Gold },
@@ -197,7 +196,7 @@ namespace TXServer.Core.Battles
                 BattleBonuses.Clear();
                 foreach (BonusType bonusType in Enum.GetValues(typeof(BonusType)))
                 {
-                    foreach (Bonus bonus in bonusTypeSpawnPoints[bonusType])
+                    foreach (ServerMapInformation.Bonus bonus in bonusTypeSpawnPoints[bonusType])
                     {
                         BattleBonus battleBonus = new(bonusType, bonus, this);
                         BattleBonuses.Add(battleBonus);

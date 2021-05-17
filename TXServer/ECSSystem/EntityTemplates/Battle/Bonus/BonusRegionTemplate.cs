@@ -20,7 +20,10 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Bonus
             if (bonusType != BonusType.GOLD)
                 entity.Components.Add(new SupplyBonusRegionComponent());
             else
+            {
                 entity.Components.Add(new GoldBonusRegionComponent());
+                entity.Components.Add(new BonusComponent());
+            }
 
             return entity;
         }

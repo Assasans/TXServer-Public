@@ -41,12 +41,14 @@ namespace TXServer.ECSSystem.Events.Battle
 
             // Calculate velocity based on 2 previous positions and last position is kept instead
             // Reasons:
-            // - velocity sent by client may be corrupled by overflow
+            // - velocity sent by client may be corrupted by overflow
             // - latest position may be corrupted too
             Vector3 velocity = matchPlayer.TankPosition - matchPlayer.PrevTankPosition;
             matchPlayer.PrevTankPosition = matchPlayer.TankPosition;
             matchPlayer.TankPosition = position.Value;
-            matchPlayer.TankQuaternion = MoveCommand.Movement?.Orientation;
+
+            if (MoveCommand.Movement != null)
+                matchPlayer.TankQuaternion = (Quaternion) MoveCommand.Movement?.Orientation;
 
             if (CheckOverflow(position.Value + velocity))
                 matchPlayer.SelfDestructionTime = DateTime.Now;
