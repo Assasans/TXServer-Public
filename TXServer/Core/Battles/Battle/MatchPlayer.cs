@@ -148,7 +148,8 @@ namespace TXServer.Core.Battles
 
             foreach (SupplyEffect supplyEffect in SupplyEffects.ToArray())
             {
-                SupplyEffectsAfterSpawn.Add(supplyEffect.BonusType);
+                if (supplyEffect.Cheat)
+                    SupplyEffectsAfterSpawn.Add(supplyEffect.BonusType);
                 supplyEffect.Remove();
             }
 
