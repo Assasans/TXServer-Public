@@ -12,6 +12,8 @@ using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Types;
 using TXServer.ECSSystem.Types.Punishments;
+using TXServer.Core.Database.NetworkEvents.PlayerAuth;
+using TXServer.Core.Database.NetworkEvents.PlayerSettings;
 
 namespace TXServer.Core
 {
@@ -20,11 +22,14 @@ namespace TXServer.Core
         public PlayerData Original { get; protected set; }
         public Player Player { get; set; }
 
-        public string UniqueId { get; }
+        public long UniqueId { get; }
         public string Email { get; protected set; }
+        public bool EmailVerified { get; protected set; }
         public bool Subscribed { get; protected set; }
         public string Username { get; set; }
         public string HashedPassword { get; protected set; }
+        public string HardwareId { get; protected set; }
+        public string AutoLoginToken { get; protected set; }
 
         public string CountryCode { get; protected set; }
         public string Avatar { get; protected set; }
@@ -58,13 +63,18 @@ namespace TXServer.Core
 
         public PlayerData(string uid)
         {
-            UniqueId = uid;
+            Username = uid;
         }
+
+        public PlayerData(long uniqueId)
+            => UniqueId = uniqueId;
 
         public ConfirmedUserEmailComponent SetEmail(string email)
         {
             var component = SetValue<ConfirmedUserEmailComponent>(email);
             Email = Email;
+            if (Server.DatabaseNetwork.isReady)
+                Server.DatabaseNetwork.Socket.emit(new SetEmail() { uid = UniqueId, email = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(email) });
             return component;
         }
 
@@ -72,6 +82,8 @@ namespace TXServer.Core
         {
             var component = SetValue<ConfirmedUserEmailComponent>(subscribed);
             Subscribed = subscribed;
+            if (Server.DatabaseNetwork.isReady)
+                Server.DatabaseNetwork.Socket.emit(new SetSubscribed() { uid = UniqueId, state = subscribed });
             return component;
         }
 
@@ -79,23 +91,31 @@ namespace TXServer.Core
         {
             Username = username;
             Player.User.ChangeComponent(new UserUidComponent(username));
+            if (Server.DatabaseNetwork.isReady)
+                Server.DatabaseNetwork.Socket.emit(new SetUsername() { uid = UniqueId, username = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(username) });
         }
 
         public void SetHashedPassword(string hashedPassword)
         {
             HashedPassword = hashedPassword;
+            if (Server.DatabaseNetwork.isReady)
+                Server.DatabaseNetwork.Socket.emit(new SetHashedPassword() { uid = UniqueId, hashedPassword = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(hashedPassword) });
         }
 
         public void SetCountryCode(string countryCode)
         {
             CountryCode = countryCode;
             Player.User.ChangeComponent(new UserCountryComponent(countryCode));
+            if (Server.DatabaseNetwork.isReady)
+                Server.DatabaseNetwork.Socket.emit(new SetCountryCode() { uid = UniqueId, countryCode = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(countryCode) });
         }
 
         public void SetAvatar(string avatarId)
         {
             Avatar = avatarId;
             Player.User.ChangeComponent(new UserAvatarComponent(avatarId));
+            if (Server.DatabaseNetwork.isReady)
+                Server.DatabaseNetwork.Socket.emit(new SetAvatar() { uid = UniqueId, avatar = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(avatarId) });
         }
 
         public void SetAdmin(bool admin)
@@ -148,6 +168,9 @@ namespace TXServer.Core
                 Player.User.AddComponent(component);
             else
                 Player.User.ChangeComponent(component);
+
+            if (Server.DatabaseNetwork.isReady)
+                Server.DatabaseNetwork.Socket.emit(new SetPremiumExpiration() { uid = UniqueId, expiration = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(PremiumExpirationDate.ToString("HH:mm:ss MM/dd/yyyy")) });
         }
 
 

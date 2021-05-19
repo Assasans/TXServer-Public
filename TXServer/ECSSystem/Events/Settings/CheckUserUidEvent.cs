@@ -1,6 +1,7 @@
 ﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.Core.Database;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -9,14 +10,19 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			// TODO: check if uid is occupied in db
-            if (Server.Instance.FindPlayerByUid(Uid) != null)
-			{
-				player.SendEvent(new UserUidOccupiedEvent(Uid), entity);
-				return;
-			}
-
-			player.SendEvent(new UserUidVacantEvent(Uid), entity);
+            if (Server.DatabaseNetwork.isReady)
+                PacketSorter.UsernameAvailable(Uid, response =>
+                {
+                    if (response.result)
+                        player.SendEvent(new UserUidVacantEvent(Uid), entity);
+                    else player.SendEvent(new UserUidOccupiedEvent(Uid), entity);
+                });
+            else
+            {
+                if (Server.Instance.FindPlayerByUid(Uid) != null)
+                    player.SendEvent(new UserUidOccupiedEvent(Uid), entity);
+                else player.SendEvent(new UserUidVacantEvent(Uid), entity);
+            }
 		}
 
 		public string Uid { get; set; }

@@ -1,6 +1,8 @@
-﻿using TXServer.Core;
+﻿using System;
+using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.Core.Database;
 
 namespace TXServer.ECSSystem.Events.Entrance
 {
@@ -9,12 +11,40 @@ namespace TXServer.ECSSystem.Events.Entrance
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			PlayerData data = player.Server.Database.FetchPlayerData(Uid);
-			if (data == null) return; // Player#LogIn(Entity) will kick the player
-			data.Player = player;
-			player.Data = data;
-			player.Data.Username = Uid;
-			player.SendEvent(new PersonalPasscodeEvent(), entity);
+            if (Server.DatabaseNetwork.isReady)
+            {
+                PacketSorter.GetUserViaUsername(Uid, response =>
+                    {
+                        if (response.uid == -1)
+                        {
+                            player.SendEvent(new UidInvalidEvent(), entity);
+                            player.SendEvent(new LoginFailedEvent(), entity);
+                            return;
+                        }
+                        PlayerData data = new PlayerDataProxy(
+                            response.uid,
+                            Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.username),
+                            Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.hashedPassword),
+                            Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.email),
+                            response.emailVerified,
+                            Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.hardwareId),
+                            Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.hardwareToken)
+                        );
+                        data.Player = player;
+                        player.Data = data;
+
+                        player.SendEvent(new PersonalPasscodeEvent(), entity);
+                    });
+            }
+            else
+            {
+                PlayerData data = player.Server.Database.FetchPlayerData(Uid);
+                if (data == null) return; // Player#LogIn(Entity) will kick the player
+                data.Player = player;
+                player.Data = data;
+                player.Data.Username = Uid;
+                player.SendEvent(new PersonalPasscodeEvent(), entity);
+            }
 		}
 
 		public string Uid { get; set; }

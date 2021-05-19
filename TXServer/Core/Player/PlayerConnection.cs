@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -85,7 +85,7 @@ namespace TXServer.Core
             {
                 Player.ClientSession = new(new TemplateAccessor(new ClientSessionTemplate(), null),
                     new ClientSessionComponent(),
-                    new SessionSecurityPublicComponent());
+                    new SessionSecurityPublicComponent(Player.EncryptionComponent.publicKey));
                 if (!((IPEndPoint)Socket.RemoteEndPoint).Address.Equals(IPAddress.Loopback))
                     Player.ClientSession.AddComponent(new InviteComponent(true, null));
 

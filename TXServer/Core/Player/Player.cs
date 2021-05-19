@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -18,6 +19,8 @@ using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
+using TXServer.Core.Database;
+using TXServer.Core.Database.NetworkEvents.Communications;
 
 namespace TXServer.Core
 {
@@ -46,12 +49,13 @@ namespace TXServer.Core
         public BattleTankPlayer BattlePlayer { get; set; }
         public Spectator Spectator { get; set; }
         public SquadPlayer SquadPlayer { get; set; }
+        public RSAEncryptionComponent EncryptionComponent { get; } = new RSAEncryptionComponent();
 
         public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
         public IReadOnlyCollection<Player> SharedPlayers => (IReadOnlyCollection<Player>)_SharedPlayers.Keys;
         private readonly ConcurrentDictionary<Player, int> _SharedPlayers = new();
 
-        public string UniqueId => Data?.UniqueId;
+        public string UniqueId => Data?.Username;
 
         public Server Server { get; }
         public PlayerConnection Connection { get; }
@@ -96,6 +100,34 @@ namespace TXServer.Core
             return found;
         }
 
+        public void LogInWithDatabase(Entity clientSession)
+        {
+            if (!Server.DatabaseNetwork.isReady)
+            {
+                LogIn(clientSession);
+                return;
+            }
+            Logger.Log($"{this}: Loading data from database {Data.Username} ({Data.UniqueId}).");
+
+            // Time to block chain all the stuff ;-;
+            PlayerDataProxy dataProxy = (PlayerDataProxy)Data;
+            PacketSorter.GetUserSettings(Data.UniqueId, settingsData =>
+            {
+                dataProxy.SetSettings(
+                    Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(settingsData.countryCode),
+                    Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(settingsData.avatar),
+                    DateTime.ParseExact(
+                        Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(settingsData.premiumExpiration),
+                        "HH:mm:ss MM/dd/yyyy", CultureInfo.InvariantCulture),
+                    settingsData.subscribed
+                );
+                // Request the other stuff here.... I think stats is next?
+                // After your done, in the last block chain call LogIn()
+                Server.DatabaseNetwork.Socket.emit(new UserLoggedInEvent() { uid = Data.UniqueId });
+                LogIn(clientSession);
+            });
+        }
+
         public bool LogIn(Entity clientSession)
         {
             if (UniqueId == null)
@@ -108,8 +140,8 @@ namespace TXServer.Core
             if (ClientSession.EntityId != clientSession?.EntityId)
                 throw new ArgumentException("ClientSession Entity doesn't match Player ClientSession Entity");
 
-            Logger.Log($"{this}: Logged in as {Data.UniqueId}.");
-
+            Logger.Log($"{this}: Logged in as {Data.Username}.");
+            // I did something similiar... lemme find it
             Entity user = new(new TemplateAccessor(new UserTemplate(), ""),
                 new UserCountryComponent(Data.CountryCode),
                 new UserAvatarComponent(Data.Avatar),
@@ -123,7 +155,7 @@ namespace TXServer.Core
                 new PersonalChatOwnerComponent(),
                 new GameplayChestScoreComponent(),
                 new BlackListComponent(),
-                new UserUidComponent(Data.UniqueId),
+                new UserUidComponent(Data.Username),
                 //new FractionUserScoreComponent(500),
 
                 new UserMoneyComponent(Data.Crystals),
@@ -154,7 +186,7 @@ namespace TXServer.Core
 
             // temp solution
             List<string> admins = new() { "NoNick", "Tim203", "M8", "Kaveman", "Assasans" };
-            if (!admins.Contains(Data.UniqueId))
+            if (!admins.Contains(Data.Username))
                 Data.Admin = false;
 
             // tip: don't change this order

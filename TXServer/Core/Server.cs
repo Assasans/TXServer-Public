@@ -5,6 +5,8 @@ using TXServer.Core.Battles.Effect;
 using TXServer.Core.Battles.Module;
 using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;
+using TXServer.Core.Database;
+using SimpleJSON;
 
 namespace TXServer.Core
 {
@@ -19,6 +21,10 @@ namespace TXServer.Core
         public Action UserErrorHandler { get; init; }
         public ModuleRegistry ModuleRegistry { get; }
 
+        // Kaveman added
+        public static JSONFile Config;
+        public static DatabaseNetwork DatabaseNetwork { get => DatabaseNetwork.instance; }
+        // end Kaveman added
         public Server()
         {
             ModuleRegistry = new ModuleRegistry();
@@ -36,6 +42,13 @@ namespace TXServer.Core
         public void Start()
         {
             Logger.Log("Starting server...");
+
+            // The database needs the config so load it
+            Config = new JSONFile("config.json").Load();
+            // Connect to the database only if there is no current connection or if it is not in a ready state
+            if (DatabaseNetwork.instance == null ||
+                !DatabaseNetwork.instance.isReady)
+                new DatabaseNetwork().Connect(null);
 
             Connection = new ServerConnection(this);
             Connection.Start(Settings.IPAddress, Settings.Port, Settings.MaxPlayers);

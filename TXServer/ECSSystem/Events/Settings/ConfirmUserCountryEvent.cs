@@ -10,6 +10,7 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity entity)
 		{
+            System.Console.WriteLine($"Got country code! '{CountryCode}'");
 			player.Data.SetCountryCode(CountryCode);
 		}
 		public string CountryCode { get; set; }
