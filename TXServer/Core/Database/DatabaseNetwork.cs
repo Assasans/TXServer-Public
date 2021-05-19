@@ -15,7 +15,7 @@ namespace TXServer.Core.Database
         static JSONNode Config { get => Server.Config["DatabaseNetwork"]; }
         public static DatabaseNetwork instance { get; private set; }
         public Client Socket { get; private set; }
-        public bool Connected { get => instance.Socket.Connected; }
+        public bool Connected { get => Socket != null ? instance.Socket.Connected : false; }
         bool ready = false;
         public bool isReady { get => Connected && ready; }
         public static bool authError { get; private set; }
