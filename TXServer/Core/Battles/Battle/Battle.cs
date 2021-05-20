@@ -65,14 +65,14 @@ namespace TXServer.Core.Battles
                 ModeHandler.SetupBattle();
         }
 
-        private (Entity, int) ConvertMapParams(ClientBattleParams Params, bool isMatchMaking)
+        private (Entity, int) ConvertMapParams(ClientBattleParams newParams, bool isMatchMaking)
         {
             Entity mapEntity = Maps.GlobalItems.Rio;
-            int maxPlayers = Params.MaxPlayers;
+            int maxPlayers = newParams.MaxPlayers;
             foreach (PropertyInfo property in typeof(Maps.Items).GetProperties())
             {
                 Entity entity = (Entity)property.GetValue(Maps.GlobalItems);
-                if (entity.EntityId == Params.MapId)
+                if (entity.EntityId == newParams.MapId)
                 {
                     mapEntity = entity;
                     CurrentMapInfo = ServerConnection.ServerMapInfo[property.Name];
@@ -86,20 +86,21 @@ namespace TXServer.Core.Battles
             return (mapEntity, maxPlayers);
         }
 
-        public void UpdateParams(Player player, ClientBattleParams @params)
+        public void UpdateParams(ClientBattleParams @params)
         {
             Params = @params;
             (MapEntity, _) = ConvertMapParams(@params, IsMatchMaking);
 
-            foreach (Component component in new Component[]
-            {
+            List<Component> paramComponents = new(){
                 new MapGroupComponent(MapEntity),
                 new BattleModeComponent(@params.BattleMode),
-                new UserLimitComponent(userLimit: @params.MaxPlayers, teamLimit: @params.MaxPlayers / 2),
-                new GravityComponent(gravity: GravityTypes[@params.Gravity], gravityType: @params.Gravity),
-                new ClientBattleParamsComponent(@params),
-            })
-            {
+                new UserLimitComponent(@params.MaxPlayers, @params.MaxPlayers / 2),
+                new GravityComponent(GravityTypes[@params.Gravity], @params.Gravity)
+            };
+            if (!IsMatchMaking)
+                paramComponents.Add(new ClientBattleParamsComponent(@params));
+
+            foreach (Component component in paramComponents) {
                 BattleLobbyEntity.RemoveComponent(component.GetType());
                 BattleLobbyEntity.AddComponent(component);
             }

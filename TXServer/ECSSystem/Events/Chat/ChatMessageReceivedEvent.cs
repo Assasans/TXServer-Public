@@ -3,6 +3,7 @@ using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.ECSSystem.Events.Chat
 {
@@ -18,6 +19,31 @@ namespace TXServer.ECSSystem.Events.Chat
         /// /// <param name="target">Targeted player</param>
         public static void SystemMessageTarget(string message, Entity chat, Player target)
         {
+            target.SendEvent(new ChatMessageReceivedEvent
+            {
+                Message = message,
+                SystemMessage = true,
+                UserId = 0,
+                UserUid = "System",
+                UserAvatarId = ""
+            }, chat);
+        }
+
+        /// <summary>
+        /// Send system message to a player & let the system choose the best chat target.
+        /// </summary>
+        /// <param name="message">Content of the message to be sent</param>
+        /// /// <param name="target">Targeted player</param>
+        public static void SystemMessageTarget(string message, Player target)
+        {
+            Entity chat;
+            if (target.IsInMatch)
+                chat = target.BattlePlayer.Battle.GeneralBattleChatEntity;
+            else if (target.IsInBattle)
+                chat = target.BattlePlayer.Battle.BattleLobbyChatEntity;
+            else
+                chat = Chats.GlobalItems.Ru;
+
             target.SendEvent(new ChatMessageReceivedEvent
             {
                 Message = message,

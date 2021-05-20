@@ -10,6 +10,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
         public class Items : ItemList
         {
+            // TODO: multiple chats + choosing the correct one on error messages
             public Entity Ru { get; } = new Entity(-968268831, new TemplateAccessor(new GeneralChatTemplate(), "/chat/general/ru"),
                 new GeneralChatComponent(),
                 new ChatComponent());

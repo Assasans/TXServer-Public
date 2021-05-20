@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TXServer.Core.Battles.Matchmaking;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
@@ -34,8 +35,8 @@ namespace TXServer.Core.Battles
                     List<MapInfo> matchMakingMaps = ServerConnection.ServerMapInfo.Values.Where(p => p.MatchMaking).ToList();
                     Random random = new();
                     int index = random.Next(matchMakingMaps.Count);
-                    Battle.Params = new ClientBattleParams(BattleMode: BattleModePicker.MatchMakingBattleModePicker(random), MapId: matchMakingMaps[index].MapId,
-                        MaxPlayers: 20, TimeLimit: 10, ScoreLimit: 100, FriendlyFire: false, Gravity: GravityType.EARTH, KillZoneEnabled: true, DisabledModules: false);
+                    Battle.Params = new ClientBattleParams(MatchMaking.BattleModePicker(), MapId: matchMakingMaps[index].MapId,
+                        MaxPlayers: 20, TimeLimit: 10, ScoreLimit: 100, FriendlyFire: false, GravityType.EARTH, KillZoneEnabled: true, DisabledModules: false);
                 }
 
                 (Battle.MapEntity, Battle.Params.MaxPlayers) = Battle.ConvertMapParams(Battle.Params, Battle.IsMatchMaking);

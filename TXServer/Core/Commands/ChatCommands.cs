@@ -41,16 +41,17 @@ namespace TXServer.Core.Commands
             { "jump", ("jump [multiplier]", ChatCommandConditions.HackBattle | ChatCommandConditions.InMatch, Jump) }
         };
 
-        private static readonly Dictionary<ChatCommandConditions, string> ConditionErrors = new()
+        public static readonly Dictionary<ChatCommandConditions, string> ConditionErrors = new()
         {
             { ChatCommandConditions.ActiveTank, "Your tank is not active" },
             { ChatCommandConditions.Admin, "You are not an admin" },
             { ChatCommandConditions.BattleOwner, "You do not own this battle" },
             { ChatCommandConditions.HackBattle, "HackBattle is not enabled or you don't have permission to it" },
+            { ChatCommandConditions.InactiveBattle, "You need to be in a battle lobby with no active players or spectators in-battle" },
             { ChatCommandConditions.InBattle, "You are not in battle" },
             { ChatCommandConditions.InMatch, "You are not in match" },
             { ChatCommandConditions.Premium, "You don't have an active premium pass" },
-            { ChatCommandConditions.Tester, "You are not a tester" },
+            { ChatCommandConditions.Tester, "You are not a tester" }
         };
 
         /// <summary>
@@ -816,7 +817,7 @@ namespace TXServer.Core.Commands
 
 
 
-        private static ChatCommandConditions GetConditionsFor(Player player)
+        public static ChatCommandConditions GetConditionsFor(Player player)
         {
             ChatCommandConditions conditions = 0;
 
@@ -834,10 +835,8 @@ namespace TXServer.Core.Commands
                 if (player.IsBattleOwner || player.Data.Admin)
                     conditions |= ChatCommandConditions.BattleOwner;
                 if (player.BattlePlayer.Battle.TypeHandler is CustomBattleHandler handler)
-                {
                     if (handler.HackBattle && player.IsBattleOwner || handler.HackBattle && handler.HackBattleDemocracy)
                         conditions |= ChatCommandConditions.HackBattle;
-                }
                 if (player.Data.Admin)
                     conditions |= ChatCommandConditions.HackBattle;
 
@@ -845,6 +844,10 @@ namespace TXServer.Core.Commands
                     conditions |= ChatCommandConditions.InMatch;
                 if (player.BattlePlayer?.MatchPlayer?.TankState == TankState.Active)
                     conditions |= ChatCommandConditions.ActiveTank;
+                if (InactiveBattleStates.Contains(player.BattlePlayer.Battle.BattleState))
+                    conditions |= ChatCommandConditions.InactiveBattle;
+                else
+                    conditions |= ChatCommandConditions.ActiveBattle;
             }
 
             return conditions;
@@ -884,5 +887,8 @@ namespace TXServer.Core.Commands
             targets = targets.Where(t => !t.IsCheatImmune || t.Player == player).ToList();
             return targets;
         }
+
+        private static readonly BattleState[] InactiveBattleStates =
+            { BattleState.NotEnoughPlayers, BattleState.Starting, BattleState.CustomNotStarted };
     }
 }

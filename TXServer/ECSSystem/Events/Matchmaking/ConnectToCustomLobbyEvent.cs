@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Events.Battle
     {
         public void Execute(Player player, Entity entity)
         {
-            Core.Battles.Battle battle = Server.Instance.FindBattleById(lobbyId: LobbyId, battleId: 0);
+            Core.Battles.Battle battle = Server.Instance.FindBattleById(LobbyId, 0);
 
             // admins can enter with the "last" code the newest custom lobby
             if (player.Data.Admin || player.Data.Beta)
@@ -26,28 +26,25 @@ namespace TXServer.ECSSystem.Events.Battle
                     case 21211920:
                         battle = ServerConnection.BattlePool.LastOrDefault(b => !b.IsMatchMaking);
                         break;
+                    // brute join specific lobby at index
+                    default:
+                        if (LobbyId < ServerConnection.BattlePool.Count)
+                            battle = ServerConnection.BattlePool[(int)LobbyId];
+                        break;
                 }
-
-                // brute join specific lobby at index
-                if (LobbyId < ServerConnection.BattlePool.Count)
-                    battle = ServerConnection.BattlePool[(int)LobbyId];
             }
 
             if (battle != null)
             {
                 if (battle.JoinedTankPlayers.Count() >= battle.Params.MaxPlayers)
-                {
-                    player.SendEvent(new EnterBattleLobbyFailedEvent(alreadyInLobby: false, lobbyIsFull: true), player.User);
-                }
+                    player.SendEvent(new EnterBattleLobbyFailedEvent(false, true), player.User);
+                else if (player.IsInBattle && player.BattlePlayer.Battle == battle)
+                    player.SendEvent(new EnterBattleLobbyFailedEvent(true, false), player.User);
                 else
-                {
                     battle.AddPlayer(player, false);
-                }
             }
             else
-            {
                 player.SendEvent(new CustomLobbyNotExistsEvent(), player.User);
-            }
         }
         public long LobbyId { get; set; }
     }

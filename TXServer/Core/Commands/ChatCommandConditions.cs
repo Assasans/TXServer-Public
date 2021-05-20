@@ -16,5 +16,7 @@ namespace TXServer.Core.Commands
         HackBattle = 32,
         InMatch = 64,
         ActiveTank = 128,
+        InactiveBattle = 256,
+        ActiveBattle = 512
     }
 }

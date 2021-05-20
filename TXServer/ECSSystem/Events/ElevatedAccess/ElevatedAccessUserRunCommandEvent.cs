@@ -1,40 +1,115 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using TXServer.Core;
 using TXServer.Core.Battles;
+using TXServer.Core.Commands;
 using TXServer.Core.Protocol;
+using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Events.Battle.Bonus;
 using TXServer.ECSSystem.Events.Chat;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.ElevatedAccess
 {
     [SerialVersionUID(1503493668447L)]
     public class ElevatedAccessUserRunCommandEvent : ECSEvent
     {
-        private static readonly Dictionary<string, Action<Player, string[]>> Commands = new()
+        private static readonly Dictionary<string, (ChatCommandConditions, Action<Player, string[]>)> Commands = new()
         {
-            { "finish", Finish },
-            { "goldrain", GoldboxRain },
-            { "immune", Immune },
-            { "open", Open },
-            { "pause", Pause },
-            { "positioninfo", PositionInfo },
-            { "start", Start },
-            { "shutdown", Shutdown },
-            { "supplyrain", SupplyRain }
+            { "battlemode", (ChatCommandConditions.InactiveBattle, ChangeBattleMode) },
+            { "finish", (ChatCommandConditions.InBattle, Finish) },
+            { "friendlyfire", (ChatCommandConditions.InactiveBattle, ChangeFriendlyFire) },
+            { "goldrain", (ChatCommandConditions.ActiveBattle, GoldboxRain) },
+            { "immune", (ChatCommandConditions.InBattle, Immune) },
+            { "map", (ChatCommandConditions.InactiveBattle, ChangeMap) },
+            { "modules", (ChatCommandConditions.InactiveBattle, ChangeModules) },
+            { "open", (ChatCommandConditions.InBattle, Open) },
+            { "pause", (ChatCommandConditions.InBattle, Pause) },
+            { "positioninfo", (ChatCommandConditions.InMatch, PositionInfo) },
+            { "start", (ChatCommandConditions.InBattle, Start) },
+            { "shutdown", (ChatCommandConditions.Admin, Shutdown) },
+            { "supplyrain", (ChatCommandConditions.ActiveBattle, SupplyRain) }
         };
 
-        public void Execute(Player player, Entity entity)
+        public void Execute(Player player, Entity session)
         {
             if (!player.Data.Admin) return;
 
             string[] args = Command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            if (Commands.ContainsKey(args[0].ToLower()))
-                Commands[args[0].ToLower()](player, args[1..]);
+            if (!Commands.ContainsKey(args[0].ToLower())) return;
+
+            (ChatCommandConditions, Action<Player, string[]>) desc = Commands[args[0].ToLower()];
+            ChatCommandConditions playerConditions = ChatCommands.GetConditionsFor(player);
+
+            foreach (ChatCommandConditions condition in Enum.GetValues<ChatCommandConditions>())
+            {
+                if ((desc.Item1 & condition) != condition || (playerConditions & condition) == condition) continue;
+                ChatMessageReceivedEvent.SystemMessageTarget(ChatCommands.ConditionErrors[condition], player);
+                return;
+            }
+
+            desc.Item2(player, args[1..]);
+        }
+
+        private static void ChangeBattleMode(Player player, string[] args)
+        {
+            ClientBattleParams newParams = player.BattlePlayer.Battle.Params;
+            string toConvertMode = args.Length == 0 ? "" : args[0];
+
+            newParams.BattleMode = toConvertMode.ToLower() switch
+            {
+                "ctf" => BattleMode.CTF,
+                "dm" => BattleMode.DM,
+                "tdm" => BattleMode.TDM,
+                _ => Core.Battles.Matchmaking.MatchMaking.BattleModePicker()
+            };
+
+            player.BattlePlayer.Battle.UpdateParams(newParams);
+        }
+
+        private static void ChangeFriendlyFire(Player player, string[] args)
+        {
+            ClientBattleParams newParams = player.BattlePlayer.Battle.Params;
+            newParams.FriendlyFire = !newParams.FriendlyFire;
+            player.BattlePlayer.Battle.UpdateParams(newParams);
+
+            string msg = newParams.FriendlyFire ? "Activated" : "Deactivated";
+            ChatMessageReceivedEvent.SystemMessageTarget(msg + " friendly fire",
+                player.BattlePlayer.Battle.BattleLobbyChatEntity, player);
+        }
+
+        private static void ChangeMap(Player player, string[] args)
+        {
+            ClientBattleParams newParams = player.BattlePlayer.Battle.Params;
+            List<MapInfo> otherMaps = ServerConnection.ServerMapInfo.Values
+                .Where(mapInfo => mapInfo.MapId != player.BattlePlayer.Battle.Params.MapId).ToList();
+
+            string newMapName = args.Length == 0 ? otherMaps[new Random().Next(otherMaps.Count)].Name : args[0];
+            long? newMapId = ServerConnection.ServerMapInfo.Values.SingleOrDefault(m =>
+                string.Equals(m.Name, newMapName, StringComparison.CurrentCultureIgnoreCase))?.MapId;
+
+            if (newMapId != null)
+            {
+                newParams.MapId = (long) newMapId;
+                player.BattlePlayer.Battle.UpdateParams(newParams);
+            }
+            else
+                ChatMessageReceivedEvent.SystemMessageTarget($"Error, a map with name {newMapName} wasn't found",
+                    player.BattlePlayer.Battle.BattleLobbyChatEntity, player);
+        }
+
+        private static void ChangeModules(Player player, string[] args)
+        {
+            ClientBattleParams newParams = player.BattlePlayer.Battle.Params;
+            newParams.DisabledModules = !newParams.DisabledModules;
+            player.BattlePlayer.Battle.UpdateParams(newParams);
+
+            string msg = newParams.DisabledModules ? "Deactivated" : "Activated";
+            ChatMessageReceivedEvent.SystemMessageTarget(msg + " modules",
+                player.BattlePlayer.Battle.BattleLobbyChatEntity, player);
         }
 
         private static void Finish(Player player, string[] args)
@@ -72,9 +147,8 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
         }
 
         private static void Immune(Player player, string[] args)
-        {
-            player.BattlePlayer.IsCheatImmune = !player.BattlePlayer.IsCheatImmune;
-        }
+            => player.BattlePlayer.IsCheatImmune = !player.BattlePlayer.IsCheatImmune;
+
 
         private static void Open(Player player, string[] args)
         {
@@ -107,9 +181,8 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
         }
 
         private static void Shutdown(Player player, string[] args)
-        {
-            Server.Instance.Stop();
-        }
+            => Server.Instance.Stop();
+
 
         private static void Start(Player player, string[] args)
         {
@@ -161,6 +234,9 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
         }
 
 
+        // ReSharper disable once UnassignedGetOnlyAutoProperty
+        // ReSharper disable once MemberCanBePrivate.Global
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public string Command { get; set; }
     }
 }

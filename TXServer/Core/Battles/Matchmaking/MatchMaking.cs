@@ -3,6 +3,7 @@ using System.Linq;
 using TXServer.Core.Squads;
 using TXServer.ECSSystem.Components.Battle.Time;
 using TXServer.ECSSystem.Components.User;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles.Matchmaking
 {
@@ -28,7 +29,7 @@ namespace TXServer.Core.Battles.Matchmaking
 
         private static Battle CreateMatchMakingBattle()
         {
-            Battle battle = new Battle(battleParams: null, isMatchMaking: true, owner: null);
+            Battle battle = new(null, true, null);
             ServerConnection.BattlePool.Add(battle);
             return battle;
         }
@@ -104,6 +105,16 @@ namespace TXServer.Core.Battles.Matchmaking
                     }
                 }
             });
+        }
+        public static BattleMode BattleModePicker()
+        {
+            int percent = new Random().Next(0, 100);
+            return percent switch
+            {
+                < 46 => BattleMode.TDM,
+                < 46 + 45 => BattleMode.CTF,
+                _ => BattleMode.DM
+            };
         }
     }
 }
