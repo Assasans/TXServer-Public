@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,13 +17,13 @@ namespace TXServer.Core.Database
 
         public static void GetUserViaUsername(string encUsername, Action<UserInitialDataEvent> callback)
         {
-            if (Server.DatabaseNetwork.isReady)
+            if (Server.DatabaseNetwork.IsReady)
             {
                 int packetId = packetIdCounter++;
                 GetUserViaUsername packet = new GetUserViaUsername()
                 {
                     packetId = packetId,
-                    encryptedUsername = DatabaseNetwork.instance.Socket.RSAEncryptionComponent.Encrypt(encUsername)
+                    encryptedUsername = DatabaseNetwork.Instance.Socket.RSAEncryptionComponent.Encrypt(encUsername)
                 };
 
                 if (!Server.DatabaseNetwork.Socket.eventExists<UserInitialDataEvent>())

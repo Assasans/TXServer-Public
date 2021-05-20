@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events.Entrance
     {
         public void Execute(Player player, Entity entity)
         {
-            if (Server.DatabaseNetwork.isReady)
+            if (Server.DatabaseNetwork.IsReady)
             {
                 PacketSorter.UsernameAvailable(Uid,
                     packet =>

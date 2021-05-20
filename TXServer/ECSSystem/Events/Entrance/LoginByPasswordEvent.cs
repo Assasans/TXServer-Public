@@ -20,7 +20,7 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity clientSession)
 		{
-            if (Server.DatabaseNetwork.isReady)
+            if (Server.DatabaseNetwork.IsReady)
             {
                 if (player.Data.HashedPassword == PasswordEncipher)
                 {

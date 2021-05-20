@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
@@ -102,7 +102,7 @@ namespace TXServer.Core
 
         public void LogInWithDatabase(Entity clientSession)
         {
-            if (!Server.DatabaseNetwork.isReady)
+            if (!Server.DatabaseNetwork.IsReady)
             {
                 LogIn(clientSession);
                 return;

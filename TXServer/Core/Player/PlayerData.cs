@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -73,7 +73,7 @@ namespace TXServer.Core
         {
             var component = SetValue<ConfirmedUserEmailComponent>(email);
             Email = Email;
-            if (Server.DatabaseNetwork.isReady)
+            if (Server.DatabaseNetwork.IsReady)
                 Server.DatabaseNetwork.Socket.emit(new SetEmail() { uid = UniqueId, email = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(email) });
             return component;
         }
@@ -82,7 +82,7 @@ namespace TXServer.Core
         {
             var component = SetValue<ConfirmedUserEmailComponent>(subscribed);
             Subscribed = subscribed;
-            if (Server.DatabaseNetwork.isReady)
+            if (Server.DatabaseNetwork.IsReady)
                 Server.DatabaseNetwork.Socket.emit(new SetSubscribed() { uid = UniqueId, state = subscribed });
             return component;
         }
@@ -91,14 +91,14 @@ namespace TXServer.Core
         {
             Username = username;
             Player.User.ChangeComponent(new UserUidComponent(username));
-            if (Server.DatabaseNetwork.isReady)
+            if (Server.DatabaseNetwork.IsReady)
                 Server.DatabaseNetwork.Socket.emit(new SetUsername() { uid = UniqueId, username = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(username) });
         }
 
         public void SetHashedPassword(string hashedPassword)
         {
             HashedPassword = hashedPassword;
-            if (Server.DatabaseNetwork.isReady)
+            if (Server.DatabaseNetwork.IsReady)
                 Server.DatabaseNetwork.Socket.emit(new SetHashedPassword() { uid = UniqueId, hashedPassword = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(hashedPassword) });
         }
 
@@ -106,7 +106,7 @@ namespace TXServer.Core
         {
             CountryCode = countryCode;
             Player.User.ChangeComponent(new UserCountryComponent(countryCode));
-            if (Server.DatabaseNetwork.isReady)
+            if (Server.DatabaseNetwork.IsReady)
                 Server.DatabaseNetwork.Socket.emit(new SetCountryCode() { uid = UniqueId, countryCode = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(countryCode) });
         }
 
@@ -114,7 +114,7 @@ namespace TXServer.Core
         {
             Avatar = avatarId;
             Player.User.ChangeComponent(new UserAvatarComponent(avatarId));
-            if (Server.DatabaseNetwork.isReady)
+            if (Server.DatabaseNetwork.IsReady)
                 Server.DatabaseNetwork.Socket.emit(new SetAvatar() { uid = UniqueId, avatar = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(avatarId) });
         }
 
@@ -169,7 +169,7 @@ namespace TXServer.Core
             else
                 Player.User.ChangeComponent(component);
 
-            if (Server.DatabaseNetwork.isReady)
+            if (Server.DatabaseNetwork.IsReady)
                 Server.DatabaseNetwork.Socket.emit(new SetPremiumExpiration() { uid = UniqueId, expiration = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(PremiumExpirationDate.ToString("HH:mm:ss MM/dd/yyyy")) });
         }
 

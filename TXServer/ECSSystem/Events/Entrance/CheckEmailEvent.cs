@@ -19,7 +19,7 @@ namespace TXServer.ECSSystem.Events
 			{
 				var addr = new System.Net.Mail.MailAddress(Email);
 
-                if (Server.DatabaseNetwork.isReady)
+                if (Server.DatabaseNetwork.IsReady)
                     PacketSorter.EmailAvailable(addr.Address, result =>
                     {
                         if (result.result)
