@@ -43,7 +43,7 @@ namespace TXServer.Core
             Logger.Log("Starting server...");
 
             // The database needs the config so load it
-            ServerConfig.Load("config.json");
+            ServerConfig.Load("Config.json");
             // Connect to the database only if there is no current connection or if it is not in a ready state
             if (DatabaseNetwork.Instance == null ||
                 !DatabaseNetwork.Instance.IsReady)

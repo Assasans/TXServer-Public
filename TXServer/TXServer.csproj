@@ -44,6 +44,10 @@
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.3" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Library\Config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Config.json</Link>
+    </None>
     <None Update="Library\ServerMapInfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
