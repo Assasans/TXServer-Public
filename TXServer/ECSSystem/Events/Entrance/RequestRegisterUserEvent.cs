@@ -1,10 +1,11 @@
-﻿using TXServer.Core;
+using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.Core.Database;
 using System;
 using System.Text;
 using TXServer.Core.Database.NetworkEvents.PlayerAuth;
+using TXServer.Core.Logging;
 
 namespace TXServer.ECSSystem.Events.Entrance
 {
@@ -20,7 +21,7 @@ namespace TXServer.ECSSystem.Events.Entrance
                     {
                         if (packet.result) // Username Available
                         {
-                            Console.WriteLine(EncryptedPasswordDigest);
+                            Logger.Debug(EncryptedPasswordDigest);
                             string generatedToken = Guid.NewGuid().ToString();
                             byte[] decryptedPass = player.EncryptionComponent.Decrypt(EncryptedPasswordDigest);
                             byte[] xor = player.EncryptionComponent.XorArrays(decryptedPass, Convert.FromBase64String(new PersonalPasscodeEvent().Passcode));

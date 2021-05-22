@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using TXServer.Core.Logging;
 using TXServer.ECSSystem.Types.Punishments;
 
 namespace TXServer.Core.Data.Database.Impl
@@ -37,7 +38,7 @@ namespace TXServer.Core.Data.Database.Impl
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Logger.Error(e);
             }
 
             return this;

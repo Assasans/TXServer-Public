@@ -1,8 +1,6 @@
 using System;
-using System.IO;
-using System.Text;
 using System.Security.Cryptography;
-using System.Xml.Serialization;
+using TXServer.Core.Logging;
 
 namespace TXServer.Core
 {
@@ -21,7 +19,7 @@ namespace TXServer.Core
 
             /*string xml = provider.ToXmlString(false);
             // Get Modulus
-            Console.WriteLine("\n\n\n\n" + Convert.ToBase64String(provider.ExportParameters(false).Exponent));
+            Logger.Debug("\n\n\n\n" + Convert.ToBase64String(provider.ExportParameters(false).Exponent));
             int startingIndex = xml.IndexOf("<Modulus>") + 9;
             int length = xml.IndexOf("</Modulus>") - startingIndex;
             publicKey = xml.Substring(startingIndex, length);
@@ -30,14 +28,14 @@ namespace TXServer.Core
             length = xml.IndexOf("</Exponent>") - startingIndex;
             publicKey += ":" + xml.Substring(startingIndex, length); */
 
-            //Console.WriteLine($"\n\n\n\n{publicKey}\n\n\n\n");
+            //Logger.Debug($"\n\n\n\n{publicKey}\n\n\n\n");
             // Not sure if this works
         }
 
         public byte[] Decrypt(string text)
         {
             byte[] cipherText = Convert.FromBase64String(text);
-            Console.WriteLine("Input length => " + text.Length);
+            Logger.Debug("Input length => " + text.Length);
 
             //string decrypted = Encoding.UTF8.GetString(plainText);
             return Decrypt(cipherText);

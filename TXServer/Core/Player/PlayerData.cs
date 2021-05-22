@@ -1,23 +1,20 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reflection;
-
 using TXServer.Core.Commands;
 using TXServer.Core.Data.Database;
+using TXServer.Core.Database.NetworkEvents.PlayerAuth;
+using TXServer.Core.Database.NetworkEvents.PlayerSettings;
 using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Types;
 using TXServer.ECSSystem.Types.Punishments;
-using TXServer.Core.Database.NetworkEvents.PlayerAuth;
-using TXServer.Core.Database.NetworkEvents.PlayerSettings;
 
 namespace TXServer.Core
 {
-	public abstract class PlayerData : ICloneable
+    public abstract class PlayerData : ICloneable
     {
         public PlayerData Original { get; protected set; }
         public Player Player { get; set; }
@@ -286,13 +283,8 @@ namespace TXServer.Core
 
         public object Clone()
         {
-            PlayerData clone = (PlayerData) Activator.CreateInstance(GetType(), UniqueId);
-
-            foreach (var field in typeof(PlayerData).GetFields())
-            {
-                if (field.Name.Equals("Original")) continue;
-                field.SetValue(clone, field.GetValue(this));
-            }
+            var clone = (PlayerData)MemberwiseClone();
+            clone.Original = null;
 
             return clone;
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using TXServer.Core;
@@ -39,7 +39,7 @@ namespace TXServerConsole
 
             if (additionalArgs == null)
             {
-                Console.WriteLine("Arguments are not valid.");
+                Console.WriteLine("Parameters are not valid.");
                 return;
             }
 

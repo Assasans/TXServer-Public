@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TXServer.Core.Data.Database;
+using Simple.Net;
 using TXServer.Core.Database.NetworkEvents.PlayerAuth;
 using TXServer.Core.Database.NetworkEvents.PlayerSettings;
-using Simple.Net;
+using TXServer.Core.Logging;
 
 namespace TXServer.Core.Database
 {
@@ -100,7 +97,7 @@ namespace TXServer.Core.Database
 
         public static void GetUserSettings(long uid, Action<UserSettingsData> callback)
         {
-            Console.WriteLine($"UserSettingsData hash: '{HashCache.Get<UserSettingsData>()}'");
+            Logger.Debug($"UserSettingsData hash: '{HashCache.Get<UserSettingsData>()}'");
             int packetId = packetIdCounter++;
             GetUserSettingsRequest request = new GetUserSettingsRequest()
             {
