@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -10,7 +11,7 @@ namespace TXServer.ECSSystem.Components
 	public class PresetEquipmentComponent : Component
     {
         private Player Player;
-        
+
         public PresetEquipmentComponent(Player player, Entity preset)
         {
             Player = player;
@@ -25,6 +26,11 @@ namespace TXServer.ECSSystem.Components
 
             WeaponItem = weaponList.Smoky;
             HullItem = hullList.Hunter;
+
+            Weapon = Weapons.GlobalItems.Smoky;
+            WeaponId = Weapon.EntityId;
+            Hull = Hulls.GlobalItems.Hunter;
+            HullId = Hull.EntityId;
 
             WeaponPaint = ((Covers.Items)Player.UserItems[typeof(Covers)]).None;
             TankPaint = ((Paints.Items)Player.UserItems[typeof(Paints)]).Green;
@@ -83,9 +89,32 @@ namespace TXServer.ECSSystem.Components
             };
         }
 
-        public Entity Weapon => Player.FindEntityById(WeaponItem.GetComponent<ParentGroupComponent>().Key);
+        [ProtocolIgnore] public Entity Weapon { get; set; }
+        public long weaponId { get; set; }
+        [ProtocolIgnore]
+        public long WeaponId
+        {
+            set
+            {
+                weaponId = value;
+                if (Preset.TryRemoveComponent<PresetEquipmentComponent>())
+                    Preset.AddComponent(this);
+            }
+        }
 
-        public Entity Hull => Player.FindEntityById(HullItem.GetComponent<ParentGroupComponent>().Key);
+        [ProtocolIgnore] public Entity Hull { get; set; }
+        public long hullId { get; set; }
+
+        [ProtocolIgnore]
+        public long HullId
+        {
+            set
+            {
+                hullId = value;
+                if (Preset.TryRemoveComponent<PresetEquipmentComponent>())
+                    Preset.AddComponent(this);
+            }
+        }
 
         [ProtocolIgnore] public Entity Preset { get; set; }
 

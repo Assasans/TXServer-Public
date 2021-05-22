@@ -50,10 +50,10 @@ namespace TXServer.ECSSystem.GlobalEntities
             public UserItems(Player player)
             {
                 Goldbonus.Components.Add(new ModuleGroupComponent((player.UserItems[typeof(Modules)] as Modules.Items).Gold));
-                
-                PresetEquipmentComponent component = new PresetEquipmentComponent(player, Preset);
+
+                PresetEquipmentComponent component = new(player, Preset);
                 Preset.Components.Add(component);
-                player.CurrentPreset = component;
+                player.Presets.Add(Preset);
             }
 
             public Entity Goldbonus { get; } = new Entity(new TemplateAccessor(new GoldBonusUserItemTemplate(), "garage/goldbonus"),
@@ -73,7 +73,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new UserItemCounterComponent(0));
             public Entity Preset { get; } = new Entity(new TemplateAccessor(new PresetUserItemTemplate(), "garage/preset"),
                 new MarketItemGroupComponent(-571744569),
-                new PresetNameComponent("Пресет 1"),
+                new PresetNameComponent("Preset 1"),
                 new MountedItemComponent());
         }
     }

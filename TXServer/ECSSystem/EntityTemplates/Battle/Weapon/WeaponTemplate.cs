@@ -9,6 +9,7 @@ using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Energy;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Weapon;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.ECSSystem.EntityTemplates.Battle
 {
@@ -47,7 +48,8 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 new WeaponEnergyComponent(1),
                 tank.GetComponent<UserGroupComponent>(),
                 tank.GetComponent<TankGroupComponent>(),
-                tank.GetComponent<BattleGroupComponent>());
+                tank.GetComponent<BattleGroupComponent>(),
+                battlePlayer.Player.CurrentPreset.Weapon.GetComponent<MarketItemGroupComponent>());
 
             if (Config.GetComponent<WeaponCooldownComponent>(configPath, false) is Component component)
             {

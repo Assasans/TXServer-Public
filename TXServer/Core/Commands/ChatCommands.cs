@@ -131,17 +131,12 @@ namespace TXServer.Core.Commands
                         if (!playerConditions.HasFlag(condition))
                             return ConditionErrors[condition];
                         if (!player.IsInBattle)
-                            return "Teleport your tank to a player or a teleport point. Use '/help teleport' " +
+                            return "Teleport your tank to a player or a teleport point. Use '/help tp' " +
                                    "in-battle to view available teleport points";
                         message = player.BattlePlayer.Battle.CurrentMapInfo.TeleportPoints.Aggregate(
                             "Available teleport points on this map: ", (current, tp) => current + $"{tp.Name}, ");
                         message = message.Remove(message.Length - 2);
                         return message;
-                    case "test":
-                        condition = ChatCommandConditions.Tester;
-                        if (!player.Data.Beta)
-                            return ConditionErrors[condition];
-                        break;
                     default:
                         return "Invalid command, specific help message wasn't found";
                 }

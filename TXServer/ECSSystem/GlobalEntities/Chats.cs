@@ -6,12 +6,12 @@ namespace TXServer.ECSSystem.GlobalEntities
 {
     public static class Chats
     {
-        public static Items GlobalItems { get; } = new Items();
+        public static Items GlobalItems { get; } = new();
 
         public class Items : ItemList
         {
-            // TODO: multiple chats + choosing the correct one on error messages
-            public Entity Ru { get; } = new Entity(-968268831, new TemplateAccessor(new GeneralChatTemplate(), "/chat/general/ru"),
+            // TODO: multiple (language) chats + choose the correct one at ChatMessageReceivedEvent.SystemMessageTarget
+            public Entity Ru { get; } = new(-968268831, new TemplateAccessor(new GeneralChatTemplate(), "/chat/general/ru"),
                 new GeneralChatComponent(),
                 new ChatComponent());
         }

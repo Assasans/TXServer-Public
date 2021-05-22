@@ -106,6 +106,7 @@ namespace TXServer.Core.Battles.Matchmaking
                 }
             });
         }
+
         public static BattleMode BattleModePicker()
         {
             int percent = new Random().Next(0, 100);

@@ -1,15 +1,17 @@
-﻿using System;
-using TXServer.Core;
+﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.EntityTemplates
+namespace TXServer.ECSSystem.Events.Matchmaking
 {
-    [SerialVersionUID(1496905821016)]
+    [SerialVersionUID(1496905821016L)]
     public class SetEquipmentEvent : ECSEvent
     {
+        public void Execute(Player player, Entity lobby)
+        {
+        }
+
         public long WeaponId { get; set; }
-        
         public long HullId { get; set; }
     }
 }

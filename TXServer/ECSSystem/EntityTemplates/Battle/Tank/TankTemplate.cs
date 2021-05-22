@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Configuration;
+﻿using TXServer.Core.Battles;
+using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -13,7 +14,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(2012489519776979402)]
     public class TankTemplate : IEntityTemplate
     {
-        public static Entity CreateEntity(Entity hullUserItem, Entity battleUser)
+        public static Entity CreateEntity(Entity hullUserItem, Entity battleUser, BattleTankPlayer battlePlayer)
         {
             string configPath = hullUserItem.TemplateAccessor.ConfigPath;
 
@@ -29,7 +30,8 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 Config.GetComponent<SpeedConfigComponent>(configPath),
                 Config.GetComponent<WeightComponent>(configPath),
                 new TemperatureComponent(0),
-                new TankNewStateComponent());
+                new TankNewStateComponent(),
+                battlePlayer.Player.CurrentPreset.Hull.GetComponent<MarketItemGroupComponent>());
 
             if (battleUser.GetComponent<TeamGroupComponent>() != null)
                 entity.Components.Add(battleUser.GetComponent<TeamGroupComponent>());

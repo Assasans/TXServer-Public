@@ -1,5 +1,4 @@
-﻿using System;
-using TXServer.Core;
+﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -12,7 +11,8 @@ namespace TXServer.ECSSystem.EntityTemplates
         public void AddUserItemComponents(Player player, Entity item)
         {
             item.Components.Add(new PresetEquipmentComponent(player, item));
-            item.Components.Add(new PresetNameComponent(Entity.GenerateId().ToString()));
+            item.Components.Add(new PresetNameComponent($"Preset {player.Presets.Count + 1}"));
+            player.Presets.Add(item);
         }
     }
 }

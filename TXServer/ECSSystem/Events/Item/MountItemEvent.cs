@@ -20,11 +20,15 @@ namespace TXServer.ECSSystem.Events
 			{
 				case IWeaponUserItemTemplate _:
 					prevItem = player.CurrentPreset.WeaponItem;
-					player.CurrentPreset.WeaponItem = item;
-					break;
+                    player.CurrentPreset.WeaponItem = item;
+                    player.CurrentPreset.Weapon = player.FindEntityById(item.GetComponent<ParentGroupComponent>().Key);
+                    player.CurrentPreset.WeaponId = player.CurrentPreset.Weapon.EntityId;
+                    break;
 				case TankUserItemTemplate _:
 					prevItem = player.CurrentPreset.HullItem;
 					player.CurrentPreset.HullItem = item;
+                    player.CurrentPreset.Hull = player.FindEntityById(item.GetComponent<ParentGroupComponent>().Key);
+                    player.CurrentPreset.HullId = player.CurrentPreset.Hull.EntityId;
 					break;
 				case AvatarUserItemTemplate _:
 					prevItem = player.CurrentAvatar;
@@ -100,8 +104,7 @@ namespace TXServer.ECSSystem.Events
 					}
 
 					prevItem = prevPreset.Preset;
-					player.CurrentPreset = newPreset;
-					break;
+                    break;
 				default:
 					throw new NotImplementedException();
 			}

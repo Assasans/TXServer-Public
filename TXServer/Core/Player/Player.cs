@@ -42,17 +42,20 @@ namespace TXServer.Core
         //todo add those three in PlayerData
         public Entity CurrentAvatar { get; set; }
         public ConcurrentDictionary<Type, ItemList> UserItems { get; } = new();
-        public PresetEquipmentComponent CurrentPreset { get; set; }
+        public List<Entity> Presets { get; } = new();
+        public PresetEquipmentComponent CurrentPreset =>
+            Presets.Single(p => p.HasComponent<MountedItemComponent>())
+                .GetComponent<PresetEquipmentComponent>();
 
         public Entity ClientSession { get; set; }
         public Entity User { get; set; }
         public BattleTankPlayer BattlePlayer { get; set; }
         public Spectator Spectator { get; set; }
         public SquadPlayer SquadPlayer { get; set; }
-        public RSAEncryptionComponent EncryptionComponent { get; } = new RSAEncryptionComponent();
+        public RSAEncryptionComponent EncryptionComponent { get; } = new();
 
-        public ConcurrentHashSet<Entity> EntityList { get; } = new ConcurrentHashSet<Entity>();
-        public IReadOnlyCollection<Player> SharedPlayers => (IReadOnlyCollection<Player>)_SharedPlayers.Keys;
+        public ConcurrentHashSet<Entity> EntityList { get; } = new();
+
         private readonly ConcurrentDictionary<Player, int> _SharedPlayers = new();
 
         public string UniqueId => Data?.Username;
