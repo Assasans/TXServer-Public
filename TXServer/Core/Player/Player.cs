@@ -119,9 +119,7 @@ namespace TXServer.Core
                 dataProxy.SetSettings(
                     Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(settingsData.countryCode),
                     Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(settingsData.avatar),
-                    DateTime.ParseExact(
-                        Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(settingsData.premiumExpiration),
-                        "HH:mm:ss MM/dd/yyyy", CultureInfo.InvariantCulture),
+                    new DateTime(settingsData.premiumExpiration),
                     settingsData.subscribed
                 );
                 // Request the other stuff here.... I think stats is next?

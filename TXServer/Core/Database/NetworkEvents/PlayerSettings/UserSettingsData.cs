@@ -1,4 +1,4 @@
-﻿using Simple.Net;
+using Simple.Net;
 
 namespace TXServer.Core.Database.NetworkEvents.PlayerSettings
 {
@@ -7,7 +7,7 @@ namespace TXServer.Core.Database.NetworkEvents.PlayerSettings
         public int packetId;
         public string countryCode;
         public string avatar;
-        public string premiumExpiration;
+        public long premiumExpiration;
         public bool subscribed;
 
         public void Serialize(NetWriter writer)
@@ -24,7 +24,7 @@ namespace TXServer.Core.Database.NetworkEvents.PlayerSettings
             packetId = (int)reader.ReadInt64();
             countryCode = reader.ReadString();
             avatar = reader.ReadString();
-            premiumExpiration = reader.ReadString();
+            premiumExpiration = reader.ReadInt64();
             subscribed = reader.ReadBool();
         }
     }

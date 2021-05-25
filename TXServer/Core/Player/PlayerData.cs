@@ -167,9 +167,8 @@ namespace TXServer.Core
                 Player.User.ChangeComponent(component);
 
             if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetPremiumExpiration() { uid = UniqueId, expiration = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(PremiumExpirationDate.ToString("HH:mm:ss MM/dd/yyyy")) });
+                Server.DatabaseNetwork.Socket.emit(new SetPremiumExpiration() { uid = UniqueId, expiration = PremiumExpirationDate.Ticks });
         }
-
 
         public void AddIncomingFriend(long userId)
         {

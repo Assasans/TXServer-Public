@@ -1,16 +1,16 @@
-﻿using Simple.Net;
+using Simple.Net;
 
 namespace TXServer.Core.Database.NetworkEvents.PlayerSettings
 {
     public struct SetPremiumExpiration : INetSerializable
     {
         public long uid;
-        public string expiration;
+        public long expiration;
 
         public void Deserialize(NetReader reader)
         {
             uid = reader.ReadInt64();
-            expiration = reader.ReadString();
+            expiration = reader.ReadInt64();
         }
 
         public void Serialize(NetWriter writer)
