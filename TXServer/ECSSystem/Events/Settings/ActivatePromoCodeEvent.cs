@@ -26,26 +26,25 @@ namespace TXServer.ECSSystem.Events.Settings
 					{ "x", ExtraItems.GlobalItems.Xcrystal }
 				};
 
-				// cheat codes
-                if (currencyCodes.ContainsKey(Convert.ToString(Code[0])))
+                switch (Code)
                 {
-					if (int.TryParse(Code[1..], out int _))
-						rewards.Add(currencyCodes[Convert.ToString(Code[0])], Convert.ToInt32(Code[1..]));
+                    case { } s when (s.StartsWith("c") || s.StartsWith("x")) && !s.StartsWith("xp"):
+                        if (int.TryParse(Code[1..], out int count))
+                            rewards.Add(currencyCodes[Convert.ToString(Code[0])], count);
+                        break;
+                    case { } s when s.StartsWith("r"):
+                        if (int.TryParse(Code[1..], out int number))
+                            player.Data.SetReputation(player.Data.Reputation + number);
+                        break;
+                    case { } s when s.StartsWith("xp"):
+                        if (int.TryParse(Code.Substring(2, Code.Length - 2), out int i))
+                        {
+                            player.Data.SetExperience(player.Data.Experience + i);
+                            Logger.Debug($"{player}: Changed experience to {player.Data.Experience}");
+                        }
+                        break;
                 }
-				if (Code.StartsWith("xp"))
-				{
-					if (int.TryParse(Code[2..], out int _))
-					{
-						player.User.ChangeComponent<UserExperienceComponent>(component =>
-						{
-							component.Experience += Convert.ToInt32(Code[2..]);
-							Logger.Debug($"{player}: Changed experience to {component.Experience}");
-						});
-
-						player.CheckRankUp();
-					}
-				}
-			}
+            }
 
 			switch (Code)
 			{
@@ -54,17 +53,6 @@ namespace TXServer.ECSSystem.Events.Settings
 					rewards.Add(ExtraItems.GlobalItems.Xcrystal, 10000);
 					rewards.Add(ExtraItems.GlobalItems.Premiumboost, 7);
 					break;
-				case "squad":
-				    // for squad testing
-				    // TODO: remove later when quads are tested & stable
-				    player.User.ChangeComponent<UserExperienceComponent>(component =>
-				    {
-					    component.Experience += 5000;
-					    Logger.Debug($"{player}: Changed experience to {component.Experience}");
-				    });
-
-				    player.CheckRankUp();
-				    break;
                 case "teleport":
                     // for teleport command testing
                     // TODO: remove later when premium is fully integrated
@@ -75,17 +63,13 @@ namespace TXServer.ECSSystem.Events.Settings
 
 			foreach (KeyValuePair<Entity, int> item in rewards)
             {
-				Entity notification = new(new TemplateAccessor(new NewItemNotificationTemplate(), "notification/newitem"),
-				    new NotificationGroupComponent(entity),
-				    new NewItemNotificationComponent(item.Key, item.Value),
-				    new NotificationComponent(NotificationPriority.MESSAGE));
-				player.ShareEntities(notification);
+                player.ShareEntities(NewItemNotificationTemplate.CreateEntity(entity, item));
 
 				if (item.Key == ExtraItems.GlobalItems.Crystal)
 					player.Data.SetCrystals(player.Data.Crystals + item.Value);
-	            if (item.Key == ExtraItems.GlobalItems.Xcrystal)
+	            else if (item.Key == ExtraItems.GlobalItems.Xcrystal)
 		            player.Data.SetXCrystals(player.Data.XCrystals + item.Value);
-	            if (item.Key == ExtraItems.GlobalItems.Premiumboost)
+	            else if (item.Key == ExtraItems.GlobalItems.Premiumboost)
 					player.Data.RenewPremium(new TimeSpan(item.Value, 0, 0, 0));
             }
 

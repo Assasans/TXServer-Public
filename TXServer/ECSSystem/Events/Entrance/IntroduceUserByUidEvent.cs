@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -38,7 +39,8 @@ namespace TXServer.ECSSystem.Events.Entrance
             }
             else
             {
-                PlayerData data = player.Server.Database.FetchPlayerData(Uid);
+                PlayerData data = Server.Instance.StoredPlayerData.SingleOrDefault(pd => pd.Username == Uid) ??
+                                  player.Server.Database.FetchPlayerData(Uid);
                 if (data == null) return; // Player#LogIn(Entity) will kick the player
                 data.Player = player;
                 player.Data = data;

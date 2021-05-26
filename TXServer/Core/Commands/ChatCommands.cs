@@ -48,6 +48,7 @@ namespace TXServer.Core.Commands
             { ChatCommandConditions.BattleOwner, "You do not own this battle" },
             { ChatCommandConditions.HackBattle, "HackBattle is not enabled or you don't have permission to it" },
             { ChatCommandConditions.InactiveBattle, "You need to be in a battle lobby with no active players or spectators in-battle" },
+            { ChatCommandConditions.ActiveBattle, "You need to be in an active battle/lobby with players in the match" },
             { ChatCommandConditions.InBattle, "You are not in battle" },
             { ChatCommandConditions.InMatch, "You are not in match" },
             { ChatCommandConditions.Premium, "You don't have an active premium pass" },

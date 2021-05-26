@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.Battles;
 using TXServer.Core.Battles.Effect;
@@ -19,11 +20,12 @@ namespace TXServer.Core
         public IDatabase Database { get; init; }
         public Action UserErrorHandler { get; init; }
         public ModuleRegistry ModuleRegistry { get; }
+        public List<PlayerData> StoredPlayerData { get; } = new();
 
-        // Kaveman added
+
         public static ServerConfig Config => ServerConfig.Instance;
         public static DatabaseNetwork DatabaseNetwork => DatabaseNetwork.Instance;
-        // end Kaveman added
+
         public Server()
         {
             ModuleRegistry = new ModuleRegistry();

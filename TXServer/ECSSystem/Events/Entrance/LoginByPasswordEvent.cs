@@ -47,7 +47,13 @@ namespace TXServer.ECSSystem.Events
                     player.SendEvent(new LoginFailedEvent(), clientSession);
                 }
             }
-			else player.LogIn(clientSession);
+            else
+            {
+                player.Data.RememberMe = RememberMe;
+                player.Data.HashedPassword = PasswordEncipher;
+                player.Data.HardwareId = HardwareFingerprint;
+                player.LogIn(clientSession);
+            }
 		}
 
 		public string HardwareFingerprint { get; set; }

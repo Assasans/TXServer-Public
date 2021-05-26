@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -23,19 +24,24 @@ namespace TXServer.ECSSystem.Components
             HullSkins.Items hullSkinList = (HullSkins.Items)player.UserItems[typeof(HullSkins)];
             Shells.Items shellList = (Shells.Items)player.UserItems[typeof(Shells)];
             ModuleSlots.Items moduleSlotList = (ModuleSlots.Items)player.UserItems[typeof(ModuleSlots)];
+            Covers.Items coverList = (Covers.Items)Player.UserItems[typeof(Covers)];
+            Paints.Items paintList = (Paints.Items) Player.UserItems[typeof(Paints)];
+            Graffiti.Items graffitiList = (Graffiti.Items) Player.UserItems[typeof(Graffiti)];
 
-            WeaponItem = weaponList.Smoky;
-            HullItem = hullList.Hunter;
+            bool restore = player.RestorablePreset != null;
 
-            Weapon = Weapons.GlobalItems.Smoky;
+            WeaponItem = restore ? FindItem(player.RestorablePreset.WeaponItem, weaponList, player) : weaponList.Smoky;
+            HullItem = restore ? FindItem(player.RestorablePreset.HullItem, hullList, player) : hullList.Hunter;
+
+            Weapon = restore ? player.RestorablePreset?.Weapon : Weapons.GlobalItems.Smoky;
             WeaponId = Weapon.EntityId;
-            Hull = Hulls.GlobalItems.Hunter;
+            Hull = restore ? player.RestorablePreset?.Hull : Hulls.GlobalItems.Hunter;
             HullId = Hull.EntityId;
 
-            WeaponPaint = ((Covers.Items)Player.UserItems[typeof(Covers)]).None;
-            TankPaint = ((Paints.Items)Player.UserItems[typeof(Paints)]).Green;
+            WeaponPaint = restore ? FindItem(player.RestorablePreset.WeaponPaint, coverList, player) : coverList.None;
+            TankPaint = restore ? FindItem(player.RestorablePreset.TankPaint, paintList, player) : paintList.Green;
 
-            Graffiti = ((Graffiti.Items)Player.UserItems[typeof(Graffiti)]).Logo;
+            Graffiti = restore ? FindItem(player.RestorablePreset.Graffiti, graffitiList, player) : graffitiList.Logo;
 
             WeaponSkins = new Dictionary<Entity, Entity>
             {
@@ -87,6 +93,16 @@ namespace TXServer.ECSSystem.Components
                 { moduleSlotList.Slot5, null },
                 { moduleSlotList.Slot6, null }
             };
+
+            if (restore)
+            {
+                WeaponSkins[WeaponItem] = FindItem(player.RestorablePreset.WeaponSkins[player.RestorablePreset.WeaponItem],
+                    weaponSkinList, player);
+                HullSkins[HullItem] = FindItem(player.RestorablePreset.HullSkins[player.RestorablePreset.HullItem],
+                    hullSkinList, player);
+                WeaponShells[WeaponItem] = FindItem(player.RestorablePreset.WeaponShells[player.RestorablePreset.WeaponItem],
+                    shellList, player);
+            }
         }
 
         [ProtocolIgnore] public Entity Weapon { get; set; }
@@ -130,5 +146,12 @@ namespace TXServer.ECSSystem.Components
 
         [ProtocolIgnore] public Dictionary<Entity, Entity> WeaponShells { get; set; }
         [ProtocolIgnore] public Dictionary<Entity, Entity> Modules { get; set; }
+
+        private static Entity FindItem(Entity restorableItem, ItemList selfItemList, Player player)
+        {
+            return selfItemList.GetAllItems()
+                .SingleOrDefault(t =>
+                    t.TemplateAccessor.ConfigPath == restorableItem.TemplateAccessor.ConfigPath);
+        }
     }
 }

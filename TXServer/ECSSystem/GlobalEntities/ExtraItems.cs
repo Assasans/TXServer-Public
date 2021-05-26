@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -51,9 +53,14 @@ namespace TXServer.ECSSystem.GlobalEntities
             {
                 Goldbonus.Components.Add(new ModuleGroupComponent((player.UserItems[typeof(Modules)] as Modules.Items).Gold));
 
+                if (player.Data.Presets.Any())
+                {
+                    player.RestorablePreset = player.CurrentPreset;
+                    player.Data.Presets.Clear();
+                }
                 PresetEquipmentComponent component = new(player, Preset);
                 Preset.Components.Add(component);
-                player.Presets.Add(Preset);
+                player.Data.Presets.Add(Preset);
             }
 
             public Entity Goldbonus { get; } = new Entity(new TemplateAccessor(new GoldBonusUserItemTemplate(), "garage/goldbonus"),

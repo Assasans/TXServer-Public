@@ -42,10 +42,12 @@ namespace TXServer.Core
         //todo add those three in PlayerData
         public Entity CurrentAvatar { get; set; }
         public ConcurrentDictionary<Type, ItemList> UserItems { get; } = new();
-        public List<Entity> Presets { get; } = new();
+
+
         public PresetEquipmentComponent CurrentPreset =>
-            Presets.Single(p => p.HasComponent<MountedItemComponent>())
+            Data.Presets.Single(p => p.HasComponent<MountedItemComponent>())
                 .GetComponent<PresetEquipmentComponent>();
+        public PresetEquipmentComponent RestorablePreset { get; set; }
 
         public Entity ClientSession { get; set; }
         public Entity User { get; set; }
@@ -79,16 +81,16 @@ namespace TXServer.Core
             Connection.Dispose();
 
             foreach (Entity entity in EntityList)
-            {
                 lock (entity.PlayerReferences)
                     entity.PlayerReferences.Remove(this);
-            }
 
             EntityList.Clear();
 
             Logger.Log($"{this} has disconnected.");
 
-            //todo save data?
+            Server.StoredPlayerData.RemoveAll(pd => pd.UniqueId == Data?.UniqueId);
+            if (Data.RememberMe)
+                Server.StoredPlayerData.Add(Data);
         }
 
         public bool IsActive => Connection.IsActive;
@@ -190,13 +192,13 @@ namespace TXServer.Core
             if (!admins.Contains(Data.Username))
                 Data.Admin = false;
 
-            // tip: don't change this order
             if (Data.PremiumExpirationDate > DateTime.UtcNow)
                 user.AddComponent(new PremiumAccountBoostComponent { EndDate = Data.PremiumExpirationDate });
             if (Data.Admin)
             {
                 user.Components.Add(new UserAdminComponent());
-                Data.RenewPremium(new TimeSpan(23999976, 0, 0));
+                if (!IsPremium)
+                    Data.RenewPremium(new TimeSpan(23999976, 0, 0));
             }
             if (Data.Beta) user.Components.Add(new ClosedBetaQuestAchievementComponent());
 
@@ -207,6 +209,7 @@ namespace TXServer.Core
             ShareEntities(ResourceManager.GetEntities(this, user));
 
             CurrentAvatar = ((Avatars.Items)UserItems[typeof(Avatars)]).Tankist;
+
             foreach (Entity item in new[]
             {
                 CurrentAvatar,

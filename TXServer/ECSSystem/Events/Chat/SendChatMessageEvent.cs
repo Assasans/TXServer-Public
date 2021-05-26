@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using TXServer.Core;
@@ -20,23 +21,9 @@ namespace TXServer.ECSSystem.Events.Chat
         {
             Core.Battles.Battle battle = player.BattlePlayer?.Battle;
 
-            ChatMessageReceivedEvent evt = new()
-            {
-                Message = Message,
-                SystemMessage = false,
-                UserId = player.User.EntityId,
-                UserUid = player.User.GetComponent<UserUidComponent>().Uid,
-                UserAvatarId = player.User.GetComponent<UserAvatarComponent>().Id
-            };
-
-            string reply = ChatCommands.CheckForCommand(player, Message);
-            if (!string.IsNullOrEmpty(reply))
-            {
-                evt.Message = reply;
-                evt.SystemMessage = true;
-                player.SendEvent(evt, chat);
-                return;
-            }
+            string commandReply = ChatCommands.CheckForCommand(player, Message);
+            if (!string.IsNullOrEmpty(commandReply))
+                ChatMessageReceivedEvent.SystemMessageTarget(commandReply, chat, player);
 
             ReadOnlyCollection<ChatMute> mutes = player.Data.GetChatMutes();
             if (mutes.Count > 0)
@@ -44,45 +31,45 @@ namespace TXServer.ECSSystem.Events.Chat
                 // TODO(Assasans): Show all mutes to player
                 ChatMute mute = mutes[0];
 
-                evt.Message = player.User.GetComponent<UserCountryComponent>().CountryCode.ToLowerInvariant() switch
+                string error = player.Data.CountryCode.ToLowerInvariant() switch
                 {
                     "ru" => $"Вы были отключены от чата {(mute.IsPermanent ? "навсегда" : $"на {((TimeSpan)mute.Duration).TotalMinutes} минут")}. Причина: {mute.Reason}",
                     _ => $"You have been muted {(mute.IsPermanent ? "forever" : $"for {((TimeSpan)mute.Duration).TotalMinutes} minutes")}. Reason: {mute.Reason}"
                 };
-                evt.SystemMessage = true;
 
-                player.SendEvent(evt, chat);
+                ChatMessageReceivedEvent.SystemMessageTarget(error, chat, player);
                 return;
             }
 
             switch (chat.TemplateAccessor.Template)
             {
                 case GeneralChatTemplate _:
-                    player.Server.Connection.Pool.SendEvent(evt, chat);
+                    ChatMessageReceivedEvent.MessageTargets(Message, chat, player, player.Server.Connection.Pool);
                     break;
                 case PersonalChatTemplate _:
-                    foreach (Player p in chat.GetComponent<ChatParticipantsComponent>().GetPlayers())
+                    IEnumerable<Player> chatParticipants = chat.GetComponent<ChatParticipantsComponent>().GetPlayers().ToList();
+                    foreach (Player p in chatParticipants)
                     {
-                        if (!p.EntityList.Contains(chat))
-                        {
-                            p.SharePlayers(player);
-                            p.ShareEntities(chat);
-                        }
-
-                        p.SendEvent(evt, chat);
+                        if (!p.EntityList.Contains(chat)) continue;
+                        p.SharePlayers(player);
+                        p.ShareEntities(chat);
                     }
+                    ChatMessageReceivedEvent.MessageTargets(Message, chat, player, chatParticipants);
                     break;
                 case SquadChatTemplate _:
-                    player.SquadPlayer.Squad.Participants.SendEvent(evt, chat);
+                    ChatMessageReceivedEvent.MessageTargets(Message, chat, player,
+                        player.SquadPlayer.Squad.Participants.Select(sp => sp.Player));
                     break;
                 case BattleLobbyChatTemplate _:
-                    battle?.JoinedTankPlayers.SendEvent(evt, chat);
+                    ChatMessageReceivedEvent.MessageTargets(Message, chat, player, battle?.JoinedTankPlayers);
                     break;
                 case GeneralBattleChatTemplate _:
-                    battle?.PlayersInMap.SendEvent(evt, chat);
+                    ChatMessageReceivedEvent.MessageTargets(Message, chat, player,
+                        battle?.PlayersInMap.Select(bp => bp.Player));
                     break;
                 case TeamBattleChatTemplate _:
-                    battle?.MatchTankPlayers.Where(x => x.Team == player.BattlePlayer.Team).SendEvent(evt, chat);
+                    ChatMessageReceivedEvent.MessageTargets(Message, chat, player,
+                        battle?.MatchTankPlayers.Where(x => x.Team == player.BattlePlayer.Team));
                     break;
             }
         }

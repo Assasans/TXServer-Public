@@ -24,9 +24,10 @@ namespace TXServer.Core
         public bool EmailVerified { get; protected set; }
         public bool Subscribed { get; protected set; }
         public string Username { get; set; }
-        public string HashedPassword { get; protected set; }
-        public string HardwareId { get; protected set; }
+        public string HashedPassword { get; set; }
+        public string HardwareId { get; set; }
         public string AutoLoginToken { get; protected set; }
+        public bool RememberMe { get; set; }
 
         public string CountryCode { get; protected set; }
         public string Avatar { get; protected set; }
@@ -39,6 +40,7 @@ namespace TXServer.Core
         public long Experience { get; protected set; }
         public long Reputation { get; protected set; }
         public DateTime PremiumExpirationDate { get; protected set; }
+        public List<Entity> Presets { get; } = new();
 
         public List<long> AcceptedFriendIds { get; protected set; }
         public List<long> IncomingFriendIds { get; protected set; }
@@ -47,7 +49,6 @@ namespace TXServer.Core
         public List<long> ReportedPlayerIds { get; protected set; }
 
         public List<Punishment> Punishments { get; protected set; }
-        public List<bool> DeserterLog { get; protected set; }
 
         public ReadOnlyCollection<ChatMute> GetChatMutes(bool expired = false)
         {
@@ -142,10 +143,11 @@ namespace TXServer.Core
             XCrystals = value;
             Player.User.ChangeComponent(new UserXCrystalsComponent(value));
         }
-        public void SetExperience(long value)
+        public void SetExperience(long value, bool rankUpCheck = true)
         {
             Experience = value;
             Player.User.ChangeComponent(new UserExperienceComponent(value));
+            if (rankUpCheck) Player.CheckRankUp();
         }
         public void SetReputation(long value)
         {
