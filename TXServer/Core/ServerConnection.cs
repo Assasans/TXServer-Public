@@ -281,7 +281,7 @@ namespace TXServer.Core
         private static void HandleError(Exception exception) => Server.Instance.HandleError(exception);
 
         // Player pool.
-        public List<Player> Pool { get; } = new List<Player>();
+        public List<Player> Pool { get; } = new();
         private int MaxPoolSize;
 
         // Client accept thread.

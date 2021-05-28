@@ -23,7 +23,10 @@ namespace TXServer.ECSSystem.Events.Chat
 
             string commandReply = ChatCommands.CheckForCommand(player, Message);
             if (!string.IsNullOrEmpty(commandReply))
+            {
                 ChatMessageReceivedEvent.SystemMessageTarget(commandReply, chat, player);
+                return;
+            }
 
             ReadOnlyCollection<ChatMute> mutes = player.Data.GetChatMutes();
             if (mutes.Count > 0)

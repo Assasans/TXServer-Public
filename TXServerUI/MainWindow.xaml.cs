@@ -13,7 +13,7 @@ namespace TXServerUI
     public partial class MainWindow : Window
     {
         private static volatile bool errorState;
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -61,7 +61,7 @@ namespace TXServerUI
                 StartServer();
             else
                 StopServer();
-            
+
             Cursor = Cursors.Arrow;
         }
 
@@ -102,17 +102,19 @@ namespace TXServerUI
                 e.Cancel = true;
             }
         }
-        
+
         public async Task UpdateStateText()
         {
             while (ServerLauncher.IsStarted())
             {
                 ServerStateText.Text = $"Connected players: {ServerLauncher.GetPlayerCount()}\n" +
                     $"Active battles: {ServerConnection.BattlePool.Count}\n" +
-                    $"Last tick duration: {ServerConnection.LastTickDuration}";
+                    $"Last tick duration: {ServerConnection.LastTickDuration}\n";
+                if (Server.Instance.StoredPlayerData.Count > 0)
+                    ServerStateText.Text += $"Stored player data: {Server.Instance.StoredPlayerData.Count}\n";
                 await Task.Delay(1000);
             }
-            
+
             ServerStateText.Text = "Server is stopped.";
             return;
         }
