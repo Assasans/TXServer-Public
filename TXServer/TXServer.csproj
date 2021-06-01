@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.3" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Library\Config.json">
@@ -49,6 +50,12 @@
       <Link>Config.json</Link>
     </None>
     <None Update="Library\ServerMapInfo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Library/HeightMaps.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Library/HeightMaps/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
