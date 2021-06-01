@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
@@ -16,7 +16,7 @@ namespace TXServer.ECSSystem.Events.Matchmaking
             player.User.AddComponent(new MatchMakingUserReadyComponent());
 
             if (player.BattlePlayer.Battle.BattleState == BattleState.Running)
-                player.BattlePlayer.MatchMakingJoinCountdown = DateTime.Now.AddSeconds(2);
+                player.BattlePlayer.MatchMakingJoinCountdown = DateTime.UtcNow.AddSeconds(2);
         }
     }
 }

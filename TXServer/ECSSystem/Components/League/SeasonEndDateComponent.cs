@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -8,6 +8,6 @@ namespace TXServer.ECSSystem.Components
     public class SeasonEndDateComponent : Component
     {
         [OptionalMapped]
-        public DateTime EndDate { get; set; } = DateTime.Now.AddHours(6);
+        public DateTime EndDate { get; set; } = DateTime.UtcNow.AddHours(6);
     }
 }

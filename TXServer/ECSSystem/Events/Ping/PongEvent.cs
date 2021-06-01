@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -14,10 +14,10 @@ namespace TXServer.ECSSystem.Events.Ping
 
         public void Execute(Player player, Entity entity)
         {
-            long ctm = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            long ctm = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             float ping = ctm - PongCommandClientRealTime;
             player.Connection.DiffToClient = (long) ping;
-            player.Connection.PingReceiveTime = DateTimeOffset.Now;
+            player.Connection.PingReceiveTime = DateTimeOffset.UtcNow;
             player.SendEvent(new PingResultEvent(ctm, ping));
         }
     }

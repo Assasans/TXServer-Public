@@ -24,7 +24,7 @@ namespace TXServer.ECSSystem.Components
 
         public IEnumerable<Player> GetPlayers()
         {
-            return Enumerable.Select(Users, user => Server.Instance.FindPlayerById(user.EntityId));
+            return Enumerable.Select(Users, user => Server.Instance.FindPlayerByUid(user.EntityId));
         }
     }
 }

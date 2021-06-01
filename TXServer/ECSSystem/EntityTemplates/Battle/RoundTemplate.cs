@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
@@ -17,7 +17,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 new BattleGroupComponent(battle),
 
                 // WarmingUpTimerSystem
-                new RoundStopTimeComponent(DateTimeOffset.Now.AddSeconds(40)),
+                new RoundStopTimeComponent(DateTimeOffset.UtcNow.AddSeconds(40)),
                 new RoundActiveStateComponent()
             );
         }

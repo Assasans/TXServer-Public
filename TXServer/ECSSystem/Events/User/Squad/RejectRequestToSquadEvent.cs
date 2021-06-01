@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Events.User.Squad
     {
         public void Execute(Player player, Entity entity)
         {
-            Player remotePlayer = Server.Instance.FindPlayerById(FromUserId);
+            Player remotePlayer = Server.Instance.FindPlayerByUid(FromUserId);
             if (remotePlayer.IsActive && remotePlayer.IsLoggedIn)
             {
                 remotePlayer.SendEvent(new RequestToSquadRejectedEvent(RejectRequestToSquadReason.RECEIVER_REJECTED, player), remotePlayer.User);

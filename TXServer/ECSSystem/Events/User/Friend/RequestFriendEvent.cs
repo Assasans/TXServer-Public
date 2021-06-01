@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events.User.Friend
     {
         public void Execute(Player player, Entity clientSession)
         {
-            Player remotePlayer = Server.Instance.FindPlayerById(User.EntityId);
+            Player remotePlayer = Server.Instance.FindPlayerByUid(User.EntityId);
             if (remotePlayer != null && remotePlayer.IsLoggedIn)
             {
                 remotePlayer.Data.AddIncomingFriend(player.User.EntityId);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
@@ -15,6 +15,6 @@ namespace TXServer.ECSSystem.Components
 
         public NotificationPriority Priority { get; set; }
 
-        public DateTime TimeCreation { get; set; } = DateTime.Now;
+        public DateTime TimeCreation { get; set; } = DateTime.UtcNow;
     }
 }

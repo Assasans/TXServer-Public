@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events.User.Friend
             player.SendEvent(new IncomingFriendRemovedEvent(User.EntityId), entity);
             player.SendEvent(new AcceptedFriendAddedEvent(User.EntityId), entity);
 
-            Player remotePlayer = Server.Instance.FindPlayerById(User.EntityId);
+            Player remotePlayer = Server.Instance.FindPlayerByUid(User.EntityId);
             if (remotePlayer != null && remotePlayer.IsLoggedIn)
             {
                 remotePlayer.Data.AddAcceptedFriend(player.User.EntityId);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -18,7 +18,7 @@ namespace TXServer.ECSSystem.Events.Battle
 			
 			player.BattlePlayer.MatchPlayer.BattleUser.AddComponent(new PauseComponent());
 			player.BattlePlayer.MatchPlayer.BattleUser.AddComponent(new IdleCounterComponent(0));
-			player.SendEvent(new IdleBeginTimeSyncEvent(DateTime.Now), player.BattlePlayer.MatchPlayer.BattleUser);
+			player.SendEvent(new IdleBeginTimeSyncEvent(DateTime.UtcNow), player.BattlePlayer.MatchPlayer.BattleUser);
 		}
 	}
 }

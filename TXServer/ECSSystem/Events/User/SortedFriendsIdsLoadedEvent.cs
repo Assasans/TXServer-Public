@@ -23,7 +23,7 @@ namespace TXServer.ECSSystem.Events.Friend
             {
                 foreach (long friendId in listPair.Key)
                 {
-                    Player friend = Server.Instance.FindPlayerById(friendId);
+                    Player friend = Server.Instance.FindPlayerByUid(friendId);
                     if (friend != null && friend.IsLoggedIn)
                         listPair.Value.Add(friendId, friend.User.GetComponent<UserUidComponent>().Uid);
                 }

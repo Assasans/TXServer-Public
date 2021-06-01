@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -229,7 +229,7 @@ namespace TXServer.Core
 
                 foreach (Player player in Pool)
                 {
-                    player.Connection.PingSendTime = DateTimeOffset.Now;
+                    player.Connection.PingSendTime = DateTimeOffset.UtcNow;
                     player.SendEvent(new PingEvent(player.Connection.PingSendTime.ToUnixTimeMilliseconds(), id), player.ClientSession);
                 }
 

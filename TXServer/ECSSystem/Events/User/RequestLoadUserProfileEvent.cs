@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events
     {
         public void Execute(Player player, Entity entity)
         {
-            Player remotePlayer = Server.Instance.FindPlayerById(UserId);
+            Player remotePlayer = Server.Instance.FindPlayerByUid(UserId);
 
             player.SharePlayers(remotePlayer);
             player.SendEvent(new UserProfileLoadedEvent(), remotePlayer.User);

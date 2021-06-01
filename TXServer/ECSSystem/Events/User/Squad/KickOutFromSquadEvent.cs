@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events.User.Squad
     {
         public void Execute(Player player, Entity entity)
         {
-            Player remotePlayer = Server.Instance.FindPlayerById(KickedOutUserId);
+            Player remotePlayer = Server.Instance.FindPlayerByUid(KickedOutUserId);
 
             if (!remotePlayer.IsInSquad || remotePlayer.SquadPlayer.IsLeader) return;
             

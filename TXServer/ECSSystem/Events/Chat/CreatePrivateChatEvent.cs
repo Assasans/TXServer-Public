@@ -13,23 +13,29 @@ namespace TXServer.ECSSystem.Events.Chat
     {
         public void Execute(Player player, Entity user, Entity sourceChat)
         {
-            Player goalPlayer = Server.Instance.Connection.Pool.FirstOrDefault(p => p.UniqueId == UserUid.Replace("Survivor ", "").Replace("Deserter ", ""));
-            if (goalPlayer is null) return;
+            Player goalPlayer =
+                Server.Instance.FindPlayerByUsername(UserUid);
+            if (goalPlayer is null)
+            {
+                ChatMessageReceivedEvent.SystemMessageTarget($"Error, couldn't find user '{UserUid}'", player);
+                return;
+            }
 
             Entity chat = null;
-            List<Entity> chatParticipants = new() { player.User, goalPlayer.User };
+            List<Entity> chatParticipants = new() { player.User, goalPlayer?.User };
             foreach (Entity participant in chatParticipants)
             {
-                Entity otherUser = chatParticipants.Single(user => user.EntityId != participant.EntityId);
-                chat = participant.GetComponent<PersonalChatOwnerComponent>().ChatsIs.FirstOrDefault(personalChat => personalChat.GetComponent<ChatParticipantsComponent>().Users.Contains(otherUser));
+                Entity otherUser = chatParticipants.Single(u => u.EntityId != participant.EntityId);
+                chat = participant.GetComponent<PersonalChatOwnerComponent>().ChatsIs.FirstOrDefault(personalChat =>
+                    personalChat.GetComponent<ChatParticipantsComponent>().Users.Contains(otherUser));
                 if (chat != null) break;
             }
-            
+
             if (chat == null)
             {
                 chat = new Entity(new TemplateAccessor(new PersonalChatTemplate(), "chat"),
                     new ChatComponent(),
-                    new ChatParticipantsComponent(user, goalPlayer.User));
+                    new ChatParticipantsComponent(user, goalPlayer?.User));
 
                 player.SharePlayers(goalPlayer);
             }

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reflection;
 using TXServer.Core.Commands;
 using TXServer.Core.Data.Database;
@@ -10,13 +8,12 @@ using TXServer.Core.Database.NetworkEvents.PlayerSettings;
 using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Types.Punishments;
 
 namespace TXServer.Core
 {
     public abstract class PlayerData : ICloneable
     {
-        public PlayerData Original { get; protected set; }
+        protected PlayerData Original { get; set; }
         public Player Player { get; set; }
 
         public long UniqueId { get; }
@@ -34,10 +31,12 @@ namespace TXServer.Core
 
         public bool Admin { get; set; }
         public bool Beta { get; protected set; }
+        public bool Mod { get; set; }
 
         public long XCrystals { get; protected set; }
         public long Crystals { get; protected set; }
         public long Experience { get; protected set; }
+        public Entity League { get; protected set; }
         public long Reputation { get; protected set; }
         public DateTime PremiumExpirationDate { get; protected set; }
         public List<Entity> Presets { get; } = new();
@@ -48,16 +47,8 @@ namespace TXServer.Core
         public List<long> BlockedPlayerIds { get; protected set; }
         public List<long> ReportedPlayerIds { get; protected set; }
 
-        public List<Punishment> Punishments { get; protected set; }
+        public List<ChatCommands.Punishment> Punishments { get; protected set; }
 
-        public ReadOnlyCollection<ChatMute> GetChatMutes(bool expired = false)
-        {
-            return Punishments.Where((ban) =>
-            {
-                if (ban is not ChatMute chatMute) return false;
-                return expired || !chatMute.IsExpired;
-            }).Cast<ChatMute>().ToList().AsReadOnly(); // XXX(Assasans): Rewrite without using so much LINQ?
-        }
 
         public PlayerData(string uid)
         {
@@ -69,19 +60,19 @@ namespace TXServer.Core
 
         public ConfirmedUserEmailComponent SetEmail(string email)
         {
-            var component = SetValue<ConfirmedUserEmailComponent>(email);
-            Email = Email;
+            ConfirmedUserEmailComponent component = SetValue<ConfirmedUserEmailComponent>(email);
+            Email = email;
             if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetEmail() { uid = UniqueId, email = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(email) });
+                Server.DatabaseNetwork.Socket.emit(new SetEmail { uid = UniqueId, email = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(email) });
             return component;
         }
 
         public ConfirmedUserEmailComponent SetSubscribed(bool subscribed)
         {
-            var component = SetValue<ConfirmedUserEmailComponent>(subscribed);
+            ConfirmedUserEmailComponent component = SetValue<ConfirmedUserEmailComponent>(subscribed);
             Subscribed = subscribed;
             if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetSubscribed() { uid = UniqueId, state = subscribed });
+                Server.DatabaseNetwork.Socket.emit(new SetSubscribed { uid = UniqueId, state = subscribed });
             return component;
         }
 
@@ -90,14 +81,14 @@ namespace TXServer.Core
             Username = username;
             Player.User.ChangeComponent(new UserUidComponent(username));
             if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetUsername() { uid = UniqueId, username = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(username) });
+                Server.DatabaseNetwork.Socket.emit(new SetUsername { uid = UniqueId, username = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(username) });
         }
 
         public void SetHashedPassword(string hashedPassword)
         {
             HashedPassword = hashedPassword;
             if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetHashedPassword() { uid = UniqueId, hashedPassword = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(hashedPassword) });
+                Server.DatabaseNetwork.Socket.emit(new SetHashedPassword { uid = UniqueId, hashedPassword = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(hashedPassword) });
         }
 
         public void SetCountryCode(string countryCode)
@@ -105,7 +96,7 @@ namespace TXServer.Core
             CountryCode = countryCode;
             Player.User.ChangeComponent(new UserCountryComponent(countryCode));
             if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetCountryCode() { uid = UniqueId, countryCode = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(countryCode) });
+                Server.DatabaseNetwork.Socket.emit(new SetCountryCode { uid = UniqueId, countryCode = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(countryCode) });
         }
 
         public void SetAvatar(string avatarId)
@@ -113,7 +104,7 @@ namespace TXServer.Core
             Avatar = avatarId;
             Player.User.ChangeComponent(new UserAvatarComponent(avatarId));
             if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetAvatar() { uid = UniqueId, avatar = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(avatarId) });
+                Server.DatabaseNetwork.Socket.emit(new SetAvatar { uid = UniqueId, avatar = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(avatarId) });
         }
 
         public void SetAdmin(bool admin)
@@ -153,6 +144,11 @@ namespace TXServer.Core
         {
             Reputation = value;
             Player.User.ChangeComponent(new UserReputationComponent(value));
+        }
+        public void SetAutoLogin(bool value)
+        {
+            RememberMe = value;
+            if (!RememberMe) AutoLoginToken = "";
         }
         public void RenewPremium(TimeSpan additionalPremiumTime)
         {

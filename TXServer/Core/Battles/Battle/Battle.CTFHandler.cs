@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.ECSSystem.Base;
@@ -63,7 +63,7 @@ namespace TXServer.Core.Battles
 
                 foreach (Flag flag in Flags.Values)
                 {
-                    if (flag.State == FlagState.Dropped && DateTime.Now > flag.ReturnStartTime)
+                    if (flag.State == FlagState.Dropped && DateTime.UtcNow > flag.ReturnStartTime)
                         flag.Return();
                 }
             }

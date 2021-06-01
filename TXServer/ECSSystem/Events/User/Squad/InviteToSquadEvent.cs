@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Events.User.Squad
         {
             foreach (long invitedUserId in InvitedUsersIds)
             {
-                Player remotePlayer = Server.Instance.FindPlayerById(invitedUserId);
+                Player remotePlayer = Server.Instance.FindPlayerByUid(invitedUserId);
 
                 remotePlayer.SendEvent(new InvitedToSquadEvent(player), remotePlayer.User);
             }

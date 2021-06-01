@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Events.User
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			Player targetPlayer = Server.Instance.FindPlayerById(UserId);
+			Player targetPlayer = Server.Instance.FindPlayerByUid(UserId);
 			PlayerData data = player.Data;
 
 			bool canRequestFriendship = !data.IncomingFriendIds.Concat(data.AcceptedFriendIds)

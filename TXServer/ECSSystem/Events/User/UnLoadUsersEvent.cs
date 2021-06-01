@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Events.Friend
         public void Execute(Player player, Entity entity)
         {
             foreach (Entity user in Users)
-                player.UnsharePlayers(Server.Instance.FindPlayerById(user.EntityId));
+                player.UnsharePlayers(Server.Instance.FindPlayerByUid(user.EntityId));
         }
 
         public HashSet<Entity> Users { get; set; }

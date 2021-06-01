@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.Battles.Matchmaking;
@@ -10,6 +10,7 @@ using TXServer.ECSSystem.Components.Battle.Time;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.Events.Matchmaking;
+using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles
@@ -40,19 +41,37 @@ namespace TXServer.Core.Battles
                 }
 
                 (Battle.MapEntity, Battle.Params.MaxPlayers) = Battle.ConvertMapParams(Battle.Params, Battle.IsMatchMaking);
-                Battle.WarmUpSeconds = 60; // TODO: 1min in Bronze league, 1,5min in Silver, Gold & Master leagues
+                Battle.WarmUpSeconds = 60;
 
                 Battle.BattleLobbyEntity = MatchMakingLobbyTemplate.CreateEntity(Battle.Params, Battle.MapEntity, Battle.GravityTypes[Battle.Params.Gravity]);
+            }
+
+            private int GetWarmUpTime()
+            {
+                int lowLeagues = 0;
+                int highLeagues = 0;
+
+                foreach (BattleTankPlayer player in Battle.JoinedTankPlayers)
+                {
+                    if (new[] {Leagues.GlobalItems.Training, Leagues.GlobalItems.Bronze}
+                        .Contains(player.Player.Data.League)) lowLeagues++;
+                    else highLeagues++;
+                }
+
+                int warmUpTime = highLeagues >= lowLeagues ? 90 : 60;
+                Battle.BattleEntity.ChangeComponent<TimeLimitComponent>(component =>
+                    component.WarmingUpTimeLimitSet = warmUpTime);
+                return warmUpTime;
             }
 
             public void Tick()
             {
                 WaitingToJoinPlayers.RemoveAll(battlePlayer =>
                 {
-                    if (DateTime.Now < battlePlayer.MatchMakingJoinCountdown) return false;
+                    if (DateTime.UtcNow < battlePlayer.MatchMakingJoinCountdown) return false;
                     if (Battle.ForcePause)
                     {
-                        battlePlayer.MatchMakingJoinCountdown = DateTime.Now.AddSeconds(10);
+                        battlePlayer.MatchMakingJoinCountdown = DateTime.UtcNow.AddSeconds(10);
                         return false;
                     }
 
@@ -88,6 +107,7 @@ namespace TXServer.Core.Battles
 
                         if (Battle.CountdownTimer < 0)
                         {
+                            Battle.WarmUpSeconds = GetWarmUpTime();
                             Battle.StartBattle();
                             Battle.BattleState = BattleState.WarmUp;
                             WarmUpState = WarmUpState.WarmingUp;
@@ -142,15 +162,15 @@ namespace TXServer.Core.Battles
                 {
                     if (Battle.LosingTeam != TeamColor.NONE)
                     {
-                        var roundDisbalancedComponent = new RoundDisbalancedComponent(Loser: Battle.LosingTeam, InitialDominationTimerSec: 30, FinishTime: DateTime.Now.AddSeconds(30));
+                        var roundDisbalancedComponent = new RoundDisbalancedComponent(Loser: Battle.LosingTeam, InitialDominationTimerSec: 30, FinishTime: DateTime.UtcNow.AddSeconds(30));
 
                         Battle.BattleEntity.AddComponent(roundDisbalancedComponent);
                         Battle.BattleEntity.AddComponent(new RoundComponent());
 
                         StopTimeBeforeDomination = Battle.RoundEntity.GetComponent<RoundStopTimeComponent>();
-                        Battle.RoundEntity.ChangeComponent(new RoundStopTimeComponent(DateTimeOffset.Now.AddSeconds(30)));
+                        Battle.RoundEntity.ChangeComponent(new RoundStopTimeComponent(DateTimeOffset.UtcNow.AddSeconds(30)));
 
-                        DominationStartTime = DateTime.Now.AddSeconds(30);
+                        DominationStartTime = DateTime.UtcNow.AddSeconds(30);
                     }
                     else
                     {
@@ -166,7 +186,7 @@ namespace TXServer.Core.Battles
                 }
 
                 if (LastLosingTeam != TeamColor.NONE &&
-                    DateTime.Now > DominationStartTime &&
+                    DateTime.UtcNow > DominationStartTime &&
                     Battle.BattleState != BattleState.Ended)
                     Battle.FinishBattle();
             }
@@ -176,7 +196,7 @@ namespace TXServer.Core.Battles
                 battlePlayer.User.AddComponent(new MatchMakingUserComponent());
                 if (Battle.BattleState is BattleState.WarmUp or BattleState.Running && !Battle.ForcePause)
                 {
-                    battlePlayer.SendEvent(new MatchMakingLobbyStartTimeEvent { StartTime = DateTime.Now.AddSeconds(10) }, battlePlayer.User);
+                    battlePlayer.SendEvent(new MatchMakingLobbyStartTimeEvent { StartTime = DateTime.UtcNow.AddSeconds(10) }, battlePlayer.User);
                     WaitingToJoinPlayers.Add(battlePlayer);
                 }
             }

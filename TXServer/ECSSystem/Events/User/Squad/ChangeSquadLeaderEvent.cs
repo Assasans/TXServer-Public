@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events.User.Squad
             player.User.RemoveComponent<SquadLeaderComponent>();
             player.SquadPlayer.IsLeader = false;
             
-            Player newLeader = Server.Instance.FindPlayerById(NewLeaderUserId);
+            Player newLeader = Server.Instance.FindPlayerByUid(NewLeaderUserId);
             newLeader.User.AddComponent(new SquadLeaderComponent());
             newLeader.SquadPlayer.IsLeader = true;
         }

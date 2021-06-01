@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using TXServer.Core.Battles;
+using TXServer.Core.Commands;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -16,7 +17,7 @@ using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
-namespace TXServer.Core.Commands
+namespace TXServer.Core.ChatCommands
 {
     public static class ChatCommands
     {
@@ -30,9 +31,10 @@ namespace TXServer.Core.Commands
 
             { "hackBattle", ("hackBattle [everyone/onlyme]", ChatCommandConditions.BattleOwner, HackBattle) },
             { "bulletSpeed", ("bulletSpeed [max/stuck/norm/number] [target]", ChatCommandConditions.HackBattle, BulletSpeed) },
+            { "cases", (null, ChatCommandConditions.None, ListPunishments) },
             { "cheat", ("cheat [supply] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.ActiveTank, Cheat) },
             { "flag", ("flag [color] [deliver/drop/return/give] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, FlagAction) },
-            { "gravity", ("gravity [number]", ChatCommandConditions.HackBattle | ChatCommandConditions.BattleOwner, Gravity) },
+            { "gravity", ("gravity [number]", ChatCommandConditions.BattleOwner | ChatCommandConditions.HackBattle, Gravity) },
             { "kickback", ("kickback [number] [target]", ChatCommandConditions.HackBattle, Kickback) },
             { "kill", ("kill [target]", ChatCommandConditions.InMatch | ChatCommandConditions.Admin, KillPlayer) },
             { "tp", ("teleport [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.Premium, Teleport) },
@@ -47,10 +49,10 @@ namespace TXServer.Core.Commands
             { ChatCommandConditions.Admin, "You are not an admin" },
             { ChatCommandConditions.BattleOwner, "You do not own this battle" },
             { ChatCommandConditions.HackBattle, "HackBattle is not enabled or you don't have permission to it" },
-            { ChatCommandConditions.InactiveBattle, "You need to be in a battle lobby with no active players or spectators in-battle" },
-            { ChatCommandConditions.ActiveBattle, "You need to be in an active battle/lobby with players in the match" },
-            { ChatCommandConditions.InBattle, "You are not in battle" },
-            { ChatCommandConditions.InMatch, "You are not in match" },
+            { ChatCommandConditions.InactiveBattle, "You need to be in a battle lobby with no active players in-battle" },
+            { ChatCommandConditions.ActiveBattle, "You need to be in a battle with active players in-battle" },
+            { ChatCommandConditions.InBattle, "You are not in a battle" },
+            { ChatCommandConditions.InMatch, "You are not in a match" },
             { ChatCommandConditions.Premium, "You don't have an active premium pass" },
             { ChatCommandConditions.Tester, "You are not a tester" }
         };
@@ -73,26 +75,26 @@ namespace TXServer.Core.Commands
             }
         }
 
-        public static string CheckForCommand(Player player, string message)
+        public static bool CheckForCommand(Player player, string message, out string reply)
         {
-            if (!message.StartsWith('/')) return null;
+            reply = null;
+            if (!message.StartsWith('/')) return false;
             string[] args = message[1..].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (args.Length == 0) return null;
+            if (args.Length == 0) return false;
 
             if (Commands.TryGetValue(args[0], out var desc))
             {
-                var playerConditions = GetConditionsFor(player);
+                ChatCommandConditions playerConditions = GetConditionsFor(player);
 
                 foreach (var condition in Enum.GetValues<ChatCommandConditions>())
-                {
                     if ((desc.Item2 & condition) == condition && (playerConditions & condition) != condition)
-                        return ConditionErrors[condition];
-                }
+                        reply = ConditionErrors[condition];
 
-                return desc.Item3(player, args[1..]);
+                reply ??= desc.Item3(player, args[1..]);
             }
 
-            return "Unknown command. Enter \"/help\" to view available commands";
+            reply ??= "Unknown command. Enter \"/help\" to view available commands";
+            return true;
         }
         private static string Help(Player player, string[] args)
         {
@@ -576,20 +578,29 @@ namespace TXServer.Core.Commands
             List<BattleTankPlayer> targets = FindTargets(targetName, player);
             if (!targets.Any()) return $"Error, the user '{targetName}' wasn't found in this battle";
             foreach (BattleTankPlayer target in targets)
-                target.MatchPlayer.SelfDestructionTime = DateTime.Now.AddSeconds(0);
+                target.MatchPlayer.SelfDestructionTime = DateTime.UtcNow.AddSeconds(0);
 
             return targets.Count > 1
                 ? $"{targets.Count} players have been killed"
                 : $"'{targets[0].Player.Data.Username}' has been killed'";
         }
 
+        private static string ListPunishments(Player player, string[] args)
+        {
+            if (!player.Data.Punishments.Any())
+                return "'Error', you don't have any cases or punishments";
+            return player.Data.Punishments.Aggregate("",
+                    (current, punishment) => current + punishment.CreateLogMsg(player));
+        }
+
         private static string Ping(Player player, string[] args)
         {
-            if (args.Length <= 0 || args[0] == player.Data.Username) return $"Network latency: {player.Connection.Ping} ms";
+            if (args.Length <= 0 || args[0] == player.Data.Username)
+                return $"Network latency: {player.Connection.Ping} ms";
             if (!player.Data.Admin)
                 return ConditionErrors[ChatCommandConditions.Admin];
 
-            Player targetPlayer = Server.Instance.FindPlayerByUid(args[0]);
+            Player targetPlayer = Server.Instance.FindPlayerByUsername(args[0]);
             return targetPlayer == null
                 ? $"Error, the user '{args[0]}' wasn't found or isn't online yet"
                 : $"Network latency of '{args[0]}': {targetPlayer.Connection.Ping} ms";
@@ -615,7 +626,7 @@ namespace TXServer.Core.Commands
             }
             switch (args[0])
             {
-                case "instant" or "0" or "istant":
+                case "instant" or "0":
                     unloadEnergyPerShot = 0;
                     break;
                 case "never":

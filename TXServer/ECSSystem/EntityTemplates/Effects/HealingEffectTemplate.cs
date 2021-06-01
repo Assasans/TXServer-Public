@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
@@ -14,7 +14,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Effects
             Entity entity = new(new TemplateAccessor(new HealingEffectTemplate(), "battle/effect/healing"),
                 new EffectComponent(),
                 new DurationConfigComponent(3000),
-                new DurationComponent { StartedTime = DateTime.Now },
+                new DurationComponent { StartedTime = DateTime.UtcNow },
                 tank.GetComponent<TankGroupComponent>());
             return entity;
         }

@@ -1,4 +1,4 @@
-﻿using TXServer.ECSSystem.Types;
+using TXServer.ECSSystem.Types;
 using System;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Tank;
@@ -23,7 +23,7 @@ namespace TXServer.Core.Battles
             BonusType = bonusType;
             MatchPlayer = matchPlayer;
             Cheat = cheat;
-            StopTime = DateTime.Now.AddSeconds(duration);
+            StopTime = DateTime.UtcNow.AddSeconds(duration);
 
             if (CheckForDuplicate()) return;
             ApplyEffect(duration * 1000);
@@ -95,9 +95,9 @@ namespace TXServer.Core.Battles
             }
             else
             {
-                StopTime = DateTime.Now.AddSeconds(30);
+                StopTime = DateTime.UtcNow.AddSeconds(30);
                 SupplyEffectEntity.RemoveComponent<DurationComponent>();
-                SupplyEffectEntity.AddComponent(new DurationComponent { StartedTime = DateTime.Now });
+                SupplyEffectEntity.AddComponent(new DurationComponent { StartedTime = DateTime.UtcNow });
             }
         }
 

@@ -56,17 +56,12 @@ namespace TXServer.Core
             Database.Startup();
         }
 
-        public Player FindPlayerById(long entityId)
-        {
-            return Connection.Pool.FirstOrDefault(player => player.IsLoggedIn && player.User.EntityId == entityId);
-        }
+        public Player FindPlayerByUid(long uid) =>
+            Connection.Pool.FirstOrDefault(player => player.IsLoggedIn && player.User.EntityId == uid);
 
-        public Player FindPlayerByUid(string uid)
-        {
-            Player searchedPlayer = Connection.Pool.FirstOrDefault(controlledPlayer =>
-                controlledPlayer.User != null && controlledPlayer.Data.Username == uid);
-            return searchedPlayer;
-        }
+        public Player FindPlayerByUsername(string username) =>
+            Connection.Pool.FirstOrDefault(controlledPlayer =>
+                controlledPlayer.User != null && controlledPlayer.Data.Username == username);
 
         public Battle FindBattleById(long? lobbyId = null, long? battleId = null)
         {

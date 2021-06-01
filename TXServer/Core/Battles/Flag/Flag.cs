@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -52,7 +52,7 @@ namespace TXServer.Core.Battles
 
         public void Pickup(BattleTankPlayer battlePlayer)
         {
-            if (battlePlayer == LastCarrier && LastCarrierMinTime > DateTime.Now) return;
+            if (battlePlayer == LastCarrier && LastCarrierMinTime > DateTime.UtcNow) return;
 
             State = FlagState.Captured;
             Carrier = battlePlayer;
@@ -70,9 +70,9 @@ namespace TXServer.Core.Battles
         public void Drop(bool isUserAction, bool silent = false)
         {
             LastCarrier = Carrier;
-            LastCarrierMinTime = DateTime.Now.AddSeconds(3);
+            LastCarrierMinTime = DateTime.UtcNow.AddSeconds(3);
 
-            ReturnStartTime = DateTime.Now.AddSeconds(60);
+            ReturnStartTime = DateTime.UtcNow.AddSeconds(60);
             State = FlagState.Dropped;
 
             Vector3 flagPosition = Carrier.MatchPlayer.TankPosition - Vector3.UnitY;

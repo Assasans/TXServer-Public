@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using TXServer.Core.ChatCommands;
 using TXServer.Core.Logging;
-using TXServer.ECSSystem.Types.Punishments;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core.Data.Database.Impl
 {
@@ -22,11 +23,13 @@ namespace TXServer.Core.Data.Database.Impl
                 Avatar = "8b74e6a3-849d-4a8d-a20e-be3c142fd5e8";
                 Admin = true;
                 Beta = true;
+                Mod = true;
 
                 Crystals = 1000000;
                 XCrystals = 50000;
                 Experience = 0;
                 Reputation = 0;
+                League = Leagues.GlobalItems.Training;
                 PremiumExpirationDate = DateTime.MinValue;
 
                 AcceptedFriendIds = new List<long>();

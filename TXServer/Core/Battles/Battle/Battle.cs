@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -46,7 +46,7 @@ namespace TXServer.Core.Battles
 
         public void CreateBattle()
         {
-            BattleEntity = BattleEntityCreators[Params.BattleMode](BattleLobbyEntity, Params.ScoreLimit, Params.TimeLimit * 60, 120);
+            BattleEntity = BattleEntityCreators[Params.BattleMode](BattleLobbyEntity, Params.ScoreLimit, Params.TimeLimit * 60, 60);
             RoundEntity = RoundTemplate.CreateEntity(BattleEntity);
             CollisionsComponent = BattleEntity.GetComponent<BattleTankCollisionsComponent>();
 
@@ -187,7 +187,7 @@ namespace TXServer.Core.Battles
                     BattleMode newMode = modeBonusRegions.Keys.First(mode => modeBonusRegions[mode] != null && mode != BattleMode.DM);
                     modeBonusRegions[Params.BattleMode] = modeBonusRegions[newMode];
                 }
-                var bonusTypeSpawnPoints = new Dictionary<BonusType, IList<ServerMapInformation.Bonus>> {
+                Dictionary<BonusType, IList<Bonus>> bonusTypeSpawnPoints = new() {
                     { BonusType.ARMOR,  modeBonusRegions[Params.BattleMode].Armor },
                     { BonusType.DAMAGE,  modeBonusRegions[Params.BattleMode].Damage },
                     { BonusType.GOLD,  modeBonusRegions[Params.BattleMode].Gold },
@@ -197,7 +197,7 @@ namespace TXServer.Core.Battles
                 BattleBonuses.Clear();
                 foreach (BonusType bonusType in Enum.GetValues(typeof(BonusType)))
                 {
-                    foreach (ServerMapInformation.Bonus bonus in bonusTypeSpawnPoints[bonusType])
+                    foreach (Bonus bonus in bonusTypeSpawnPoints[bonusType])
                     {
                         BattleBonus battleBonus = new(bonusType, bonus, this);
                         BattleBonuses.Add(battleBonus);
@@ -276,7 +276,7 @@ namespace TXServer.Core.Battles
             }
             else
             {
-                var tankPlayer = (BattleTankPlayer)battlePlayer;
+                BattleTankPlayer tankPlayer = (BattleTankPlayer)battlePlayer;
 
                 MatchPlayer matchPlayer = new(tankPlayer, BattleEntity, (ModeHandler as TeamBattleHandler)?.BattleViewFor(tankPlayer).AllyTeamResults ?? ((DMHandler)ModeHandler).Results);
                 tankPlayer.MatchPlayer = matchPlayer;
@@ -303,6 +303,7 @@ namespace TXServer.Core.Battles
                         }
                         catch (Exception exception)
                         {
+                            // ignored
                         }
                     }
 
@@ -390,10 +391,10 @@ namespace TXServer.Core.Battles
             // Remove spectators if last
             if (MatchTankPlayers.Count == 0)
             {
-                foreach (Spectator _spectator in Spectators.ToArray())
+                foreach (Spectator spec in Spectators.ToArray())
                 {
-                    _spectator.SendEvent(new KickFromBattleEvent(), _spectator.BattleUser);
-                    RemoveMatchPlayer(_spectator);
+                    spec.SendEvent(new KickFromBattleEvent(), spec.BattleUser);
+                    RemoveMatchPlayer(spec);
                 }
             }
 
@@ -459,7 +460,7 @@ namespace TXServer.Core.Battles
                 ProcessMatchPlayers();
                 ProcessBonuses(deltaTime);
 
-                foreach (TickHandler handler in tickHandlers.Where(handler => DateTimeOffset.Now >= handler.Time).ToArray())
+                foreach (TickHandler handler in tickHandlers.Where(handler => DateTimeOffset.UtcNow >= handler.Time).ToArray())
                 {
                     tickHandlers.Remove(handler);
 
@@ -540,17 +541,17 @@ namespace TXServer.Core.Battles
             { GravityType.MARS, 3.71f }
         };
 
-        public ClientBattleParams Params { get; set; }
+        public ClientBattleParams Params { get; private set; }
         public bool IsMatchMaking { get; }
         public Entity MapEntity { get; private set; }
 
         public bool ForceStart { get; set; }
         public bool ForcePause { get; set; }
         public bool ForceOpen { get; set; }
-        public int WarmUpSeconds { get; set; }
+        private int WarmUpSeconds { get; set; }
         private bool IsWarmUpCompleted { get; set; }
 
-        public MapInfo CurrentMapInfo { get; set; }
+        public MapInfo CurrentMapInfo { get; private set; }
 
         public List<BattleBonus> BattleBonuses { get; set; } = new();
         public IEnumerable<BattleBonus> GoldBonuses => BattleBonuses.Where(b => b.BonusType == BonusType.GOLD);
@@ -577,7 +578,7 @@ namespace TXServer.Core.Battles
                 switch (value)
                 {
                     case BattleState.StartCountdown:
-                        BattleLobbyEntity.AddComponent(new MatchMakingLobbyStartTimeComponent { StartTime = DateTime.Now.AddSeconds(10) });
+                        BattleLobbyEntity.AddComponent(new MatchMakingLobbyStartTimeComponent { StartTime = DateTime.UtcNow.AddSeconds(10) });
                         CountdownTimer = 10;
                         break;
                     case BattleState.Starting:
@@ -585,15 +586,15 @@ namespace TXServer.Core.Battles
                         CountdownTimer = 3;
                         break;
                     case BattleState.WarmUp:
-                        BattleEntity.ChangeComponent(new BattleStartTimeComponent(DateTimeOffset.Now.AddSeconds(WarmUpSeconds)));
-                        RoundEntity.ChangeComponent(new RoundStopTimeComponent(DateTimeOffset.Now.AddSeconds(60 * Params.TimeLimit)));
+                        BattleEntity.ChangeComponent(new BattleStartTimeComponent(DateTimeOffset.UtcNow.AddSeconds(WarmUpSeconds)));
+                        RoundEntity.ChangeComponent(new RoundStopTimeComponent(DateTimeOffset.UtcNow.AddSeconds(60 * Params.TimeLimit)));
                         RoundEntity.AddComponent(new RoundWarmingUpStateComponent());
                         CountdownTimer = WarmUpSeconds;
                         break;
                     case BattleState.Running:
                         CountdownTimer = 60 * Params.TimeLimit;
-                        BattleEntity.ChangeComponent(new BattleStartTimeComponent(DateTime.Now));
-                        RoundEntity.ChangeComponent(new RoundStopTimeComponent(DateTimeOffset.Now.AddSeconds(CountdownTimer)));
+                        BattleEntity.ChangeComponent(new BattleStartTimeComponent(DateTime.UtcNow));
+                        RoundEntity.ChangeComponent(new RoundStopTimeComponent(DateTimeOffset.UtcNow.AddSeconds(CountdownTimer)));
                         break;
                 }
 
@@ -615,7 +616,7 @@ namespace TXServer.Core.Battles
         /// </summary>
         /// <param name="time">Time at which action should run</param>
         /// <param name="handler">Action to run at specified time</param>
-        public void Schedule(DateTimeOffset time, Action handler)
+        private void Schedule(DateTimeOffset time, Action handler)
         {
             tickHandlers.Add(new TickHandler(time, handler));
         }
@@ -627,7 +628,7 @@ namespace TXServer.Core.Battles
         /// <param name="handler">Action to run at specified time</param>
         public void Schedule(TimeSpan timeSpan, Action handler)
         {
-            Schedule(DateTimeOffset.Now + timeSpan, handler);
+            Schedule(DateTimeOffset.UtcNow + timeSpan, handler);
         }
 
         private readonly List<TickHandler> tickHandlers;
@@ -639,20 +640,20 @@ namespace TXServer.Core.Battles
         public IBattleTypeHandler TypeHandler { get; }
         public IBattleModeHandler ModeHandler { get; private set; }
 
-        public double CountdownTimer { get; set; }
+        public double CountdownTimer { get; private set; }
 
         public IEnumerable<BattleTankPlayer> JoinedTankPlayers => ModeHandler.Players;
         public List<BattleTankPlayer> MatchTankPlayers { get; } = new();
         public List<Spectator> Spectators { get; } = new();
-        public IEnumerable<BaseBattlePlayer> PlayersInMap => MatchTankPlayers.Cast<BaseBattlePlayer>().Concat(Spectators.Cast<BaseBattlePlayer>());
+        public IEnumerable<BaseBattlePlayer> PlayersInMap => MatchTankPlayers.Concat(Spectators.Cast<BaseBattlePlayer>());
 
         private bool IsEnoughPlayers => ModeHandler.IsEnoughPlayers;
         private TeamColor LosingTeam => ModeHandler.LosingTeam;
 
-        public Entity BattleEntity { get; set; }
-        public Entity BattleLobbyEntity { get; set; }
-        public Entity RoundEntity { get; set; }
-        public BattleTankCollisionsComponent CollisionsComponent { get; set; }
+        public Entity BattleEntity { get; private set; }
+        public Entity BattleLobbyEntity { get; private set; }
+        public Entity RoundEntity { get; private set; }
+        public BattleTankCollisionsComponent CollisionsComponent { get; private set; }
 
         public Entity GeneralBattleChatEntity { get; }
         public Entity BattleLobbyChatEntity { get; }

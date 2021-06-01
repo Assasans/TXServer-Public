@@ -21,6 +21,7 @@ using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 using TXServer.Core.Database;
 using TXServer.Core.Database.NetworkEvents.Communications;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core
 {
@@ -38,6 +39,9 @@ namespace TXServer.Core
         public bool IsInBattle => BattlePlayer != null;
         public bool IsBattleOwner => (BattlePlayer?.Battle.TypeHandler as CustomBattleHandler)?.Owner == this;
         public bool IsInMatch => BattlePlayer?.MatchPlayer != null;
+
+        public bool IsBanned => Data.Punishments.Any(p => p.Type is PunishmentType.Ban && p.IsActive);
+        public bool IsMuted => Data.Punishments.Any(p => p.Type is PunishmentType.Mute && p.IsActive);
 
         //todo add those three in PlayerData
         public Entity CurrentAvatar { get; set; }
@@ -153,7 +157,7 @@ namespace TXServer.Core
                 //new UserDailyBonusCycleComponent(1),
                 new TutorialCompleteIdsComponent(),
                 new RegistrationDateComponent(),
-                new LeagueGroupComponent(Leagues.GlobalItems.Master),
+                new LeagueGroupComponent(Data.League),
                 new UserStatisticsComponent(),
                 new PersonalChatOwnerComponent(),
                 new GameplayChestScoreComponent(),
@@ -187,10 +191,13 @@ namespace TXServer.Core
 
             User = user;
 
-            // temp solution
+            // todo: in db
             List<string> admins = new() { "NoNick", "Tim203", "M8", "Kaveman", "Assasans" };
             if (!admins.Contains(Data.Username))
+            {
                 Data.Admin = false;
+                Data.Mod = false;
+            }
 
             if (Data.PremiumExpirationDate > DateTime.UtcNow)
                 user.AddComponent(new PremiumAccountBoostComponent { EndDate = Data.PremiumExpirationDate });

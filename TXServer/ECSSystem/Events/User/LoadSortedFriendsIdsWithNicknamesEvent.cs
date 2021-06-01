@@ -14,7 +14,7 @@ namespace TXServer.ECSSystem.Events.Friend
             Dictionary<long, string> friendsIdsAndNicknames = new();
             foreach (long friendId in player.Data.AcceptedFriendIds)
             {
-                Player remotePlayer = Server.Instance.FindPlayerById(friendId);
+                Player remotePlayer = Server.Instance.FindPlayerByUid(friendId);
                 if (remotePlayer != null) 
                     friendsIdsAndNicknames.Add(friendId, remotePlayer.Data.Username);
             }

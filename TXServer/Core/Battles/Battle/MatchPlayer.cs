@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -162,7 +162,7 @@ namespace TXServer.Core.Battles
 
         public void Tick()
         {
-            if (SelfDestructionTime != null && DateTime.Now > SelfDestructionTime && Battle.BattleState != BattleState.Ended)
+            if (SelfDestructionTime != null && DateTime.UtcNow > SelfDestructionTime && Battle.BattleState != BattleState.Ended)
             {
                 if (TankState != TankState.Dead)
                 {
@@ -178,7 +178,7 @@ namespace TXServer.Core.Battles
             }
 
             // switch state after it's ended
-            if (DateTime.Now > TankStateChangeTime)
+            if (DateTime.UtcNow > TankStateChangeTime)
             {
                 switch (TankState)
                 {
@@ -229,7 +229,7 @@ namespace TXServer.Core.Battles
             // supply effects
             foreach (SupplyEffect supplyEffect in SupplyEffects.ToArray())
             {
-                if (DateTime.Now > supplyEffect.StopTime)
+                if (DateTime.UtcNow > supplyEffect.StopTime)
                 {
                     if (supplyEffect.Cheat)
                         supplyEffect.ExtendTime();
@@ -307,7 +307,7 @@ namespace TXServer.Core.Battles
                 Tank.AddComponent((Component)Activator.CreateInstance(TankStates[value].Item1));
                 _TankState = value;
 
-                TankStateChangeTime = DateTime.Now.AddSeconds(TankStates[value].Item2);
+                TankStateChangeTime = DateTime.UtcNow.AddSeconds(TankStates[value].Item2);
             }
         }
         private TankState _TankState;

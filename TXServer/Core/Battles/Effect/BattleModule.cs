@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -46,7 +46,7 @@ namespace TXServer.Core.Battles.Module {
 
 		// TODO(Assasans): Cooldown has visual bugs on client
 		public void StartCooldown() {
-			DateTimeOffset time = DateTimeOffset.Now;
+			DateTimeOffset time = DateTimeOffset.UtcNow;
 
 			CooldownStart = time;
 
@@ -94,11 +94,11 @@ namespace TXServer.Core.Battles.Module {
 		/// <param name="timeSpan">TimeSpan after which action should run</param>
 		/// <param name="handler">Action to run at specified time</param>
 		protected void Schedule(TimeSpan timeSpan, Action handler) {
-			Schedule(DateTimeOffset.Now + timeSpan, handler);
+			Schedule(DateTimeOffset.UtcNow + timeSpan, handler);
 		}
 
 		public void ModuleTick() {
-			if(CooldownStart != null && DateTimeOffset.Now >= CooldownEnd) {
+			if(CooldownStart != null && DateTimeOffset.UtcNow >= CooldownEnd) {
 				if(ModuleEntity.HasComponent<InventoryCooldownStateComponent>()) {
 					ModuleEntity.RemoveComponent<InventoryCooldownStateComponent>();
 				}
@@ -110,7 +110,7 @@ namespace TXServer.Core.Battles.Module {
 				CooldownStart = null;
 			}
 
-			foreach(TickHandler handler in tickHandlers.Where(handler => DateTimeOffset.Now >= handler.Time).ToArray()) {
+			foreach(TickHandler handler in tickHandlers.Where(handler => DateTimeOffset.UtcNow >= handler.Time).ToArray()) {
 				tickHandlers.Remove(handler);
 
 				handler.Action();

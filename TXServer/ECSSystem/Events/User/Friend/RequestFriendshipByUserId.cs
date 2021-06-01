@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Events.User.Friend
     {
         public void Execute(Player player, Entity entity)
         {
-            Player targetPlayer = Server.Instance.FindPlayerById(UserId);
+            Player targetPlayer = Server.Instance.FindPlayerByUid(UserId);
             
             if (targetPlayer != null && targetPlayer.IsLoggedIn)
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace TXServer.Core.Logging
 {
@@ -11,7 +11,7 @@ namespace TXServer.Core.Logging
             lock (_lock)
             {
                 Console.ForegroundColor = color;
-                Console.WriteLine($"[{DateTime.Now}, {type}] {content}");
+                Console.WriteLine($"[{DateTime.UtcNow}, {type}] {content}");
             }
         }
 

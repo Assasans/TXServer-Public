@@ -19,7 +19,7 @@ namespace TXServer.ECSSystem.Events
                 });
             else
             {
-                if (Server.Instance.FindPlayerByUid(Uid) != null)
+                if (Server.Instance.FindPlayerByUsername(Uid) != null)
                     player.SendEvent(new UserUidOccupiedEvent(Uid), entity);
                 else player.SendEvent(new UserUidVacantEvent(Uid), entity);
             }

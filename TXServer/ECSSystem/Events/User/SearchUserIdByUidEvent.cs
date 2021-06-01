@@ -14,7 +14,7 @@ namespace TXServer.ECSSystem.Events.User
             bool isNotSelfUser = player.User.GetComponent<UserUidComponent>().Uid != Uid;
 
             // todo: search user in database
-            Player searchedPlayer = Server.Instance.FindPlayerByUid(Uid);
+            Player searchedPlayer = Server.Instance.FindPlayerByUsername(Uid);
             long searchedPlayerId = searchedPlayer?.User.EntityId ?? 0;
 
             PlayerData data = player.Data;

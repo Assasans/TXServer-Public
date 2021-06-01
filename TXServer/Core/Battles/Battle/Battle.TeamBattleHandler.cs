@@ -21,8 +21,8 @@ namespace TXServer.Core.Battles
             public Entity TeamBattleChatEntity { get; private set; }
             public TeamSpawnPointList SpawnPoints { get; private set; }
 
-            public List<BattleTankPlayer> RedTeamPlayers { get; private set; } = new List<BattleTankPlayer>();
-            public List<BattleTankPlayer> BlueTeamPlayers { get; private set; } = new List<BattleTankPlayer>();
+            public List<BattleTankPlayer> RedTeamPlayers { get; private set; } = new();
+            public List<BattleTankPlayer> BlueTeamPlayers { get; private set; } = new();
             public IEnumerable<BattleTankPlayer> Players => RedTeamPlayers.Concat(BlueTeamPlayers);
 
             public bool IsEnoughPlayers => Players.Any() && RedTeamPlayers.Count == BlueTeamPlayers.Count;
@@ -139,7 +139,7 @@ namespace TXServer.Core.Battles
                 List<List<BattleTankPlayer>> teamPlayerLists = new() { RedTeamPlayers, BlueTeamPlayers };
                 Dictionary<List<BattleTankPlayer>, Entity> entityPlayersDict = new()
                     {{RedTeamPlayers, RedTeamEntity}, {BlueTeamPlayers, BlueTeamEntity}};
-                    
+
                 if (Battle.IsMatchMaking)
                 {
                     foreach (var playersList in teamPlayerLists.Where(y => player.IsInSquad).Where(

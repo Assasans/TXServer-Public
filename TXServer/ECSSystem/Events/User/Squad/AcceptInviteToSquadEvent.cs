@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events.User.Squad
     {
         public void Execute(Player player, Entity entity)
         {
-            Player squadLeader = Server.Instance.FindPlayerById(FromUserId);
+            Player squadLeader = Server.Instance.FindPlayerByUid(FromUserId);
 
             if (squadLeader.IsInSquad)
                 squadLeader.SquadPlayer.Squad.AddPlayer(player);

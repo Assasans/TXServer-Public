@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using TXServer.Core;
 using TXServer.Core.Battles;
@@ -51,14 +51,14 @@ namespace TXServer.ECSSystem.Events.Battle
                 matchPlayer.TankQuaternion = (Quaternion) MoveCommand.Movement?.Orientation;
 
             if (CheckOverflow(position.Value + velocity))
-                matchPlayer.SelfDestructionTime = DateTime.Now;
+                matchPlayer.SelfDestructionTime = DateTime.UtcNow;
 
             if (player.BattlePlayer.Battle.Params.KillZoneEnabled)
             {
                 foreach (PuntativeGeometry geometry in player.BattlePlayer.Battle.CurrentMapInfo.PuntativeGeoms)
                 {
                     if (IsInsideBox(position.Value, geometry.Position, geometry.Size))
-                        matchPlayer.SelfDestructionTime = DateTime.Now;
+                        matchPlayer.SelfDestructionTime = DateTime.UtcNow;
                 }
             }
         }

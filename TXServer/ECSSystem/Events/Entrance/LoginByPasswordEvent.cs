@@ -39,7 +39,11 @@ namespace TXServer.ECSSystem.Events
                             Token = System.Text.Encoding.UTF8.GetBytes(generatedToken)
                         }, player.ClientSession);
                     }
-                    player.LogInWithDatabase(clientSession);
+                    if (!player.IsBanned)
+                        player.LogInWithDatabase(clientSession);
+                    else
+                        player.SendEvent(new LoginFailedEvent(), clientSession);
+
                 }
                 else
                 {
@@ -49,10 +53,17 @@ namespace TXServer.ECSSystem.Events
             }
             else
             {
-                player.Data.RememberMe = RememberMe;
-                player.Data.HashedPassword = PasswordEncipher;
-                player.Data.HardwareId = HardwareFingerprint;
-                player.LogIn(clientSession);
+                if (!player.IsBanned)
+                {
+                    player.Data.RememberMe = RememberMe;
+                    player.Data.HashedPassword = PasswordEncipher;
+                    player.Data.HardwareId = HardwareFingerprint;
+                    player.LogIn(clientSession);
+                }
+                else
+                    player.SendEvent(new LoginFailedEvent(), clientSession);
+
+
             }
 		}
 

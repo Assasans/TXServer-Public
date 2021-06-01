@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using TXServer.Core;
-using TXServer.Core.Commands;
+using TXServer.Core.ChatCommands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Chat;
-using TXServer.ECSSystem.Types.Punishments;
+using TXServer.ECSSystem.Types;
+using Punishment = TXServer.Core.ChatCommands.Punishment;
 
 namespace TXServer.ECSSystem.Events.Chat
 {
@@ -21,26 +21,26 @@ namespace TXServer.ECSSystem.Events.Chat
         {
             Core.Battles.Battle battle = player.BattlePlayer?.Battle;
 
-            string commandReply = ChatCommands.CheckForCommand(player, Message);
-            if (!string.IsNullOrEmpty(commandReply))
+            if (ChatCommands.CheckForCommand(player, Message, out string commandReply))
             {
                 ChatMessageReceivedEvent.SystemMessageTarget(commandReply, chat, player);
                 return;
             }
-
-            ReadOnlyCollection<ChatMute> mutes = player.Data.GetChatMutes();
-            if (mutes.Count > 0)
+            if (player.Data.Mod && ModCommands.CheckForCommand(player, Message, out string reply))
             {
-                // TODO(Assasans): Show all mutes to player
-                ChatMute mute = mutes[0];
+                ChatMessageReceivedEvent.SystemMessageTarget(reply, chat, player);
+                return;
+            }
 
-                string error = player.Data.CountryCode.ToLowerInvariant() switch
+            if (player.IsMuted)
+            {
+                Punishment mute = player.Data.Punishments.First(p => p.Type is PunishmentType.Mute);
+                string errorMsg = player.Data.CountryCode.ToLowerInvariant() switch
                 {
-                    "ru" => $"Вы были отключены от чата {(mute.IsPermanent ? "навсегда" : $"на {((TimeSpan)mute.Duration).TotalMinutes} минут")}. Причина: {mute.Reason}",
-                    _ => $"You have been muted {(mute.IsPermanent ? "forever" : $"for {((TimeSpan)mute.Duration).TotalMinutes} minutes")}. Reason: {mute.Reason}"
+                    "ru" => $"Вы были отключены от чата {(mute.IsPermanent ? "навсегда" : $"на {Math.Round(mute.Duration.TotalMinutes)} минут")}. {(mute.Reason != null ? $"Причина: {mute.Reason}" : "")}",
+                    _ => $"You have been muted {(mute.IsPermanent ? "forever" : $"for {Math.Round(mute.Duration.TotalMinutes)} minute(s)")}. {(mute.Reason != null ? $"Reason: {mute.Reason}" : "")}"
                 };
-
-                ChatMessageReceivedEvent.SystemMessageTarget(error, chat, player);
+                ChatMessageReceivedEvent.SystemMessageTarget(errorMsg, chat, player);
                 return;
             }
 
@@ -53,9 +53,10 @@ namespace TXServer.ECSSystem.Events.Chat
                     IEnumerable<Player> chatParticipants = chat.GetComponent<ChatParticipantsComponent>().GetPlayers().ToList();
                     foreach (Player p in chatParticipants)
                     {
-                        if (!p.EntityList.Contains(chat)) continue;
-                        p.SharePlayers(player);
-                        p.ShareEntities(chat);
+                        if (!p.EntityList.Contains(chat))
+                            p.ShareEntities(chat);
+                        if (p != player)
+                            p.SharePlayers(player);
                     }
                     ChatMessageReceivedEvent.MessageTargets(Message, chat, player, chatParticipants);
                     break;

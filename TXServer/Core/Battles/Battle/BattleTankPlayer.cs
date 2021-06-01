@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 
@@ -24,7 +24,7 @@ namespace TXServer.Core.Battles
         public Entity Team { get; set; }
         public MatchPlayer MatchPlayer { get; set; }
 
-        public DateTime MatchMakingJoinCountdown { get; set; } = DateTime.Now.AddSeconds(10);
+        public DateTime MatchMakingJoinCountdown { get; set; } = DateTime.UtcNow.AddSeconds(10);
 
         public float? BulletSpeed { get; set; }
         public float? TurretKickback { get; set; }

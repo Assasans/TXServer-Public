@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Components.Battle.Tank
     {
         public void OnAttached(Player player, Entity tank)
         {
-            player.BattlePlayer.MatchPlayer.SelfDestructionTime = DateTime.Now.AddSeconds(5);
+            player.BattlePlayer.MatchPlayer.SelfDestructionTime = DateTime.UtcNow.AddSeconds(5);
         }
     }
 }

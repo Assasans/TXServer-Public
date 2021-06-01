@@ -1,164 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-
-using TXServer.Core;
-using TXServer.Core.Battles;
+﻿using TXServer.Core;
+using TXServer.Core.ChatCommands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Events.Chat;
-using TXServer.ECSSystem.Types.Punishments;
 
 namespace TXServer.ECSSystem.Events.ElevatedAccess
 {
     [SerialVersionUID(1503470104769L)]
     public class ElevatedAccessUserBanUserEvent : ElevatedAccessUserBasePunishEvent, ECSEvent
     {
-        // TODO(Assasans): Difficult to understand, rewrite?
         public void Execute(Player player, Entity entity)
         {
             if (!player.Data.Admin) return;
 
-            Core.Battles.Battle battle = GetBattle(player);
-            Player punishedPlayer = GetPunishedPlayer(battle, Uid);
-
-            List<string> availableUnits = new() { "minute", "hour", "day", "warn" };
-            if (!availableUnits.Contains(Regex.Replace(Type, "[0-9]", "").Replace("S", "").ToLower()) && !String.IsNullOrEmpty(Type))
-            {
-                string errorMessage = GetErrorMsg("unknownType", Type, player);
-                ChatMessageReceivedEvent.SystemMessageTarget(errorMessage, battle.GeneralBattleChatEntity, player);
-                return;
-            }
-            if (punishedPlayer == null)
-            {
-                string errorMsg = GetErrorMsg("playerNotFound", Uid, player);
-                ChatMessageReceivedEvent.SystemMessageTarget(errorMsg, battle.GeneralBattleChatEntity, player);
-                return;
-            }
-            if (punishedPlayer.User.GetComponent<UserAdminComponent>() == null)
-            {
-                string errorMsg = GetErrorMsg("adminPlayer", Uid, player);
-                ChatMessageReceivedEvent.SystemMessageTarget(errorMsg, battle.GeneralBattleChatEntity, player);
-                return;
-            }
-
-
-            string duration = string.Empty;
-            for (int i = 0; i < Type.Length; i++)
-            {
-                if (Char.IsDigit(Type[i]))
-                    duration += Type[i];
-            }
-            if (string.IsNullOrEmpty(duration) && Type != "WARN")
-                duration = "1";
-
-            Dictionary<string, string> languages = new() { { "EN", "" }, { "RU", "" } };
-            foreach (KeyValuePair<string, string> translation in languages.ToArray())
-            {
-                string unit;
-                string durationIfNeeded = "";
-                List<string> punishments = new();
-
-                switch (translation.Key)
-                {
-                    case "RU":
-                        punishments.AddRange(new List<string>() { "предупрежден", "отключен от чата" });
-                        if (Type != "WARN")
-                        {
-                            int intDuration = Convert.ToInt32(duration);
-                            List<string> minuteTranslations = new() { "минуту", "минуты", "минут" };
-                            List<string> hourTranslations = new() { "час", "часа", "часов" };
-                            List<string> dictUnit = Type.Replace("S", "") switch
-                            {
-                                "MINUTE" => minuteTranslations,
-                                "HOUR" => hourTranslations,
-                                _ => new()
-                            };
-                            if (dictUnit.Any())
-                            {
-                                unit = intDuration switch
-                                {
-                                    1 => dictUnit[0],
-                                    int n when n >= 2 && n <= 4 => dictUnit[1],
-                                    _ => dictUnit[2],
-                                };
-                            }
-                            else
-                            {
-                                unit = intDuration switch
-                                {
-                                    1 => "сутки",
-                                    _ => "суток",
-                                };
-                            }
-                            durationIfNeeded = Type switch
-                            {
-                                "FOREVER" or "" => " навсегда",
-                                _ => $" на {duration} {unit}",
-                            };
-                        }
-                        break;
-                    default:
-                        punishments.AddRange(new List<string>() { "warned", "chat banned" });
-                        if (Type != "WARN")
-                        {
-                            unit = Regex.Replace(Type, "[0-9]", "").Replace("S", "").ToLower();
-                            if (Convert.ToInt32(duration) > 1)
-                                unit += "s";
-                            durationIfNeeded = Type switch
-                            {
-                                "FOREVER" or "" => " forever",
-                                _ => $" for {duration} {unit}",
-                            };
-                        }
-                        break;
-                }
-                string punishment = Regex.Replace(Type, "[0-9]", "").Replace("S", "").ToLower() switch
-                {
-                    "warn" => punishments[0],
-                    _ => punishments[1],
-                };
-                languages[translation.Key] = translation.Key switch
-                {
-                    "RU" => $"{Uid} был {punishment}{durationIfNeeded}. Причина: {TranslateReason(Reason, translation.Key)}",
-                    _ => $"{Uid} was {punishment}{durationIfNeeded}. Reason: {TranslateReason(Reason, translation.Key)}",
-                };
-            }
-
-            foreach (BattleTankPlayer battleLobbyPlayer in battle.PlayersInMap)
-                ChatMessageReceivedEvent.SystemMessageTarget(
-                    languages[battleLobbyPlayer.User.GetComponent<UserCountryComponent>().CountryCode],
-                    battle.GeneralBattleChatEntity, battleLobbyPlayer.Player);
-
-            if (Type != "WARN")
-            {
-                int intDuration = Convert.ToInt32(duration);
-                if (intDuration == 0) intDuration = 1;
-
-                ChatMute mute = new ChatMute(punishedPlayer.Data, DateTimeOffset.Now)
-                {
-                    Duration = Type != "FOREVER" ? new TimeSpan(
-                    Regex.Replace(Type, "[0-9S]", "") == "DAY" ? intDuration : 0,
-                    Regex.Replace(Type, "[0-9S]", "") == "HOUR" ? intDuration : 0,
-                    Regex.Replace(Type, "[0-9S]", "") == "MINUTE" ? intDuration : 0,
-                    Regex.Replace(Type, "[0-9S]", "") == "SECOND" ? intDuration : 0
-                  ) : null,
-                    Reason = Reason
-                };
-
-                punishedPlayer.Data.Punishments.Add(mute);
-            }
-            else
-            {
-                ChatWarning warn = new ChatWarning(punishedPlayer.Data, DateTimeOffset.Now)
-                {
-                    Reason = Reason
-                };
-
-                punishedPlayer.Data.Punishments.Add(warn);
-            }
+            ChatMessageReceivedEvent.SystemMessageTarget(
+                Type.ToLower() == "warn"
+                    ? ModCommands.Warn(player, new[] {Uid, Reason})
+                    : ModCommands.Ban(player, new[] {Uid, Type, Reason}),
+                player);
         }
 
         public string Type { get; set; }
