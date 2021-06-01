@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using TXServer.Core.Battles.Matchmaking;
 using TXServer.Core.Battles.Module;
+using TXServer.Core.HeightMaps;
 using TXServer.Core.Logging;
 using TXServer.Core.ServerMapInformation;
 using TXServer.Core.Squads;
@@ -39,6 +40,8 @@ namespace TXServer.Core.Battles
             CreateBattle();
             BattleLobbyChatEntity = BattleLobbyChatTemplate.CreateEntity();
             GeneralBattleChatEntity = GeneralBattleChatTemplate.CreateEntity();
+
+            HeightMap = ServerConnection.HeightMaps[ServerConnection.ServerMapInfo.First((entry) => entry.Value.MapId == Params.MapId).Key];
 
             tickHandlers = new List<TickHandler>();
             nextTickHandlers = new List<Action>();
@@ -657,5 +660,7 @@ namespace TXServer.Core.Battles
 
         public Entity GeneralBattleChatEntity { get; }
         public Entity BattleLobbyChatEntity { get; }
+
+        public HeightMap HeightMap { get; }
     }
 }

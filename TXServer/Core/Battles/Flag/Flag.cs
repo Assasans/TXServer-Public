@@ -1,7 +1,12 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using TXServer.Library;
+using TXServer.Core.HeightMaps;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
@@ -9,6 +14,7 @@ using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
+using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -74,6 +80,60 @@ namespace TXServer.Core.Battles
 
             ReturnStartTime = DateTime.UtcNow.AddSeconds(60);
             State = FlagState.Dropped;
+
+            HeightMap map = Battle.HeightMap;
+            (HeightMapLayer layer, float y) = map.Layers
+                .Select((layer) =>
+                {
+                    // If layer is not loaded
+                    if (layer == null) return (null, -9999);
+
+                    // Get height map layer
+                    Image<Rgb24> image = layer.Image;
+
+                    // Map tank coordinates to layer size
+                    float x = MathUtils.Map(Carrier.MatchPlayer.TankPosition.X, map.MinX, map.MaxX, 0, image.Width);
+                    float z = MathUtils.Map(Carrier.MatchPlayer.TankPosition.Z, map.MinZ, map.MaxZ, 0, image.Height);
+
+                    // Get pixel color
+                    Rgb24 pixel = image[(int)Math.Round(x), (int)Math.Round(z)];
+
+                    // Map pixel color to height
+                    float y = MathUtils.Map(pixel.R, byte.MinValue, byte.MaxValue, layer.MinY, layer.MaxY);
+
+                    return (layer, y);
+                })
+                .First((tuple) =>
+                {
+                    float flagY = (Carrier.MatchPlayer.TankPosition - Vector3.UnitY).Y;
+
+                    // "iterate maps and look for first with height below flag"
+                    return tuple.y < flagY;
+                });
+
+            if (layer == null)
+            {
+                ChatMessageReceivedEvent.SystemMessageTarget(
+                    $"[Flag] Dropped at {Carrier.MatchPlayer.TankPosition.X}, {Carrier.MatchPlayer.TankPosition.Z}, {Carrier.MatchPlayer.TankPosition.Y}\n" +
+                    "[Flag/Error] No layer found",
+                    Battle.GeneralBattleChatEntity, Carrier.Player
+                );
+                return;
+            }
+
+            Image<Rgb24> image = layer.Image;
+
+            float x = MathUtils.Map(Carrier.MatchPlayer.TankPosition.X, map.MinX, map.MaxX, 0, image.Width);
+            float z = MathUtils.Map(Carrier.MatchPlayer.TankPosition.Z, map.MinZ, map.MaxZ, 0, image.Height);
+
+            Rgb24 pixel = image[(int)Math.Round(x), (int)Math.Round(z)];
+
+            ChatMessageReceivedEvent.SystemMessageTarget(
+                $"[Flag] Dropped at {Carrier.MatchPlayer.TankPosition.X}, {Carrier.MatchPlayer.TankPosition.Z}, {Carrier.MatchPlayer.TankPosition.Y}\n" +
+                $"Layer: {Path.GetFileName(layer.Path)} (pixel color: {pixel.R})\n" +
+                $"Height map position: {x}; {z}; {y} ({Math.Round(x)}; {Math.Round(z)}; {Math.Round(y)})",
+                Battle.GeneralBattleChatEntity, Carrier.Player
+            );
 
             Vector3 flagPosition = Carrier.MatchPlayer.TankPosition - Vector3.UnitY;
             Carrier = null;
