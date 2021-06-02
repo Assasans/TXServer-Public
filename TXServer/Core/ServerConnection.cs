@@ -52,7 +52,7 @@ namespace TXServer.Core
             {
                 Logger.Trace($"Reading {layer.Path}...");
                 // Uncomment this to load height maps (would take ~1.3 GB of RAM)
-                // layer.Image = Image.Load<Rgb24>(Path.Combine(Directory.GetCurrentDirectory(), "Library", layer.Path));
+                layer.Image = Image.Load<Rgb24>(Path.Combine(Directory.GetCurrentDirectory(), "Library", layer.Path));
             }
             Logger.Log("Height maps loaded");
 

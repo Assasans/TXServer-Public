@@ -7,6 +7,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using TXServer.Library;
 using TXServer.Core.HeightMaps;
+using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
@@ -86,7 +87,7 @@ namespace TXServer.Core.Battles
                 .Select((layer) =>
                 {
                     // If layer is not loaded
-                    if (layer == null) return (null, -9999);
+                    if (layer.Image == null) return (null, -9999);
 
                     // Get height map layer
                     Image<Rgb24> image = layer.Image;
@@ -101,14 +102,16 @@ namespace TXServer.Core.Battles
                     // Map pixel color to height
                     float y = MathUtils.Map(pixel.R, byte.MinValue, byte.MaxValue, layer.MinY, layer.MaxY);
 
+                    Logger.Log($"{Carrier.MatchPlayer.TankPosition.X} {Carrier.MatchPlayer.TankPosition.Z} {Carrier.MatchPlayer.TankPosition.Y} | {Path.GetFileName(layer.Path)} | {Math.Round(x)} {Math.Round(z)} | {pixel.R} {pixel.G} {pixel.B} | {y}");
+
                     return (layer, y);
                 })
                 .First((tuple) =>
                 {
-                    float flagY = (Carrier.MatchPlayer.TankPosition - Vector3.UnitY).Y;
+                    // float flagY = (Carrier.MatchPlayer.TankPosition - Vector3.UnitY).Y + 0.3f;
 
                     // "iterate maps and look for first with height below flag"
-                    return tuple.y < flagY;
+                    return tuple.y - Vector3.UnitY.Y < Carrier.MatchPlayer.TankPosition.Y;
                 });
 
             if (layer == null)
@@ -135,7 +138,9 @@ namespace TXServer.Core.Battles
                 Battle.GeneralBattleChatEntity, Carrier.Player
             );
 
-            Vector3 flagPosition = Carrier.MatchPlayer.TankPosition - Vector3.UnitY;
+            Vector3 flagPosition = new Vector3(Carrier.MatchPlayer.TankPosition.X, y, Carrier.MatchPlayer.TankPosition.Z) - Vector3.UnitY;
+
+            // Vector3 flagPosition = Carrier.MatchPlayer.TankPosition - Vector3.UnitY;
             Carrier = null;
 
             if (!silent)
