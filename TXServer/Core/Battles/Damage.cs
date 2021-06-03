@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
@@ -14,11 +16,12 @@ namespace TXServer.Core.Battles
 {
     public static class Damage
     {
-        public static void DealDamage(MatchPlayer victim, MatchPlayer damager, HitTarget hitTarget, int damage)
+        public static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
+            HitTarget hitTarget, float damage, bool mine = false)
         {
             Battle battle = victim.Battle;
 
-            damage = DamageWithSupplies(damage, victim, damager);
+            damage = DamageWithSupplies(damage, victim, damager, mine);
 
             victim.Tank.ChangeComponent<HealthComponent>(component =>
             {
@@ -32,7 +35,7 @@ namespace TXServer.Core.Battles
                     if (damager.Player != victim.Player)
                     {
                         battle.PlayersInMap.SendEvent(
-                            new KillEvent(damager.Player.CurrentPreset.Weapon, hitTarget.Entity), damager.BattleUser);
+                            new KillEvent(weaponMarketItem, hitTarget.Entity), damager.BattleUser);
                         damager.SendEvent(
                             new VisualScoreKillEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid,
                                 victim.Player.User.GetComponent<UserRankComponent>().Rank,
@@ -46,9 +49,9 @@ namespace TXServer.Core.Battles
                     if (battle.ModeHandler is TDMHandler)
                         battle.UpdateScore(damager.Player.BattlePlayer.Team);
 
-                    damager.UserResult.Damage += damage;
+                    damager.UserResult.Damage += (int) damage;
 
-                    foreach (KeyValuePair<MatchPlayer, int> assist in victim.DamageAssistants.Where(assist =>
+                    foreach (KeyValuePair<MatchPlayer, float> assist in victim.DamageAssistants.Where(assist =>
                         assist.Key != damager && assist.Key != victim))
                     {
                         assist.Key.UpdateStatistics(additiveScore: 5, 0, additiveKillAssists: 1, 0, null);
@@ -108,14 +111,14 @@ namespace TXServer.Core.Battles
             }
         }
 
-        private static int DamageWithSupplies(int damage, MatchPlayer target, MatchPlayer shooter)
+        private static float DamageWithSupplies(float damage, MatchPlayer target, MatchPlayer shooter, bool mine = false)
         {
-            if (shooter.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.DAMAGE))
+            if (!mine && shooter.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.DAMAGE))
                 damage *= 2;
             if (target.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.ARMOR))
                 damage /= 2;
 
-            if (shooter.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.DAMAGE && supplyEffect.Cheat))
+            if (!mine && shooter.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.DAMAGE && supplyEffect.Cheat))
                 damage = 99999;
             if (target.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.ARMOR && supplyEffect.Cheat))
                 damage = 0;
@@ -130,17 +133,16 @@ namespace TXServer.Core.Battles
                 victim.Incarnation.ChangeComponent<TankIncarnationKillStatisticsComponent>(component =>
                 {
                     component.Kills += additiveKills;
-                    if (component.Kills >= 2)
-                    {
-                        KillStreakScores.TryGetValue(component.Kills, out int streakScore);
-                        if (component.Kills > 40) streakScore = 70;
-                        victim.Player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(
-                            statistics => statistics.ScoreWithoutBonuses += streakScore);
-                        if (component.Kills < 5 || component.Kills % 5 == 0)
-                            victim.SendEvent(new KillStreakEvent(streakScore), victim.Incarnation);
-                        if (component.Kills > 2)
-                            victim.SendEvent(new VisualScoreStreakEvent(victim.GetScoreWithPremium(streakScore)), victim.BattleUser);
-                    }
+                    if (component.Kills < 2) return;
+
+                    KillStreakScores.TryGetValue(component.Kills, out int streakScore);
+                    if (component.Kills > 40) streakScore = 70;
+                    victim.Player.BattlePlayer.MatchPlayer.RoundUser.ChangeComponent<RoundUserStatisticsComponent>(
+                        statistics => statistics.ScoreWithoutBonuses += streakScore);
+                    if (component.Kills < 5 || component.Kills % 5 == 0)
+                        victim.SendEvent(new KillStreakEvent(streakScore), victim.Incarnation);
+                    if (component.Kills > 2)
+                        victim.SendEvent(new VisualScoreStreakEvent(victim.GetScoreWithPremium(streakScore)), victim.BattleUser);
                 });
             }
 

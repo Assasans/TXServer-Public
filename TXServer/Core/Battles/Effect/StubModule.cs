@@ -1,11 +1,9 @@
 ﻿using System.Linq;
-
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 using TXServer.ECSSystem.Events.Chat;
 
-namespace TXServer.Core.Battles.Module
+namespace TXServer.Core.Battles.Effect
 {
     public class StubModule : BattleModule
     {

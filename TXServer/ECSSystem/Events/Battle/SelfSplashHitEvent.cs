@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
+using TXServer.Core.Battles.Effect;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
+using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Battle
@@ -14,13 +16,14 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity weapon)
 		{
-			var battlePlayer = player.BattlePlayer;
+            if (player.BattlePlayer.MatchPlayer.TankState == TankState.Dead)
+                return;
 
-			if (battlePlayer.MatchPlayer.TankState == TankState.Dead)
-				return;
+            BattleTankPlayer battlePlayer = player.BattlePlayer;
+            Entity weaponMarketItem = player.CurrentPreset.Weapon;
 
-			Core.Battles.Battle battle = player.BattlePlayer.Battle;
-			
+            Core.Battles.Battle battle = player.BattlePlayer.Battle;
+
 			foreach (HitTarget hitTarget in Targets)
 			{
 				BattleTankPlayer victim = battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
@@ -29,19 +32,32 @@ namespace TXServer.ECSSystem.Events.Battle
 				    victim.Team == player.BattlePlayer.Team && !battle.Params.FriendlyFire)
 					return;
 
-				Damage.DealDamage(victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget, 900);
+				Damage.DealDamage(weaponMarketItem, victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget, 900);
 			}
 
-			foreach (HitTarget splashTarget in SplashTargets)
+            foreach (HitTarget splashTarget in SplashTargets)
 			{
-				BattleTankPlayer hitPlayer = battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == splashTarget.IncarnationEntity);
+                BattleTankPlayer hitPlayer = battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == splashTarget.IncarnationEntity);
 
-				if (player.BattlePlayer.Battle.Params.BattleMode != BattleMode.DM &&
-				    hitPlayer.Team == player.BattlePlayer.Team && hitPlayer != player.BattlePlayer &&
-				    !battle.Params.FriendlyFire)
-					return;
+                if (player.BattlePlayer.Battle.Params.BattleMode != BattleMode.DM &&
+                    hitPlayer.Team.EntityId == player.BattlePlayer.Team.EntityId && hitPlayer != player.BattlePlayer &&
+                    !battle.Params.FriendlyFire)
+					continue;
 
-				Damage.DealDamage(hitPlayer.MatchPlayer, battlePlayer.MatchPlayer, splashTarget, 500);
+                // TODO: proper damage
+                float damage = 500;
+
+                if (weapon.TemplateAccessor.Template.GetType() == typeof(SpiderEffectTemplate))
+                {
+                    SpiderMineModule spiderMineModule =
+                        player.BattlePlayer.MatchPlayer.Modules.Single(m => m.GetType() == typeof(SpiderMineModule)) as
+                            SpiderMineModule;
+                    spiderMineModule?.Explode();
+                    damage = SpiderMineModule.Damage;
+                    weaponMarketItem = Modules.GlobalItems.Spidermine;
+                }
+
+                Damage.DealDamage(weaponMarketItem, hitPlayer.MatchPlayer, battlePlayer.MatchPlayer, splashTarget, damage);
 			}
 		}
 

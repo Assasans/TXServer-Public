@@ -1,8 +1,9 @@
 ﻿using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Types;
 using TXServer.ECSSystem.EntityTemplates;
+using TXServer.ECSSystem.EntityTemplates.Item.Module;
+using TXServer.ECSSystem.Types;
 
-namespace TXServer.Core.Battles.Module {
+namespace TXServer.Core.Battles.Effect {
 	public class GoldModule : BattleModule {
 		public GoldModule(MatchPlayer matchPlayer, Entity garageModule) : base(
 			matchPlayer,
@@ -15,7 +16,7 @@ namespace TXServer.Core.Battles.Module {
 
 		protected override void Tick() {
 			base.Tick();
-			
+
 			IsEnabled &= MatchPlayer.Battle.IsMatchMaking && MatchPlayer.Battle.BattleState == BattleState.Running;
 		}
 	}

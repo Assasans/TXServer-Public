@@ -40,7 +40,7 @@ namespace TXServer.ECSSystem.Events.Battle
                         }
                         if (!battle.Params.FriendlyFire)
                             return;
-                    } 
+                    }
                 }
 
                 victim.MatchPlayer.Tank.ChangeComponent<TemperatureComponent>(component =>
@@ -67,7 +67,7 @@ namespace TXServer.ECSSystem.Events.Battle
                 //     battle.GeneralBattleChatEntity, player
                 // );
 
-                Damage.DealDamage(victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget, damage);
+                Damage.DealDamage(player.CurrentPreset.Weapon, victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget, damage);
             }
         }
 

@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.EntityTemplates.Item.Slot;
 
-namespace TXServer.Core.Battles.Module {
+namespace TXServer.Core.Battles.Effect {
 	public class TickHandler {
 		public TickHandler(DateTimeOffset time, Action action) {
 			Time = time;
@@ -16,7 +15,7 @@ namespace TXServer.Core.Battles.Module {
 		public DateTimeOffset Time { get; }
 		public Action Action { get; }
 	}
-	
+
 	public abstract class BattleModule {
 		protected BattleModule(MatchPlayer matchPlayer, Entity moduleEntity) {
 			MatchPlayer = matchPlayer;
@@ -32,7 +31,8 @@ namespace TXServer.Core.Battles.Module {
 
 		public Entity SlotEntity { get; }
 		public Entity ModuleEntity { get; }
-		
+        public Entity EffectEntity { get; set; }
+
 		public bool IsEnabled { get; set; }
 
 		public TimeSpan CooldownDuration { get; set; }
@@ -65,6 +65,19 @@ namespace TXServer.Core.Battles.Module {
 
 		public abstract void Activate();
 		public virtual void Deactivate() { }
+
+        public void ShareEffect(Player joiningPlayer)
+        {
+            if (EffectEntity != null)
+                joiningPlayer.ShareEntities(EffectEntity);
+        }
+        public void UnshareEffect(Player leavingPlayer)
+        {
+            if (leavingPlayer == MatchPlayer.Player)
+                Deactivate();
+            if (EffectEntity != null && leavingPlayer.EntityList.Contains(EffectEntity))
+                leavingPlayer.UnshareEntities(EffectEntity);
+        }
 
 		protected virtual void Tick() {
 			IsEnabled = MatchPlayer.Battle.BattleState is BattleState.Running or BattleState.WarmUp &&
@@ -115,7 +128,7 @@ namespace TXServer.Core.Battles.Module {
 
 				handler.Action();
 			}
-			
+
 			foreach(Action handler in nextTickHandlers.ToArray()) {
 				nextTickHandlers.Remove(handler);
 

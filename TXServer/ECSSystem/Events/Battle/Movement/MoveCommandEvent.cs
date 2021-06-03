@@ -6,7 +6,7 @@ using TXServer.Core.Protocol;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Events.Battle
+namespace TXServer.ECSSystem.Events.Battle.Movement
 {
     [SerialVersionUID(6959116100408127452)]
     public class MoveCommandEvent : ECSEvent, ISelfEvent

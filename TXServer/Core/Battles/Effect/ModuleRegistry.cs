@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.Core.Battles.Module {
+namespace TXServer.Core.Battles.Effect {
 	public class ModuleTypeInfo {
 		public ModuleTypeInfo(Type type, TimeSpan cooldown) {
 			Type = type;
@@ -17,7 +16,7 @@ namespace TXServer.Core.Battles.Module {
 	public class ModuleRegistry {
 		private readonly Dictionary<string, ModuleTypeInfo> name2Module;
 
-		private readonly ModuleTypeInfo stubModule = new ModuleTypeInfo(
+		private readonly ModuleTypeInfo stubModule = new(
 			typeof(StubModule),
 			TimeSpan.FromMilliseconds(1000)
 		);
@@ -41,11 +40,11 @@ namespace TXServer.Core.Battles.Module {
 
 		public BattleModule CreateModule(MatchPlayer player, Entity garageModule) {
 			string name = garageModule.TemplateAccessor.ConfigPath;
-			
+
 			ModuleTypeInfo? type = Get(name);
 			if(type == null) throw new InvalidOperationException($"Module '{name}' not found");
 
-			BattleModule module = (BattleModule)Activator.CreateInstance(type.Type, player, garageModule); 
+			BattleModule module = (BattleModule)Activator.CreateInstance(type.Type, player, garageModule);
 			module.CooldownDuration = type.Cooldown;
 
 			return module;

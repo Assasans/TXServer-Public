@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using TXServer.Core.Battles.Effect;
 using TXServer.Core.Battles.Matchmaking;
-using TXServer.Core.Battles.Module;
 using TXServer.Core.Logging;
 using TXServer.Core.ServerMapInformation;
 using TXServer.Core.Squads;
@@ -164,7 +164,7 @@ namespace TXServer.Core.Battles
                 if (battlePlayer.Player.IsInSquad)
                     battlePlayer.Player.SquadPlayer.Squad.ProcessBattleLeave(battlePlayer.Player, this);
 
-                JoinedTankPlayers.UnsharePlayers(battlePlayer.Player);
+                JoinedTankPlayers.Where(p => p != battlePlayer).UnsharePlayers(battlePlayer.Player);
 
                 Logger.Log($"{battlePlayer.Player}: Left battle {BattleEntity.EntityId}");
             }
@@ -262,8 +262,13 @@ namespace TXServer.Core.Battles
                     if (battleBonus.State == BonusState.Spawned)
                         battlePlayer.ShareEntities(battleBonus.BonusEntity);
                 }
+
                 foreach (BattleTankPlayer battlePlayer1 in MatchTankPlayers)
+                {
                     battlePlayer.ShareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
+                    foreach (BattleModule module in battlePlayer1.MatchPlayer.Modules)
+                        module.ShareEffect(battlePlayer.Player);
+                }
             }
 
             // Enter battle and add critical entities
@@ -348,8 +353,14 @@ namespace TXServer.Core.Battles
                     if (battleBonus.State == BonusState.Spawned)
                         player.UnshareEntities(battleBonus.BonusEntity);
                 }
-                foreach (BattleTankPlayer battlePlayer1 in MatchTankPlayers.Where(x => x != baseBattlePlayer))
-                    baseBattlePlayer.UnshareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
+
+                foreach (BattleTankPlayer battlePlayer1 in MatchTankPlayers.ToArray())
+                {
+                    if (battlePlayer1 != baseBattlePlayer)
+                        baseBattlePlayer.UnshareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
+                    foreach (BattleModule module in battlePlayer1.MatchPlayer.Modules)
+                        module.UnshareEffect(baseBattlePlayer.Player);
+                }
             }
 
             // Remove other players' entities and leave battle
@@ -406,7 +417,7 @@ namespace TXServer.Core.Battles
 
         private void ProcessExitedPlayers()
         {
-            foreach (BaseBattlePlayer battlePlayer in JoinedTankPlayers.Cast<BaseBattlePlayer>().Concat(Spectators).ToArray())
+            foreach (BaseBattlePlayer battlePlayer in JoinedTankPlayers.ToArray().Cast<BaseBattlePlayer>().Concat(Spectators).ToArray())
             {
                 if (!battlePlayer.Player.IsActive || battlePlayer.WaitingForExit)
                 {

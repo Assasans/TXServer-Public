@@ -2,7 +2,7 @@
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 
-namespace TXServer.Core.Battles.Module {
+namespace TXServer.Core.Battles.Effect {
 	public class JumpImpactModule : BattleModule {
 		public JumpImpactModule(MatchPlayer matchPlayer, Entity garageModule) : base(
 			matchPlayer,

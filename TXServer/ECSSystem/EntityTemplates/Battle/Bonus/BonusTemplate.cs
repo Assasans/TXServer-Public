@@ -12,18 +12,16 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Bonus
     [SerialVersionUID(7553964914512142106L)]
     public class BonusTemplate : IEntityTemplate
     {
-        public static Entity CreateEntity(BonusType bonusType, Entity bonusRegion, Vector3 position, Entity battleEntity)
+        public static Entity CreateEntity(BonusTemplate template, string configPath, Entity bonusRegion, Vector3 position, Entity battleEntity)
         {
-            Entity entity = new Entity(new TemplateAccessor(new SupplyBonusTemplate(), "battle/bonus/" + bonusType.ToString().ToLower()),
+            return new (new TemplateAccessor(template, configPath),
                 new BonusComponent(),
                 new BonusDropTimeComponent(DateTime.UtcNow),
                 new PositionComponent(position),
                 new RotationComponent(new Vector3(0, 0, 0)),
-                new BonusRegionGroupComponent(bonusRegion),
-                new BattleGroupComponent(battleEntity)
+                bonusRegion.GetComponent<BonusRegionGroupComponent>(),
+                battleEntity.GetComponent<BattleGroupComponent>()
             );
-
-            return entity;
         }
     }
 }

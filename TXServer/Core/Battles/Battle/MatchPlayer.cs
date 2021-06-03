@@ -3,10 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using TXServer.Core.Battles.Module;
+using TXServer.Core.Battles.Effect;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
@@ -289,6 +288,7 @@ namespace TXServer.Core.Battles
                         Tank.AddComponent(new TankVisibleStateComponent());
                         break;
                     case TankState.Dead:
+
                         DisableTank();
                         Player.SendEvent(new SelfTankExplosionEvent(), Tank);
                         if (Battle.ModeHandler is CTFHandler handler)
@@ -317,7 +317,7 @@ namespace TXServer.Core.Battles
         public DateTime? SelfDestructionTime { get; set; }
         private bool WaitingForTankActivation { get; set; }
 
-        public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new ConcurrentDictionary<Type, TranslatedEvent>();
+        public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new();
 
         public Vector3 TankPosition { get; set; }
         public Vector3 PrevTankPosition { get; set; }
@@ -329,12 +329,16 @@ namespace TXServer.Core.Battles
         public List<SupplyEffect> SupplyEffects { get; } = new();
         private List<BonusType> SupplyEffectsAfterSpawn { get; } = new();
 
-        public Dictionary<MatchPlayer, int> DamageAssistants { get; } = new();
+        public Dictionary<MatchPlayer, float> DamageAssistants { get; } = new();
         public int AlreadyAddedExperience { get; set; }
 
         private readonly IList<SpawnPoint> SpawnCoordinates;
         public SpawnPoint LastSpawnPoint { get; set; }
         public TeleportPoint LastTeleportPoint { get; set; }
         public TeleportPoint NextTeleportPoint { get; set; }
+
+        public bool IsEnemyOf(MatchPlayer suspect) => (Battle.Params.BattleMode == BattleMode.DM ||
+                                                      Player.BattlePlayer.Team != suspect.Player.BattlePlayer.Team) &&
+                                                      suspect != this;
     }
 }

@@ -4,7 +4,7 @@ using TXServer.ECSSystem.Base;
 namespace TXServer.ECSSystem.EntityTemplates.Battle.Bonus
 {
 	[SerialVersionUID(636404649605276028L)]
-	public class GoldBonusWithTeleportTemplate : GoldBonusTemplate, IEntityTemplate
+	public class GoldBonusWithTeleportTemplate : GoldBonusTemplate
 	{
         // not in use anymore
 	}

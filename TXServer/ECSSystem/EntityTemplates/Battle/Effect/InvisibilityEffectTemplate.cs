@@ -1,19 +1,15 @@
 ﻿using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle;
-using TXServer.ECSSystem.Components.Battle.Tank;
 
-namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect {
+namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
+{
 	[SerialVersionUID(636222384398205627L)]
-	public class InvisibilityEffectTemplate : IEntityTemplate {
-		public static Entity CreateEntity(MatchPlayer matchPlayer) {
-			Entity entity = new(
-				new TemplateAccessor(new InvisibilityEffectTemplate(), "/battle/effect/invisibility"),
-				new EffectComponent(),
-				matchPlayer.Tank.GetComponent<TankGroupComponent>()
-			);
-			return entity;
-		}
-	}
+	public class InvisibilityEffectTemplate : EffectBaseTemplate
+    {
+        private static readonly string _configPath = "/battle/effect/invisibility";
+
+		public static Entity CreateEntity(MatchPlayer matchPlayer) =>
+            CreateEntity(new InvisibilityEffectTemplate(), _configPath, matchPlayer, 6000);
+    }
 }

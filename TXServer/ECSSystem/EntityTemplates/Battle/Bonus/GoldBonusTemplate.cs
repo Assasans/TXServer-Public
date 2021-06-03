@@ -9,23 +9,15 @@ using TXServer.ECSSystem.Components.Battle.Location;
 namespace TXServer.ECSSystem.EntityTemplates.Battle.Bonus
 {
 	[SerialVersionUID(-8402520789413485183L)]
-	public class GoldBonusTemplate : IEntityTemplate
+	public class GoldBonusTemplate : BonusTemplate
 	{
         public static Entity CreateEntity(Entity bonusRegion, Vector3 position, Entity battleEntity)
         {
+            Entity bonus = CreateEntity(new GoldBonusTemplate(), "battle/bonus/gold/cry", bonusRegion,
+                position, battleEntity);
+            bonus.AddComponent(bonusRegion.GetComponent<GoldBonusRegionComponent>());
 
-            Entity entity = new Entity(new TemplateAccessor(new GoldBonusWithCrystalsTemplate(), "battle/bonus/gold/cry"),
-                new BonusComponent(),
-                new BonusDropTimeComponent(DateTime.UtcNow),
-                new PositionComponent(position),
-                new RotationComponent(new Vector3(0, 0, 0)),
-
-                bonusRegion.GetComponent<BonusRegionGroupComponent>(),
-                bonusRegion.GetComponent<GoldBonusRegionComponent>(),
-                battleEntity.GetComponent<BattleGroupComponent>()
-            );
-
-            return entity;
+            return bonus;
         }
     }
 }

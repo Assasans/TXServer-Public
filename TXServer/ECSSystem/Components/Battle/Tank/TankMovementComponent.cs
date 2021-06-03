@@ -17,11 +17,11 @@ namespace TXServer.ECSSystem.Components.Battle.Tank
         }
 
         public Movement Movement { get; set; }
-        
+
         public MoveControl MoveControl { get; set; }
-        
+
         public float WeaponRotation { get; set; }
-        
+
         public float WeaponControl { get; set; }
     }
 
@@ -55,7 +55,7 @@ namespace TXServer.ECSSystem.Components.Battle.Tank
         }
 
         public float MoveAxis { get; set; }
-        
+
         public float TurnAxis { get; set; }
     }
 }

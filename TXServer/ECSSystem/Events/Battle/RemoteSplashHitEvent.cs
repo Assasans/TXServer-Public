@@ -7,7 +7,7 @@ namespace TXServer.ECSSystem.Events.Battle
     [SerialVersionUID(-2203330189936241204L)]
 	public class RemoteSplashHitEvent : RemoteHitEvent, IRemoteEvent
 	{
-		[OptionalMapped]
+        [OptionalMapped]
 		public List<HitTarget> SplashTargets { get; set; }
 	}
 }

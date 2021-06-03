@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using TXServer.Core;
 using TXServer.Core.Battles;
-using TXServer.Core.Battles.Module;
+using TXServer.Core.Battles.Effect;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;

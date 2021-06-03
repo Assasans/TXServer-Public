@@ -1,8 +1,8 @@
 ﻿using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Types;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
+using TXServer.ECSSystem.Types;
 
-namespace TXServer.Core.Battles.Module {
+namespace TXServer.Core.Battles.Effect {
 	public class EnhancedArmorModule : BattleModule {
 		public EnhancedArmorModule(MatchPlayer matchPlayer, Entity garageModule) : base(
 			matchPlayer,

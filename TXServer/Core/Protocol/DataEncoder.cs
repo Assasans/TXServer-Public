@@ -9,6 +9,7 @@ using TXServer.Core.Commands;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Events.Battle.Movement;
 using TXServer.ECSSystem.Types;
 using TXServer.Library;
 using static TXServer.Core.Commands.PacketTools;

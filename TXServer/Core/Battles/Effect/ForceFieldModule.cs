@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using TXServer.Core.Battles.Module;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
@@ -17,7 +16,7 @@ namespace TXServer.Core.Battles.Effect {
 		public override void Activate() {
 			if(EffectEntity != null) Deactivate();
 
-			EffectEntity = ForceFieldTemplate.CreateEntity(MatchPlayer);
+			EffectEntity = ForceFieldEffectTemplate.CreateEntity(MatchPlayer);
 
 			// TODO(Assasans): Doesn't have effect on new joined players
 			MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);

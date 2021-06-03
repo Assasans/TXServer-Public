@@ -7,6 +7,11 @@ namespace TXServer.ECSSystem.Components.Battle
     [SerialVersionUID(5192591761194414739L)]
     public class DurationComponent : Component
     {
+        public DurationComponent(DateTime startedTime)
+        {
+            StartedTime = startedTime;
+        }
+
         public DateTime StartedTime { get; set; }
     }
 }

@@ -1,12 +1,11 @@
 ﻿using TXServer.Core.Protocol;
-using TXServer.ECSSystem.Components.Battle.Tank;
 
-namespace TXServer.ECSSystem.Events.Battle
+namespace TXServer.ECSSystem.Events.Battle.Movement
 {
     public struct MoveCommand
     {
         [OptionalMapped]
-        public Movement? Movement { get; set; }
+        public Components.Battle.Tank.Movement? Movement { get; set; }
 
         [OptionalMapped]
         public float? WeaponRotation { get; set; }
@@ -25,9 +24,9 @@ namespace TXServer.ECSSystem.Events.Battle
         public override string ToString() =>
             $"MoveCommand[Movement={Movement}, WeaponRotation={WeaponRotation}]";
 
-        public bool IsDiscrete() => this.IsFloatDiscrete(TankControlVertical) &&
+        public bool IsDiscrete() => IsFloatDiscrete(TankControlVertical) &&
                                     IsFloatDiscrete(TankControlHorizontal) && IsFloatDiscrete(WeaponRotationControl);
 
-        private bool IsFloatDiscrete(float val) => val == 0.0 || val == 1.0 || val == -1.0;
+        private static bool IsFloatDiscrete(float val) => val == 0.0 || val == 1.0 || val == -1.0;
     }
 }
