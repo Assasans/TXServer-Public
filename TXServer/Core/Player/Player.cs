@@ -93,7 +93,7 @@ namespace TXServer.Core
             Logger.Log($"{this} has disconnected.");
 
             Server.StoredPlayerData.RemoveAll(pd => pd.UniqueId == Data?.UniqueId);
-            if (Data.RememberMe)
+            if (Data is {RememberMe: true})
                 Server.StoredPlayerData.Add(Data);
         }
 
