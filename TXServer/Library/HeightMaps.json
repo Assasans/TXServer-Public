@@ -13,12 +13,12 @@
       {
         "path": "HeightMaps/Acidlake/layer1.png",
         "maxY": 41.8606453,
-        "minY": -15.4421
+        "minY": -15.363965
       },
       {
         "path": "HeightMaps/Acidlake/layer2.png",
         "maxY": 40.6406136,
-        "minY": -14.7095194
+        "minY": -8.032617
       },
       {
         "path": "HeightMaps/Acidlake/layer3.png",
@@ -45,18 +45,18 @@
     "layers": [
       {
         "path": "HeightMaps/Acidlakehalloween/layer0.png",
-        "maxY": 50.13781,
+        "maxY": 43.18081,
         "minY": -16.8489132
       },
       {
         "path": "HeightMaps/Acidlakehalloween/layer1.png",
         "maxY": 41.8606453,
-        "minY": -15.4421
+        "minY": -15.363965
       },
       {
         "path": "HeightMaps/Acidlakehalloween/layer2.png",
         "maxY": 40.6406136,
-        "minY": -14.7095194
+        "minY": -8.032617
       },
       {
         "path": "HeightMaps/Acidlakehalloween/layer3.png",
@@ -66,12 +66,12 @@
       {
         "path": "HeightMaps/Acidlakehalloween/layer4.png",
         "maxY": 36.5973358,
-        "minY": -4.39332
+        "minY": -0.142895818
       },
       {
         "path": "HeightMaps/Acidlakehalloween/layer5.png",
         "maxY": 25.286602,
-        "minY": -0.142895818
+        "minY": -0.127797708
       }
     ]
   },
@@ -204,7 +204,7 @@
       },
       {
         "path": "HeightMaps/Iran/layer5.png",
-        "maxY": 13.16152,
+        "maxY": 5.098417,
         "minY": -10.4999866
       }
     ]
@@ -261,7 +261,7 @@
       {
         "path": "HeightMaps/Massacre/layer1.png",
         "maxY": 75.61065,
-        "minY": -7.528289
+        "minY": -7.52829266
       },
       {
         "path": "HeightMaps/Massacre/layer2.png",
@@ -319,7 +319,7 @@
       {
         "path": "HeightMaps/MassacremarsBG/layer5.png",
         "maxY": 132.96521,
-        "minY": -3.671561
+        "minY": -3.28370357
       }
     ]
   },
