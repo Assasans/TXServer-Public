@@ -17,6 +17,6 @@ namespace TXServer.ECSSystem.Components
 
         public ModuleBehaviourType ModuleBehaviourType { get; set; }
 
-        public int UpgradeLevel { get; set; } = 0;
+        public int UpgradeLevel { get; set; } = 1;
     }
 }

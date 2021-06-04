@@ -27,18 +27,22 @@ namespace TXServer.Core
 
         public Server()
         {
-            ModuleRegistry = new ModuleRegistry();
+            Dictionary<string, Type> modules = new Dictionary<string, Type>()
+            {
+                ["garage/module/module/tank/active/1/absorbingarmor"] = typeof(EnhancedArmorModule),
+                ["garage/module/prebuildmodule/common/active/1/gold"] = typeof(GoldModule),
+                ["garage/module/module/tank/active/2/forcefield"] = typeof(ForceFieldModule),
+                ["garage/module/module/weapon/active/2/increaseddamage"] = typeof(IncreasedDamageModule),
+                ["garage/module/module/tank/active/2/invisibility"] = typeof(InvisibilityModule),
+                ["garage/module/module/tank/active/2/jumpimpact"] = typeof(JumpImpactModule),
+                ["garage/module/module/weapon/active/1/mine"] = typeof(MineModule),
+                ["garage/module/module/tank/active/1/repairkit"] = typeof(RepairKitModule),
+                ["garage/module/module/weapon/active/2/spidermine"] = typeof(SpiderMineModule),
+                ["garage/module/module/tank/active/1/turbospeed"] = typeof(TurbospeedModule)
+            };
 
-            ModuleRegistry.Register("garage/module/module/tank/active/1/absorbingarmor", new ModuleTypeInfo(typeof(EnhancedArmorModule), TimeSpan.FromMilliseconds(5000)));
-            ModuleRegistry.Register("garage/module/prebuildmodule/common/active/1/gold", new ModuleTypeInfo(typeof(GoldModule), TimeSpan.FromMilliseconds(500)));
-            ModuleRegistry.Register("garage/module/module/tank/active/2/forcefield", new ModuleTypeInfo(typeof(ForceFieldModule), TimeSpan.FromMilliseconds(150000)));
-            ModuleRegistry.Register("garage/module/module/weapon/active/2/increaseddamage", new ModuleTypeInfo(typeof(IncreasedDamageModule), TimeSpan.FromMilliseconds(5000)));
-            ModuleRegistry.Register("garage/module/module/tank/active/2/invisibility", new ModuleTypeInfo(typeof(InvisibilityModule), TimeSpan.FromMilliseconds(2000)));
-            ModuleRegistry.Register("garage/module/module/tank/active/2/jumpimpact", new ModuleTypeInfo(typeof(JumpImpactModule), TimeSpan.FromMilliseconds(25000)));
-            ModuleRegistry.Register("garage/module/module/weapon/active/1/mine", new ModuleTypeInfo(typeof(MineModule), TimeSpan.FromMilliseconds(2000)));
-            ModuleRegistry.Register("garage/module/module/tank/active/1/repairkit", new ModuleTypeInfo(typeof(RepairKitModule), TimeSpan.FromMilliseconds(1000)));
-            ModuleRegistry.Register("garage/module/module/weapon/active/2/spidermine", new ModuleTypeInfo(typeof(SpiderMineModule), TimeSpan.FromMilliseconds(2000)));
-            ModuleRegistry.Register("garage/module/module/tank/active/1/turbospeed", new ModuleTypeInfo(typeof(TurbospeedModule), TimeSpan.FromMilliseconds(5000)));
+            ModuleRegistry = new ModuleRegistry();
+            ModuleRegistry.Register(modules);
         }
 
         public void Start()

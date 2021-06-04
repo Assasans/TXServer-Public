@@ -35,7 +35,9 @@ namespace TXServer.Core.Battles.Effect {
 
 		public bool IsEnabled { get; set; }
 
-		public TimeSpan CooldownDuration { get; set; }
+        public TimeSpan Duration { get; set; }
+
+        public TimeSpan CooldownDuration { get; set; }
 		public DateTimeOffset? CooldownStart { get; set; }
 		public DateTimeOffset? CooldownEnd => CooldownStart + CooldownDuration;
 

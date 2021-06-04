@@ -14,19 +14,19 @@ namespace TXServer.Core.Battles
 {
     public class SupplyEffect
     {
-        public SupplyEffect(BonusType bonusType, MatchPlayer matchPlayer, bool cheat = false, long duration = 30)
+        public SupplyEffect(BonusType bonusType, MatchPlayer matchPlayer, bool cheat = false, long duration = 30000)
         {
             if (matchPlayer.TankState != TankState.Active) return;
-            if (duration == 30 && bonusType == BonusType.REPAIR)
-                duration = 3;
+            if (duration == 30000 && bonusType == BonusType.REPAIR)
+                duration = 3000;
 
             BonusType = bonusType;
             MatchPlayer = matchPlayer;
             Cheat = cheat;
-            StopTime = DateTime.UtcNow.AddSeconds(duration);
+            StopTime = DateTime.UtcNow.AddMilliseconds(duration);
 
             if (CheckForDuplicate()) return;
-            ApplyEffect(duration * 1000);
+            ApplyEffect(duration);
 
             MatchPlayer.Battle.PlayersInMap.ShareEntities(SupplyEffectEntity);
             MatchPlayer.SupplyEffects.Add(this);

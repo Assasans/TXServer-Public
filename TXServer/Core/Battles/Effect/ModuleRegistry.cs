@@ -1,51 +1,70 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Battle.Module;
 
 namespace TXServer.Core.Battles.Effect {
-	public class ModuleTypeInfo {
-		public ModuleTypeInfo(Type type, TimeSpan cooldown) {
-			Type = type;
-			Cooldown = cooldown;
-		}
-
-		public Type Type { get; }
-		public TimeSpan Cooldown { get; }
-	}
-
 	public class ModuleRegistry {
-		private readonly Dictionary<string, ModuleTypeInfo> name2Module;
+		private readonly Dictionary<string, Type> name2Module;
 
-		private readonly ModuleTypeInfo stubModule = new(
-			typeof(StubModule),
-			TimeSpan.FromMilliseconds(1000)
-		);
+        private readonly Type stubModule = typeof(StubModule);
 
 		public ModuleRegistry() {
-			name2Module = new Dictionary<string, ModuleTypeInfo>();
+			name2Module = new Dictionary<string, Type>();
 		}
 
-		public void Register(string name, ModuleTypeInfo type) {
+        public void Register(Dictionary<string, Type> modules) {
+            foreach ((string name, Type type) in modules)
+            {
+                Register(name, type);
+            }
+        }
+
+		public void Register(string name, Type type) {
 			name2Module.Add(name, type);
 		}
 
-		public ModuleTypeInfo? Get(string name) {
-			try {
-				return name2Module[name];
-			}
-			catch {
-				return stubModule;
-			}
+		public Type Get(string name)
+        {
+            if (!name2Module.ContainsKey(name)) return stubModule;
+			return name2Module[name];
 		}
 
 		public BattleModule CreateModule(MatchPlayer player, Entity garageModule) {
 			string name = garageModule.TemplateAccessor.ConfigPath;
 
-			ModuleTypeInfo? type = Get(name);
+			Type type = Get(name);
 			if(type == null) throw new InvalidOperationException($"Module '{name}' not found");
 
-			BattleModule module = (BattleModule)Activator.CreateInstance(type.Type, player, garageModule);
-			module.CooldownDuration = type.Cooldown;
+			BattleModule module = (BattleModule)Activator.CreateInstance(type, player, garageModule);
+
+            if (module is StubModule)
+            {
+                module.Duration = TimeSpan.Zero;
+                module.CooldownDuration = TimeSpan.FromMilliseconds(1000);
+            }
+            else
+            {
+                string upgradePath = $"garage/module/upgrade/properties/{name.Split('/').Last()}";
+
+                var durationComponent = Config.GetComponent<ModuleEffectDurationPropertyComponent>(upgradePath, false);
+                var cooldownComponent = Config.GetComponent<ModuleCooldownPropertyComponent>(upgradePath);
+
+                int level = 1;
+                if (module is not GoldModule)
+                {
+                    level = module.ModuleEntity.GetComponent<SlotUserItemInfoComponent>().UpgradeLevel;
+                }
+
+                TimeSpan duration = durationComponent != null ? TimeSpan.FromMilliseconds(durationComponent.UpgradeLevel2Values[level - 1]) : TimeSpan.Zero;
+                TimeSpan cooldown = TimeSpan.FromMilliseconds(cooldownComponent.UpgradeLevel2Values[level - 1]);
+
+                module.Duration = duration;
+			    module.CooldownDuration = cooldown;
+            }
 
 			return module;
 		}
