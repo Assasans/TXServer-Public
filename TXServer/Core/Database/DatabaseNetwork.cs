@@ -1,7 +1,7 @@
 using System;
 using Simple.Net;
 using Simple.Net.Client;
-using TXServer.Core.Database.NetworkEvents.Security;
+using TXDatabase.NetworkEvents.Security;
 using TXServer.Core.Logging;
 
 namespace TXServer.Core.Database

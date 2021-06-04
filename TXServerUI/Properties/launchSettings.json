@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TXServerUI": {
+      "commandName": "Project",
+      "sqlDebugging": false
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TXDatabase": {
+      "commandName": "Project",
+      "commandLineArgs": ""
+    }
+  }
+}

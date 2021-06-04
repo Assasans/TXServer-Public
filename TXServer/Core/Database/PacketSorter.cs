@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Simple.Net;
-using TXServer.Core.Database.NetworkEvents.PlayerAuth;
-using TXServer.Core.Database.NetworkEvents.PlayerSettings;
+using TXDatabase.NetworkEvents.PlayerAuth;
+using TXDatabase.NetworkEvents.PlayerSettings;
 using TXServer.Core.Logging;
 
 namespace TXServer.Core.Database

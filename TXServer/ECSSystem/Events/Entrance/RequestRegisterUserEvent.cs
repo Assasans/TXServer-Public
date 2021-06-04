@@ -4,7 +4,7 @@ using TXServer.ECSSystem.Base;
 using TXServer.Core.Database;
 using System;
 using System.Text;
-using TXServer.Core.Database.NetworkEvents.PlayerAuth;
+using TXDatabase.NetworkEvents.PlayerAuth;
 using TXServer.Core.Logging;
 
 namespace TXServer.ECSSystem.Events.Entrance

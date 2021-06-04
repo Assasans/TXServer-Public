@@ -20,7 +20,7 @@ using TXServer.ECSSystem.GlobalEntities;
 using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 using TXServer.Core.Database;
-using TXServer.Core.Database.NetworkEvents.Communications;
+using TXDatabase.NetworkEvents.Communications;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core

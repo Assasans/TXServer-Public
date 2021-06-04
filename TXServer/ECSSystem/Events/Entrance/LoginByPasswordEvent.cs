@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -11,7 +11,7 @@ using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 using TXServer.Core.Database;
-using TXServer.Core.Database.NetworkEvents.PlayerAuth;
+using TXDatabase.NetworkEvents.PlayerAuth;
 
 namespace TXServer.ECSSystem.Events
 {
