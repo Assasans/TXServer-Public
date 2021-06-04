@@ -41,8 +41,6 @@ namespace TXServer.Core.Battles
             BattleLobbyChatEntity = BattleLobbyChatTemplate.CreateEntity();
             GeneralBattleChatEntity = GeneralBattleChatTemplate.CreateEntity();
 
-            HeightMap = ServerConnection.HeightMaps[ServerConnection.ServerMapInfo.First((entry) => entry.Value.MapId == Params.MapId).Key];
-
             tickHandlers = new List<TickHandler>();
             nextTickHandlers = new List<Action>();
         }
@@ -66,6 +64,8 @@ namespace TXServer.Core.Battles
                 ModeHandler.SetupBattle(prevHandler);
             else
                 ModeHandler.SetupBattle();
+
+            HeightMap = ServerConnection.HeightMaps[ServerConnection.ServerMapInfo.First((entry) => entry.Value.MapId == Params.MapId).Key];
         }
 
         private (Entity, int) ConvertMapParams(ClientBattleParams newParams, bool isMatchMaking)
@@ -661,6 +661,6 @@ namespace TXServer.Core.Battles
         public Entity GeneralBattleChatEntity { get; }
         public Entity BattleLobbyChatEntity { get; }
 
-        public HeightMap HeightMap { get; }
+        public HeightMap HeightMap { get; private set; }
     }
 }
