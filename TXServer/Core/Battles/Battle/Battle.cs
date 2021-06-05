@@ -65,7 +65,10 @@ namespace TXServer.Core.Battles
             else
                 ModeHandler.SetupBattle();
 
-            HeightMap = ServerConnection.HeightMaps[ServerConnection.ServerMapInfo.First((entry) => entry.Value.MapId == Params.MapId).Key];
+            if (!Server.Instance.Settings.DisableHeightMaps)
+            {
+                HeightMap = ServerConnection.HeightMaps[ServerConnection.ServerMapInfo.First((entry) => entry.Value.MapId == Params.MapId).Key];
+            }
         }
 
         private (Entity, int) ConvertMapParams(ClientBattleParams newParams, bool isMatchMaking)

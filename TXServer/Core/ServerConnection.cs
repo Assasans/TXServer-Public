@@ -41,20 +41,22 @@ namespace TXServer.Core
                 IncludeFields = true
             });
 
-            Logger.Log("Loading height maps...");
-            HeightMaps = JsonSerializer.Deserialize<Dictionary<string, HeightMap>>(File.ReadAllText(HeightMapInfoLocation), new JsonSerializerOptions
+            if (!Server.Instance.Settings.DisableHeightMaps)
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                IncludeFields = true
-            });
+                Logger.Log("Loading height maps...");
+                HeightMaps = JsonSerializer.Deserialize<Dictionary<string, HeightMap>>(File.ReadAllText(HeightMapInfoLocation), new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    IncludeFields = true
+                });
 
-            foreach (HeightMapLayer layer in HeightMaps.Values.SelectMany(map => map.Layers))
-            {
-                Logger.Trace($"Reading {layer.Path}...");
-                // Uncomment this to load height maps (would take ~1.3 GB of RAM)
-                layer.Image = Image.Load<Rgb24>(Path.Combine(Directory.GetCurrentDirectory(), "Library", layer.Path));
+                foreach (HeightMapLayer layer in HeightMaps.Values.SelectMany(map => map.Layers))
+                {
+                    Logger.Trace($"Reading {layer.Path}...");
+                    layer.Image = Image.Load<Rgb24>(Path.Combine(Directory.GetCurrentDirectory(), "Library", layer.Path));
+                }
+                Logger.Log("Height maps loaded");
             }
-            Logger.Log("Height maps loaded");
 
             MaxPoolSize = poolSize;
 

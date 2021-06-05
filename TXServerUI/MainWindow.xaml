@@ -4,10 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="TX Server" WindowStartupLocation="CenterScreen" Height="268" Width="608" ResizeMode="CanMinimize" ScrollViewer.VerticalScrollBarVisibility="Disabled" Closing="Window_Closing">
+        Title="TX Server" WindowStartupLocation="CenterScreen" Height="291" Width="648" ResizeMode="CanMinimize" ScrollViewer.VerticalScrollBarVisibility="Disabled" Closing="Window_Closing">
     <!-- TODO: Implement dynamic localization -->
     <Grid Margin="0,0,4,-19" UseLayoutRounding="False">
-        <GroupBox Header="Actions" Margin="10,10,0,0" Height="65" VerticalAlignment="Top" HorizontalAlignment="Left" Width="280">
+        <GroupBox Header="Actions" Margin="10,10,0,0" Height="65" VerticalAlignment="Top" HorizontalAlignment="Left" Width="320">
             <Grid Height="65" Margin="0,0,-12,-22" VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="87*"/>
@@ -17,7 +17,7 @@
                 <Button x:Name="StartButton" Content="Start" Margin="10,10,21,0" VerticalAlignment="Top" Grid.Column="1" Height="20" Click="StartServer_Click"/>
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="SettingsGroupBox" Header="Settings" HorizontalAlignment="Left" Height="135" Margin="10,80,0,0" VerticalAlignment="Top" Width="280">
+        <GroupBox x:Name="SettingsGroupBox" Header="Settings" HorizontalAlignment="Left" Height="158" Margin="10,80,0,0" VerticalAlignment="Top" Width="320">
             <Grid Margin="0,0,-12,-22">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="31*"/>
@@ -33,11 +33,13 @@
                 <TextBlock HorizontalAlignment="Left" Margin="10,66,0,0" TextWrapping="Wrap" Text="Max players:" VerticalAlignment="Top" Height="22" Width="109"/>
                 <TextBox x:Name="MaxPlayersTextBox" Height="23" Margin="10,65,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Text="5"/>
 
-                <CheckBox x:Name="EnableTracingCheckBox" Content="Enable tracing" HorizontalAlignment="Left" Margin="10,93,0,0" VerticalAlignment="Top" Width="104"/>
+                <CheckBox x:Name="DisableHeightMapsCheckBox" Content="Disable height maps" HorizontalAlignment="Left" Margin="10,93,0,0" VerticalAlignment="Top"/>
+                
+                <CheckBox x:Name="EnableTracingCheckBox" Content="Enable tracing" HorizontalAlignment="Left" Margin="10,116,0,0" VerticalAlignment="Top"/>
             </Grid>
         </GroupBox>
         <TextBlock HorizontalAlignment="Left" Height="0" Margin="10,10,0,0" Grid.Row="1" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="25" Grid.Column="1"/>
-        <GroupBox x:Name="StateGroupBox" Header="State" Margin="295,10,0,0" Height="205" VerticalAlignment="Top" HorizontalAlignment="Left" Width="293">
+        <GroupBox x:Name="StateGroupBox" Header="State" Margin="335,10,0,0" Height="205" VerticalAlignment="Top" HorizontalAlignment="Left" Width="293">
             <Grid Height="184" Margin="0,0,-12,-13" VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="87*"/>

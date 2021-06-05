@@ -74,6 +74,7 @@ namespace TXServerUI
                 IPAddress = (IPAddress)IPAddressComboBox.SelectedItem,
                 Port = short.Parse(PortTextBox.Text),
                 MaxPlayers = int.Parse(MaxPlayersTextBox.Text),
+                DisableHeightMaps = DisableHeightMapsCheckBox.IsChecked.GetValueOrDefault(),
                 TraceModeEnabled = EnableTracingCheckBox.IsChecked.GetValueOrDefault()
             };
 
@@ -116,7 +117,6 @@ namespace TXServerUI
             }
 
             ServerStateText.Text = "Server is stopped.";
-            return;
         }
     }
 }
