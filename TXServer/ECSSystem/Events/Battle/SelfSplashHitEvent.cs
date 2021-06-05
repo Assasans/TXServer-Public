@@ -32,7 +32,7 @@ namespace TXServer.ECSSystem.Events.Battle
 				    victim.Team == player.BattlePlayer.Team && !battle.Params.FriendlyFire)
 					return;
 
-				Damage.DealDamage(weaponMarketItem, victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget, 900);
+				Damage.DealNormalDamage(weapon, weaponMarketItem, victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget);
 			}
 
             foreach (HitTarget splashTarget in SplashTargets)
@@ -44,20 +44,16 @@ namespace TXServer.ECSSystem.Events.Battle
                     !battle.Params.FriendlyFire)
 					continue;
 
-                // TODO: proper damage
-                float damage = 500;
-
                 if (weapon.TemplateAccessor.Template.GetType() == typeof(SpiderEffectTemplate))
                 {
                     SpiderMineModule spiderMineModule =
                         player.BattlePlayer.MatchPlayer.Modules.Single(m => m.GetType() == typeof(SpiderMineModule)) as
                             SpiderMineModule;
                     spiderMineModule?.Explode();
-                    damage = SpiderMineModule.Damage;
                     weaponMarketItem = Modules.GlobalItems.Spidermine;
                 }
 
-                Damage.DealDamage(weaponMarketItem, hitPlayer.MatchPlayer, battlePlayer.MatchPlayer, splashTarget, damage);
+                Damage.DealSplashDamage(weapon, weaponMarketItem, hitPlayer.MatchPlayer, battlePlayer.MatchPlayer, splashTarget);
 			}
 		}
 

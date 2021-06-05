@@ -2,6 +2,10 @@
 {
     public static class Damage
     {
+        public class DamagePerSecondPropertyComponent : RangedComponent
+        {
+        }
+
         public class MinDamagePropertyComponent : RangedComponent
         {
         }

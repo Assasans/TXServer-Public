@@ -329,6 +329,7 @@ namespace TXServer.Core.Battles
         public List<SupplyEffect> SupplyEffects { get; } = new();
         private List<BonusType> SupplyEffectsAfterSpawn { get; } = new();
 
+        public Dictionary<BattleTankPlayer, DateTimeOffset> DamageCooldowns { get; } = new();
         public Dictionary<MatchPlayer, float> DamageAssistants { get; } = new();
         public int AlreadyAddedExperience { get; set; }
 
