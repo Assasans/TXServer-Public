@@ -10,7 +10,7 @@ namespace TXServer.Core.Battles.Effect {
 		) { }
 
 		public override void Activate() {
-			_ = new SupplyEffect(BonusType.ARMOR, MatchPlayer, duration: (long) Duration.TotalMilliseconds);
+			_ = new SupplyEffect(BonusType.ARMOR, MatchPlayer, duration:(long)Duration, bonus:false);
 		}
 	}
 }

@@ -12,9 +12,7 @@ namespace TXServer.Core.Battles.Effect
         )
         { }
 
-        public override void Activate()
-        {
-            _ = new SupplyEffect(BonusType.SPEED, MatchPlayer, duration: (long) Duration.TotalMilliseconds);
-        }
+        public override void Activate() =>
+            _ = new SupplyEffect(BonusType.SPEED, MatchPlayer, duration: (long) Duration, bonus: false);
     }
 }

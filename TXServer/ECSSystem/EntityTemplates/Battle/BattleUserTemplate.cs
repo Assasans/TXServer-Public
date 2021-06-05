@@ -13,8 +13,8 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
         private static Entity CreateEntity(Player player, Entity battle)
         {
             return new Entity(new TemplateAccessor(new BattleUserTemplate(), "battle/battleuser"),
-                new UserGroupComponent(player.User),
-                new BattleGroupComponent(battle),
+                player.User.GetComponent<UserGroupComponent>(),
+                battle.GetComponent<BattleGroupComponent>(),
                 new BattleUserComponent());
         }
 
@@ -26,6 +26,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
 
             if (team != null)
                 entity.Components.Add(team.GetComponent<TeamGroupComponent>());
+
 
             return entity;
         }

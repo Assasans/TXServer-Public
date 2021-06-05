@@ -6,7 +6,7 @@ using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Effect;
 using TXServer.ECSSystem.Components.Battle.Effect.Mine;
-using TXServer.ECSSystem.Components.Battle.Effect.SpiderMine;
+using TXServer.ECSSystem.Components.Battle.Effect.Unit;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 
@@ -17,19 +17,23 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
     {
         private static readonly string _configPath = "/battle/effect/spidermine";
 
-        public static Entity CreateEntity(MatchPlayer matchPlayer) {
+        public static Entity CreateEntity(MatchPlayer matchPlayer, float acceleration, long activationTime,
+            float beginHideDistance, float hideRange, float impact, float speed)
+        {
             Entity effect = CreateEntity(new SpiderEffectTemplate(), _configPath, matchPlayer, addTeam:true);
             effect.AddComponent(matchPlayer.Player.User.GetComponent<UserGroupComponent>());
 
             effect.AddComponent(new EffectActiveComponent());
-            effect.AddComponent(new MineConfigComponent());
-            effect.AddComponent(new SpiderMineConfigComponent());
+            effect.AddComponent(new MineConfigComponent(activationTime: activationTime,
+                beginHideDistance: beginHideDistance, hideRange: hideRange, impact: impact));
+            effect.AddComponent(new SpiderMineConfigComponent(acceleration:acceleration, speed:speed));
 
             effect.AddComponent(matchPlayer.Battle.BattleEntity.GetComponent<BattleGroupComponent>());
             effect.AddComponent(new SplashWeaponComponent(40f, 0f, 15f));
 
             effect.AddComponent(new UnitComponent());
-            effect.AddComponent(new UnitMoveComponent(new Movement(matchPlayer.TankPosition, Vector3.Zero, Vector3.Zero, new Quaternion())));
+            effect.AddComponent(new UnitMoveComponent(new Movement(matchPlayer.TankPosition, Vector3.Zero, Vector3.Zero,
+                matchPlayer.TankQuaternion)));
 
             return effect;
         }

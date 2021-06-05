@@ -27,26 +27,7 @@ namespace TXServer.Core.Battles.Effect {
 			nextTickHandlers = new List<Action>();
 		}
 
-		public MatchPlayer MatchPlayer { get; }
-
-		public Entity SlotEntity { get; }
-		public Entity ModuleEntity { get; }
-        public Entity EffectEntity { get; set; }
-
-		public bool IsEnabled { get; set; }
-
-        public TimeSpan Duration { get; set; }
-
-        public TimeSpan CooldownDuration { get; set; }
-		public DateTimeOffset? CooldownStart { get; set; }
-		public DateTimeOffset? CooldownEnd => CooldownStart + CooldownDuration;
-
-		public bool IsOnCooldown => ModuleEntity.HasComponent<InventoryCooldownStateComponent>();
-
-		private readonly List<TickHandler> tickHandlers;
-		private readonly List<Action> nextTickHandlers;
-
-		// TODO(Assasans): Cooldown has visual bugs on client
+        // TODO(Assasans): Cooldown has visual bugs on client
 		public void StartCooldown() {
 			DateTimeOffset time = DateTimeOffset.UtcNow;
 
@@ -54,24 +35,26 @@ namespace TXServer.Core.Battles.Effect {
 
 			if(!ModuleEntity.HasComponent<InventorySlotTemporaryBlockedByServerComponent>()) {
 				ModuleEntity.AddComponent(
-					new InventorySlotTemporaryBlockedByServerComponent((int)CooldownDuration.TotalMilliseconds, time.UtcDateTime)
+					new InventorySlotTemporaryBlockedByServerComponent((long) CooldownDuration, time.UtcDateTime)
 				);
 			}
 
 			if(!ModuleEntity.HasComponent<InventoryCooldownStateComponent>()) {
 				ModuleEntity.AddComponent(
-					new InventoryCooldownStateComponent((int)CooldownDuration.TotalMilliseconds, time.UtcDateTime)
+					new InventoryCooldownStateComponent((int) CooldownDuration, time.UtcDateTime)
 				);
 			}
 		}
 
 		public abstract void Activate();
 		public virtual void Deactivate() { }
+        public virtual void Init() {}
 
         public void ShareEffect(Player joiningPlayer)
         {
             if (EffectEntity != null)
                 joiningPlayer.ShareEntities(EffectEntity);
+            joiningPlayer.ShareEntities(EffectEntities);
         }
         public void UnshareEffect(Player leavingPlayer)
         {
@@ -79,6 +62,10 @@ namespace TXServer.Core.Battles.Effect {
                 Deactivate();
             if (EffectEntity != null && leavingPlayer.EntityList.Contains(EffectEntity))
                 leavingPlayer.UnshareEntities(EffectEntity);
+            foreach (Entity effectEntity in EffectEntities.Where(effectEntity =>
+                leavingPlayer.EntityList.Contains(effectEntity)))
+                leavingPlayer.UnshareEntities(effectEntity);
+
         }
 
 		protected virtual void Tick() {
@@ -150,5 +137,28 @@ namespace TXServer.Core.Battles.Effect {
 				ModuleEntity.RemoveComponent<InventoryEnabledStateComponent>();
 			}
 		}
+
+        public MatchPlayer MatchPlayer { get; }
+
+        public Entity SlotEntity { get; }
+        public Entity ModuleEntity { get; }
+        public Entity EffectEntity { get; set; }
+        public List<Entity> EffectEntities { get; set; } = new();
+
+        public bool IsEnabled { get; set; }
+
+        public float Duration { get; set; }
+
+        public float CooldownDuration { get; set; }
+        public DateTimeOffset? CooldownStart { get; set; }
+        public DateTimeOffset? CooldownEnd => CooldownStart?.AddMilliseconds(CooldownDuration);
+
+        public bool IsOnCooldown => ModuleEntity.HasComponent<InventoryCooldownStateComponent>();
+
+        public string ConfigPath { get; set; }
+        public int Level { get; set; }
+
+        private readonly List<TickHandler> tickHandlers;
+        private readonly List<Action> nextTickHandlers;
 	}
 }

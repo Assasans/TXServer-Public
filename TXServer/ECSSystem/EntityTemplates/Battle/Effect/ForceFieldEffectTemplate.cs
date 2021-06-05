@@ -10,6 +10,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
         private static readonly string _configPath = "/battle/effect/forcefield";
 
 		public static Entity CreateEntity(MatchPlayer matchPlayer) =>
-            CreateEntity(new ForceFieldEffectTemplate(), _configPath, matchPlayer, 8000, true);
+            CreateEntity(new ForceFieldEffectTemplate(), _configPath, matchPlayer, 8000, addTeam:true);
     }
 }

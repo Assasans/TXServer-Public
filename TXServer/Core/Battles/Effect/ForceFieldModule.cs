@@ -6,9 +6,8 @@ using TXServer.ECSSystem.EntityTemplates.Item.Module;
 
 namespace TXServer.Core.Battles.Effect {
 	public class ForceFieldModule : BattleModule {
-		public Entity? EffectEntity { get; private set; }
 
-		public ForceFieldModule(MatchPlayer matchPlayer, Entity garageModule) : base(
+        public ForceFieldModule(MatchPlayer matchPlayer, Entity garageModule) : base(
 			matchPlayer,
 			ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
 		) { }
@@ -17,11 +16,9 @@ namespace TXServer.Core.Battles.Effect {
 			if(EffectEntity != null) Deactivate();
 
 			EffectEntity = ForceFieldEffectTemplate.CreateEntity(MatchPlayer);
+            MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
-			// TODO(Assasans): Doesn't have effect on new joined players
-			MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
-
-			Schedule(TimeSpan.FromMilliseconds(15000), Deactivate);
+			Schedule(TimeSpan.FromMilliseconds(Duration), Deactivate);
 		}
 
 		public override void Deactivate() {

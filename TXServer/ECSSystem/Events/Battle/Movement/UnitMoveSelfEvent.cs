@@ -1,7 +1,7 @@
 ﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle.Effect.SpiderMine;
+using TXServer.ECSSystem.Components.Battle.Effect.Unit;
 
 namespace TXServer.ECSSystem.Events.Battle.Movement
 {

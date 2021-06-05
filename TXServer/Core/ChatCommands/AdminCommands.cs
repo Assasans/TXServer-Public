@@ -125,7 +125,7 @@ namespace TXServer.Core.ChatCommands
                     break;
                 case "others":
                     targets.AddRange(
-                        ServerConnection.BattlePool.Where(b => b.FindPlayerByUid(player.Data.Username) == null));
+                        ServerConnection.BattlePool.Where(b => b.FindPlayerByUsername(player.Data.Username) == null));
                     break;
                 case "this" or "":
                     if (player.IsInBattle)

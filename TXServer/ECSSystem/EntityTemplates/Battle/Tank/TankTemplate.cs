@@ -33,7 +33,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 new TankNewStateComponent(),
                 battlePlayer.Player.CurrentPreset.Hull.GetComponent<MarketItemGroupComponent>());
 
-            if (battleUser.GetComponent<TeamGroupComponent>() != null)
+            if (battleUser.HasComponent<TeamGroupComponent>())
                 entity.Components.Add(battleUser.GetComponent<TeamGroupComponent>());
             entity.Components.Add(new TankGroupComponent(entity));
 

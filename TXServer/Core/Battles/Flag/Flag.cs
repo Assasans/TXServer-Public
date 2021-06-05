@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using TXServer.Core.Battles.Effect;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
@@ -29,7 +30,7 @@ namespace TXServer.Core.Battles
             State = FlagState.Home;
         }
 
-        private void Reshare()
+        private void ReShare()
         {
             List<Player> refs = new(FlagEntity.PlayerReferences);
             refs.UnshareEntities(FlagEntity);
@@ -48,6 +49,8 @@ namespace TXServer.Core.Battles
             CurrentAssists.Add(battlePlayer);
 
             FlagEntity.RemoveComponent<FlagHomeStateComponent>();
+
+            battlePlayer.MatchPlayer.TryDeactivateInvisibility();
         }
 
         public void Pickup(BattleTankPlayer battlePlayer)
@@ -65,6 +68,8 @@ namespace TXServer.Core.Battles
                 CurrentAssists.Add(battlePlayer);
 
             FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
+
+            battlePlayer.MatchPlayer.TryDeactivateInvisibility();
         }
 
         public void Drop(bool isUserAction, bool silent = false)
@@ -108,7 +113,7 @@ namespace TXServer.Core.Battles
             FlagEntity.ChangeComponent(new FlagPositionComponent(BasePosition));
             FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
             FlagEntity.AddComponent(new FlagHomeStateComponent());
-            Reshare();
+            ReShare();
 
             LastCarrier = null;
         }
@@ -122,7 +127,7 @@ namespace TXServer.Core.Battles
             FlagEntity.RemoveComponent<TankGroupComponent>();
 
             FlagEntity.ChangeComponent(new FlagPositionComponent(BasePosition));
-            Reshare();
+            ReShare();
 
             foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(Carrier).AllyTeamResults)
             {

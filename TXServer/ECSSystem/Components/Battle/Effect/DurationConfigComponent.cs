@@ -1,7 +1,7 @@
 ﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Components.Battle
+namespace TXServer.ECSSystem.Components.Battle.Effect
 {
     [SerialVersionUID(482294559116673084L)]
     public class DurationConfigComponent : Component

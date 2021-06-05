@@ -43,28 +43,25 @@ namespace TXServer.Core.Battles.Effect {
 
             if (module is StubModule)
             {
-                module.Duration = TimeSpan.Zero;
-                module.CooldownDuration = TimeSpan.FromMilliseconds(1000);
+                module.Duration = 0;
+                module.CooldownDuration = 1000;
             }
             else
             {
-                string upgradePath = $"garage/module/upgrade/properties/{name.Split('/').Last()}";
+                module.ConfigPath = $"garage/module/upgrade/properties/{name.Split('/').Last()}";
 
-                var durationComponent = Config.GetComponent<ModuleEffectDurationPropertyComponent>(upgradePath, false);
-                var cooldownComponent = Config.GetComponent<ModuleCooldownPropertyComponent>(upgradePath);
+                var durationComponent = Config.GetComponent<ModuleEffectDurationPropertyComponent>(module.ConfigPath, false);
+                var cooldownComponent = Config.GetComponent<ModuleCooldownPropertyComponent>(module.ConfigPath);
 
-                int level = 1;
+                module.Level = 1;
                 if (module is not GoldModule)
-                {
-                    level = module.ModuleEntity.GetComponent<SlotUserItemInfoComponent>().UpgradeLevel;
-                }
+                    module.Level = module.ModuleEntity.GetComponent<SlotUserItemInfoComponent>().UpgradeLevel;
 
-                TimeSpan duration = durationComponent != null ? TimeSpan.FromMilliseconds(durationComponent.UpgradeLevel2Values[level - 1]) : TimeSpan.Zero;
-                TimeSpan cooldown = TimeSpan.FromMilliseconds(cooldownComponent.UpgradeLevel2Values[level - 1]);
-
-                module.Duration = duration;
-			    module.CooldownDuration = cooldown;
+                module.Duration = durationComponent?.UpgradeLevel2Values[module.Level - 1] ?? 0;
+                module.CooldownDuration = cooldownComponent.UpgradeLevel2Values[module.Level - 1];
             }
+
+            module.Init();
 
 			return module;
 		}

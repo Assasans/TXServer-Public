@@ -6,30 +6,36 @@ using TXServer.ECSSystem.EntityTemplates.Item.Module;
 
 namespace TXServer.Core.Battles.Effect {
 	public class InvisibilityModule : BattleModule {
-		public Entity? EffectEntity { get; private set; }
-		
-		public InvisibilityModule(MatchPlayer matchPlayer, Entity garageModule) : base(
+
+        public InvisibilityModule(MatchPlayer matchPlayer, Entity garageModule) : base(
 			matchPlayer,
 			ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
 		) { }
 
 		public override void Activate() {
-			if(EffectEntity != null) Deactivate();
-			
+			if (EffectEntity != null) Deactivate();
+
 			EffectEntity = InvisibilityEffectTemplate.CreateEntity(MatchPlayer);
+            MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
+            EndTime = DateTimeOffset.Now.AddMilliseconds(6000);
+        }
 
-			// TODO(Assasans): Doesn't have effect on new joined players
-			MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
+		public override void Deactivate()
+        {
+            if (EffectEntity == null) return;
+            MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
 
-			Schedule(TimeSpan.FromMilliseconds(15000), Deactivate);
-		}
+            EndTime = null;
+            EffectEntity = null;
+        }
 
-		public override void Deactivate() {
-			if (EffectEntity != null) {
-				MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
+        protected override void Tick()
+        {
+            base.Tick();
 
-				EffectEntity = null;
-			}
-		}
+            if (DateTimeOffset.Now >= EndTime) Deactivate();
+        }
+
+        private DateTimeOffset? EndTime { get; set; }
 	}
 }

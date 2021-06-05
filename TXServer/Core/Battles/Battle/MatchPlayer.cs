@@ -122,6 +122,7 @@ namespace TXServer.Core.Battles
                 NextTeleportPoint = null;
             }
 
+            // ReSharper disable once PossibleNullReferenceException
             Vector3 position = LastSpawnPoint?.Position ?? LastTeleportPoint.Position;
             Quaternion rotation = LastSpawnPoint?.Rotation ?? LastTeleportPoint.Rotation;
 
@@ -131,6 +132,19 @@ namespace TXServer.Core.Battles
 
             Tank.AddComponent(new TankMovementComponent(new Movement(position, Vector3.Zero, Vector3.Zero, rotation), new MoveControl(), 0, 0));
         }
+
+        public bool FindModule(Type moduleType, out BattleModule module)
+        {
+            module = Modules.SingleOrDefault(m => m.GetType() == moduleType);
+            return module != null;
+        }
+
+        public void TryDeactivateInvisibility() => Modules.SingleOrDefault(m => m.GetType() == typeof(InvisibilityModule))
+            ?.Deactivate();
+
+        public bool IsEnemyOf(MatchPlayer suspect) => (Battle.Params.BattleMode == BattleMode.DM ||
+                                                       Player.BattlePlayer.Team != suspect.Player.BattlePlayer.Team) &&
+                                                      suspect != this;
 
         private void EnableTank()
         {
@@ -336,9 +350,5 @@ namespace TXServer.Core.Battles
         public SpawnPoint LastSpawnPoint { get; set; }
         public TeleportPoint LastTeleportPoint { get; set; }
         public TeleportPoint NextTeleportPoint { get; set; }
-
-        public bool IsEnemyOf(MatchPlayer suspect) => (Battle.Params.BattleMode == BattleMode.DM ||
-                                                      Player.BattlePlayer.Team != suspect.Player.BattlePlayer.Team) &&
-                                                      suspect != this;
     }
 }

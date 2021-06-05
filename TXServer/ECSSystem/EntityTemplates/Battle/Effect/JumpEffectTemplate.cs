@@ -10,10 +10,10 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
     {
         private static readonly string _configPath = "/battle/effect/jumpimpact";
 
-		public static Entity CreateEntity(MatchPlayer matchPlayer, float multiplier = 15.0f)
+		public static Entity CreateEntity(MatchPlayer matchPlayer, float forceMultiplier)
         {
-            Entity effect = CreateEntity(new JumpEffectTemplate(), _configPath, matchPlayer, 1000);
-            effect.AddComponent(new JumpEffectConfigComponent(multiplier));
+            Entity effect = CreateEntity(new JumpEffectTemplate(), _configPath, matchPlayer);
+            effect.AddComponent(new JumpEffectConfigComponent(forceMultiplier));
 
             return effect;
 		}

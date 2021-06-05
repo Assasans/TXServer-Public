@@ -27,18 +27,23 @@ namespace TXServer.Core
 
         public Server()
         {
-            Dictionary<string, Type> modules = new Dictionary<string, Type>()
+            Dictionary<string, Type> modules = new()
             {
                 ["garage/module/module/tank/active/1/absorbingarmor"] = typeof(EnhancedArmorModule),
-                ["garage/module/prebuildmodule/common/active/1/gold"] = typeof(GoldModule),
+                ["garage/module/module/weapon/passive/1/engineer"] = typeof(EngineerModule),
+                ["garage/module/module/tank/active/3/firering"] = typeof(FireRingModule),
                 ["garage/module/module/tank/active/2/forcefield"] = typeof(ForceFieldModule),
+                ["garage/module/prebuildmodule/common/active/1/gold"] = typeof(GoldModule),
                 ["garage/module/module/weapon/active/2/increaseddamage"] = typeof(IncreasedDamageModule),
                 ["garage/module/module/tank/active/2/invisibility"] = typeof(InvisibilityModule),
                 ["garage/module/module/tank/active/2/jumpimpact"] = typeof(JumpImpactModule),
+                ["garage/module/module/weapon/trigger/3/lifesteal"] = typeof(LifeStealModule),
                 ["garage/module/module/weapon/active/1/mine"] = typeof(MineModule),
                 ["garage/module/module/tank/active/1/repairkit"] = typeof(RepairKitModule),
+                ["garage/module/module/weapon/active/1/sonar"] = typeof(SonarModule),
                 ["garage/module/module/weapon/active/2/spidermine"] = typeof(SpiderMineModule),
-                ["garage/module/module/tank/active/1/turbospeed"] = typeof(TurbospeedModule)
+                ["garage/module/module/tank/active/1/turbospeed"] = typeof(TurbospeedModule),
+                ["garage/module/module/weapon/active/3/drone"] = typeof(TurretDroneModule)
             };
 
             ModuleRegistry = new ModuleRegistry();

@@ -17,9 +17,11 @@ namespace TXServer.ECSSystem.Events.Battle
     [SerialVersionUID(8814758840778124785L)]
     public class SelfHitEvent : HitEvent, ISelfEvent
     {
-        public void Execute(Player player, Entity weapon) {
+        public void Execute(Player player, Entity weapon)
+        {
             SelfEvent.Execute(this, player, weapon);
-            var battlePlayer = player.BattlePlayer;
+
+            BattleTankPlayer battlePlayer = player.BattlePlayer;
 
             if (battlePlayer.MatchPlayer.TankState == TankState.Dead)
                 return;

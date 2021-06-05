@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using TXServer.Core.Battles.Effect;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Health;
@@ -19,49 +19,15 @@ namespace TXServer.Core.Battles
         public static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             HitTarget hitTarget, float damage, bool mine = false)
         {
-            Battle battle = victim.Battle;
-
             damage = DamageWithSupplies(damage, victim, damager, mine);
 
             victim.Tank.ChangeComponent<HealthComponent>(component =>
             {
-                if (component.CurrentHealth >= 0)
+                if (component.CurrentHealth >= 0) {}
                     component.CurrentHealth -= damage;
 
                 if (component.CurrentHealth <= 0)
-                {
-                    victim.TankState = TankState.Dead;
-
-                    if (damager.Player != victim.Player)
-                    {
-                        battle.PlayersInMap.SendEvent(
-                            new KillEvent(weaponMarketItem, hitTarget.Entity), damager.BattleUser);
-                        damager.SendEvent(
-                            new VisualScoreKillEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid,
-                                victim.Player.User.GetComponent<UserRankComponent>().Rank,
-                                damager.GetScoreWithPremium(10)), damager.BattleUser);
-                        damager.UpdateStatistics(10, additiveKills: 1, 0, 0, null);
-                    }
-                    else
-                        battle.PlayersInMap.SendEvent(new SelfDestructionBattleUserEvent(), victim.BattleUser);
-                    victim.UpdateStatistics(0, 0, 0, 1, damager);
-
-                    if (battle.ModeHandler is TDMHandler)
-                        battle.UpdateScore(damager.Player.BattlePlayer.Team);
-
-                    damager.UserResult.Damage += (int) damage;
-
-                    foreach (KeyValuePair<MatchPlayer, float> assist in victim.DamageAssistants.Where(assist =>
-                        assist.Key != damager && assist.Key != victim))
-                    {
-                        assist.Key.UpdateStatistics(additiveScore: 5, 0, additiveKillAssists: 1, 0, null);
-                        int percent = (int)(assist.Value / component.MaxHealth * 100);
-                        assist.Key.SendEvent(
-                            new VisualScoreAssistEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid, percent,
-                                assist.Key.GetScoreWithPremium(5)), assist.Key.BattleUser);
-                    }
-                    victim.DamageAssistants.Clear();
-                }
+                    ProcessKill(weaponMarketItem, victim, damager, hitTarget, damage);
                 else
                 {
                     if (victim.DamageAssistants.ContainsKey(damager))
@@ -73,6 +39,21 @@ namespace TXServer.Core.Battles
                 damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false, false), victim.Tank);
                 victim.Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), victim.Tank);
             });
+        }
+
+        private static float DamageWithSupplies(float damage, MatchPlayer target, MatchPlayer shooter, bool mine = false)
+        {
+            if (!mine && shooter.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.DAMAGE))
+                damage *= 2;
+            if (target.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.ARMOR))
+                damage /= 2;
+
+            if (!mine && shooter.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.DAMAGE && supplyEffect.Cheat))
+                damage = 99999;
+            if (target.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.ARMOR && supplyEffect.Cheat))
+                damage = 0;
+
+            return damage;
         }
 
         public static void IsisHeal(MatchPlayer target, MatchPlayer healer, HitTarget hitTarget)
@@ -111,19 +92,47 @@ namespace TXServer.Core.Battles
             }
         }
 
-        private static float DamageWithSupplies(float damage, MatchPlayer target, MatchPlayer shooter, bool mine = false)
+        private static void ProcessKill(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer killer, HitTarget hitTarget, float damage)
         {
-            if (!mine && shooter.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.DAMAGE))
-                damage *= 2;
-            if (target.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.ARMOR))
-                damage /= 2;
+            victim.TankState = TankState.Dead;
+            Battle battle = victim.Battle;
 
-            if (!mine && shooter.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.DAMAGE && supplyEffect.Cheat))
-                damage = 99999;
-            if (target.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.ARMOR && supplyEffect.Cheat))
-                damage = 0;
+            if (killer.Player != victim.Player)
+            {
+                battle.PlayersInMap.SendEvent(
+                    new KillEvent(weaponMarketItem, hitTarget.Entity), killer.BattleUser);
+                killer.SendEvent(
+                    new VisualScoreKillEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid,
+                        victim.Player.User.GetComponent<UserRankComponent>().Rank,
+                        killer.GetScoreWithPremium(10)), killer.BattleUser);
+                killer.UpdateStatistics(10, additiveKills: 1, 0, 0, null);
+            }
+            else
+                battle.PlayersInMap.SendEvent(new SelfDestructionBattleUserEvent(), victim.BattleUser);
+            victim.UpdateStatistics(0, 0, 0, 1, killer);
 
-            return damage;
+            if (battle.ModeHandler is TDMHandler)
+                battle.UpdateScore(killer.Player.BattlePlayer.Team);
+
+            killer.UserResult.Damage += (int) damage;
+
+            ProcessKillAssists(victim, killer);
+            if (killer.FindModule(typeof(LifeStealModule), out BattleModule module))
+                ((LifeStealModule) module).Activate();
+        }
+
+        private static void ProcessKillAssists(MatchPlayer victim, MatchPlayer damager)
+        {
+            foreach (KeyValuePair<MatchPlayer, float> assist in victim.DamageAssistants.Where(assist =>
+                assist.Key != damager && assist.Key != victim))
+            {
+                assist.Key.UpdateStatistics(additiveScore: 5, 0, additiveKillAssists: 1, 0, null);
+                int percent = (int)(assist.Value / victim.Tank.GetComponent<HealthComponent>().MaxHealth * 100);
+                assist.Key.SendEvent(
+                    new VisualScoreAssistEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid, percent,
+                        assist.Key.GetScoreWithPremium(5)), assist.Key.BattleUser);
+            }
+            victim.DamageAssistants.Clear();
         }
 
         public static void ProcessKillStreak(int additiveKills, bool died, MatchPlayer victim, MatchPlayer killer)
@@ -158,6 +167,7 @@ namespace TXServer.Core.Battles
 
         }
 
-        private static readonly Dictionary<int, int> KillStreakScores = new() { { 2, 0 }, { 3, 5 }, { 4, 7 }, { 5, 10 }, { 10, 10 }, { 15, 10 }, { 20, 20 }, { 25, 30 }, { 30, 40 }, { 35, 50 }, { 40, 60 } };
+        private static readonly Dictionary<int, int> KillStreakScores = new()
+            {{2, 0}, {3, 5}, {4, 7}, {5, 10}, {10, 10}, {15, 10}, {20, 20}, {25, 30}, {30, 40}, {35, 50}, {40, 60}};
     }
 }

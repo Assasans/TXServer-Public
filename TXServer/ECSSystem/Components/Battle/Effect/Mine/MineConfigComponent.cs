@@ -5,14 +5,14 @@ namespace TXServer.ECSSystem.Components.Battle.Effect.Mine {
     [SerialVersionUID(1431927384785L)]
     public class MineConfigComponent : Component
     {
-        public MineConfigComponent()
+        public MineConfigComponent(long activationTime, float beginHideDistance, float hideRange, float impact)
         {
             DamageFrom = 400;
             DamageTo = 500;
-            ActivationTime = 1;
-            Impact = 10;
-            BeginHideDistance = 10;
-            HideRange = 10;
+            ActivationTime = activationTime;
+            Impact = impact;
+            BeginHideDistance = beginHideDistance;
+            HideRange = hideRange;
         }
 
         public float DamageFrom { get; set; }

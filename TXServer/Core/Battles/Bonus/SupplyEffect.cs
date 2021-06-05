@@ -6,19 +6,24 @@ using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Components.Battle.Chassis;
 using System.Linq;
+using TXServer.Core.Battles.Effect;
 using TXServer.ECSSystem.Components.Battle;
-using TXServer.Core.Configuration;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 
 namespace TXServer.Core.Battles
 {
     public class SupplyEffect
     {
-        public SupplyEffect(BonusType bonusType, MatchPlayer matchPlayer, bool cheat = false, long duration = 30000)
+        public SupplyEffect(BonusType bonusType, MatchPlayer matchPlayer, bool cheat = false, bool bonus = true,
+            long duration = 30000)
         {
             if (matchPlayer.TankState != TankState.Active) return;
+
             if (duration == 30000 && bonusType == BonusType.REPAIR)
                 duration = 3000;
+            if (bonus && matchPlayer.FindModule(typeof(EngineerModule), out BattleModule module))
+                duration = ((EngineerModule) module).SupplyDuration(duration);
+
 
             BonusType = bonusType;
             MatchPlayer = matchPlayer;

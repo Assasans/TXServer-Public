@@ -527,10 +527,10 @@ namespace TXServer.Core.Battles
         public void SortRoundUsers() => ModeHandler.SortRoundUsers();
         private void CompleteWarmUp() => ModeHandler.CompleteWarmUp();
 
-        public Player FindPlayerByUid(string uid)
+        public Player FindPlayerByUsername(string username)
         {
             Player searchedPlayer = JoinedTankPlayers.FirstOrDefault(controlledPlayer =>
-                controlledPlayer.Player.Data.Username == uid)
+                controlledPlayer.Player.Data.Username == username)
                 ?.Player;
             return searchedPlayer;
         }

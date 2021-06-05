@@ -885,7 +885,7 @@ namespace TXServer.Core.ChatCommands
                     targets.AddRange(battle.MatchTankPlayers.Where(p => p.Player != player));
                     break;
                 default:
-                    Player target = battle.FindPlayerByUid(targetName);
+                    Player target = battle.FindPlayerByUsername(targetName);
                     if (target != null && !target.BattlePlayer.IsCheatImmune || target == player)
                         targets.Add(target.BattlePlayer);
                     break;

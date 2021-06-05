@@ -1,14 +1,14 @@
 ﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Components.Battle.Effect.SpiderMine {
+namespace TXServer.ECSSystem.Components.Battle.Effect {
     [SerialVersionUID(1487227856805L)]
     public class SpiderMineConfigComponent : Component
     {
-        public SpiderMineConfigComponent()
+        public SpiderMineConfigComponent(float acceleration, float speed)
         {
-            Speed = 8;
-            Acceleration = 20;
+            Speed = speed;
+            Acceleration = acceleration;
             Energy = 100;
             IdleEnergyDrainRate = 0;
             ChasingEnergyDrainRate = 0;

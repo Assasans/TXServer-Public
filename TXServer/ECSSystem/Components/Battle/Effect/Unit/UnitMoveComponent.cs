@@ -3,7 +3,7 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Tank;
 
-namespace TXServer.ECSSystem.Components.Battle.Effect.SpiderMine
+namespace TXServer.ECSSystem.Components.Battle.Effect.Unit
 {
     [SerialVersionUID(1485519196443L)]
     public class UnitMoveComponent : Component
