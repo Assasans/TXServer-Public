@@ -1,0 +1,665 @@
+{
+  "Acidlake": {
+    "minX": -300.427734,
+    "maxX": 300.427734,
+    "minZ": -655.36,
+    "maxZ": 306.9173,
+    "layers": [
+      {
+        "path": "HeightMaps/Acidlake/layer0.png",
+        "maxY": 43.18081,
+        "minY": -16.8489132
+      },
+      {
+        "path": "HeightMaps/Acidlake/layer1.png",
+        "maxY": 41.8606453,
+        "minY": -15.363965
+      },
+      {
+        "path": "HeightMaps/Acidlake/layer2.png",
+        "maxY": 40.6406136,
+        "minY": -8.032617
+      },
+      {
+        "path": "HeightMaps/Acidlake/layer3.png",
+        "maxY": 38.7731,
+        "minY": -5.65749264
+      },
+      {
+        "path": "HeightMaps/Acidlake/layer4.png",
+        "maxY": 36.5973358,
+        "minY": -0.142895818
+      },
+      {
+        "path": "HeightMaps/Acidlake/layer5.png",
+        "maxY": 25.286602,
+        "minY": -0.127797708
+      }
+    ]
+  },
+  "Acidlakehalloween": {
+    "minX": -300.427734,
+    "maxX": 300.427734,
+    "minZ": -655.36,
+    "maxZ": 306.9173,
+    "layers": [
+      {
+        "path": "HeightMaps/Acidlakehalloween/layer0.png",
+        "maxY": 43.18081,
+        "minY": -16.8489132
+      },
+      {
+        "path": "HeightMaps/Acidlakehalloween/layer1.png",
+        "maxY": 41.8606453,
+        "minY": -15.363965
+      },
+      {
+        "path": "HeightMaps/Acidlakehalloween/layer2.png",
+        "maxY": 40.6406136,
+        "minY": -8.032617
+      },
+      {
+        "path": "HeightMaps/Acidlakehalloween/layer3.png",
+        "maxY": 38.7731,
+        "minY": -5.65749264
+      },
+      {
+        "path": "HeightMaps/Acidlakehalloween/layer4.png",
+        "maxY": 36.5973358,
+        "minY": -0.142895818
+      },
+      {
+        "path": "HeightMaps/Acidlakehalloween/layer5.png",
+        "maxY": 25.286602,
+        "minY": -0.127797708
+      }
+    ]
+  },
+  "Area159": {
+    "minX": -88.21573,
+    "maxX": 88.20575,
+    "minZ": -77.69873,
+    "maxZ": 77.73073,
+    "layers": [
+      {
+        "path": "HeightMaps/Area159/layer0.png",
+        "maxY": 62.79393,
+        "minY": -0.249992788
+      },
+      {
+        "path": "HeightMaps/Area159/layer1.png",
+        "maxY": 55.92502,
+        "minY": -0.249992788
+      },
+      {
+        "path": "HeightMaps/Area159/layer2.png",
+        "maxY": 50.71927,
+        "minY": -1.76146364
+      },
+      {
+        "path": "HeightMaps/Area159/layer3.png",
+        "maxY": 45.4730034,
+        "minY": -1.8305645
+      },
+      {
+        "path": "HeightMaps/Area159/layer4.png",
+        "maxY": 42.64129,
+        "minY": -1.83056545
+      },
+      {
+        "path": "HeightMaps/Area159/layer5.png",
+        "maxY": 37.9825668,
+        "minY": -3.49707
+      },
+      {
+        "path": "HeightMaps/Area159/layer6.png",
+        "maxY": 35.3765,
+        "minY": -5.003663
+      },
+      {
+        "path": "HeightMaps/Area159/layer7.png",
+        "maxY": 25.8447552,
+        "minY": -5.003663
+      }
+    ]
+  },
+  "Boombox": {
+    "minX": -651.9006,
+    "maxX": 655.3599,
+    "minZ": -655.36,
+    "maxZ": 655.36,
+    "layers": [
+      {
+        "path": "HeightMaps/Boombox/layer0.png",
+        "maxY": 148.5597,
+        "minY": -114.843269
+      },
+      {
+        "path": "HeightMaps/Boombox/layer1.png",
+        "maxY": 97.56746,
+        "minY": -114.621971
+      },
+      {
+        "path": "HeightMaps/Boombox/layer2.png",
+        "maxY": 88.82626,
+        "minY": -114.588287
+      },
+      {
+        "path": "HeightMaps/Boombox/layer3.png",
+        "maxY": 71.1643448,
+        "minY": -114.59671
+      },
+      {
+        "path": "HeightMaps/Boombox/layer4.png",
+        "maxY": 68.9754944,
+        "minY": -12.020813
+      },
+      {
+        "path": "HeightMaps/Boombox/layer5.png",
+        "maxY": 67.6936646,
+        "minY": -8.70298
+      },
+      {
+        "path": "HeightMaps/Boombox/layer6.png",
+        "maxY": 64.77649,
+        "minY": -11.9697876
+      },
+      {
+        "path": "HeightMaps/Boombox/layer7.png",
+        "maxY": 51.4685364,
+        "minY": -11.9187469
+      }
+    ]
+  },
+  "Iran": {
+    "minX": -655.36,
+    "maxX": 655.36,
+    "minZ": -655.36,
+    "maxZ": 655.36,
+    "layers": [
+      {
+        "path": "HeightMaps/Iran/layer0.png",
+        "maxY": 91.8874359,
+        "minY": -10.4032774
+      },
+      {
+        "path": "HeightMaps/Iran/layer1.png",
+        "maxY": 74.59714,
+        "minY": -10.4998217
+      },
+      {
+        "path": "HeightMaps/Iran/layer2.png",
+        "maxY": 66.659874,
+        "minY": -10.4999866
+      },
+      {
+        "path": "HeightMaps/Iran/layer3.png",
+        "maxY": 38.2563858,
+        "minY": -10.4999866
+      },
+      {
+        "path": "HeightMaps/Iran/layer4.png",
+        "maxY": 32.3246155,
+        "minY": -10.4999866
+      },
+      {
+        "path": "HeightMaps/Iran/layer5.png",
+        "maxY": 5.098417,
+        "minY": -10.4999866
+      }
+    ]
+  },
+  "Kungur": {
+    "minX": -655.36,
+    "maxX": 655.36,
+    "minZ": -655.36,
+    "maxZ": 655.36,
+    "layers": [
+      {
+        "path": "HeightMaps/Kungur/layer0.png",
+        "maxY": 80.02557,
+        "minY": -51.9589233
+      },
+      {
+        "path": "HeightMaps/Kungur/layer1.png",
+        "maxY": 77.20449,
+        "minY": -8.972229
+      },
+      {
+        "path": "HeightMaps/Kungur/layer2.png",
+        "maxY": 71.75063,
+        "minY": -8.815918
+      },
+      {
+        "path": "HeightMaps/Kungur/layer3.png",
+        "maxY": 65.99902,
+        "minY": -8.815918
+      },
+      {
+        "path": "HeightMaps/Kungur/layer4.png",
+        "maxY": 60.1594925,
+        "minY": -8.815918
+      },
+      {
+        "path": "HeightMaps/Kungur/layer5.png",
+        "maxY": 54.4073067,
+        "minY": -8.815918
+      }
+    ]
+  },
+  "Massacre": {
+    "minX": -425.000061,
+    "maxX": 375.000061,
+    "minZ": -392.500061,
+    "maxZ": 407.500061,
+    "layers": [
+      {
+        "path": "HeightMaps/Massacre/layer0.png",
+        "maxY": 80.66335,
+        "minY": -10.1321487
+      },
+      {
+        "path": "HeightMaps/Massacre/layer1.png",
+        "maxY": 75.61065,
+        "minY": -7.52829266
+      },
+      {
+        "path": "HeightMaps/Massacre/layer2.png",
+        "maxY": 74.4384842,
+        "minY": -7.31057358
+      },
+      {
+        "path": "HeightMaps/Massacre/layer3.png",
+        "maxY": 60.24,
+        "minY": -8.06073952
+      },
+      {
+        "path": "HeightMaps/Massacre/layer4.png",
+        "maxY": 53.17804,
+        "minY": -10.7405033
+      },
+      {
+        "path": "HeightMaps/Massacre/layer5.png",
+        "maxY": 42.13216,
+        "minY": -13.440547
+      }
+    ]
+  },
+  "MassacremarsBG": {
+    "minX": -655.36,
+    "maxX": 655.36,
+    "minZ": -655.36,
+    "maxZ": 655.36,
+    "layers": [
+      {
+        "path": "HeightMaps/MassacremarsBG/layer0.png",
+        "maxY": 194.049561,
+        "minY": -11.7864809
+      },
+      {
+        "path": "HeightMaps/MassacremarsBG/layer1.png",
+        "maxY": 192.229233,
+        "minY": -2.70049667
+      },
+      {
+        "path": "HeightMaps/MassacremarsBG/layer2.png",
+        "maxY": 188.1598,
+        "minY": -3.50752473
+      },
+      {
+        "path": "HeightMaps/MassacremarsBG/layer3.png",
+        "maxY": 179.878082,
+        "minY": -3.93789148
+      },
+      {
+        "path": "HeightMaps/MassacremarsBG/layer4.png",
+        "maxY": 151.987152,
+        "minY": -4.415144
+      },
+      {
+        "path": "HeightMaps/MassacremarsBG/layer5.png",
+        "maxY": 132.96521,
+        "minY": -3.28370357
+      }
+    ]
+  },
+  "Nightiran": {
+    "minX": -655.36,
+    "maxX": 655.36,
+    "minZ": -655.36,
+    "maxZ": 655.36,
+    "layers": [
+      {
+        "path": "HeightMaps/Nightiran/layer0.png",
+        "maxY": 91.8874359,
+        "minY": -7.499999
+      },
+      {
+        "path": "HeightMaps/Nightiran/layer1.png",
+        "maxY": 74.59714,
+        "minY": -9.043431
+      },
+      {
+        "path": "HeightMaps/Nightiran/layer2.png",
+        "maxY": 66.659874,
+        "minY": -8.614684
+      },
+      {
+        "path": "HeightMaps/Nightiran/layer3.png",
+        "maxY": 38.2563858,
+        "minY": -9.657943
+      },
+      {
+        "path": "HeightMaps/Nightiran/layer4.png",
+        "maxY": 32.3246155,
+        "minY": -10.2049723
+      },
+      {
+        "path": "HeightMaps/Nightiran/layer5.png",
+        "maxY": 5.098417,
+        "minY": -10.0419731
+      }
+    ]
+  },
+  "Repin": {
+    "minX": -290.258759,
+    "maxX": 118.258759,
+    "minZ": -434.278,
+    "maxZ": 193.301514,
+    "layers": [
+      {
+        "path": "HeightMaps/Repin/layer0.png",
+        "maxY": 60.34327,
+        "minY": -60.03858
+      },
+      {
+        "path": "HeightMaps/Repin/layer1.png",
+        "maxY": 59.3417473,
+        "minY": -74.23307
+      },
+      {
+        "path": "HeightMaps/Repin/layer2.png",
+        "maxY": 53.18377,
+        "minY": -74.21473
+      },
+      {
+        "path": "HeightMaps/Repin/layer3.png",
+        "maxY": 50.2114372,
+        "minY": -74.22113
+      },
+      {
+        "path": "HeightMaps/Repin/layer4.png",
+        "maxY": 46.59929,
+        "minY": -74.2328949
+      },
+      {
+        "path": "HeightMaps/Repin/layer5.png",
+        "maxY": 32.56536,
+        "minY": -74.26006
+      }
+    ]
+  },
+  "Rio": {
+    "minX": -655.36,
+    "maxX": 280.7766,
+    "minZ": -318.912079,
+    "maxZ": 371.885834,
+    "layers": [
+      {
+        "path": "HeightMaps/Rio/layer0.png",
+        "maxY": 103.543488,
+        "minY": -4.00270653
+      },
+      {
+        "path": "HeightMaps/Rio/layer1.png",
+        "maxY": 101.998642,
+        "minY": -2.57288575
+      },
+      {
+        "path": "HeightMaps/Rio/layer2.png",
+        "maxY": 100.229874,
+        "minY": -0.688137054
+      },
+      {
+        "path": "HeightMaps/Rio/layer3.png",
+        "maxY": 91.48035,
+        "minY": 0.150035322
+      },
+      {
+        "path": "HeightMaps/Rio/layer4.png",
+        "maxY": 84.2909851,
+        "minY": 0.232353553
+      },
+      {
+        "path": "HeightMaps/Rio/layer5.png",
+        "maxY": 38.7352676,
+        "minY": 1.050012
+      }
+    ]
+  },
+  "Sandbox": {
+    "minX": -300.0,
+    "maxX": 299.999268,
+    "minZ": -655.36,
+    "maxZ": 306.9173,
+    "layers": [
+      {
+        "path": "HeightMaps/Sandbox/layer0.png",
+        "maxY": 43.1808052,
+        "minY": -16.848444
+      },
+      {
+        "path": "HeightMaps/Sandbox/layer1.png",
+        "maxY": 41.85704,
+        "minY": -15.35528
+      },
+      {
+        "path": "HeightMaps/Sandbox/layer2.png",
+        "maxY": 40.6906738,
+        "minY": -5.658396
+      },
+      {
+        "path": "HeightMaps/Sandbox/layer3.png",
+        "maxY": 38.82284,
+        "minY": -5.657323
+      },
+      {
+        "path": "HeightMaps/Sandbox/layer4.png",
+        "maxY": 36.58832,
+        "minY": -0.142935261
+      },
+      {
+        "path": "HeightMaps/Sandbox/layer5.png",
+        "maxY": 25.286602,
+        "minY": -0.1278335
+      }
+    ]
+  },
+  "Silence": {
+    "minX": -655.36,
+    "maxX": 655.36,
+    "minZ": -655.36,
+    "maxZ": 655.36,
+    "layers": [
+      {
+        "path": "HeightMaps/Silence/layer0.png",
+        "maxY": 91.466835,
+        "minY": -15.8320789
+      },
+      {
+        "path": "HeightMaps/Silence/layer1.png",
+        "maxY": 87.72702,
+        "minY": -16.3338623
+      },
+      {
+        "path": "HeightMaps/Silence/layer2.png",
+        "maxY": 80.4970245,
+        "minY": -31.4491863
+      },
+      {
+        "path": "HeightMaps/Silence/layer3.png",
+        "maxY": 72.87231,
+        "minY": -31.2579
+      },
+      {
+        "path": "HeightMaps/Silence/layer4.png",
+        "maxY": 65.38557,
+        "minY": -19.8147087
+      },
+      {
+        "path": "HeightMaps/Silence/layer5.png",
+        "maxY": 59.58634,
+        "minY": -11.6631765
+      }
+    ]
+  },
+  "Silencemoon": {
+    "minX": -655.36,
+    "maxX": 655.36,
+    "minZ": -655.36,
+    "maxZ": 655.36,
+    "layers": [
+      {
+        "path": "HeightMaps/Silencemoon/layer0.png",
+        "maxY": 153.199554,
+        "minY": -11.8494568
+      },
+      {
+        "path": "HeightMaps/Silencemoon/layer1.png",
+        "maxY": 151.3865,
+        "minY": -40.52144
+      },
+      {
+        "path": "HeightMaps/Silencemoon/layer2.png",
+        "maxY": 147.3098,
+        "minY": -40.4826164
+      },
+      {
+        "path": "HeightMaps/Silencemoon/layer3.png",
+        "maxY": 130.159073,
+        "minY": -40.363018
+      },
+      {
+        "path": "HeightMaps/Silencemoon/layer4.png",
+        "maxY": 111.137146,
+        "minY": -37.6171875
+      },
+      {
+        "path": "HeightMaps/Silencemoon/layer5.png",
+        "maxY": 92.11521,
+        "minY": -37.6883659
+      }
+    ]
+  },
+  "Testbox": {
+    "minX": -655.36,
+    "maxX": 655.36,
+    "minZ": -655.36,
+    "maxZ": 655.36,
+    "layers": [
+      {
+        "path": "HeightMaps/Testbox/layer0.png",
+        "maxY": 35.8504028,
+        "minY": -51.9589233
+      },
+      {
+        "path": "HeightMaps/Testbox/layer1.png",
+        "maxY": 33.480175,
+        "minY": -8.958374
+      },
+      {
+        "path": "HeightMaps/Testbox/layer2.png",
+        "maxY": 32.171978,
+        "minY": -5.707088
+      },
+      {
+        "path": "HeightMaps/Testbox/layer3.png",
+        "maxY": 29.81781,
+        "minY": -5.625775
+      },
+      {
+        "path": "HeightMaps/Testbox/layer4.png",
+        "maxY": 28.3868256,
+        "minY": -0.141924113
+      },
+      {
+        "path": "HeightMaps/Testbox/layer5.png",
+        "maxY": 25.2866039,
+        "minY": -0.126363635
+      },
+      {
+        "path": "HeightMaps/Testbox/layer6.png",
+        "maxY": 21.0064583,
+        "minY": -0.05612457
+      },
+      {
+        "path": "HeightMaps/Testbox/layer7.png",
+        "maxY": 18.35075,
+        "minY": -0.0009554773
+      },
+      {
+        "path": "HeightMaps/Testbox/layer8.png",
+        "maxY": 15.7967453,
+        "minY": -0.000955413969
+      },
+      {
+        "path": "HeightMaps/Testbox/layer9.png",
+        "maxY": 6.93560934,
+        "minY": -0.000955382246
+      }
+    ]
+  },
+  "Westprime": {
+    "minX": -105.42926,
+    "maxX": 224.361969,
+    "minZ": -86.86786,
+    "maxZ": 135.274979,
+    "layers": [
+      {
+        "path": "HeightMaps/Westprime/layer0.png",
+        "maxY": 61.0085449,
+        "minY": -2.84016
+      },
+      {
+        "path": "HeightMaps/Westprime/layer1.png",
+        "maxY": 49.68612,
+        "minY": -8.506362
+      },
+      {
+        "path": "HeightMaps/Westprime/layer2.png",
+        "maxY": 44.44517,
+        "minY": -8.506361
+      },
+      {
+        "path": "HeightMaps/Westprime/layer3.png",
+        "maxY": 43.0960159,
+        "minY": -8.50636
+      },
+      {
+        "path": "HeightMaps/Westprime/layer4.png",
+        "maxY": 42.01997,
+        "minY": -9.193837
+      },
+      {
+        "path": "HeightMaps/Westprime/layer5.png",
+        "maxY": 40.5364456,
+        "minY": -9.467937
+      },
+      {
+        "path": "HeightMaps/Westprime/layer6.png",
+        "maxY": 39.28978,
+        "minY": -8.50636
+      },
+      {
+        "path": "HeightMaps/Westprime/layer7.png",
+        "maxY": 37.9406242,
+        "minY": -8.50636
+      },
+      {
+        "path": "HeightMaps/Westprime/layer8.png",
+        "maxY": 36.8645821,
+        "minY": 7.71826458
+      }
+    ]
+  }
+}

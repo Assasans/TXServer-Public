@@ -1,8 +1,13 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using TXServer.Core.Battles.Effect;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using TXServer.Library;
+using TXServer.Core.HeightMaps;
+using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
@@ -10,6 +15,7 @@ using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
+using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -80,7 +86,54 @@ namespace TXServer.Core.Battles
             ReturnStartTime = DateTime.UtcNow.AddSeconds(60);
             State = FlagState.Dropped;
 
-            Vector3 flagPosition = Carrier.MatchPlayer.TankPosition - Vector3.UnitY;
+            Vector3 flagPosition;
+            if (!Server.Instance.Settings.DisableHeightMaps)
+            {
+                HeightMap map = Battle.HeightMap;
+                (HeightMapLayer layer, float y) = map.Layers
+                    .Select((layer) =>
+                    {
+                        // If layer is not loaded
+                        if (layer.Image == null) return (null, -9999);
+
+                        // Get height map layer
+                        Image<Rgb24> image = layer.Image;
+
+                        // Map tank coordinates to layer size
+                        float x = MathUtils.Map(Carrier.MatchPlayer.TankPosition.X, map.MinX, map.MaxX, 0, image.Width);
+                        float z = MathUtils.Map(Carrier.MatchPlayer.TankPosition.Z, map.MinZ, map.MaxZ, 0, image.Height);
+
+                        // Get pixel color
+                        Rgb24 pixel = image[(int) Math.Round(x), (int) Math.Round(z)];
+
+                        // Map pixel color to height
+                        float y = MathUtils.Map(pixel.R, byte.MinValue, byte.MaxValue, layer.MinY, layer.MaxY);
+
+                        Logger.Log(
+                            $"{Carrier.MatchPlayer.TankPosition.X} {Carrier.MatchPlayer.TankPosition.Z} {Carrier.MatchPlayer.TankPosition.Y} | {Path.GetFileName(layer.Path)} | {Math.Round(x)} {Math.Round(z)} | {pixel.R} {pixel.G} {pixel.B} | {y}");
+
+                        return (layer, y);
+                    })
+                    .First((tuple) => tuple.y - Vector3.UnitY.Y < Carrier.MatchPlayer.TankPosition.Y);
+
+                if (layer == null)
+                {
+                    ChatMessageReceivedEvent.SystemMessageTarget(
+                        $"[Flag] Dropped at {Carrier.MatchPlayer.TankPosition.X}, {Carrier.MatchPlayer.TankPosition.Z}, {Carrier.MatchPlayer.TankPosition.Y}\n" +
+                        "[Flag/Error] No layer found",
+                        Battle.GeneralBattleChatEntity, Carrier.Player
+                    );
+                    return;
+                }
+
+                flagPosition = new Vector3(Carrier.MatchPlayer.TankPosition.X, y, Carrier.MatchPlayer.TankPosition.Z) - Vector3.UnitY;
+            }
+            else
+            {
+                flagPosition = Carrier.MatchPlayer.TankPosition - Vector3.UnitY;
+            }
+
+
             Carrier = null;
 
             if (!silent)

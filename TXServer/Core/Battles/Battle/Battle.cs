@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Battles.Matchmaking;
+using TXServer.Core.HeightMaps;
 using TXServer.Core.Logging;
 using TXServer.Core.ServerMapInformation;
 using TXServer.Core.Squads;
@@ -63,6 +64,11 @@ namespace TXServer.Core.Battles
                 ModeHandler.SetupBattle(prevHandler);
             else
                 ModeHandler.SetupBattle();
+
+            if (!Server.Instance.Settings.DisableHeightMaps)
+            {
+                HeightMap = ServerConnection.HeightMaps[ServerConnection.ServerMapInfo.First((entry) => entry.Value.MapId == Params.MapId).Key];
+            }
         }
 
         private (Entity, int) ConvertMapParams(ClientBattleParams newParams, bool isMatchMaking)
@@ -668,5 +674,7 @@ namespace TXServer.Core.Battles
 
         public Entity GeneralBattleChatEntity { get; }
         public Entity BattleLobbyChatEntity { get; }
+
+        public HeightMap HeightMap { get; private set; }
     }
 }

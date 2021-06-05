@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
@@ -9,9 +10,12 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using TXServer.Core.Battles;
 using TXServer.Core.Configuration;
 using TXServer.Core.Logging;
+using TXServer.Core.HeightMaps;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Events.Ping;
 
@@ -36,6 +40,23 @@ namespace TXServer.Core
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 IncludeFields = true
             });
+
+            if (!Server.Instance.Settings.DisableHeightMaps)
+            {
+                Logger.Log("Loading height maps...");
+                HeightMaps = JsonSerializer.Deserialize<Dictionary<string, HeightMap>>(File.ReadAllText(HeightMapInfoLocation), new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    IncludeFields = true
+                });
+
+                foreach (HeightMapLayer layer in HeightMaps.Values.SelectMany(map => map.Layers))
+                {
+                    Logger.Trace($"Reading {layer.Path}...");
+                    layer.Image = Image.Load<Rgb24>(Path.Combine(Directory.GetCurrentDirectory(), "Library", layer.Path));
+                }
+                Logger.Log("Height maps loaded");
+            }
 
             MaxPoolSize = poolSize;
 
@@ -302,6 +323,8 @@ namespace TXServer.Core
         public int PlayerCount = 0;
 
         public static string ServerMapInfoLocation { get; } = "Library/ServerMapInfo.json";
+        public static string HeightMapInfoLocation { get; } = "Library/HeightMaps.json";
         public static Dictionary<string, MapInfo> ServerMapInfo { get; private set; }
+        public static Dictionary<string, HeightMap> HeightMaps { get; private set; }
     }
 }
