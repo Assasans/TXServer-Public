@@ -71,7 +71,7 @@ namespace TXServer.Core.Battles.Effect
 
         public void Explode()
         {
-            MatchPlayer.Battle.MatchTankPlayers.SendEvent(new MineExplosionEvent(), EffectEntity);
+            MatchPlayer.Battle.PlayersInMap.SendEvent(new MineExplosionEvent(), EffectEntity);
             IsDropped = false;
             StopHunting();
             Deactivate();

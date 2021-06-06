@@ -27,7 +27,7 @@ namespace TXServer.Core.Battles.Effect
             StartCooldown();
 
             EffectEntity = LifestealEffectTemplate.CreateEntity(MatchPlayer);
-            MatchPlayer.Battle.JoinedTankPlayers.ShareEntities(EffectEntity);
+            MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
             MatchPlayer.Tank.ChangeComponent<HealthComponent>(component =>
             {
@@ -36,9 +36,9 @@ namespace TXServer.Core.Battles.Effect
             });
 
             MatchPlayer.Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), MatchPlayer.Tank);
-            MatchPlayer.Battle.JoinedTankPlayers.SendEvent(new TriggerEffectExecuteEvent(), EffectEntity);
+            MatchPlayer.Battle.PlayersInMap.SendEvent(new TriggerEffectExecuteEvent(), EffectEntity);
             Schedule(() => {
-                MatchPlayer.Battle.JoinedTankPlayers.UnshareEntities(EffectEntity);
+                MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
             });
         }
 

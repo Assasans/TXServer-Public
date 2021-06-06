@@ -12,11 +12,10 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity mode)
 		{
-			Core.Battles.Battle battle = player.BattlePlayer.Battle;
-			var battlePlayer = player.BattlePlayer;
-			
-			if (battle.Params.BattleMode == BattleMode.DM)
-				return;
+            Core.Battles.Battle battle = player.BattlePlayer.Battle;
+			BattleTankPlayer battlePlayer = player.BattlePlayer;
+
+            if (battle.Params.BattleMode == BattleMode.DM) return;
 
 			var handler = (Core.Battles.Battle.TeamBattleHandler)battle.ModeHandler;
 			BattleView view = handler.BattleViewFor(battlePlayer);
@@ -24,9 +23,9 @@ namespace TXServer.ECSSystem.Events.Battle
 			player.User.RemoveComponent<TeamColorComponent>();
 			player.User.AddComponent(new TeamColorComponent(view.EnemyTeamColor));
 
-			view.AllyTeamPlayers.Remove(battlePlayer);
+            view.AllyTeamPlayers.Remove(battlePlayer);
 			player.BattlePlayer = new BattleTankPlayer(battle, player, view.EnemyTeamEntity);
-			view.EnemyTeamPlayers.Add(battlePlayer);
-		}
+			view.EnemyTeamPlayers.Add(player.BattlePlayer);
+        }
 	}
 }
