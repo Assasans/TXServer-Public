@@ -3,8 +3,6 @@ using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
-using TXServer.Core.Configuration;
-using TXServer.Library;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Tank;
@@ -54,20 +52,7 @@ namespace TXServer.ECSSystem.Events.Battle
                     };
                 });
 
-                if (battlePlayer.MatchPlayer.DamageCooldowns.ContainsKey(victim))
-                {
-                    DateTimeOffset cooldownEnd = battlePlayer.MatchPlayer.DamageCooldowns[victim];
-
-                    if(DateTimeOffset.UtcNow < cooldownEnd) continue;
-
-                    battlePlayer.MatchPlayer.DamageCooldowns.Remove(victim);
-                }
-                else
-                {
-                    battlePlayer.MatchPlayer.DamageCooldowns[victim] = DateTimeOffset.UtcNow + TimeSpan.FromMilliseconds(1000);
-
-                    Damage.DealNormalDamage(weapon, player.CurrentPreset.Weapon, victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget);
-                }
+                Damage.DealNormalDamage(weapon, player.CurrentPreset.Weapon, victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget);
             }
         }
 

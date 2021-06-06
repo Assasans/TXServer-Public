@@ -31,7 +31,7 @@ namespace TXServer.Core.Battles
 
             // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
             //     $"[Damage] Dealt {damage} damage units to {victim.Player.Data.Username}",
-            //     battle.GeneralBattleChatEntity, damager.Player
+            //     damager.Battle.GeneralBattleChatEntity, damager.Player
             // );
 
             victim.Tank.ChangeComponent<HealthComponent>(component =>
@@ -123,6 +123,8 @@ namespace TXServer.Core.Battles
         public static void DealNormalDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             HitTarget hitTarget)
         {
+            if(IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
+
             float damage = GetRandomDamage(weapon, weaponMarketItem, victim, damager, hitTarget);
             DealDamage(weaponMarketItem, victim, damager, hitTarget, damage);
         }
@@ -130,6 +132,8 @@ namespace TXServer.Core.Battles
         public static void DealSplashDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             HitTarget hitTarget)
         {
+            if(IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
+
             float distance = hitTarget.HitDistance;
 
             float damage = GetRandomDamage(weapon, weaponMarketItem, victim, damager, hitTarget);
@@ -142,6 +146,34 @@ namespace TXServer.Core.Battles
             // );
 
             DealDamage(weaponMarketItem, victim, damager, hitTarget, splashDamage);
+        }
+
+        private static bool IsStreamOnCooldown(Entity weapon, MatchPlayer victim, MatchPlayer damager, HitTarget hitTarget)
+        {
+
+            BattleTankPlayer victimTankPlayer = damager.Battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
+
+            string path = Weapons.GlobalItems.GetAllItems()
+                .First(a => a.EntityId == weapon.GetComponent<MarketItemGroupComponent>().Key)
+                .TemplateAccessor.ConfigPath;
+
+            var damageComponent = Config.GetComponent<ServerComponents.Damage.DamagePerSecondPropertyComponent>(path, false);
+            if (damageComponent == null) return false;
+
+            if (damager.DamageCooldowns.ContainsKey(victimTankPlayer))
+            {
+                DateTimeOffset cooldownEnd = damager.DamageCooldowns[victimTankPlayer];
+
+                if(DateTimeOffset.UtcNow < cooldownEnd) return true;
+
+                damager.DamageCooldowns.Remove(victimTankPlayer);
+
+                return true;
+            }
+
+            damager.DamageCooldowns[victimTankPlayer] = DateTimeOffset.UtcNow + TimeSpan.FromMilliseconds(1000);
+
+            return false;
         }
 
         public static void IsisHeal(MatchPlayer target, MatchPlayer healer, HitTarget hitTarget)
