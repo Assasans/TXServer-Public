@@ -27,13 +27,10 @@ namespace TXServer.Core.Battles.Effect
         {
             Factor = Config.GetComponent<ModuleEngineerEffectDurationFactorPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
+            Activate();
         }
 
-        public long SupplyDuration(long normalDuration)
-        {
-            Activate();
-            return (long) (normalDuration * Factor);
-        }
+        public long SupplyDuration(long normalDuration) => (long)(normalDuration * Factor);
 
         private float Factor { get; set; }
     }

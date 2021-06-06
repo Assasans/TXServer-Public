@@ -78,9 +78,9 @@ namespace TXServer.ECSSystem.GlobalEntities
             public Entity Invisibility { get; } = new Entity(1625485211, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/invisibility"),
                 new ParentGroupComponent(Modules.GlobalItems.Invisibility),
                 new MarketItemGroupComponent(1625485211));
-            /*public Entity Invulnerability { get; } = new Entity(-1128519711, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/invulnerability"),
+            public Entity Invulnerability { get; } = new Entity(-1128519711, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/invulnerability"),
                 new ParentGroupComponent(Modules.GlobalItems.Invulnerability),
-                new MarketItemGroupComponent(-1128519711));*/
+                new MarketItemGroupComponent(-1128519711));
             public Entity Jumpimpact { get; } = new Entity(-1596570946, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/jumpimpact"),
                 new ParentGroupComponent(Modules.GlobalItems.Jumpimpact),
                 new MarketItemGroupComponent(-1596570946));

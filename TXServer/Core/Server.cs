@@ -36,6 +36,7 @@ namespace TXServer.Core
                 ["garage/module/prebuildmodule/common/active/1/gold"] = typeof(GoldModule),
                 ["garage/module/module/weapon/active/2/increaseddamage"] = typeof(IncreasedDamageModule),
                 ["garage/module/module/tank/active/2/invisibility"] = typeof(InvisibilityModule),
+                ["garage/module/module/tank/active/3/invulnerability"] = typeof(InvulnerabilityModule),
                 ["garage/module/module/tank/active/2/jumpimpact"] = typeof(JumpImpactModule),
                 ["garage/module/module/weapon/trigger/3/lifesteal"] = typeof(LifeStealModule),
                 ["garage/module/module/weapon/active/1/mine"] = typeof(MineModule),

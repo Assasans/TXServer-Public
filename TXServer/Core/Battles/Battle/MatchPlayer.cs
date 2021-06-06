@@ -133,7 +133,7 @@ namespace TXServer.Core.Battles
             Tank.AddComponent(new TankMovementComponent(new Movement(position, Vector3.Zero, Vector3.Zero, rotation), new MoveControl(), 0, 0));
         }
 
-        public bool FindModule(Type moduleType, out BattleModule module)
+        public bool HasModule(Type moduleType, out BattleModule module)
         {
             module = Modules.SingleOrDefault(m => m.GetType() == moduleType);
             return module != null;

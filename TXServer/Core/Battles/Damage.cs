@@ -27,6 +27,9 @@ namespace TXServer.Core.Battles
         private static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             HitTarget hitTarget, float damage, bool mine = false)
         {
+            if (victim.HasModule(typeof(InvulnerabilityModule), out BattleModule module))
+                if (((InvulnerabilityModule) module).IsProtected) return;
+
             damage = DamageWithSupplies(damage, victim, damager, mine);
 
             // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
@@ -238,7 +241,7 @@ namespace TXServer.Core.Battles
             killer.UserResult.Damage += (int) damage;
 
             ProcessKillAssists(victim, killer);
-            if (killer.FindModule(typeof(LifeStealModule), out BattleModule module))
+            if (killer.HasModule(typeof(LifeStealModule), out BattleModule module))
                 ((LifeStealModule) module).Activate();
         }
 

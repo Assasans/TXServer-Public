@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;

@@ -21,7 +21,7 @@ namespace TXServer.Core.Battles
 
             if (duration == 30000 && bonusType == BonusType.REPAIR)
                 duration = 3000;
-            if (bonus && matchPlayer.FindModule(typeof(EngineerModule), out BattleModule module))
+            if (bonus && matchPlayer.HasModule(typeof(EngineerModule), out BattleModule module))
                 duration = ((EngineerModule) module).SupplyDuration(duration);
 
 

@@ -104,13 +104,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(2),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
                 new ModuleCardsCompositionComponent());*/
-            /*public Entity Invulnerability { get; } = new Entity(1924597477, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/3/invulnerability"),
+            public Entity Invulnerability { get; } = new Entity(1924597477, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/3/invulnerability"),
                 new ParentGroupComponent(1924597477),
                 new MarketItemGroupComponent(1924597477),
                 new ModuleTankPartComponent(TankPartModuleType.TANK),
                 new ModuleTierComponent(2),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             /*public Entity Backhitdefence { get; } = new Entity(-1962420821, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/passive/1/backhitdefence"),
                 new ParentGroupComponent(-1962420821),
                 new MarketItemGroupComponent(-1962420821),
