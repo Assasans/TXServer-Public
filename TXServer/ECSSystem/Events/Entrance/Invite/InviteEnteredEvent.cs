@@ -18,7 +18,7 @@ namespace TXServer.ECSSystem.Events.Entrance.Invite
 				"NoNick", "Tim203", "M8", "Kaveman", "Assasans",
 				"Concodroid", "Corpserdefg",
 				"SH42913",
-				"Bodr", "C6OI", "Legendar-X", "Pchelik", "networkspecter", "DageLV",
+				"Bodr", "C6OI", "Legendar-X", "Pchelik", "networkspecter", "DageLV", "F24_dark",
 				"Black_Wolf", "NN77296", "MEWPASCO", "Doctor", "TowerCrusher", "Kurays", "AlveroHUN", "Inctrice", "NicolasIceberg"
 			};
 
