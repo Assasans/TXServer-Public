@@ -9,9 +9,10 @@ using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 using TXServer.ECSSystem.Events.Battle.Effect;
 
-namespace TXServer.Core.Battles.Effect {
-    public class MineModule : BattleModule {
-
+namespace TXServer.Core.Battles.Effect
+{
+    public class MineModule : BattleModule
+    {
         public MineModule(MatchPlayer matchPlayer, Entity garageModule) : base(
             matchPlayer,
             ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)

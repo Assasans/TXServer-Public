@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using System.Reflection.Metadata;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Effect.Unit;
@@ -134,7 +133,6 @@ namespace TXServer.Core.Battles.Effect
         private float Acceleration { get; set; }
         private long ActivationTime { get; set; }
         private float BeginHideDistance { get; set; }
-        public const float Damage = 700;
         private float HideRange { get; set; }
         private float Impact { get; set; }
         private float Speed { get; set; }

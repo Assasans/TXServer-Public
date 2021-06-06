@@ -11,7 +11,7 @@ namespace TXServer.Core.Battles.Effect
     {
 		public JumpImpactModule(MatchPlayer matchPlayer, Entity garageModule) : base(
 			matchPlayer,
-			ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
+            ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
 		) { }
 
 		public override void Activate()
@@ -30,9 +30,9 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
-            ForceMultiplier = Config.GetComponent<JumpImpactForceMultPropertyComponent>(ConfigPath, true)
+            ForceMultiplier = Config.GetComponent<JumpImpactForceMultPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
-            WorkingTemperature = Config.GetComponent<JumpImpactWorkingTemperaturePropertyComponent>(ConfigPath, true)
+            WorkingTemperature = Config.GetComponent<JumpImpactWorkingTemperaturePropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
         }
 

@@ -6,9 +6,9 @@ namespace TXServer.ECSSystem.Components
     [SerialVersionUID(1545809085571)]
     public class UserAvatarComponent : Component
     {
-        public UserAvatarComponent(string Id)
+        public UserAvatarComponent(string id)
         {
-            this.Id = Id;
+            this.Id = id;
         }
 
         public string Id { get; set; }

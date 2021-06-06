@@ -4,12 +4,13 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 
-namespace TXServer.Core.Battles.Effect {
-	public class InvisibilityModule : BattleModule {
-
+namespace TXServer.Core.Battles.Effect
+{
+	public class InvisibilityModule : BattleModule
+    {
         public InvisibilityModule(MatchPlayer matchPlayer, Entity garageModule) : base(
 			matchPlayer,
-			ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
+            ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
 		) { }
 
 		public override void Activate() {

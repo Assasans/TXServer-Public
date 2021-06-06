@@ -12,7 +12,7 @@ namespace TXServer.Core.Battles.Effect {
         ) { }
 
         public override void Activate() {
-            if(EffectEntity != null) Deactivate();
+            if (EffectEntity != null) Deactivate();
 
             EffectEntity = SonarEffectTemplate.CreateEntity(MatchPlayer, Duration);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);

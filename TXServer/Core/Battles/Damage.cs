@@ -75,7 +75,7 @@ namespace TXServer.Core.Battles
         {
             float damage;
 
-            if (Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem))
+            if (IsModule(weaponMarketItem))
             {
                 // Module
 
@@ -132,7 +132,7 @@ namespace TXServer.Core.Battles
         public static void DealSplashDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             HitTarget hitTarget)
         {
-            if(IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
+            if (!IsModule(weaponMarketItem) && IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
 
             float distance = hitTarget.HitDistance;
 
@@ -150,6 +150,7 @@ namespace TXServer.Core.Battles
 
         private static bool IsStreamOnCooldown(Entity weapon, MatchPlayer victim, MatchPlayer damager, HitTarget hitTarget)
         {
+
 
             BattleTankPlayer victimTankPlayer = damager.Battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
 
@@ -257,11 +258,7 @@ namespace TXServer.Core.Battles
 
         private static float GetSplashDamageMultiplier(Entity weaponMarketItem, float distance, MatchPlayer victim, MatchPlayer damager)
         {
-            if (weaponMarketItem.TemplateAccessor.Template is SpiderEffectTemplate)
-            {
-                // Spider mine
-                return 1;
-            }
+            if (IsModule(weaponMarketItem)) return 1;
 
             var damageComponent = damager.Weapon.GetComponent<SplashWeaponComponent>();
 
@@ -312,6 +309,10 @@ namespace TXServer.Core.Battles
             }
 
         }
+
+        private static bool IsModule(Entity weaponMarketItem) =>
+            Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem);
+
 
         private static readonly Dictionary<int, int> KillStreakScores = new()
             {{2, 0}, {3, 5}, {4, 7}, {5, 10}, {10, 10}, {15, 10}, {20, 20}, {25, 30}, {30, 40}, {35, 50}, {40, 60}};

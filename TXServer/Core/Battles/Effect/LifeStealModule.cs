@@ -44,9 +44,9 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
-            AdditiveHpFactor = Config.GetComponent<ModuleLifestealEffectAdditiveHPFactorPropertyComponent>(ConfigPath, true)
+            AdditiveHpFactor = Config.GetComponent<ModuleLifestealEffectAdditiveHPFactorPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
-            FixedHp = Config.GetComponent<ModuleLifestealEffectFixedHPPropertyComponent>(ConfigPath, true)
+            FixedHp = Config.GetComponent<ModuleLifestealEffectFixedHPPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
         }
 

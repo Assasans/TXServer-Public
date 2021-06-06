@@ -148,7 +148,7 @@ namespace TXServer.Core
                 throw new ArgumentException("ClientSession Entity doesn't match Player ClientSession Entity");
 
             Logger.Log($"{this}: Logged in as {Data.Username}.");
-            // I did something similiar... lemme find it
+
             Entity user = new(new TemplateAccessor(new UserTemplate(), ""),
                 new UserCountryComponent(Data.CountryCode),
                 new UserAvatarComponent(Data.Avatar),

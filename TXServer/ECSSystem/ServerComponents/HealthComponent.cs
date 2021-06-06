@@ -2,7 +2,7 @@
 
 namespace TXServer.ECSSystem.ServerComponents
 {
-    public class HealthComponent : RangedComponent, IConvertibleComponent<Components.Battle.Health.HealthComponent>, IConvertibleComponent<Components.Battle.Health.HealthConfigComponent>
+    public class HealthComponent : RangedComponent, IConvertibleComponent<Components.Battle.Health.HealthComponent>, IConvertibleComponent<HealthConfigComponent>
     {
         public void Convert(Components.Battle.Health.HealthComponent component)
         {

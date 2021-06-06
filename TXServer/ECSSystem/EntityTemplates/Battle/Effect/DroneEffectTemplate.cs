@@ -13,14 +13,12 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
     [SerialVersionUID(1485335642293L)]
     public class DroneEffectTemplate : EffectBaseTemplate
     {
-        private static readonly string _configPath = "/battle/effect/drone";
-
         public static Entity CreateEntity(MatchPlayer matchPlayer)
         {
             Vector3 spawnPosition = new (matchPlayer.TankPosition.X, matchPlayer.TankPosition.Y + 4,
                 matchPlayer.TankPosition.Z);
 
-            Entity effect = CreateEntity(new DroneEffectTemplate(), _configPath, matchPlayer, addTeam:true);
+            Entity effect = CreateEntity(new DroneEffectTemplate(), "/battle/effect/drone", matchPlayer, addTeam:true);
             effect.AddComponent(matchPlayer.Player.User.GetComponent<UserGroupComponent>());
 
             effect.AddComponent(new EffectActiveComponent());

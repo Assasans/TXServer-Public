@@ -25,7 +25,7 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
-            Factor = Config.GetComponent<ModuleEngineerEffectDurationFactorPropertyComponent>(ConfigPath, true)
+            Factor = Config.GetComponent<ModuleEngineerEffectDurationFactorPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
         }
 

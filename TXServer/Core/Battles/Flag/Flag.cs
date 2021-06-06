@@ -109,8 +109,8 @@ namespace TXServer.Core.Battles
                         // Map pixel color to height
                         float y = MathUtils.Map(pixel.R, byte.MinValue, byte.MaxValue, layer.MinY, layer.MaxY);
 
-                        Logger.Log(
-                            $"{Carrier.MatchPlayer.TankPosition.X} {Carrier.MatchPlayer.TankPosition.Z} {Carrier.MatchPlayer.TankPosition.Y} | {Path.GetFileName(layer.Path)} | {Math.Round(x)} {Math.Round(z)} | {pixel.R} {pixel.G} {pixel.B} | {y}");
+                        //Logger.Log(
+                            //$"{Carrier.MatchPlayer.TankPosition.X} {Carrier.MatchPlayer.TankPosition.Z} {Carrier.MatchPlayer.TankPosition.Y} | {Path.GetFileName(layer.Path)} | {Math.Round(x)} {Math.Round(z)} | {pixel.R} {pixel.G} {pixel.B} | {y}");
 
                         return (layer, y);
                     })

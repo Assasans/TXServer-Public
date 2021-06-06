@@ -4,6 +4,7 @@ using System.Linq;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.EntityTemplates.Item.Slot;
+using TXServer.ECSSystem.Events.Battle;
 
 namespace TXServer.Core.Battles.Effect {
 	public class TickHandler {
@@ -29,21 +30,19 @@ namespace TXServer.Core.Battles.Effect {
 
         // TODO(Assasans): Cooldown has visual bugs on client
 		public void StartCooldown() {
-			DateTimeOffset time = DateTimeOffset.UtcNow;
+            DateTimeOffset time = DateTimeOffset.UtcNow;
 
 			CooldownStart = time;
 
-			if(!ModuleEntity.HasComponent<InventorySlotTemporaryBlockedByServerComponent>()) {
+			/*if(!ModuleEntity.HasComponent<InventorySlotTemporaryBlockedByServerComponent>()) {
 				ModuleEntity.AddComponent(
 					new InventorySlotTemporaryBlockedByServerComponent((long) CooldownDuration, time.UtcDateTime)
 				);
-			}
+			}*/
 
-			if(!ModuleEntity.HasComponent<InventoryCooldownStateComponent>()) {
-				ModuleEntity.AddComponent(
-					new InventoryCooldownStateComponent((int) CooldownDuration, time.UtcDateTime)
-				);
-			}
+            ModuleEntity.TryRemoveComponent<InventoryEnabledStateComponent>();
+            ModuleEntity.AddComponent(new InventoryCooldownStateComponent((int) CooldownDuration, time.UtcDateTime));
+            MatchPlayer.SendEvent(new BattleUserInventoryCooldownSpeedChangedEvent(), ModuleEntity);
 		}
 
 		public abstract void Activate();
@@ -100,14 +99,16 @@ namespace TXServer.Core.Battles.Effect {
 		}
 
 		public void ModuleTick() {
-			if(CooldownStart != null && DateTimeOffset.UtcNow >= CooldownEnd) {
-				if(ModuleEntity.HasComponent<InventoryCooldownStateComponent>()) {
-					ModuleEntity.RemoveComponent<InventoryCooldownStateComponent>();
-				}
+			if (CooldownStart != null && DateTimeOffset.UtcNow >= CooldownEnd)
+            {
+                ModuleEntity.TryRemoveComponent<InventoryCooldownStateComponent>();
+                ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
 
-				if(ModuleEntity.HasComponent<InventorySlotTemporaryBlockedByServerComponent>()) {
+                /*if (ModuleEntity.HasComponent<InventorySlotTemporaryBlockedByServerComponent>()) {
 					ModuleEntity.RemoveComponent<InventorySlotTemporaryBlockedByServerComponent>();
-				}
+				}*/
+
+                ModuleEntity.TryRemoveComponent<InventoryCooldownStateComponent>();
 
 				CooldownStart = null;
 			}
@@ -126,16 +127,14 @@ namespace TXServer.Core.Battles.Effect {
 
 			Tick();
 
-			if(IsEnabled) {
-				if(ModuleEntity.HasComponent<InventoryEnabledStateComponent>()) return;
-
-				ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
+			if (IsEnabled && !IsOnCooldown) {
+				if (ModuleEntity.HasComponent<InventoryEnabledStateComponent>()) return;
+                ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
 			}
-			else {
-				if(!ModuleEntity.HasComponent<InventoryEnabledStateComponent>()) return;
-
-				ModuleEntity.RemoveComponent<InventoryEnabledStateComponent>();
-			}
+			else
+            {
+                ModuleEntity.TryRemoveComponent<InventoryEnabledStateComponent>();
+            }
 		}
 
         public MatchPlayer MatchPlayer { get; }
