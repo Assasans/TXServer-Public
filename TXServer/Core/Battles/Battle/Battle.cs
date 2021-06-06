@@ -171,6 +171,7 @@ namespace TXServer.Core.Battles
                     battlePlayer.Player.SquadPlayer.Squad.ProcessBattleLeave(battlePlayer.Player, this);
 
                 JoinedTankPlayers.Where(p => p != battlePlayer).UnsharePlayers(battlePlayer.Player);
+                Spectators.UnsharePlayers(battlePlayer.Player);
 
                 Logger.Log($"{battlePlayer.Player}: Left battle {BattleEntity.EntityId}");
             }
@@ -334,6 +335,7 @@ namespace TXServer.Core.Battles
                 // Add and share self to players in list
                 MatchTankPlayers.Add(tankPlayer);
                 PlayersInMap.ShareEntities(tankPlayer.MatchPlayer.GetEntities());
+                Spectators.SharePlayers(tankPlayer.Player);
 
                 SortRoundUsers();
             }
