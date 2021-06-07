@@ -17,10 +17,6 @@ namespace TXServer.Core.Battles.Effect
         {
             EffectEntity = EngineerEffectTemplate.CreateEntity(MatchPlayer);
             MatchPlayer.ShareEntities(EffectEntity);
-
-            Schedule(() => {
-                MatchPlayer.UnshareEntities(EffectEntity);
-            });
         }
 
         public override void Init()

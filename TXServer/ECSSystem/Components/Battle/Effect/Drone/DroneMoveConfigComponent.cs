@@ -3,7 +3,8 @@ using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Components.Battle.Effect {
+namespace TXServer.ECSSystem.Components.Battle.Effect.Drone
+{
     [SerialVersionUID(3441234123559L)]
     public class DroneMoveConfigComponent : Component
     {

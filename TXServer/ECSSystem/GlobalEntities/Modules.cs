@@ -195,13 +195,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(2),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
                 new ModuleCardsCompositionComponent());*/
-            /*public Entity Energyinjection { get; } = new Entity(1128679079, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/3/energyinjection"),
+            public Entity Energyinjection { get; } = new Entity(1128679079, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/3/energyinjection"),
                 new ParentGroupComponent(1128679079),
                 new MarketItemGroupComponent(1128679079),
                 new ModuleTankPartComponent(TankPartModuleType.WEAPON),
                 new ModuleTierComponent(2),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             /*public Entity Explosivemass { get; } = new Entity(393550399, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/3/explosivemass"),
                 new ParentGroupComponent(393550399),
                 new MarketItemGroupComponent(393550399),

@@ -5,6 +5,7 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Effect;
+using TXServer.ECSSystem.Components.Battle.Effect.Drone;
 using TXServer.ECSSystem.Components.Battle.Effect.Unit;
 using TXServer.ECSSystem.Components.Battle.Tank;
 

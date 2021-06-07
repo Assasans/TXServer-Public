@@ -1,7 +1,8 @@
 ﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Components.Battle.Module {
+namespace TXServer.ECSSystem.Components.Battle.Effect.EnergyInjection
+{
 	[SerialVersionUID(636367507221863506L)]
 	public class EnergyInjectionModuleReloadEnergyComponent : Component
 	{
