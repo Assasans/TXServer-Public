@@ -151,6 +151,13 @@ namespace TXServer.Core.Battles
             if (KeepDisabled) return;
             Tank.AddComponent(new TankMovableComponent());
             Weapon.AddComponent(new ShootableComponent());
+
+            if (FirstTankSpawn)
+            {
+                foreach (BattleModule module in Modules.Where(module => module.ActivateOnFirstTankActivate))
+                    module.Activate();
+                FirstTankSpawn = false;
+            }
         }
 
         public void DisableTank()
@@ -166,7 +173,7 @@ namespace TXServer.Core.Battles
                 supplyEffect.Remove();
             }
 
-            foreach (BattleModule module in Modules.ToArray())
+            foreach (BattleModule module in Modules.ToArray().Where(m => m.DeactivateOnTankDisable))
                 module.Deactivate();
 
             if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
@@ -326,6 +333,8 @@ namespace TXServer.Core.Battles
         }
         private TankState _TankState;
         public bool KeepDisabled { get; set; }
+
+        public bool FirstTankSpawn { get; set; } = true;
 
         private DateTime TankStateChangeTime { get; set; }
         public DateTime? SelfDestructionTime { get; set; }

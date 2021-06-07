@@ -145,6 +145,8 @@ namespace TXServer.Core.Battles.Effect {
         public List<Entity> EffectEntities { get; set; } = new();
 
         public bool IsEnabled { get; set; }
+        public bool ActivateOnFirstTankActivate { get; set; }
+        public bool DeactivateOnTankDisable { get; set; } = true;
 
         public float Duration { get; set; }
 

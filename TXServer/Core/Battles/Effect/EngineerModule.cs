@@ -16,13 +16,16 @@ namespace TXServer.Core.Battles.Effect
         public override void Activate()
         {
             EffectEntity = EngineerEffectTemplate.CreateEntity(MatchPlayer);
-            MatchPlayer.ShareEntities(EffectEntity);
+            MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
         }
 
         public override void Init()
         {
+            DeactivateOnTankDisable = false;
+
             Factor = Config.GetComponent<ModuleEngineerEffectDurationFactorPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
+
             Activate();
         }
 

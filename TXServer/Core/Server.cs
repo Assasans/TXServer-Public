@@ -29,6 +29,7 @@ namespace TXServer.Core
         {
             Dictionary<string, Type> modules = new()
             {
+                ["garage/module/module/tank/passive/2/acceleratedgears"] = typeof(AcceleratedGearsModule),
                 ["garage/module/module/weapon/active/3/energyinjection"] = typeof(EnergyInjectionModule),
                 ["garage/module/module/weapon/passive/1/engineer"] = typeof(EngineerModule),
                 ["garage/module/module/tank/active/1/absorbingarmor"] = typeof(EnhancedArmorModule),
