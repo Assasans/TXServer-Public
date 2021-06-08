@@ -7,7 +7,7 @@ namespace TXServer.ECSSystem.Events.Battle
     [SerialVersionUID(1430210549752L)]
 	public class SelfUpdateStreamHitEvent : BaseUpdateStreamHitEvent, ISelfEvent
 	{
-		public void Execute(Player player, Entity weapon) => SelfEvent.Execute(this, player, weapon);
-		public IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteUpdateStreamHitEvent>();
+        public void Execute(Player player, Entity weapon) => SelfEvent.Execute(this, player, weapon);
+        public IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteUpdateStreamHitEvent>();
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 
 namespace TXServer.ECSSystem.EntityTemplates.Battle
@@ -8,7 +9,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(1430285569243L)]
     public class StreamWeaponTemplate : WeaponTemplate
     {
-        protected static new Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank, BattleTankPlayer battlePlayer)
+        protected new static Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank, BattleTankPlayer battlePlayer)
         {
             Entity entity = WeaponTemplate.CreateEntity(template, configPath, tank, battlePlayer);
             entity.Components.Add(new StreamWeaponComponent());
@@ -16,6 +17,11 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
             entity.Components.Add(battlePlayer.TurretUnloadEnergyPerShot == null
                 ? new StreamWeaponEnergyComponent(.167f, .25f)
                 : new StreamWeaponEnergyComponent(.167f, (float) battlePlayer.TurretUnloadEnergyPerShot));
+
+            entity.AddComponent(new StreamHitConfigComponent(1000, 1000,true));
+
+            if (battlePlayer.Team != null)
+                entity.AddComponent(battlePlayer.Team.GetComponent<TeamGroupComponent>());
 
             return entity;
         }

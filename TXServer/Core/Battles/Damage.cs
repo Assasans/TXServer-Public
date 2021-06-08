@@ -205,6 +205,7 @@ namespace TXServer.Core.Battles
 
             target.Tank.ChangeComponent<HealthComponent>(component =>
             {
+                // todo: fix overpowered healing (doesn't seem to be correct)
                 int healingPerSecond = 415;
                 if (component.CurrentHealth != component.MaxHealth)
                 {
@@ -220,7 +221,7 @@ namespace TXServer.Core.Battles
             {
                 target.Player.BattlePlayer.Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), target.Tank);
                 healer.Battle.Spectators.Concat(new[] {(IPlayerPart) healer})
-                    .SendEvent(new DamageInfoEvent(900, hitTarget.LocalHitPoint, false, true), target.Tank);
+                    .SendEvent(new DamageInfoEvent(415, hitTarget.LocalHitPoint, false, true), target.Tank);
                 healer.SendEvent(new VisualScoreHealEvent(healer.GetScoreWithPremium(4)), healer.BattleUser);
                 healer.UpdateStatistics(additiveScore: 4, 0, 0, 0, null);
             }
