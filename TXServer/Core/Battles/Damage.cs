@@ -113,10 +113,20 @@ namespace TXServer.Core.Battles
                 else
                 {
                     // Discrete weapon
-                    var minDamageComponent = Config.GetComponent<ServerComponents.Damage.MinDamagePropertyComponent>(path);
-                    var maxDamageComponent = Config.GetComponent<ServerComponents.Damage.MaxDamagePropertyComponent>(path);
+                    var damagePerPelletComponent = Config.GetComponent<ServerComponents.Damage.DamagePerPelletPropertyComponent>(path, false);
+                    if (damagePerPelletComponent != null)
+                    {
+                        // Hammer
+                        // TODO(Assasans): damage should take distance into account
+                        damage = (int) damagePerPelletComponent.FinalValue;
+                    }
+                    else
+                    {
+                        var minDamageComponent = Config.GetComponent<ServerComponents.Damage.MinDamagePropertyComponent>(path);
+                        var maxDamageComponent = Config.GetComponent<ServerComponents.Damage.MaxDamagePropertyComponent>(path);
 
-                    damage = (int) Math.Round(new Random().NextGaussianRange(minDamageComponent.FinalValue, maxDamageComponent.FinalValue));
+                        damage = (int) Math.Round(new Random().NextGaussianRange(minDamageComponent.FinalValue, maxDamageComponent.FinalValue));
+                    }
                 }
             }
 

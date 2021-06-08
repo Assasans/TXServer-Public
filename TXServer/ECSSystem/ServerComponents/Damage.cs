@@ -2,6 +2,10 @@
 {
     public static class Damage
     {
+        public class DamagePerPelletPropertyComponent : RangedComponent
+        {
+        }
+
         public class DamagePerSecondPropertyComponent : RangedComponent
         {
         }
