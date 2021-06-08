@@ -10,7 +10,10 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity module, Entity slot)
 		{
-			player.CurrentPreset.Modules[slot] = null;
+            if (!slot.HasComponent<ModuleGroupComponent>() || !module.HasComponent<MountedItemComponent>())
+                return;
+
+            player.CurrentPreset.Modules[slot] = null;
 
 			slot.RemoveComponent<ModuleGroupComponent>();
 			module.RemoveComponent<MountedItemComponent>();

@@ -9,8 +9,11 @@ namespace TXServer.ECSSystem.Events
 	public class ModuleMountEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity module, Entity slot)
-		{
-			player.CurrentPreset.Modules[slot] = module;
+        {
+            if (slot.HasComponent<ModuleGroupComponent>() || module.HasComponent<MountedItemComponent>())
+                return;
+
+            player.CurrentPreset.Modules[slot] = module;
 
 			slot.AddComponent(new ModuleGroupComponent(module));
 			module.AddComponent(new MountedItemComponent());
