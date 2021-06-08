@@ -66,7 +66,9 @@ namespace TXServer.Core
             new Thread(() => StateServer(ip)) { Name = "State Server" }.Start();
 
             new Thread(BattleLoop) { Name = "Battle Thread" }.Start();
+#if DEBUG
             if (!Server.Instance.Settings.DisablePingMessages)
+#endif
                 new Thread(PingChecker) { Name = "Ping Checker" }.Start();
 
             Logger.Log("Server is started.");
@@ -113,7 +115,7 @@ namespace TXServer.Core
         /// <summary>
         /// Waits for new clients.
         /// </summary>
-        public void AcceptPlayers(IPAddress ip, short port, int PoolSize)
+        private void AcceptPlayers(IPAddress ip, short port, int PoolSize)
         {
             using (acceptorSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {
@@ -155,7 +157,7 @@ namespace TXServer.Core
         /// HTTP state server.
         /// </summary>
         /// <param name="ip">IP address.</param>
-        public void StateServer(IPAddress ip)
+        private void StateServer(IPAddress ip)
         {
             string rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/StateServer";
 
@@ -240,7 +242,7 @@ namespace TXServer.Core
             }
         }
 
-        public void PingChecker()
+        private void PingChecker()
         {
             sbyte id = 0;
 
@@ -254,16 +256,11 @@ namespace TXServer.Core
                     player.SendEvent(new PingEvent(player.Connection.PingSendTime.ToUnixTimeMilliseconds(), id), player.ClientSession);
                 }
 
-                if (id++ == 255)
-                {
-                    id = 0;
-                }
-
                 Thread.Sleep(10000);
             }
         }
 
-        public void BattleLoop()
+        private void BattleLoop()
         {
             Stopwatch stopwatch = new();
 
@@ -322,8 +319,8 @@ namespace TXServer.Core
 
         public int PlayerCount = 0;
 
-        public static string ServerMapInfoLocation { get; } = "Library/ServerMapInfo.json";
-        public static string HeightMapInfoLocation { get; } = "Library/HeightMaps.json";
+        private static string ServerMapInfoLocation { get; } = "Library/ServerMapInfo.json";
+        private static string HeightMapInfoLocation { get; } = "Library/HeightMaps.json";
         public static Dictionary<string, MapInfo> ServerMapInfo { get; private set; }
         public static Dictionary<string, HeightMap> HeightMaps { get; private set; }
     }

@@ -4,49 +4,69 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="TX Server" WindowStartupLocation="CenterScreen" Height="291" Width="648" ResizeMode="CanMinimize" ScrollViewer.VerticalScrollBarVisibility="Disabled" Closing="Window_Closing">
-    <!-- TODO: Implement dynamic localization -->
-    <Grid Margin="0,0,4,-19" UseLayoutRounding="False">
-        <GroupBox Header="Actions" Margin="10,10,0,0" Height="65" VerticalAlignment="Top" HorizontalAlignment="Left" Width="320">
-            <Grid Height="65" Margin="0,0,-12,-22" VerticalAlignment="Top">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="87*"/>
-                    <ColumnDefinition Width="53*"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="Start Server:" HorizontalAlignment="Left" Margin="10,7,0,0" VerticalAlignment="Top" Height="26" Width="95"/>
-                <Button x:Name="StartButton" Content="Start" Margin="10,10,21,0" VerticalAlignment="Top" Grid.Column="1" Height="20" Click="StartServer_Click"/>
-            </Grid>
-        </GroupBox>
-        <GroupBox x:Name="SettingsGroupBox" Header="Settings" HorizontalAlignment="Left" Height="158" Margin="10,80,0,0" VerticalAlignment="Top" Width="320">
-            <Grid Margin="0,0,-12,-22">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="31*"/>
-                    <ColumnDefinition Width="39*"/>
-                </Grid.ColumnDefinitions>
+        Title="TXServer" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" Closing="Window_Closing" Width="550" SizeToContent="Height">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
 
-                <TextBlock HorizontalAlignment="Left" Margin="10,38,0,0" TextWrapping="Wrap" Text="Port:" VerticalAlignment="Top" Height="16" Width="30"/>
-                <ComboBox x:Name="IPAddressComboBox" Grid.Column="1" Margin="10,10,21,0" VerticalAlignment="Top" SelectedIndex="0" Height="22"/>
+        <StackPanel Grid.Column="0">
+            <GroupBox Header="Actions" Margin="3">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="7*"/>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
 
-                <TextBlock HorizontalAlignment="Left" Margin="10,13,0,0" TextWrapping="Wrap" Text="IP address:" VerticalAlignment="Top" Height="16" Width="70"/>
-                <TextBox x:Name="PortTextBox" Grid.Column="1" Height="23" Margin="10,37,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="5050" IsEnabled="False"/>
+                    <Label Content="Start server:" Grid.Column="0"/>
+                    <Button x:Name="StartButton" Content="Start" Click="StartServer_Click" Margin="3" Grid.Column="1"/>
+                </Grid>
+            </GroupBox>
+            
+            <StackPanel x:Name="SettingsStackPanel">
+                <GroupBox Header="Settings" Margin="3">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
 
-                <TextBlock HorizontalAlignment="Left" Margin="10,66,0,0" TextWrapping="Wrap" Text="Max players:" VerticalAlignment="Top" Height="22" Width="109"/>
-                <TextBox x:Name="MaxPlayersTextBox" Height="23" Margin="10,65,21,0" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Text="5"/>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
 
-                <CheckBox x:Name="DisableHeightMapsCheckBox" Content="Disable height maps" HorizontalAlignment="Left" Margin="10,93,0,0" VerticalAlignment="Top"/>
-                
-                <CheckBox x:Name="EnableTracingCheckBox" Content="Enable tracing" HorizontalAlignment="Left" Margin="10,116,0,0" VerticalAlignment="Top"/>
-            </Grid>
-        </GroupBox>
-        <TextBlock HorizontalAlignment="Left" Height="0" Margin="10,10,0,0" Grid.Row="1" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="25" Grid.Column="1"/>
-        <GroupBox x:Name="StateGroupBox" Header="State" Margin="335,10,0,0" Height="205" VerticalAlignment="Top" HorizontalAlignment="Left" Width="293">
-            <Grid Height="184" Margin="0,0,-12,-13" VerticalAlignment="Top">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="87*"/>
-                    <ColumnDefinition Width="53*"/>
-                </Grid.ColumnDefinitions>
-                <TextBox x:Name="ServerStateText" Margin="10,10,0,0" TextWrapping="Wrap" Grid.ColumnSpan="2" Focusable="False" AllowDrop="False" IsTabStop="False" UndoLimit="0" Height="164" VerticalAlignment="Top" HorizontalAlignment="Left" Width="264" UseLayoutRounding="False" IsReadOnly="True"/>
-            </Grid>
+                        <Label Content="IP address:" Grid.Row="0" Grid.Column="0"/>
+                        <ComboBox x:Name="IPAddressComboBox" Margin="3" Grid.Row="0" Grid.Column="1"/>
+
+                        <Label Content="Port:" Grid.Row="1" Grid.Column="0"/>
+                        <TextBox x:Name="PortTextBox" Text="5050" Margin="3" Grid.Row="1" Grid.Column="1"/>
+
+                        <Label Content="Max players:" Grid.Row="2" Grid.Column="0"/>
+                        <TextBox x:Name="MaxPlayersTextBox" Text="5" Margin="3" Grid.Row="2" Grid.Column="1"/>
+
+                        <CheckBox x:Name="DisableHeightMapsCheckBox" Content="Disable height maps" Margin="3" Grid.Row="3" Grid.ColumnSpan="2"/>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox x:Name="DebugOptionsGroupBox" Header="Debug options" Margin="3">
+                    <StackPanel>
+                        <CheckBox x:Name="DisablePingMessagesCheckBox" Content="Disable sending of ping messages" Margin="3"/>
+
+                        <CheckBox x:Name="EnableTracingCheckBox" Content="Enable tracing" Margin="3" Click="EnableTracing_Click"/>
+                        <StackPanel x:Name="TracingOptions" IsEnabled="False" Margin="20,0,0,0">
+                            <CheckBox x:Name="EnableCommandStackTraceCheckBox" Content="Print stack traces of commands" Margin="3"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </StackPanel>
+        <GroupBox x:Name="StateGroupBox" Header="State" Margin="3" Grid.Column="1" Padding="3">
+            <TextBox x:Name="ServerStateText" TextWrapping="Wrap" Focusable="False" AllowDrop="False" IsTabStop="False" UndoLimit="0" IsReadOnly="True" Margin="3"/>
         </GroupBox>
     </Grid>
 </Window>

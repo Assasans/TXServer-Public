@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -75,15 +75,9 @@ namespace TXServer.Core
                 IsConsoleAttached = false;
             }
         }
-        
-        public static bool IsStarted()
-        {
-            return Server.Instance != null && Server.Instance.Connection.IsStarted;
-        }
-        
-        public static int GetPlayerCount()
-        {
-            return Server.Instance != null ? Server.Instance.Connection.PlayerCount : -1;
-        }
+
+        public static bool IsStarted() => Server.Instance?.Connection.IsStarted == true;
+
+        public static int GetPlayerCount() => Server.Instance?.Connection.PlayerCount ?? -1;
     }
 }

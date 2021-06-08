@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using System.Windows;
@@ -7,9 +7,6 @@ using TXServer.Core;
 
 namespace TXServerUI
 {
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private static volatile bool errorState;
@@ -18,19 +15,20 @@ namespace TXServerUI
         {
             InitializeComponent();
 
-            // Заполнение списка IP-адресов.
             foreach (NetworkInterface @interface in NetworkInterface.GetAllNetworkInterfaces())
             {
                 foreach (UnicastIPAddressInformation ipInfo in @interface.GetIPProperties().UnicastAddresses)
                 {
                     if (ipInfo.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                    {
                         IPAddressComboBox.Items.Add(ipInfo.Address);
-                    }
                 }
             }
-
             IPAddressComboBox.Items.Add(IPAddress.Any);
+            IPAddressComboBox.SelectedItem = IPAddressComboBox.Items[0];
+
+#if !DEBUG
+            DebugOptionsGroupBox.Visibility = Visibility.Collapsed;
+#endif
 
             _ = UpdateStateText();
         }
@@ -47,7 +45,6 @@ namespace TXServerUI
             });
         }
 
-        // Кнопка запуска сервера.
         private void StartServer_Click(object sender, RoutedEventArgs e)
         {
             errorState = false;
@@ -67,31 +64,31 @@ namespace TXServerUI
 
         private void StartServer()
         {
-            SettingsGroupBox.IsEnabled = false;
-
             ServerSettings settings = new()
             {
                 IPAddress = (IPAddress)IPAddressComboBox.SelectedItem,
                 Port = short.Parse(PortTextBox.Text),
                 MaxPlayers = int.Parse(MaxPlayersTextBox.Text),
                 DisableHeightMaps = DisableHeightMapsCheckBox.IsChecked.GetValueOrDefault(),
-                TraceModeEnabled = EnableTracingCheckBox.IsChecked.GetValueOrDefault()
+
+                DisablePingMessages = DisablePingMessagesCheckBox.IsChecked.GetValueOrDefault(),
+                EnableTracing = EnableTracingCheckBox.IsChecked.GetValueOrDefault(),
+                EnableCommandStackTrace = EnableCommandStackTraceCheckBox.IsChecked.GetValueOrDefault(),
             };
 
             ServerLauncher.InitServer(settings);
 
+            SettingsStackPanel.IsEnabled = false;
             StartButton.Content = "Stop";
-
             Activate();
             _ = UpdateStateText();
         }
 
         private void StopServer()
         {
-            SettingsGroupBox.IsEnabled = true;
-
             ServerLauncher.StopServer();
 
+            SettingsStackPanel.IsEnabled = true;
             StartButton.Content = "Start";
         }
 
@@ -104,7 +101,12 @@ namespace TXServerUI
             }
         }
 
-        public async Task UpdateStateText()
+        private void EnableTracing_Click(object sender, RoutedEventArgs e)
+        {
+            TracingOptions.IsEnabled = EnableTracingCheckBox.IsChecked.GetValueOrDefault();
+        }
+
+        private async Task UpdateStateText()
         {
             while (ServerLauncher.IsStarted())
             {

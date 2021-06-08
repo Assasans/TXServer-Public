@@ -180,7 +180,7 @@ namespace TXServer.Core
             if (!IsActive) return;
 
 #if DEBUG
-            if (Server.Instance.Settings.CommandStackTraceEnabled)
+            if (Server.Instance.Settings.EnableCommandStackTrace)
                 Logger.Trace($"Queued commands for {Player}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}\n{Environment.StackTrace}");
 #endif
 

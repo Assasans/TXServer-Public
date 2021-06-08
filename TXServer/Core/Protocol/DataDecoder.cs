@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -285,7 +285,7 @@ namespace TXServer.Core.Protocol
             if (readMagic.Length < 2)
                 throw new IOException("Unexpected client error.");
             else if (!readMagic.SequenceEqual(Magic))
-                throw new Exception();
+                throw new IOException($"Invalid packet magic: {BitConverter.ToString(readMagic)}");
 
             // Length values.
             mapLength = reader.ReadInt32();

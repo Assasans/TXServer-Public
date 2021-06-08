@@ -27,7 +27,7 @@ namespace TXServer.Core.Logging
         public static void Debug(object content) => DebugWrite("DEBUG", ConsoleColor.DarkGreen, content);
         public static void Trace(object content)
         {
-            if (Server.Instance.Settings.TraceModeEnabled)
+            if (Server.Instance.Settings.EnableTracing)
                 DebugWrite("TRACE", ConsoleColor.DarkGray, content);
         }
 
