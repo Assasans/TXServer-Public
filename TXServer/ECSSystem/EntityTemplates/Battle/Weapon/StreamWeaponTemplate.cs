@@ -20,9 +20,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
 
             entity.AddComponent(new StreamHitConfigComponent(1000, 1000,true));
 
-            if (battlePlayer.Team != null)
-                entity.AddComponent(battlePlayer.Team.GetComponent<TeamGroupComponent>());
-
             return entity;
         }
     }
