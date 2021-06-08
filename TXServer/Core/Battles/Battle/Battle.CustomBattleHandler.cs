@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
@@ -78,13 +79,12 @@ namespace TXServer.Core.Battles
             {
                 if (battlePlayer.Player == Owner)
                 {
-                    if (Battle.JoinedTankPlayers.Any())
-                    {
-                        var allBattlePlayers = Battle.JoinedTankPlayers.ToList();
-                        _Owner = allBattlePlayers[new Random().Next(allBattlePlayers.Count)].Player;
-                        Battle.BattleLobbyEntity.RemoveComponent<UserGroupComponent>();
-                        Battle.BattleLobbyEntity.AddComponent(new UserGroupComponent(Owner.User));
-                    }
+                    if (Battle.JoinedTankPlayers.All(p => p == battlePlayer)) return;
+
+                    var allBattlePlayers = Battle.JoinedTankPlayers.Where(p => p != battlePlayer).ToList();
+                    _Owner = allBattlePlayers[new Random().Next(allBattlePlayers.Count)].Player;
+                    Battle.BattleLobbyEntity.RemoveComponent<UserGroupComponent>();
+                    Battle.BattleLobbyEntity.AddComponent(new UserGroupComponent(Owner.User));
                 }
             }
         }

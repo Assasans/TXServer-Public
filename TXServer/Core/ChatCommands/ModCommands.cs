@@ -63,7 +63,7 @@ namespace TXServer.Core.ChatCommands
             '/' + string.Join("\n/", from command in Commands
                 select command.Value.Item1 ?? command.Key);
 
-        private static bool FindPlayer(string targetIdentifier, out Player target, out string error)
+        public static bool FindPlayer(string targetIdentifier, out Player target, out string error)
         {
             error = $"Command error, couldn't find player '{targetIdentifier}'";
             target = Server.Instance.FindPlayerByUsername(targetIdentifier);

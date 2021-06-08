@@ -4,6 +4,7 @@ using System.Linq;
 using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.Core.ServerMapInformation;
+using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
 using TXServer.ECSSystem.Types;
 
@@ -23,6 +24,7 @@ namespace TXServer.Core.ChatCommands
             { "open", (null, ChatCommandConditions.InBattle, Open) },
             { "pause", (null, ChatCommandConditions.InBattle, Pause) },
             { "positioninfo", (null, ChatCommandConditions.InMatch, PositionInfo) },
+            { "reload", ("reload [opt: all]", ChatCommandConditions.None, Reload) },
             { "start", (null, ChatCommandConditions.InBattle, Start) },
             { "shutdown", (null, ChatCommandConditions.Admin, Shutdown) },
             { "supplyrain", (null, ChatCommandConditions.ActiveBattle, SupplyRain) }
@@ -225,6 +227,34 @@ namespace TXServer.Core.ChatCommands
         {
             MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
             return $"Vector3: {matchPlayer.TankPosition} || Quaternion: {matchPlayer.TankQuaternion}";
+        }
+
+        private static string Reload(Player player, string[] args)
+        {
+            List<BaseBattlePlayer> targets = new();
+            string targetName = args.Any() ? args[0] : player.Data.Username;
+            switch (targetName)
+            {
+                case "all":
+                    if (!player.IsInMatch) return "Error: Target 'all' is only possible in a match";
+                    targets.AddRange(player.BattlePlayer.Battle.PlayersInMap);
+                    break;
+                default:
+                    if (!ModCommands.FindPlayer(targetName, out Player target, out string error)) return error;
+                    if (!target.IsInMatch)
+                        return $"Error: Player '{target.Data.Username}' isn't in a match";
+                    targets.Add(target.BattlePlayer);
+                    break;
+            }
+
+            foreach (BaseBattlePlayer battlePlayer in targets)
+            {
+                battlePlayer.Battle.KeepRunning = true;
+                battlePlayer.Rejoin = true;
+                battlePlayer.SendEvent(new KickFromBattleEvent(), (battlePlayer as BattleTankPlayer)?.MatchPlayer.BattleUser ?? ((Spectator)battlePlayer).BattleUser);
+            }
+
+            return $"Target{(targets.Count > 1 ? "s" : "")} rejoin{(targets.Count < 2 ? "s" : "")}";
         }
 
         private static string Shutdown(Player player, string[] args)
