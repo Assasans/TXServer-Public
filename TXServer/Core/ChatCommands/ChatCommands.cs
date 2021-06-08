@@ -31,7 +31,7 @@ namespace TXServer.Core.ChatCommands
 
             { "hackBattle", ("hackBattle [everyone/onlyme]", ChatCommandConditions.BattleOwner, HackBattle) },
             { "bulletSpeed", ("bulletSpeed [max/stuck/norm/number] [target]", ChatCommandConditions.HackBattle, BulletSpeed) },
-            { "cases", (null, ChatCommandConditions.None, ListPunishments) },
+            { "cases", ("cases (punishments)", ChatCommandConditions.None, ListPunishments) },
             { "cheat", ("cheat [supply] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.ActiveTank, Cheat) },
             { "flag", ("flag [color] [deliver/drop/return/give] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, FlagAction) },
             { "gravity", ("gravity [number]", ChatCommandConditions.BattleOwner | ChatCommandConditions.HackBattle, Gravity) },
@@ -655,7 +655,7 @@ namespace TXServer.Core.ChatCommands
                     continue;
                 }
 
-                if (target.MatchPlayer.Weapon.GetComponent<StreamWeaponComponent>() != null)
+                if (target.MatchPlayer.Weapon.HasComponent<StreamWeaponComponent>())
                     target.MatchPlayer.Weapon.ChangeComponent<StreamWeaponEnergyComponent>(component =>
                         component.UnloadEnergyPerSec = (float)unloadEnergyPerShot);
                 else

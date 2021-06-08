@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(-1716200834009238305L)]
     public class DiscreteWeaponTemplate : WeaponTemplate
     {
-        protected static new Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank, BattleTankPlayer battlePlayer)
+        protected new static Entity CreateEntity(WeaponTemplate template, string configPath, Entity tank, BattleTankPlayer battlePlayer)
         {
             Entity entity = WeaponTemplate.CreateEntity(template, configPath, tank, battlePlayer);
 
@@ -23,7 +23,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                     : new KickbackComponent((float)battlePlayer.TurretKickback),
                 battlePlayer.TurretUnloadEnergyPerShot == null
                     ? Config.GetComponent<DiscreteWeaponEnergyComponent>(configPath)
-                    : new DiscreteWeaponEnergyComponent(1f, 1f / (float)battlePlayer.TurretUnloadEnergyPerShot)
+                    : new DiscreteWeaponEnergyComponent(1f, (float)battlePlayer.TurretUnloadEnergyPerShot)
             }.Where(x => x != null));
 
             return entity;
