@@ -1,7 +1,6 @@
 ﻿using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 
 namespace TXServer.ECSSystem.EntityTemplates.Battle

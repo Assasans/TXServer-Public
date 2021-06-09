@@ -17,7 +17,8 @@ namespace TXServer.ECSSystem.Events.Chat
 	{
         private static ChatMessageReceivedEvent CreateMessage(string message, Player receiver, Player sender = null)
         {
-            if (sender is {IsLoggedIn: true} && receiver.Data.BlockedPlayerIds.Contains(sender.User.EntityId))
+            if (receiver is {IsLoggedIn: true} && sender != null &&
+                receiver.Data.BlockedPlayerIds.Contains(sender.User.EntityId))
                 return CreateBlockedMessage(receiver, sender);
 
             return new ChatMessageReceivedEvent
