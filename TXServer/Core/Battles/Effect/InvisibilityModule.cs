@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 
@@ -34,7 +35,8 @@ namespace TXServer.Core.Battles.Effect
         {
             base.Tick();
 
-            if (DateTimeOffset.Now >= EndTime) Deactivate();
+            if (DateTimeOffset.Now >= EndTime ||
+                MatchPlayer.Weapon.HasComponent<StreamWeaponWorkingComponent>()) Deactivate();
         }
 
         private DateTimeOffset? EndTime { get; set; }
