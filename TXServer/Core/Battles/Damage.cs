@@ -163,8 +163,6 @@ namespace TXServer.Core.Battles
 
         private static bool IsStreamOnCooldown(Entity weapon, MatchPlayer victim, MatchPlayer damager, HitTarget hitTarget)
         {
-
-
             BattleTankPlayer victimTankPlayer = damager.Battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
 
             string path = Weapons.GlobalItems.GetAllItems()
@@ -174,20 +172,78 @@ namespace TXServer.Core.Battles
             var damageComponent = Config.GetComponent<ServerComponents.Damage.DamagePerSecondPropertyComponent>(path, false);
             if (damageComponent == null) return false;
 
-            if (damager.DamageCooldowns.ContainsKey(victimTankPlayer))
+            if (!damager.DamageCooldowns.ContainsKey(victimTankPlayer)) {
+                damager.DamageCooldowns[victimTankPlayer] = new TankDamageCooldown();
+            }
+
+            TankDamageCooldown cooldown = damager.DamageCooldowns[victimTankPlayer];
+
+            // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
+            //     $"====================================================",
+            //     victim.Battle.GeneralBattleChatEntity, damager.Player
+            // );
+
+            // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
+            //     $"[Damage] DifferenceToLastShot: {(long)sus.DifferenceToLastShot.TotalMilliseconds} ms",
+            //     victim.Battle.GeneralBattleChatEntity, damager.Player
+            // );
+
+            // Долго не стрелял
+            if (cooldown.DifferenceToLastShot.TotalMilliseconds > 100)
             {
-                DateTimeOffset cooldownEnd = damager.DamageCooldowns[victimTankPlayer];
+                // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
+                //     $"[Damage] Долго не стрелял, сброс LastShot (старое значение DifferenceToLastShot: {(long)sus.DifferenceToLastShot.TotalMilliseconds} ms)",
+                //     victim.Battle.GeneralBattleChatEntity, damager.Player
+                // );
 
-                if(DateTimeOffset.UtcNow < cooldownEnd) return true;
-
-                damager.DamageCooldowns.Remove(victimTankPlayer);
+                // Сброс времени последнего удара на текущее время
+                cooldown.LastDamageTime = DateTimeOffset.UtcNow;
 
                 return true;
             }
 
-            damager.DamageCooldowns[victimTankPlayer] = DateTimeOffset.UtcNow + TimeSpan.FromMilliseconds(1000);
+            if (cooldown.LastDamageTime != default)
+            {
+                // Добавить разницу от времени последнего удара
+                // к времени беспрерывной стрельбы
+                cooldown.DamageTime += DateTimeOffset.UtcNow - cooldown.LastDamageTime;
 
-            return false;
+                // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
+                //     $"[Damage] Добавлена разница от последнего удара (текущее значение: {(long)sus.DamageTime.TotalMilliseconds} ms)",
+                //     victim.Battle.GeneralBattleChatEntity, damager.Player
+                // );
+            }
+
+            // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
+            //     $"[Damage] Сброс времени последнего удара (старое значение: {sus.LastDamageTime:dd/MM/yyyy hh:mm:ss.fff})",
+            //     victim.Battle.GeneralBattleChatEntity, damager.Player
+            // );
+
+            // Сброс времени последнего удара (?)
+            cooldown.LastDamageTime = DateTimeOffset.UtcNow;
+
+            // Если время беспрерывной стрельбы больше X
+            if (cooldown.DamageTime.TotalMilliseconds > 1000)
+            {
+                // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
+                //     $"[Damage] Сброс времени беспрерывной стрельбы (старое значение: {(long)sus.DamageTime.TotalMilliseconds} ms)",
+                //     victim.Battle.GeneralBattleChatEntity, damager.Player
+                // );
+
+                // Сброс времени беспрерывной стрельбы
+                cooldown.DamageTime = TimeSpan.Zero;
+
+                // Времени беспрерывной стрельбы достаточно
+                return false;
+            }
+
+            // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
+            //     $"[Damage] Времени беспрерывной стрельбы недостаточно (текущее значение: {(long)sus.DamageTime.TotalMilliseconds} ms)",
+            //     victim.Battle.GeneralBattleChatEntity, damager.Player
+            // );
+
+            // Времени беспрерывной стрельбы недостаточно
+            return true;
         }
 
         public static void IsisHeal(MatchPlayer target, MatchPlayer healer, HitTarget hitTarget)

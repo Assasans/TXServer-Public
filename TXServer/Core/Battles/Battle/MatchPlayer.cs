@@ -352,7 +352,7 @@ namespace TXServer.Core.Battles
         public List<SupplyEffect> SupplyEffects { get; } = new();
         private List<BonusType> SupplyEffectsAfterSpawn { get; } = new();
 
-        public Dictionary<BattleTankPlayer, DateTimeOffset> DamageCooldowns { get; } = new();
+        public Dictionary<BattleTankPlayer, TankDamageCooldown> DamageCooldowns { get; } = new();
         public Dictionary<MatchPlayer, float> DamageAssistants { get; } = new();
         public int AlreadyAddedExperience { get; set; }
 
@@ -360,5 +360,13 @@ namespace TXServer.Core.Battles
         public SpawnPoint LastSpawnPoint { get; set; }
         public TeleportPoint LastTeleportPoint { get; set; }
         public TeleportPoint NextTeleportPoint { get; set; }
+    }
+
+    public class TankDamageCooldown
+    {
+        public DateTimeOffset LastDamageTime { get; set; }
+        public TimeSpan DamageTime { get; set; }
+
+        public TimeSpan DifferenceToLastShot => LastDamageTime == default ? default : DateTimeOffset.UtcNow - LastDamageTime;
     }
 }
