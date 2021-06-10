@@ -17,6 +17,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Activate()
         {
+            if (EffectEntity != null) return;
+
             MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.TurnSpeed *= HullRotation);
             MatchPlayer.Weapon.ChangeComponent<WeaponRotationComponent>(component =>
             {
@@ -45,7 +47,6 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
-            ActivateOnFirstTankActivate = true;
             DeactivateOnTankDisable = false;
 
             HullRotation = Config.GetComponent<ModuleAcceleratedGearsEffectHullRotationSpeedPropertyComponent>(ConfigPath)

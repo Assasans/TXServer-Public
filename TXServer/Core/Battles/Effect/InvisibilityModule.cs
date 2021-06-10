@@ -19,7 +19,10 @@ namespace TXServer.Core.Battles.Effect
 
 			EffectEntity = InvisibilityEffectTemplate.CreateEntity(MatchPlayer);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
-            EndTime = DateTimeOffset.Now.AddMilliseconds(6000);
+
+            Schedule(TimeSpan.FromMilliseconds(Duration), Deactivate);
+
+            if (MatchPlayer.Weapon.HasComponent<StreamWeaponWorkingComponent>()) Deactivate();
         }
 
 		public override void Deactivate()
@@ -35,8 +38,7 @@ namespace TXServer.Core.Battles.Effect
         {
             base.Tick();
 
-            if (DateTimeOffset.Now >= EndTime ||
-                MatchPlayer.Weapon.HasComponent<StreamWeaponWorkingComponent>()) Deactivate();
+            if (DateTimeOffset.Now >= EndTime ) Deactivate();
         }
 
         private DateTimeOffset? EndTime { get; set; }

@@ -12,7 +12,7 @@ namespace TXServer.Core.Battles.Effect {
 		) { }
 
 		public override void Activate() {
-			if(EffectEntity != null) Deactivate();
+			if( EffectEntity != null) Deactivate();
 
 			EffectEntity = ForceFieldEffectTemplate.CreateEntity(MatchPlayer);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
@@ -20,12 +20,16 @@ namespace TXServer.Core.Battles.Effect {
 			Schedule(TimeSpan.FromMilliseconds(Duration), Deactivate);
 		}
 
-		public override void Deactivate() {
-			if (EffectEntity != null) {
-				MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
+		public override void Deactivate()
+        {
+            if (EffectEntity == null) return;
+            MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
+            EffectEntity = null;
+        }
 
-				EffectEntity = null;
-			}
-		}
-	}
+        public override void Init()
+        {
+            EffectAffectedByEmp = false;
+        }
+    }
 }

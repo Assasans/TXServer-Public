@@ -29,7 +29,8 @@ namespace TXServer.Core.Battles.Effect
             Activate();
         }
 
-        public long SupplyDuration(long normalDuration) => (long)(normalDuration * Factor);
+        public long SupplyDuration(long normalDuration) =>
+            EmpIsActive ? normalDuration : (long) (normalDuration * Factor);
 
         private float Factor { get; set; }
     }

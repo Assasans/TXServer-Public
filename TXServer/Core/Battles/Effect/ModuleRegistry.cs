@@ -33,13 +33,15 @@ namespace TXServer.Core.Battles.Effect {
 			return name2Module[name];
 		}
 
-		public BattleModule CreateModule(MatchPlayer player, Entity garageModule) {
+		public BattleModule CreateModule(MatchPlayer player, Entity garageModule)
+        {
 			string name = garageModule.TemplateAccessor.ConfigPath;
 
 			Type type = Get(name);
-			if(type == null) throw new InvalidOperationException($"Module '{name}' not found");
+			if (type == null) throw new InvalidOperationException($"Module '{name}' not found");
 
 			BattleModule module = (BattleModule)Activator.CreateInstance(type, player, garageModule);
+            module.ModuleType = garageModule.GetComponent<ModuleBehaviourTypeComponent>().Type;
 
             if (module is StubModule)
             {

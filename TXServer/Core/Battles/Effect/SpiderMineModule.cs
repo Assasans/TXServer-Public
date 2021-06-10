@@ -19,7 +19,8 @@ namespace TXServer.Core.Battles.Effect
             ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
         ) { }
 
-        public override void Activate() {
+        public override void Activate()
+        {
             if (EffectEntity != null)
             {
                 if (Hunting) StopHunting();
@@ -46,6 +47,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            EffectAffectedByEmp = false;
+
             Acceleration = Config.GetComponent<ModuleEffectAccelerationPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
             ActivationTime = (long) Config.GetComponent<ModuleEffectActivationTimePropertyComponent>(ConfigPath)

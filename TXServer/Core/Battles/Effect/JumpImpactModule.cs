@@ -30,6 +30,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            EffectAffectedByEmp = false;
+
             ForceMultiplier = Config.GetComponent<JumpImpactForceMultPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
             WorkingTemperature = Config.GetComponent<JumpImpactWorkingTemperaturePropertyComponent>(ConfigPath)

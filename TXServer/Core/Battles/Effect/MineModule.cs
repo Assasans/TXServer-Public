@@ -37,6 +37,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            EffectAffectedByEmp = false;
+
             ActivationTime = (long) Config.GetComponent<ModuleEffectActivationTimePropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
             BeginHideDistance = Config.GetComponent<ModuleMineEffectBeginHideDistancePropertyComponent>(ConfigPath)

@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Protocol;
+﻿using TXServer.Core;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Components.Battle.Weapon
@@ -6,6 +7,9 @@ namespace TXServer.ECSSystem.Components.Battle.Weapon
     [SerialVersionUID(971549724137995758L)]
 	public class StreamWeaponWorkingComponent : Component
 	{
-		public int Time { get; set; }
+        public void OnAttached(Player player, Entity battleUser) =>
+            player.BattlePlayer.MatchPlayer.TryDeactivateInvisibility();
+
+        public int Time { get; set; }
 	}
 }

@@ -17,7 +17,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 ? new StreamWeaponEnergyComponent(.167f, .25f)
                 : new StreamWeaponEnergyComponent(.167f, (float) battlePlayer.TurretUnloadEnergyPerShot));
 
-            entity.AddComponent(new StreamHitConfigComponent(1000, 1000,true));
+            entity.AddComponent(new StreamHitConfigComponent());
 
             return entity;
         }
