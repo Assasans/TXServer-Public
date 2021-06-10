@@ -246,8 +246,10 @@ namespace TXServer.Core.Battles
             return true;
         }
 
-        public static void IsisHeal(MatchPlayer target, MatchPlayer healer, HitTarget hitTarget)
+        public static void IsisHeal(Entity weapon, MatchPlayer target, MatchPlayer healer, HitTarget hitTarget)
         {
+            if(IsStreamOnCooldown(weapon, target, healer, hitTarget)) return;
+
             bool healed = false;
             target.Tank.ChangeComponent<TemperatureComponent>(component =>
             {

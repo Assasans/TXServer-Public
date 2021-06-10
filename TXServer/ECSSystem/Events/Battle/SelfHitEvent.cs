@@ -34,7 +34,7 @@ namespace TXServer.ECSSystem.Events.Battle
                     {
                         if (weapon.TemplateAccessor.Template.GetType() == typeof(IsisBattleItemTemplate))
                         {
-                            Damage.IsisHeal(victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget);
+                            Damage.IsisHeal(weapon, victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget);
                             return;
                         }
                         if (!battle.Params.FriendlyFire)
