@@ -19,7 +19,7 @@ namespace TXServer.ECSSystem.Events.Entrance.Invite
 				"Concodroid", "Corpserdefg",
 				"SH42913",
 				"Bodr", "C6OI", "Legendar-X", "Pchelik", "networkspecter", "DageLV", "F24_dark",
-				"Black_Wolf", "NN77296", "MEWPASCO", "Doctor", "TowerCrusher", "Kurays", "AlveroHUN", "Inctrice", "NicolasIceberg"
+				"Black_Wolf", "NN77296", "MEWPASCO", "Doctor", "TowerCrusher", "Kurays", "AlveroHUN", "Inctrice", "NicolasIceberg", "Bilmez"
 			};
 
 			string inviteCode = entity.GetComponent<InviteComponent>().InviteCode;
