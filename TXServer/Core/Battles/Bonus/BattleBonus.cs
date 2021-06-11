@@ -1,8 +1,12 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Collections.Generic;
+using System.Numerics;
+using TXServer.Core.Battles.Effect;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
 using TXServer.ECSSystem.EntityTemplates.Battle.Bonus;
 using TXServer.ECSSystem.Events.Battle.Bonus;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core.Battles
 {
@@ -56,7 +60,16 @@ namespace TXServer.Core.Battles
                     Battle.PlayersInMap.UnshareEntities(BonusRegion);
                     break;
                 default:
-                    _ = new SupplyEffect(BonusType, battlePlayer.MatchPlayer, cheat:false);
+                    (Type, Entity) desc = _bonusToModule[BonusType];
+                    if (!player.BattlePlayer.MatchPlayer.HasModule(desc.Item1, out BattleModule module))
+                    {
+                        module =
+                            (BattleModule) Activator.CreateInstance(desc.Item1, player.BattlePlayer.MatchPlayer,
+                                desc.Item2);
+                        player.BattlePlayer.MatchPlayer.Modules.Add(module);
+                    }
+                    module.IsSupply = true;
+                    module.Activate();
                     break;
             }
         }
@@ -96,5 +109,13 @@ namespace TXServer.Core.Battles
         }
         private BonusState _state;
         public double StateChangeCountdown { get; set; } = -1;
+
+        private readonly Dictionary<BonusType, (Type, Entity)> _bonusToModule = new()
+        {
+            { BonusType.ARMOR, (typeof(ArmorModule), Modules.GlobalItems.Absorbingarmor) },
+            { BonusType.DAMAGE, (typeof(DamageModule), Modules.GlobalItems.Increaseddamage) },
+            { BonusType.REPAIR, (typeof(RepairKitModule), Modules.GlobalItems.Repairkit) },
+            { BonusType.SPEED, (typeof(TurboSpeedModule), Modules.GlobalItems.Turbospeed) }
+        };
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
@@ -30,17 +29,7 @@ namespace TXServer.Core.Battles.Effect
             if (EffectEntity == null) return;
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
 
-            EndTime = null;
             EffectEntity = null;
         }
-
-        protected override void Tick()
-        {
-            base.Tick();
-
-            if (DateTimeOffset.Now >= EndTime ) Deactivate();
-        }
-
-        private DateTimeOffset? EndTime { get; set; }
-	}
+    }
 }

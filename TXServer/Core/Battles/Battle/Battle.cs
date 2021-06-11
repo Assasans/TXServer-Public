@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Battles.Matchmaking;
 using TXServer.Core.HeightMaps;
@@ -260,7 +261,7 @@ namespace TXServer.Core.Battles
         {
             battlePlayer.ShareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
 
-            // Supply boxes and everyone else's supply effects
+            // Supply boxes
             if (!Params.DisabledModules)
             {
                 foreach (BattleBonus battleBonus in BattleBonuses.Where(b => b.State != BonusState.Unused && b.State != BonusState.New))
@@ -269,23 +270,18 @@ namespace TXServer.Core.Battles
                     if (battleBonus.State == BonusState.Spawned)
                         battlePlayer.ShareEntities(battleBonus.BonusEntity);
                 }
-
-                foreach (BattleTankPlayer battlePlayer1 in MatchTankPlayers)
-                {
-                    battlePlayer.ShareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
-                    foreach (BattleModule module in battlePlayer1.MatchPlayer.Modules)
-                        module.ShareEffect(battlePlayer.Player);
-                }
             }
+
+            // Module/Supply effects
+            foreach (BattleModule module in MatchTankPlayers.SelectMany(tankPlayer => tankPlayer.MatchPlayer.Modules))
+                module.ShareEffect(battlePlayer.Player);
 
             // Enter battle and add critical entities
             battlePlayer.Player.User.AddComponent(BattleEntity.GetComponent<BattleGroupComponent>());
             ModeHandler.OnMatchJoin(battlePlayer);
 
             if (battlePlayer is Spectator spectator)
-            {
                 battlePlayer.ShareEntities(spectator.BattleUser);
-            }
             else
             {
                 BattleTankPlayer tankPlayer = (BattleTankPlayer)battlePlayer;
@@ -352,7 +348,7 @@ namespace TXServer.Core.Battles
 
             player.UnshareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
 
-            // Supply boxes and everyone else's supply effects
+            // Supply boxes
             if (!Params.DisabledModules)
             {
                 foreach (BattleBonus battleBonus in BattleBonuses.Where(b => b.State != BonusState.Unused && b.State != BonusState.New))
@@ -360,14 +356,6 @@ namespace TXServer.Core.Battles
                     player.UnshareEntities(battleBonus.BonusRegion);
                     if (battleBonus.State == BonusState.Spawned)
                         player.UnshareEntities(battleBonus.BonusEntity);
-                }
-
-                foreach (BattleTankPlayer battlePlayer1 in MatchTankPlayers.ToArray())
-                {
-                    if (battlePlayer1 != baseBattlePlayer)
-                        baseBattlePlayer.UnshareEntities(battlePlayer1.MatchPlayer.SupplyEffects.Select(supplyEffect => supplyEffect.SupplyEffectEntity));
-                    foreach (BattleModule module in battlePlayer1.MatchPlayer.Modules)
-                        module.UnshareEffect(baseBattlePlayer.Player);
                 }
             }
 
@@ -391,13 +379,8 @@ namespace TXServer.Core.Battles
             var battlePlayer = (BattleTankPlayer)baseBattlePlayer;
 
             // Player's own supply effects and modules
-            if (!Params.DisabledModules)
-            {
-                foreach (SupplyEffect supplyEffect in battlePlayer.MatchPlayer.SupplyEffects.ToArray())
-                    supplyEffect.Remove();
-                foreach (BattleModule module in battlePlayer.MatchPlayer.Modules.ToArray())
-                    battlePlayer.UnshareEntities(module.SlotEntity, module.ModuleEntity);
-            }
+            foreach (BattleModule module in MatchTankPlayers.ToList().SelectMany(p => p.MatchPlayer.Modules))
+                module.UnshareEffect(baseBattlePlayer.Player);
 
             // Unshare and remove self from list
             PlayersInMap.UnshareEntities(battlePlayer.MatchPlayer.GetEntities());

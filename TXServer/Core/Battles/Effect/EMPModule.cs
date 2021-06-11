@@ -48,9 +48,6 @@ namespace TXServer.Core.Battles.Effect
                 foreach (BattleModule module in target.Modules.ToList()
                     .Where(module => module.GetType() != typeof(GoldModule)))
                     module.ActivateEmpLock(Duration);
-
-                foreach (SupplyEffect supplyEffect in target.SupplyEffects.ToList()
-                    .Where(supplyEffect => !supplyEffect.Cheat)) supplyEffect.Remove();
             }
         }
 

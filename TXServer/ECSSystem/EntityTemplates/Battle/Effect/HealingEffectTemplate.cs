@@ -7,7 +7,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
     [SerialVersionUID(1486988156885L)]
     public class HealingEffectTemplate : EffectBaseTemplate
     {
-        public static Entity CreateEntity(MatchPlayer matchPlayer) =>
-            CreateEntity(new HealingEffectTemplate(), "battle/effect/healing", matchPlayer, 3000);
+        public static Entity CreateEntity(MatchPlayer matchPlayer, long duration) =>
+            CreateEntity(new HealingEffectTemplate(), "battle/effect/healing", matchPlayer, duration);
     }
 }

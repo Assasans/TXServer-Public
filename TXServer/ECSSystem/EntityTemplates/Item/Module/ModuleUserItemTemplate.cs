@@ -10,8 +10,10 @@ using TXServer.ECSSystem.Components.Battle.Tank;
 namespace TXServer.ECSSystem.EntityTemplates.Item.Module {
 	[SerialVersionUID(1484901449548L)]
 	public class ModuleUserItemTemplate : IEntityTemplate {
-		public static Entity CreateEntity(Entity garageModule, BattleTankPlayer battlePlayer) {
+		public static Entity CreateEntity(Entity garageModule, BattleTankPlayer battlePlayer)
+        {
 			Entity slot = battlePlayer.Player.CurrentPreset.Modules.SingleOrDefault(x => x.Value == garageModule).Key;
+            if (slot is null) return null;
 			Component slotUserItemInfoComponent = slot.GetComponent<SlotUserItemInfoComponent>();
 
 			Entity entity = new(new TemplateAccessor(new ModuleUserItemTemplate(), garageModule.TemplateAccessor.ConfigPath),

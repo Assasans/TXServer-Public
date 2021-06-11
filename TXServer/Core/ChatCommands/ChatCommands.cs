@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using TXServer.Core.Battles;
+using TXServer.Core.Battles.Effect;
 using TXServer.Core.Commands;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
@@ -14,6 +15,7 @@ using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Chat;
+using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -256,8 +258,18 @@ namespace TXServer.Core.ChatCommands
                         cheats = new List<BonusType>((BonusType[])Enum.GetValues(typeof(SupplyType)));
 
                     foreach (BattleTankPlayer target in targets)
-                        foreach (BonusType bonusCheat in cheats)
-                            _ = new SupplyEffect(bonusCheat, target.MatchPlayer, true);
+                    foreach ((Type, Entity) desc in cheats.Select(bonusCheat => BonusToModule[bonusCheat]))
+                    {
+                        if (!target.MatchPlayer.HasModule(desc.Item1, out BattleModule module))
+                        {
+                            module =
+                                (BattleModule) Activator.CreateInstance(desc.Item1, target.MatchPlayer,
+                                    desc.Item2);
+                            module.IsCheat = true;
+                            target.MatchPlayer.Modules.Add(module);
+                        }
+                        module.Activate();
+                    }
 
                     string cheatWritten = cheats.Count == 1
                         ? char.ToUpper(bonusType.ToString().First()) + bonusType.ToString().Substring(1).ToLower() +
@@ -269,11 +281,12 @@ namespace TXServer.Core.ChatCommands
                         : $"{cheatWritten} {hasHaveWritten} been activated for multiple people";
                 case "DISABLE":
                     int amount = 0;
-                    foreach (SupplyEffect supplyEffect in targets.SelectMany(target =>
-                        target.MatchPlayer.SupplyEffects.ToArray().Where(supply => supply.Cheat)))
+                    foreach (BattleModule effect in targets.SelectMany(target =>
+                        target.MatchPlayer.Modules.ToArray().Where(effect => effect.IsCheat)))
                     {
                         amount += 1;
-                        supplyEffect.Remove();
+                        effect.DeactivateCheat = true;
+                        effect.Deactivate();
                     }
                     string cheatString = amount == 1 ? "cheat" : "cheats";
                     string hasHaveString = amount == 1 ? "has" : "have";
@@ -897,5 +910,13 @@ namespace TXServer.Core.ChatCommands
 
         private static readonly BattleState[] InactiveBattleStates =
             { BattleState.NotEnoughPlayers, BattleState.Starting, BattleState.CustomNotStarted };
+
+        private static readonly Dictionary<BonusType, (Type, Entity)> BonusToModule = new()
+        {
+            { BonusType.ARMOR, (typeof(ArmorModule), Modules.GlobalItems.Absorbingarmor) },
+            { BonusType.DAMAGE, (typeof(DamageModule), Modules.GlobalItems.Increaseddamage) },
+            { BonusType.REPAIR, (typeof(RepairKitModule), Modules.GlobalItems.Repairkit) },
+            { BonusType.SPEED, (typeof(TurboSpeedModule), Modules.GlobalItems.Turbospeed) }
+        };
     }
 }

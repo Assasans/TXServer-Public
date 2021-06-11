@@ -7,7 +7,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
     [SerialVersionUID(1486018791920L)]
     public class DamageEffectTemplate : EffectBaseTemplate
     {
-        public static Entity CreateEntity(long duration, MatchPlayer matchPlayer) =>
+        public static Entity CreateEntity(MatchPlayer matchPlayer, long duration) =>
             CreateEntity(new DamageEffectTemplate(), "battle/effect/damage", matchPlayer, duration);
     }
 }

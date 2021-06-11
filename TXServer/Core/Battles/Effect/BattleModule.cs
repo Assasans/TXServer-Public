@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components.Battle;
+using TXServer.ECSSystem.Components.Battle.Chassis;
+using TXServer.ECSSystem.Components.Battle.Effect;
 using TXServer.ECSSystem.Components.Battle.Effect.EMP;
 using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.EntityTemplates.Item.Slot;
@@ -15,7 +18,8 @@ namespace TXServer.Core.Battles.Effect {
         {
 			MatchPlayer = matchPlayer;
 
-			SlotEntity = SlotUserItemTemplate.CreateEntity(moduleEntity, matchPlayer.Player.BattlePlayer);
+            if (moduleEntity != null)
+			    SlotEntity = SlotUserItemTemplate.CreateEntity(moduleEntity, matchPlayer.Player.BattlePlayer);
 			ModuleEntity = moduleEntity;
 
 			tickHandlers = new List<TickHandler>();
@@ -77,12 +81,42 @@ namespace TXServer.Core.Battles.Effect {
         public void UnshareEffect(Player leavingPlayer)
         {
             if (leavingPlayer == MatchPlayer.Player)
+            {
                 Deactivate();
+                if (ModuleEntity is not null)
+                    leavingPlayer.UnshareEntities(ModuleEntity, SlotEntity);
+            }
+
             if (EffectEntity != null && leavingPlayer.EntityList.Contains(EffectEntity))
                 leavingPlayer.UnshareEntities(EffectEntity);
             foreach (Entity effectEntity in EffectEntities.Where(effectEntity =>
                 leavingPlayer.EntityList.Contains(effectEntity)))
                 leavingPlayer.UnshareEntities(effectEntity);
+        }
+
+        protected void ChangeDuration(float duration)
+        {
+            if (IsCheat)
+            {
+                if (GetType() == typeof(RepairKitModule))
+                {
+                    DeactivateCheat = true;
+                    Deactivate();
+                    DeactivateCheat = false;
+                    Activate();
+                    return;
+                }
+                if (GetType() == typeof(TurboSpeedModule) && IsCheat)
+                    MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.Speed = float.MaxValue);
+            }
+
+            tickHandlers.Clear();
+
+            EffectEntity.ChangeComponent<DurationConfigComponent>(component => component.Duration = (long)duration);
+            EffectEntity.RemoveComponent<DurationComponent>();
+            EffectEntity.AddComponent(new DurationComponent(DateTime.UtcNow));
+
+            Schedule(TimeSpan.FromMilliseconds(duration), Deactivate);
         }
 
 		protected virtual void Tick()
@@ -91,8 +125,9 @@ namespace TXServer.Core.Battles.Effect {
 			            MatchPlayer.TankState == TankState.Active;
 		}
 
-        public void ModuleTick() {
-			if (CooldownStart != null && DateTimeOffset.UtcNow >= CooldownEnd)
+        public void ModuleTick()
+        {
+            if (CooldownStart != null && DateTimeOffset.UtcNow >= CooldownEnd)
             {
                 ModuleEntity.TryRemoveComponent<InventoryCooldownStateComponent>();
                 ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
@@ -127,13 +162,16 @@ namespace TXServer.Core.Battles.Effect {
 
 			Tick();
 
-			if (IsEnabled && !IsOnCooldown)
+            if (ModuleEntity is not null)
             {
-				if (ModuleEntity.HasComponent<InventoryEnabledStateComponent>()) return;
-                ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
-			}
-			else
-                ModuleEntity.TryRemoveComponent<InventoryEnabledStateComponent>();
+                if (IsEnabled && !IsOnCooldown)
+                {
+                    if (ModuleEntity.HasComponent<InventoryEnabledStateComponent>()) return;
+                    ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
+                }
+                else
+                    ModuleEntity.TryRemoveComponent<InventoryEnabledStateComponent>();
+            }
         }
 
         /// <summary>
@@ -166,10 +204,13 @@ namespace TXServer.Core.Battles.Effect {
         public List<Entity> EffectEntities { get; set; } = new();
         public ModuleBehaviourType ModuleType { get; set; }
 
+        public bool IsCheat { get; set; }
         public bool IsEnabled { get; set; }
-        public bool EffectIsActive => EffectEntity == null && !EffectEntities.Any();
+        public bool IsSupply { get; set; }
+        public bool EffectIsActive => EffectEntity is not null || EffectEntities.Any();
         protected bool EmpIsActive => EmpLockEnd != null && EmpLockEnd > DateTimeOffset.Now;
 
+        public bool DeactivateCheat { get; set; }
         public bool DeactivateOnTankDisable { get; set; } = true;
         protected bool EffectAffectedByEmp { get; set; } = true;
 
@@ -182,7 +223,8 @@ namespace TXServer.Core.Battles.Effect {
         public DateTimeOffset? CooldownStart { get; set; }
         public DateTimeOffset? CooldownEnd => CooldownStart?.AddMilliseconds(CooldownDuration);
 
-        public bool IsOnCooldown => ModuleEntity.HasComponent<InventoryCooldownStateComponent>();
+        public bool IsOnCooldown =>
+            ModuleEntity is not null && ModuleEntity.HasComponent<InventoryCooldownStateComponent>();
 
         public string ConfigPath { get; set; }
         public int Level { get; set; }

@@ -65,7 +65,7 @@ namespace TXServer.Core.Battles.Effect {
 
             module.Init();
 
-			return module;
+            return module;
 		}
 	}
 }

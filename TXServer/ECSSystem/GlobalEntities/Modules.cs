@@ -55,13 +55,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(0),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
                 new ModuleCardsCompositionComponent());
-            /*public Entity Repairkit { get; } = new Entity(-862259125, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/1/repairkit"),
+            public Entity Repairkit { get; } = new Entity(-862259125, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/1/repairkit"),
                 new ParentGroupComponent(-862259125),
                 new MarketItemGroupComponent(-862259125),
                 new ModuleTankPartComponent(TankPartModuleType.TANK),
                 new ModuleTierComponent(0),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             public Entity Turbospeed { get; } = new Entity(-365494384, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/1/turbospeed"),
                 new ParentGroupComponent(-365494384),
                 new MarketItemGroupComponent(-365494384),

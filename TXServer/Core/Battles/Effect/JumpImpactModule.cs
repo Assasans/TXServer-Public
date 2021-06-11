@@ -19,7 +19,6 @@ namespace TXServer.Core.Battles.Effect
 			EffectEntity = JumpEffectTemplate.CreateEntity(MatchPlayer, ForceMultiplier);
             MatchPlayer.Battle.JoinedTankPlayers.ShareEntities(EffectEntity);
 
-
             /*MatchPlayer.Tank.ChangeComponent<TemperatureComponent>(component =>
                 component.Temperature += WorkingTemperature);*/
 

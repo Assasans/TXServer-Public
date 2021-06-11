@@ -7,7 +7,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
     [SerialVersionUID(1486970297039L)]
     public class TurboSpeedEffectTemplate : EffectBaseTemplate
     {
-        public static Entity CreateEntity(long duration, MatchPlayer matchPlayer) => CreateEntity(new TurboSpeedEffectTemplate(),
+        public static Entity CreateEntity(MatchPlayer matchPlayer, long duration) => CreateEntity(new TurboSpeedEffectTemplate(),
             "battle/effect/turbospeed", matchPlayer, duration);
     }
 }

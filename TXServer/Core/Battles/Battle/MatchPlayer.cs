@@ -159,13 +159,6 @@ namespace TXServer.Core.Battles
                 Tank.TryRemoveComponent(TankStates[_TankState].Item1);
             Tank.TryRemoveComponent<SelfDestructionComponent>();
 
-            foreach (SupplyEffect supplyEffect in SupplyEffects.ToArray())
-            {
-                if (supplyEffect.Cheat)
-                    SupplyEffectsAfterSpawn.Add(supplyEffect.BonusType);
-                supplyEffect.Remove();
-            }
-
             foreach (BattleModule module in Modules.ToArray().Where(m => m.DeactivateOnTankDisable))
                 module.Deactivate();
 
@@ -225,10 +218,6 @@ namespace TXServer.Core.Battles
                 Tank.RemoveComponent<HealthComponent>();
                 component.CurrentHealth = component.MaxHealth;
                 Tank.AddComponent(component);
-
-                foreach (BonusType bonusType in SupplyEffectsAfterSpawn)
-                    _ = new SupplyEffect(bonusType, this, true);
-                SupplyEffectsAfterSpawn.Clear();
             }
 
             foreach (KeyValuePair<Type, TranslatedEvent> pair in TranslatedEvents)
@@ -237,18 +226,6 @@ namespace TXServer.Core.Battles
                  where (matchPlayer as BattleTankPlayer)?.MatchPlayer != this
                  select matchPlayer.Player).SendEvent(pair.Value.Event, pair.Value.TankPart);
                 TranslatedEvents.TryRemove(pair);
-            }
-
-            // supply effects
-            foreach (SupplyEffect supplyEffect in SupplyEffects.ToArray())
-            {
-                if (DateTime.UtcNow > supplyEffect.StopTime)
-                {
-                    if (supplyEffect.Cheat)
-                        supplyEffect.ExtendTime();
-                    else
-                        supplyEffect.Remove();
-                }
             }
 
             // battle modules
@@ -340,8 +317,6 @@ namespace TXServer.Core.Battles
         public bool Paused { get; set; }
         public DateTime? IdleKickTime { get; set; }
 
-        public List<SupplyEffect> SupplyEffects { get; } = new();
-        private List<BonusType> SupplyEffectsAfterSpawn { get; } = new();
 
         public Dictionary<BattleTankPlayer, TankDamageCooldown> DamageCooldowns { get; } = new();
         public Dictionary<MatchPlayer, float> DamageAssistants { get; } = new();

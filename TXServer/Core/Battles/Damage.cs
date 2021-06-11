@@ -60,16 +60,15 @@ namespace TXServer.Core.Battles
         private static float DamageWithSupplies(float damage, MatchPlayer target, MatchPlayer shooter,
             bool mine = false)
         {
-            if (!mine && shooter.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.DAMAGE))
+            if (!mine && shooter.Modules.Any(effect => effect.GetType() == typeof(DamageModule)))
                 damage *= 2;
-            if (target.SupplyEffects.Any(supplyEffect => supplyEffect.BonusType == BonusType.ARMOR))
+            if (target.Modules.Any(effect => effect.GetType() == typeof(ArmorModule)))
                 damage /= 2;
 
-            if (!mine && shooter.SupplyEffects.Any(supplyEffect =>
-                supplyEffect.BonusType == BonusType.DAMAGE && supplyEffect.Cheat))
+            if (!mine && shooter.Modules.Any(effect =>
+                effect.GetType() == typeof(DamageModule) && effect.IsCheat))
                 damage = 99999;
-            if (target.SupplyEffects.Any(
-                supplyEffect => supplyEffect.BonusType == BonusType.ARMOR && supplyEffect.Cheat))
+            if (target.Modules.Any(effect => effect.GetType() == typeof(ArmorModule) && effect.IsCheat))
                 damage = 0;
             return damage;
         }

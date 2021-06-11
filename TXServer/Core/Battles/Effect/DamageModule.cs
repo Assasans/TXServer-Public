@@ -1,35 +1,29 @@
 ﻿using System;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle.Health;
-using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
-using TXServer.ECSSystem.Events.Battle;
 
 namespace TXServer.Core.Battles.Effect
 {
-	public class RepairKitModule : BattleModule
+	public class DamageModule : BattleModule
     {
-		public RepairKitModule(MatchPlayer matchPlayer, Entity garageModule) : base(
+		public DamageModule(MatchPlayer matchPlayer, Entity garageModule) : base(
 			matchPlayer,
-            ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
+			ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
 		) { }
 
         public override void Activate()
         {
-            float duration = IsSupply || IsCheat ? 3000 : Duration;
+            float duration = IsSupply || IsCheat ? 30000 : Duration;
+
             if (EffectIsActive)
             {
                 ChangeDuration(duration);
                 return;
             }
 
-            EffectEntity = HealingEffectTemplate.CreateEntity(MatchPlayer, (long)duration);
+            EffectEntity = DamageEffectTemplate.CreateEntity(MatchPlayer, (long)duration);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
-
-            MatchPlayer.Tank.ChangeComponent(new TemperatureComponent(0));
-            MatchPlayer.Tank.ChangeComponent<HealthComponent>(component => component.CurrentHealth = component.MaxHealth);
-            MatchPlayer.Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), MatchPlayer.Tank);
 
             Schedule(TimeSpan.FromMilliseconds(duration), Deactivate);
         }
@@ -39,7 +33,7 @@ namespace TXServer.Core.Battles.Effect
             if (EffectEntity == null) return;
             if (IsCheat && !DeactivateCheat)
             {
-                ChangeDuration(3000);
+                ChangeDuration(30000);
                 return;
             }
 

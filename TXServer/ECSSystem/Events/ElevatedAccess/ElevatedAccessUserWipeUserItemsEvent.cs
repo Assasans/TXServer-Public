@@ -12,8 +12,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 		{
 			if (!player.IsInMatch || !player.Data.Admin) return;
 
-			foreach (SupplyEffect supplyEffect in player.BattlePlayer.MatchPlayer.SupplyEffects.ToArray())
-				supplyEffect.Remove();
-		}
+            // TODO: something
+        }
 	}
 }
