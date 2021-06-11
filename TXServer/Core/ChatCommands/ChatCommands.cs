@@ -909,7 +909,9 @@ namespace TXServer.Core.ChatCommands
         }
 
         private static readonly BattleState[] InactiveBattleStates =
-            { BattleState.NotEnoughPlayers, BattleState.Starting, BattleState.CustomNotStarted };
+        {
+            BattleState.CustomNotStarted, BattleState.NotEnoughPlayers, BattleState.StartCountdown, BattleState.Starting
+        };
 
         private static readonly Dictionary<BonusType, (Type, Entity)> BonusToModule = new()
         {
