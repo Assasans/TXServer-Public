@@ -1,44 +1,64 @@
 ﻿using System;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Components
 {
     [SerialVersionUID(1479374709878L)]
     public class NewsItemComponent : Component
     {
-		[OptionalMapped]
-		public DateTime? Date { get; set; } = null;
+        public NewsItemComponent(DateTime? date = null, string headerText = null, string shortText = null,
+            string longText = null, string previewImageUrl = null, string previewImageGuid = null,
+            string centralIconGuid = null, string toolTip = null, bool previewImageFitInParent = false,
+            string externalUrl = null, string internalUrl = null, NewsItemLayout layout = NewsItemLayout.LARGE)
+        {
+            Date = date;
+            HeaderText = headerText;
+            ShortText = shortText;
+            LongText = longText;
+            PreviewImageUrl = previewImageUrl;
+            PreviewImageGuid = previewImageGuid;
+            CentralIconGuid = centralIconGuid;
+            Tooltip = toolTip;
+            PreviewImageFitInParent = previewImageFitInParent;
+            ExternalUrl = externalUrl;
+            InternalUrl = internalUrl;
+            Layout = layout;
+        }
 
 		[OptionalMapped]
-		public string HeaderText { get; set; } = "Форум";
+		public DateTime? Date { get; set; }
 
 		[OptionalMapped]
-		public string ShortText { get; set; } = null;
+		public string HeaderText { get; set; }
 
 		[OptionalMapped]
-		public string LongText { get; set; } = null;
+		public string ShortText { get; set; }
 
 		[OptionalMapped]
-		public string PreviewImageUrl { get; set; } = null;
+		public string LongText { get; set; }
 
 		[OptionalMapped]
-		public string PreviewImageGuid { get; set; } = "60c3b3d3e174aa74c90d26593e947b3d";
+		public string PreviewImageUrl { get; set; }
 
 		[OptionalMapped]
-		public string CentralIconGuid { get; set; } = "d6e6e5e4f34a45d408b589798b80dbe2";
+		public string PreviewImageGuid { get; set; }
 
 		[OptionalMapped]
-		public string Tooltip { get; set; } = "Стань частью сообщества и помоги разработчикам обратной связью и предложениями";
-
-		public bool PreviewImageFitInParent { get; set; } = false;
+		public string CentralIconGuid { get; set; }
 
 		[OptionalMapped]
-		public string ExternalUrl { get; set; } = "http://ru.forum.tankix.com";
+		public string Tooltip { get; set; }
+
+		public bool PreviewImageFitInParent { get; set; }
 
 		[OptionalMapped]
-		public string InternalUrl { get; set; } = null;
+		public string ExternalUrl { get; set; }
 
-		public byte /* enum */ Layout { get; set; } = 0;
+		[OptionalMapped]
+		public string InternalUrl { get; set; }
+
+		public NewsItemLayout Layout { get; set; }
     }
 }

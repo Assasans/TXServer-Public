@@ -43,21 +43,23 @@ namespace TXServer.ECSSystem.GlobalEntities
 
             typeof(Avatars),
             typeof(Graffiti),
-            
+
             typeof(BattleRewards),
 
             //typeof(Details),
             //typeof(DailyBonuses),
             //typeof(Quests),
-            
+
             typeof(ModuleSlots),
             typeof(Modules),
             typeof(ModuleCards),
 
             typeof(ExtraItems),
             typeof(Containers),
-            
+
             typeof(Chats),
+
+            typeof(News)
         };
 
         static ResourceManager()
@@ -100,9 +102,9 @@ namespace TXServer.ECSSystem.GlobalEntities
             {
                 MethodInfo info = type.GetMethod("GetUserItems");
                 if (info == null) continue;
-                
-                ItemList list = (info.GetParameters()[0].ParameterType.IsAssignableFrom(typeof(Player)) ? 
-                    info.Invoke(null, new object[] { player }) : 
+
+                ItemList list = (info.GetParameters()[0].ParameterType.IsAssignableFrom(typeof(Player)) ?
+                    info.Invoke(null, new object[] { player }) :
                     info.Invoke(null, new object[] { user })) as ItemList;
                 entities.AddRange(list.GetAllItems());
                 player.UserItems.TryAdd(type, list);
