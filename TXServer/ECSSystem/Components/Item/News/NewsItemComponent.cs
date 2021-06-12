@@ -3,7 +3,7 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
 
-namespace TXServer.ECSSystem.Components
+namespace TXServer.ECSSystem.Components.Item.News
 {
     [SerialVersionUID(1479374709878L)]
     public class NewsItemComponent : Component
