@@ -5,6 +5,7 @@ using TXServer.Core.Battles.Effect;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Battle.Effect;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Module;
@@ -77,12 +78,14 @@ namespace TXServer.Core.Battles
         {
             float damage;
 
-            if (IsModule(weaponMarketItem))
+            if (IsModule(weapon, weaponMarketItem))
             {
                 // Module
 
-                BattleModule module = damager.Modules
-                    .First(m => m.ModuleEntity.TemplateAccessor.ConfigPath == weaponMarketItem.TemplateAccessor.ConfigPath);
+                BattleModule module = damager.Modules.FirstOrDefault(m =>
+                    m.ModuleEntity.TemplateAccessor.ConfigPath == weaponMarketItem.TemplateAccessor.ConfigPath) ??
+                                      damager.Modules.First(m =>
+                    m.EffectEntity?.TemplateAccessor.Template == weapon.TemplateAccessor.Template);
 
                 string upgradePath = $"garage/module/upgrade/properties/{module.ModuleEntity.TemplateAccessor.ConfigPath.Split('/').Last()}";
 
@@ -144,12 +147,12 @@ namespace TXServer.Core.Battles
         public static void DealSplashDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             HitTarget hitTarget)
         {
-            if (!IsModule(weaponMarketItem) && IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
+            if (!IsModule(weapon, weaponMarketItem) && IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
 
             float distance = hitTarget.HitDistance;
 
             float damage = GetRandomDamage(weapon, weaponMarketItem, victim, damager, hitTarget);
-            float damageMultiplier = GetSplashDamageMultiplier(weaponMarketItem, distance, victim, damager);
+            float damageMultiplier = GetSplashDamageMultiplier(weapon, weaponMarketItem, distance, victim, damager);
             int splashDamage = (int) Math.Round(damage * damageMultiplier);
 
             // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
@@ -327,9 +330,10 @@ namespace TXServer.Core.Battles
             victim.DamageAssistants.Clear();
         }
 
-        private static float GetSplashDamageMultiplier(Entity weaponMarketItem, float distance, MatchPlayer victim, MatchPlayer damager)
+        private static float GetSplashDamageMultiplier(Entity weapon, Entity weaponMarketItem, float distance,
+            MatchPlayer victim, MatchPlayer damager)
         {
-            if (IsModule(weaponMarketItem)) return 1;
+            if (IsModule(weapon, weaponMarketItem)) return 1;
 
             var damageComponent = damager.Weapon.GetComponent<SplashWeaponComponent>();
 
@@ -381,8 +385,8 @@ namespace TXServer.Core.Battles
 
         }
 
-        private static bool IsModule(Entity weaponMarketItem) =>
-            Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem);
+        private static bool IsModule(Entity weapon, Entity weaponMarketItem) =>
+            Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem) || weapon.HasComponent<EffectComponent>();
 
 
         private static readonly Dictionary<int, int> KillStreakScores = new()

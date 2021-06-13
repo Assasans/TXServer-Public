@@ -29,11 +29,12 @@ namespace TXServer.Core
         {
             Dictionary<string, Type> modules = new()
             {
+                ["garage/module/module/tank/active/1/absorbingarmor"] = typeof(ArmorModule),
                 ["garage/module/module/tank/passive/2/acceleratedgears"] = typeof(AcceleratedGearsModule),
                 ["garage/module/module/weapon/active/1/emp"] = typeof(EmpModule),
                 ["garage/module/module/weapon/active/3/energyinjection"] = typeof(EnergyInjectionModule),
                 ["garage/module/module/weapon/passive/1/engineer"] = typeof(EngineerModule),
-                ["garage/module/module/tank/active/1/absorbingarmor"] = typeof(ArmorModule),
+                ["garage/module/module/weapon/active/2/externalimpact"] = typeof(ExternalImpactModule),
                 ["garage/module/module/tank/active/3/firering"] = typeof(FireRingModule),
                 ["garage/module/module/tank/active/2/forcefield"] = typeof(ForceFieldModule),
                 ["garage/module/prebuildmodule/common/active/1/gold"] = typeof(GoldModule),

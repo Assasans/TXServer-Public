@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
@@ -17,6 +16,8 @@ namespace TXServer.ECSSystem.Events.Battle
 	{
 		public void Execute(Player player, Entity weapon)
 		{
+            SelfEvent.Execute(this, player, weapon);
+
             if (player.BattlePlayer.MatchPlayer.TankState == TankState.Dead)
                 return;
 

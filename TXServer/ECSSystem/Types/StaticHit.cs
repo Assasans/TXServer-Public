@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Types
 
 		public override string ToString()
 		{
-			return string.Format("Position: {0}, Normal: {1}", this.Position, this.Normal);
+			return string.Format("Position: {0}, Normal: {1}", Position, Normal);
 		}
 	}
 }
