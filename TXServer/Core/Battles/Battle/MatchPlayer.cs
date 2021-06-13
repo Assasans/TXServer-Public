@@ -160,7 +160,14 @@ namespace TXServer.Core.Battles
             Tank.TryRemoveComponent<SelfDestructionComponent>();
 
             foreach (BattleModule module in Modules.ToArray().Where(m => m.DeactivateOnTankDisable))
+            {
+                module.tickHandlers.Clear();
+                module.DeactivateCheat = true;
                 module.Deactivate();
+                module.DeactivateCheat = false;
+                module.CheatWaitingForTank = true;
+            }
+
 
             if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
             Weapon.TryRemoveComponent<ShootableComponent>();

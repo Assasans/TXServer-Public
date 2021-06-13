@@ -1,5 +1,4 @@
 ﻿using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 using TXServer.ECSSystem.Types;
 
@@ -14,7 +13,13 @@ namespace TXServer.Core.Battles.Effect {
 			MatchPlayer.Battle.DropSpecificBonusType(BonusType.GOLD, MatchPlayer.Player.Data.Username);
 		}
 
-		protected override void Tick() {
+        public override void Init()
+        {
+            base.Init();
+            DeactivateOnTankDisable = false;
+        }
+
+        protected override void Tick() {
 			base.Tick();
 
 			IsEnabled &= MatchPlayer.Battle.IsMatchMaking && MatchPlayer.Battle.BattleState == BattleState.Running;

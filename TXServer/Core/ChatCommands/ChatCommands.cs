@@ -265,9 +265,9 @@ namespace TXServer.Core.ChatCommands
                             module =
                                 (BattleModule) Activator.CreateInstance(desc.Item1, target.MatchPlayer,
                                     desc.Item2);
-                            module.IsCheat = true;
                             target.MatchPlayer.Modules.Add(module);
                         }
+                        module.IsCheat = true;
                         module.Activate();
                     }
 
@@ -286,6 +286,7 @@ namespace TXServer.Core.ChatCommands
                     {
                         amount += 1;
                         effect.DeactivateCheat = true;
+                        effect.tickHandlers.Clear();
                         effect.Deactivate();
                     }
                     string cheatString = amount == 1 ? "cheat" : "cheats";

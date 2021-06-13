@@ -103,6 +103,7 @@ namespace TXServer.Core.Battles.Effect {
                     DeactivateCheat = true;
                     Deactivate();
                     DeactivateCheat = false;
+                    IsCheat = true;
                     Activate();
                     return;
                 }
@@ -123,7 +124,7 @@ namespace TXServer.Core.Battles.Effect {
         {
 			IsEnabled = MatchPlayer.Battle.BattleState is BattleState.Running or BattleState.WarmUp &&
 			            MatchPlayer.TankState == TankState.Active;
-		}
+        }
 
         public void ModuleTick()
         {
@@ -172,6 +173,13 @@ namespace TXServer.Core.Battles.Effect {
                 else
                     ModuleEntity.TryRemoveComponent<InventoryEnabledStateComponent>();
             }
+
+            if (CheatWaitingForTank && MatchPlayer.TankState == TankState.Active)
+            {
+                CheatWaitingForTank = false;
+                IsCheat = true;
+                Activate();
+            }
         }
 
         /// <summary>
@@ -210,6 +218,7 @@ namespace TXServer.Core.Battles.Effect {
         public bool EffectIsActive => EffectEntity is not null || EffectEntities.Any();
         protected bool EmpIsActive => EmpLockEnd != null && EmpLockEnd > DateTimeOffset.Now;
 
+        public bool CheatWaitingForTank { get; set; }
         public bool DeactivateCheat { get; set; }
         public bool DeactivateOnTankDisable { get; set; } = true;
         protected bool EffectAffectedByEmp { get; set; } = true;
@@ -229,7 +238,7 @@ namespace TXServer.Core.Battles.Effect {
         public string ConfigPath { get; set; }
         public int Level { get; set; }
 
-        private readonly List<TickHandler> tickHandlers;
+        public readonly List<TickHandler> tickHandlers;
         private readonly List<Action> nextTickHandlers;
 	}
 

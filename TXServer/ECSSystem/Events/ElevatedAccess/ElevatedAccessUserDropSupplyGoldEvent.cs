@@ -1,7 +1,6 @@
 ﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.ElevatedAccess
@@ -10,7 +9,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 	public class ElevatedAccessUserDropSupplyGoldEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity entity)
-		{
+        {
             if (!player.Data.Admin) return;
 
             player.BattlePlayer?.Battle.DropSpecificBonusType(BonusType.GOLD, player.Data.Username);
