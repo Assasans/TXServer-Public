@@ -18,7 +18,7 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Activate()
         {
-            if(EffectEntity != null) Deactivate();
+            if (EffectEntity != null) Deactivate();
 
             EffectEntity = EMPEffectTemplate.CreateEntity(MatchPlayer, Radius);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
@@ -42,8 +42,8 @@ namespace TXServer.Core.Battles.Effect
                 MatchPlayer target = MatchPlayer.Battle.MatchTankPlayers.
                     Single(p => p.MatchPlayer.Tank == tank).MatchPlayer;
 
-                if (target.HasModule(typeof(InvulnerabilityModule), out BattleModule invul))
-                    if (invul.EffectIsActive) return;
+                if (target.HasModule(typeof(InvulnerabilityModule), out BattleModule shieldModule))
+                    if (shieldModule.EffectIsActive) return;
 
                 foreach (BattleModule module in target.Modules.ToList()
                     .Where(module => module.GetType() != typeof(GoldModule)))
