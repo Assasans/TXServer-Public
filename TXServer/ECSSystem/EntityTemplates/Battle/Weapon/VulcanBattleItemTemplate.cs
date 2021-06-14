@@ -20,7 +20,9 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 Config.GetComponent<VulcanWeaponComponent>(_configPath),
                 Config.GetComponent<KickbackComponent>(_configPath),
                 Config.GetComponent<ImpactComponent>(_configPath),
-                new VulcanComponent()
+                Config.GetComponent<StreamHitConfigComponent>("battle/weapon/vulcan"),
+                new VulcanComponent(),
+                new StreamWeaponComponent()
             });
 
             return entity;

@@ -1,4 +1,5 @@
 ﻿using TXServer.Core.Battles;
+using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Weapon;
@@ -12,6 +13,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
         {
             Entity entity = CreateEntity(new IsisBattleItemTemplate(), "garage/weapon/isis", tank, battlePlayer);
             entity.Components.Add(new IsisComponent());
+            entity.Components.Add(Config.GetComponent<StreamHitConfigComponent>("battle/weapon/isis"));
 
             return entity;
         }
