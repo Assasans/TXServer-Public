@@ -267,12 +267,13 @@ namespace TXServer.Core.ChatCommands
                                     desc.Item2);
                             target.MatchPlayer.Modules.Add(module);
                         }
+
                         module.IsCheat = true;
                         module.Activate();
                     }
 
                     string cheatWritten = cheats.Count == 1
-                        ? char.ToUpper(bonusType.ToString().First()) + bonusType.ToString().Substring(1).ToLower() +
+                        ? char.ToUpper(bonusType.ToString().First()) + bonusType.ToString()[1..].ToLower() +
                           " cheat"
                         : "Multiple cheats";
                     string hasHaveWritten = cheats.Count == 1 ? "has" : "have";

@@ -96,6 +96,8 @@ namespace TXServer.Core.Battles.Effect {
 
         protected void ChangeDuration(float duration)
         {
+            tickHandlers.Clear();
+
             if (IsCheat)
             {
                 if (GetType() == typeof(RepairKitModule))
@@ -110,8 +112,6 @@ namespace TXServer.Core.Battles.Effect {
                 if (GetType() == typeof(TurboSpeedModule) && IsCheat)
                     MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.Speed = float.MaxValue);
             }
-
-            tickHandlers.Clear();
 
             EffectEntity.ChangeComponent<DurationConfigComponent>(component => component.Duration = (long)duration);
             EffectEntity.RemoveComponent<DurationComponent>();
