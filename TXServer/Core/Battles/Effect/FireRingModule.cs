@@ -12,7 +12,7 @@ namespace TXServer.Core.Battles.Effect {
         ) { }
 
         public override void Activate() {
-            if(EffectEntity != null) Deactivate();
+            if (EffectEntity != null) Deactivate();
 
             EffectEntity = FireRingEffectTemplate.CreateEntity(MatchPlayer);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);

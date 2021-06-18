@@ -57,9 +57,9 @@ namespace TXServer.ECSSystem.GlobalEntities
             public Entity Engineer { get; } = new Entity(1464064213, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/engineer"),
                 new ParentGroupComponent(Modules.GlobalItems.Engineer),
                 new MarketItemGroupComponent(1464064213));
-            /*public Entity Explosivemass { get; } = new Entity(-206369995, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/explosivemass"),
+            public Entity Explosivemass { get; } = new Entity(-206369995, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/explosivemass"),
                 new ParentGroupComponent(Modules.GlobalItems.Explosivemass),
-                new MarketItemGroupComponent(-206369995));*/
+                new MarketItemGroupComponent(-206369995));
             /*public Entity Externalimpact { get; } = new Entity(1032613237, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/externalimpact"),
                 new ParentGroupComponent(Modules.GlobalItems.Externalimpact),
                 new MarketItemGroupComponent(1032613237));*/

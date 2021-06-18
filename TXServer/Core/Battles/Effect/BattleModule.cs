@@ -206,6 +206,7 @@ namespace TXServer.Core.Battles.Effect {
 
         protected MatchPlayer MatchPlayer { get; }
 
+        public Entity MarketItem { get; set; }
         public Entity SlotEntity { get; }
         public Entity ModuleEntity { get; }
         public Entity EffectEntity { get; set; }

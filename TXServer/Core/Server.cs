@@ -34,6 +34,7 @@ namespace TXServer.Core
                 ["garage/module/module/weapon/active/1/emp"] = typeof(EmpModule),
                 ["garage/module/module/weapon/active/3/energyinjection"] = typeof(EnergyInjectionModule),
                 ["garage/module/module/weapon/passive/1/engineer"] = typeof(EngineerModule),
+                ["garage/module/module/weapon/active/3/explosivemass"] = typeof(ExplosiveMassModule),
                 ["garage/module/module/weapon/active/2/externalimpact"] = typeof(ExternalImpactModule),
                 ["garage/module/module/tank/active/3/firering"] = typeof(FireRingModule),
                 ["garage/module/module/tank/active/2/forcefield"] = typeof(ForceFieldModule),

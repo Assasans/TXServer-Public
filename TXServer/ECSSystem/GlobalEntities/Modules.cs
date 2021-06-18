@@ -202,13 +202,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(2),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
                 new ModuleCardsCompositionComponent());
-            /*public Entity Explosivemass { get; } = new Entity(393550399, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/3/explosivemass"),
+            public Entity Explosivemass { get; } = new Entity(393550399, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/3/explosivemass"),
                 new ParentGroupComponent(393550399),
                 new MarketItemGroupComponent(393550399),
                 new ModuleTankPartComponent(TankPartModuleType.WEAPON),
                 new ModuleTierComponent(2),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             /*public Entity Backhitincrease { get; } = new Entity(-2075784110, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/passive/1/backhitincrease"),
                 new ParentGroupComponent(-2075784110),
                 new MarketItemGroupComponent(-2075784110),

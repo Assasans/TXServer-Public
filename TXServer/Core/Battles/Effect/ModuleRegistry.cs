@@ -5,6 +5,7 @@ using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Module;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core.Battles.Effect {
 	public class ModuleRegistry {
@@ -63,6 +64,8 @@ namespace TXServer.Core.Battles.Effect {
                 module.CooldownDuration = cooldownComponent.UpgradeLevel2Values[module.Level - 1];
             }
 
+            module.MarketItem = Modules.GlobalItems.GetAllItems().Single(m =>
+                m.TemplateAccessor.ConfigPath.Split("/").Last() == name.Split("/").Last());
             module.Init();
 
             return module;

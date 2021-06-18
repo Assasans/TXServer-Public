@@ -6,7 +6,6 @@ using TXServer.Core.Battles.Effect;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
-using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Battle
@@ -21,9 +20,8 @@ namespace TXServer.ECSSystem.Events.Battle
             if (player.BattlePlayer.MatchPlayer.TankState == TankState.Dead)
                 return;
 
+            Entity weaponMarketItem = Damage.WeaponToModuleMarketItem(weapon, player) ?? player.CurrentPreset.Weapon;
             BattleTankPlayer battlePlayer = player.BattlePlayer;
-            Entity weaponMarketItem = player.CurrentPreset.Weapon;
-
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
 
 			foreach (HitTarget hitTarget in Targets)
@@ -52,7 +50,6 @@ namespace TXServer.ECSSystem.Events.Battle
                         player.BattlePlayer.MatchPlayer.Modules.Single(m => m.GetType() == typeof(SpiderMineModule)) as
                             SpiderMineModule;
                     spiderMineModule?.Explode();
-                    weaponMarketItem = Modules.GlobalItems.Spidermine;
                 }
 
                 Damage.DealSplashDamage(weapon, weaponMarketItem, hitPlayer.MatchPlayer, battlePlayer.MatchPlayer, splashTarget);

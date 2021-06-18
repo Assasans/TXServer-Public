@@ -66,5 +66,8 @@
   <ItemGroup>
     <ProjectReference Include="..\TXDatabaseShared\TXDatabaseShared.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ECSSystem\Components\Battle\Module\ExplosiveMass" />
+  </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 </Project>

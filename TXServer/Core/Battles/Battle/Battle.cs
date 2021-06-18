@@ -204,22 +204,24 @@ namespace TXServer.Core.Battles
 
                 BattleBonuses.Clear();
                 foreach (BonusType bonusType in Enum.GetValues(typeof(BonusType)))
+                foreach (Bonus bonus in bonusTypeSpawnPoints[bonusType])
                 {
-                    foreach (Bonus bonus in bonusTypeSpawnPoints[bonusType])
-                    {
-                        BattleBonus battleBonus = new(bonusType, bonus, this);
-                        BattleBonuses.Add(battleBonus);
-                    }
+                    BattleBonus battleBonus = new(bonusType, bonus, this);
+                    BattleBonuses.Add(battleBonus);
                 }
 
                 Random random = new();
-                List<BattleBonus> supplyBonuses = new(BattleBonuses.Where(b => b.BonusType != BonusType.GOLD).OrderBy(b => random.Next()));
+                List<BattleBonus> supplyBonuses =
+                    new(BattleBonuses.Where(b => b.BonusType != BonusType.GOLD).OrderBy(b => random.Next()));
                 foreach (BattleBonus battleBonus in supplyBonuses.ToList())
                 {
                     battleBonus.StateChangeCountdown = random.Next(10, 120);
                     battleBonus.State = BonusState.New;
                 }
             }
+
+            if (ModeHandler is TeamBattleHandler handler)
+                BattleEntity.AddComponent(handler.RedTeamEntity.GetComponent<TeamGroupComponent>());
 
             foreach (BattleTankPlayer battlePlayer in JoinedTankPlayers.ToArray())
                 InitMatchPlayer(battlePlayer);
@@ -422,7 +424,7 @@ namespace TXServer.Core.Battles
 
         private void ProcessMatchPlayers()
         {
-            foreach (MatchPlayer matchPlayer in MatchTankPlayers.Select(x => x.MatchPlayer))
+            foreach (MatchPlayer matchPlayer in MatchTankPlayers.ToList().Select(x => x.MatchPlayer))
                 matchPlayer.Tick();
         }
 

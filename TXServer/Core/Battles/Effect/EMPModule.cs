@@ -20,7 +20,7 @@ namespace TXServer.Core.Battles.Effect
         {
             if (EffectEntity != null) Deactivate();
 
-            EffectEntity = EMPEffectTemplate.CreateEntity(MatchPlayer, Radius);
+            EffectEntity = EmpEffectTemplate.CreateEntity(MatchPlayer, Radius);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
             MatchPlayer.Battle.PlayersInMap.SendEvent(new EMPEffectReadyEvent(), EffectEntity);

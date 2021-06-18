@@ -5,14 +5,12 @@ using TXServer.Core.Battles.Effect;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle.Effect;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Weapon;
-using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
 using TXServer.ECSSystem.GlobalEntities;
@@ -74,20 +72,22 @@ namespace TXServer.Core.Battles
             return damage;
         }
 
-        private static float GetRandomDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager, HitTarget hitTarget)
+        private static float GetRandomDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer damager)
         {
             float damage;
 
-            if (IsModule(weapon, weaponMarketItem))
+            if (IsModule(weaponMarketItem))
             {
                 // Module
 
-                BattleModule module = damager.Modules.FirstOrDefault(m =>
-                    m.ModuleEntity.TemplateAccessor.ConfigPath == weaponMarketItem.TemplateAccessor.ConfigPath) ??
-                                      damager.Modules.First(m =>
-                    m.EffectEntity?.TemplateAccessor.Template == weapon.TemplateAccessor.Template);
+                BattleModule module =
+                    damager.Modules.FirstOrDefault(m =>
+                        m.ModuleEntity.TemplateAccessor.ConfigPath == weaponMarketItem.TemplateAccessor.ConfigPath) ??
+                    damager.Modules.First(m =>
+                        m.EffectEntity?.TemplateAccessor.Template == weapon.TemplateAccessor.Template);
 
-                string upgradePath = $"garage/module/upgrade/properties/{module.ModuleEntity.TemplateAccessor.ConfigPath.Split('/').Last()}";
+                string upgradePath =
+                    $"garage/module/upgrade/properties/{module.ModuleEntity.TemplateAccessor.ConfigPath.Split('/').Last()}";
 
                 int level = module.ModuleEntity.GetComponent<SlotUserItemInfoComponent>().UpgradeLevel;
 
@@ -138,20 +138,20 @@ namespace TXServer.Core.Battles
         public static void DealNormalDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             HitTarget hitTarget)
         {
-            if(IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
+            if (!IsModule(weaponMarketItem) && IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
 
-            float damage = GetRandomDamage(weapon, weaponMarketItem, victim, damager, hitTarget);
+            float damage = GetRandomDamage(weapon, weaponMarketItem, damager);
             DealDamage(weaponMarketItem, victim, damager, hitTarget, damage);
         }
 
         public static void DealSplashDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             HitTarget hitTarget)
         {
-            if (!IsModule(weapon, weaponMarketItem) && IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
+            if (!IsModule(weaponMarketItem) && IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
 
             float distance = hitTarget.HitDistance;
 
-            float damage = GetRandomDamage(weapon, weaponMarketItem, victim, damager, hitTarget);
+            float damage = GetRandomDamage(weapon, weaponMarketItem, damager);
             float damageMultiplier = GetSplashDamageMultiplier(weapon, weaponMarketItem, distance, victim, damager);
             int splashDamage = (int) Math.Round(damage * damageMultiplier);
 
@@ -312,6 +312,7 @@ namespace TXServer.Core.Battles
             killer.UserResult.Damage += (int) damage;
 
             ProcessKillAssists(victim, killer);
+
             if (killer.HasModule(typeof(LifeStealModule), out BattleModule module))
                 ((LifeStealModule) module).Activate();
         }
@@ -333,7 +334,7 @@ namespace TXServer.Core.Battles
         private static float GetSplashDamageMultiplier(Entity weapon, Entity weaponMarketItem, float distance,
             MatchPlayer victim, MatchPlayer damager)
         {
-            if (IsModule(weapon, weaponMarketItem)) return 1;
+            if (IsModule(weaponMarketItem)) return 1;
 
             var damageComponent = damager.Weapon.GetComponent<SplashWeaponComponent>();
 
@@ -385,8 +386,11 @@ namespace TXServer.Core.Battles
 
         }
 
-        private static bool IsModule(Entity weapon, Entity weaponMarketItem) =>
-            Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem) || weapon.HasComponent<EffectComponent>();
+        private static bool IsModule(Entity weaponMarketItem) =>
+            Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem);
+
+        public static Entity WeaponToModuleMarketItem(Entity weapon, Player player) =>
+            player.BattlePlayer.MatchPlayer.Modules.SingleOrDefault(m => m.EffectEntity == weapon)?.MarketItem;
 
 
         private static readonly Dictionary<int, int> KillStreakScores = new()

@@ -1,5 +1,4 @@
-﻿using System;
-using TXServer.Core.Protocol;
+﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;

@@ -51,7 +51,8 @@ namespace TXServer.ECSSystem.Events.Battle
                     };
                 });
 
-                Damage.DealNormalDamage(weapon, player.CurrentPreset.Weapon, victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget);
+                Entity weaponMarketItem = Damage.WeaponToModuleMarketItem(weapon, player) ?? player.CurrentPreset.Weapon;
+                Damage.DealNormalDamage(weapon, weaponMarketItem, victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget);
             }
         }
 
