@@ -45,7 +45,7 @@ namespace TXServer.Core.Battles
             if (victim.HasModule(typeof(EmergencyProtectionModule), out BattleModule epModule))
                 if (((EmergencyProtectionModule) epModule).IsImmune) return;
 
-            damage = DamageWithSupplies(damage, victim, damager, mine);
+            damage = DamageWithEffects(damage, victim, damager, mine);
 
             // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
             //     $"[Damage] Dealt {damage} damage units to {victim.Player.Data.Username}",
@@ -78,19 +78,23 @@ namespace TXServer.Core.Battles
             });
         }
 
-        private static float DamageWithSupplies(float damage, MatchPlayer target, MatchPlayer shooter,
+        private static float DamageWithEffects(float damage, MatchPlayer target, MatchPlayer shooter,
             bool mine = false)
         {
-            if (!mine && shooter.Modules.Any(effect => effect.GetType() == typeof(DamageModule)))
-                damage *= 2;
-            if (target.Modules.Any(effect => effect.GetType() == typeof(ArmorModule)))
-                damage /= 2;
+            if (!mine && shooter.HasModule(typeof(IncreasedDamageModule), out BattleModule damageModule))
+            {
+                if (damageModule.IsCheat)
+                    damage = target.Tank.GetComponent<HealthComponent>().CurrentHealth;
+                else
+                    damage *= ((IncreasedDamageModule) damageModule).Factor;
+            }
 
-            if (!mine && shooter.Modules.Any(effect =>
-                effect.GetType() == typeof(DamageModule) && effect.IsCheat))
-                damage = 99999;
-            if (target.Modules.Any(effect => effect.GetType() == typeof(ArmorModule) && effect.IsCheat))
-                damage = 0;
+            if (target.HasModule(typeof(AbsorbingArmorEffect), out BattleModule armorModule))
+            {
+                if (armorModule.IsCheat) damage = 0;
+                else damage += ((AbsorbingArmorEffect) armorModule).Factor;
+            }
+
             return damage;
         }
 

@@ -7,9 +7,9 @@ using TXServer.ECSSystem.EntityTemplates.Item.Module;
 
 namespace TXServer.Core.Battles.Effect
 {
-	public class ArmorModule : BattleModule
+	public class AbsorbingArmorEffect : BattleModule
     {
-		public ArmorModule(MatchPlayer matchPlayer, Entity garageModule) : base(
+		public AbsorbingArmorEffect(MatchPlayer matchPlayer, Entity garageModule) : base(
 			matchPlayer,
 			ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
 		) { }
@@ -46,14 +46,12 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
-            base.Init();
-
             ModuleFactor = Config.GetComponent<ModuleArmorEffectPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
         }
 
 
-        private float Factor => IsSupply ? 1.15f : ModuleFactor;
+        public float Factor => IsSupply ? 1.5f : ModuleFactor;
         private float ModuleFactor { get; set; }
 
     }

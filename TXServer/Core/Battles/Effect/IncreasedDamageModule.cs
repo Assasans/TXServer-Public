@@ -1,13 +1,15 @@
 ﻿using System;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components.Battle.Module.IncreasedDamage;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 
 namespace TXServer.Core.Battles.Effect
 {
-	public class DamageModule : BattleModule
+	public class IncreasedDamageModule : BattleModule
     {
-		public DamageModule(MatchPlayer matchPlayer, Entity garageModule) : base(
+		public IncreasedDamageModule(MatchPlayer matchPlayer, Entity garageModule) : base(
 			matchPlayer,
 			ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
 		) { }
@@ -42,5 +44,15 @@ namespace TXServer.Core.Battles.Effect
             EffectEntity = null;
             IsCheat = false;
         }
+
+        public override void Init()
+        {
+            // min & max factor are the same for this module
+            ModuleFactor = (long) Config.GetComponent<ModuleDamageEffectMaxFactorPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level - 1];
+        }
+
+        public float Factor => IsSupply ? 1.5f : ModuleFactor;
+        public float ModuleFactor { get; set; }
     }
 }

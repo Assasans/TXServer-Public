@@ -18,7 +18,6 @@ namespace TXServer.Core.Battles.Effect
         public override void Activate()
         {
             float duration = IsSupply || IsCheat ? 30000 : Duration;
-            float factor = IsSupply ? 1.15f : Factor;
             if (EffectIsActive)
             {
                 ChangeDuration(duration);
@@ -31,8 +30,7 @@ namespace TXServer.Core.Battles.Effect
             MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component =>
             {
                 _prevSpeedComponent = (SpeedComponent)component.Clone();
-                if (IsCheat) component.Speed = float.MaxValue;
-                else component.Speed *= factor;
+                component.Speed *= Factor();
             });
 
             Schedule(TimeSpan.FromMilliseconds(duration), Deactivate);
@@ -58,11 +56,16 @@ namespace TXServer.Core.Battles.Effect
         {
             base.Init();
 
-            Factor = Config.GetComponent<ModuleTurbospeedEffectPropertyComponent>(ConfigPath)
+            ModuleFactor = Config.GetComponent<ModuleTurbospeedEffectPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
         }
 
-        private float Factor { get; set; }
+        private float Factor()
+        {
+            if (IsCheat) return float.MaxValue;
+            return IsSupply ? 1.5f : ModuleFactor;
+        }
+        private float ModuleFactor { get; set; }
         private SpeedComponent _prevSpeedComponent;
     }
 }

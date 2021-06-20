@@ -917,8 +917,8 @@ namespace TXServer.Core.ChatCommands
 
         private static readonly Dictionary<BonusType, (Type, Entity)> BonusToModule = new()
         {
-            { BonusType.ARMOR, (typeof(ArmorModule), Modules.GlobalItems.Absorbingarmor) },
-            { BonusType.DAMAGE, (typeof(DamageModule), Modules.GlobalItems.Increaseddamage) },
+            { BonusType.ARMOR, (typeof(AbsorbingArmorEffect), Modules.GlobalItems.Absorbingarmor) },
+            { BonusType.DAMAGE, (typeof(IncreasedDamageModule), Modules.GlobalItems.Increaseddamage) },
             { BonusType.REPAIR, (typeof(RepairKitModule), Modules.GlobalItems.Repairkit) },
             { BonusType.SPEED, (typeof(TurboSpeedModule), Modules.GlobalItems.Turbospeed) }
         };
