@@ -90,6 +90,7 @@ namespace TXServer.Core.Battles
             return score;
         }
 
+
         private void PrepareForRespawning()
         {
             Tank.TryRemoveComponent<TankVisibleStateComponent>();
@@ -133,6 +134,7 @@ namespace TXServer.Core.Battles
             Tank.AddComponent(new TankMovementComponent(new Movement(position, Vector3.Zero, Vector3.Zero, rotation), new MoveControl(), 0, 0));
         }
 
+
         public bool HasModule(Type moduleType, out BattleModule module)
         {
             module = Modules.SingleOrDefault(m => m.GetType() == moduleType);
@@ -141,6 +143,7 @@ namespace TXServer.Core.Battles
 
         public void TryDeactivateInvisibility() => Modules.SingleOrDefault(m => m.GetType() == typeof(InvisibilityModule))
             ?.Deactivate();
+
 
         public bool IsEnemyOf(MatchPlayer suspect) => (Battle.Params.BattleMode == BattleMode.DM ||
                                                        Player.BattlePlayer.Team != suspect.Player.BattlePlayer.Team) &&
@@ -151,6 +154,9 @@ namespace TXServer.Core.Battles
             if (KeepDisabled) return;
             Tank.AddComponent(new TankMovableComponent());
             Weapon.AddComponent(new ShootableComponent());
+
+            foreach (BattleModule module in Modules.Where(m => m.ActivateOnTankSpawn && !m.IsOnCooldown))
+                module.Activate();
         }
 
         public void DisableTank()

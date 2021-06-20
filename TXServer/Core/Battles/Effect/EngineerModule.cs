@@ -21,6 +21,7 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            ActivateOnTankSpawn = true;
             DeactivateOnTankDisable = false;
 
             Factor = Config.GetComponent<ModuleEngineerEffectDurationFactorPropertyComponent>(ConfigPath)
@@ -30,7 +31,7 @@ namespace TXServer.Core.Battles.Effect
         }
 
         public long SupplyDuration(long normalDuration) =>
-            EmpIsActive ? normalDuration : (long) (normalDuration * Factor);
+            IsEmpLocked ? normalDuration : (long) (normalDuration * Factor);
 
         private float Factor { get; set; }
     }

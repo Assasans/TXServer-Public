@@ -220,7 +220,7 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            if (ModeHandler is TeamBattleHandler handler)
+            if (ModeHandler is TeamBattleHandler handler && !BattleEntity.HasComponent<TeamGroupComponent>())
                 BattleEntity.AddComponent(handler.RedTeamEntity.GetComponent<TeamGroupComponent>());
 
             foreach (BattleTankPlayer battlePlayer in JoinedTankPlayers.ToArray())

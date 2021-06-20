@@ -23,11 +23,27 @@ namespace TXServer.Core.Battles
 {
     public static class Damage
     {
+        public static void ApplySelfHeal(float healHp, MatchPlayer matchPlayer)
+        {
+            matchPlayer.Tank.ChangeComponent<HealthComponent>(component =>
+            {
+                if (component.CurrentHealth + healHp > component.MaxHealth)
+                    component.CurrentHealth = component.MaxHealth;
+                else
+                    component.CurrentHealth += healHp;
+            });
+            matchPlayer.SendEvent(new DamageInfoEvent(healHp, matchPlayer.TankPosition, false, true), matchPlayer.Tank);
+            matchPlayer.SendEvent(new HealthChangedEvent(), matchPlayer.Tank);
+            // Todo: fix position of self heal info
+        }
+
         private static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             HitTarget hitTarget, float damage, bool mine = false)
         {
             if (victim.HasModule(typeof(InvulnerabilityModule), out BattleModule module))
                 if (((InvulnerabilityModule) module).IsProtected) return;
+            if (victim.HasModule(typeof(EmergencyProtectionModule), out BattleModule epModule))
+                if (((EmergencyProtectionModule) epModule).IsImmune) return;
 
             damage = DamageWithSupplies(damage, victim, damager, mine);
 
@@ -41,9 +57,15 @@ namespace TXServer.Core.Battles
                 if (component.CurrentHealth >= 0) {}
                     component.CurrentHealth -= damage;
 
-                if (component.CurrentHealth <= 0)
-                    ProcessKill(weaponMarketItem, victim, damager, hitTarget, damage);
-                else
+                    if (component.CurrentHealth <= 0)
+                    {
+                        if (victim.HasModule(typeof(EmergencyProtectionModule), out BattleModule ep) &&
+                            !ep.IsOnCooldown)
+                            ep.Activate();
+                        else
+                            ProcessKill(weaponMarketItem, victim, damager, hitTarget, damage);
+                    }
+                    else
                 {
                     if (victim.DamageAssistants.ContainsKey(damager))
                         victim.DamageAssistants[damager] += damage;

@@ -63,7 +63,7 @@ namespace TXServer.Core.Battles.Effect {
 
             EmpLockEnd = DateTimeOffset.Now.AddMilliseconds(duration);
 
-            if (EffectAffectedByEmp) Deactivate();
+            if (IsAffectedByEmp) Deactivate();
         }
         private void DeactivateEmpLock()
         {
@@ -131,21 +131,16 @@ namespace TXServer.Core.Battles.Effect {
             if (CooldownStart != null && DateTimeOffset.UtcNow >= CooldownEnd)
             {
                 ModuleEntity.TryRemoveComponent<InventoryCooldownStateComponent>();
-                ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
 
-                /*if (ModuleEntity.HasComponent<InventorySlotTemporaryBlockedByServerComponent>()) {
-					ModuleEntity.RemoveComponent<InventorySlotTemporaryBlockedByServerComponent>();
-				}*/
+                if (ModuleType is not ModuleBehaviourType.PASSIVE)
+                    ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
 
-                ModuleEntity.TryRemoveComponent<InventoryCooldownStateComponent>();
-
-				CooldownStart = null;
+                CooldownStart = null;
 			}
 
-            if (EmpLockEnd != null && !EmpIsActive)
-                DeactivateEmpLock();
+            if (EmpLockEnd != null && !IsEmpLocked) DeactivateEmpLock();
 
-            if (EffectEntity == null && ModuleType == ModuleBehaviourType.PASSIVE && !EmpIsActive &&
+            if (!EffectIsActive && !IsEmpLocked && AlwaysActiveExceptEmp &&
                 MatchPlayer.Battle.BattleState is BattleState.WarmUp or BattleState.MatchBegins or BattleState.Running)
                 Activate();
 
@@ -163,7 +158,7 @@ namespace TXServer.Core.Battles.Effect {
 
 			Tick();
 
-            if (ModuleEntity is not null)
+            if (ModuleEntity is not null && ModuleType is not ModuleBehaviourType.PASSIVE)
             {
                 if (IsEnabled && !IsOnCooldown)
                 {
@@ -217,12 +212,14 @@ namespace TXServer.Core.Battles.Effect {
         public bool IsEnabled { get; set; }
         public bool IsSupply { get; set; }
         public bool EffectIsActive => EffectEntity is not null || EffectEntities.Any();
-        protected bool EmpIsActive => EmpLockEnd != null && EmpLockEnd > DateTimeOffset.Now;
+        protected bool IsEmpLocked => EmpLockEnd != null && EmpLockEnd > DateTimeOffset.Now;
 
+        public bool ActivateOnTankSpawn { get; set; }
+        public bool AlwaysActiveExceptEmp { get; set; }
         public bool CheatWaitingForTank { get; set; }
         public bool DeactivateCheat { get; set; }
         public bool DeactivateOnTankDisable { get; set; } = true;
-        protected bool EffectAffectedByEmp { get; set; } = true;
+        protected bool IsAffectedByEmp { get; set; } = true;
 
 
         public float Duration { get; set; }

@@ -139,13 +139,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(1),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
                 new ModuleCardsCompositionComponent());*/
-            /*public Entity Emergencyprotection { get; } = new Entity(-357196071, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/trigger/3/emergencyprotection"),
+            public Entity Emergencyprotection { get; } = new Entity(-357196071, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/trigger/3/emergencyprotection"),
                 new ParentGroupComponent(-357196071),
                 new MarketItemGroupComponent(-357196071),
                 new ModuleTankPartComponent(TankPartModuleType.TANK),
                 new ModuleTierComponent(2),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             public Entity Emp { get; } = new Entity(-1493372159, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/1/emp"),
                 new ParentGroupComponent(-1493372159),
                 new MarketItemGroupComponent(-1493372159),

@@ -29,7 +29,7 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
-            EffectAffectedByEmp = false;
+            IsAffectedByEmp = false;
 
             ForceMultiplier = Config.GetComponent<JumpImpactForceMultPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];

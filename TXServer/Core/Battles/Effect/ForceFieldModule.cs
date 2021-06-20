@@ -29,7 +29,7 @@ namespace TXServer.Core.Battles.Effect {
 
         public override void Init()
         {
-            EffectAffectedByEmp = false;
+            IsAffectedByEmp = false;
         }
     }
 }

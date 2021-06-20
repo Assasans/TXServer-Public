@@ -19,7 +19,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Activate()
         {
-            if (CooldownEnd > DateTimeOffset.Now || MatchPlayer.TankState == TankState.Dead || EmpIsActive) return;
+            if (IsOnCooldown || MatchPlayer.TankState == TankState.Dead || IsEmpLocked) return;
+
             HealthComponent healthComponent = MatchPlayer.Tank.GetComponent<HealthComponent>();
 
             if (!(healthComponent.CurrentHealth < healthComponent.MaxHealth)) return;

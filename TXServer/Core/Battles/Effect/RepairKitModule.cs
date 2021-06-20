@@ -28,8 +28,7 @@ namespace TXServer.Core.Battles.Effect
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
             MatchPlayer.Tank.ChangeComponent(new TemperatureComponent(0));
-            MatchPlayer.Tank.ChangeComponent<HealthComponent>(component => component.CurrentHealth = component.MaxHealth);
-            MatchPlayer.Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), MatchPlayer.Tank);
+            Damage.ApplySelfHeal(MatchPlayer.Tank.GetComponent<HealthComponent>().MaxHealth, MatchPlayer);
 
             Schedule(TimeSpan.FromMilliseconds(duration), Deactivate);
         }
