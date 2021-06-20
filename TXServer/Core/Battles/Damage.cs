@@ -38,14 +38,14 @@ namespace TXServer.Core.Battles
         }
 
         private static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
-            HitTarget hitTarget, float damage, bool mine = false)
+            HitTarget hitTarget, float damage)
         {
             if (victim.HasModule(typeof(InvulnerabilityModule), out BattleModule module))
                 if (((InvulnerabilityModule) module).IsProtected) return;
             if (victim.HasModule(typeof(EmergencyProtectionModule), out BattleModule epModule))
                 if (((EmergencyProtectionModule) epModule).IsImmune) return;
 
-            damage = DamageWithEffects(damage, victim, damager, mine);
+            damage = DamageWithEffects(damage, victim, damager, IsModule(weaponMarketItem));
 
             // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
             //     $"[Damage] Dealt {damage} damage units to {victim.Player.Data.Username}",
@@ -79,9 +79,9 @@ namespace TXServer.Core.Battles
         }
 
         private static float DamageWithEffects(float damage, MatchPlayer target, MatchPlayer shooter,
-            bool mine = false)
+            bool module)
         {
-            if (!mine && shooter.HasModule(typeof(IncreasedDamageModule), out BattleModule damageModule))
+            if (!module && shooter.HasModule(typeof(IncreasedDamageModule), out BattleModule damageModule))
             {
                 if (damageModule.IsCheat)
                     damage = target.Tank.GetComponent<HealthComponent>().CurrentHealth;
@@ -91,9 +91,12 @@ namespace TXServer.Core.Battles
 
             if (target.HasModule(typeof(AbsorbingArmorEffect), out BattleModule armorModule))
             {
-                if (armorModule.IsCheat) damage = 0;
-                else damage += ((AbsorbingArmorEffect) armorModule).Factor;
+                Console.WriteLine(damage);
+                Console.WriteLine(((AbsorbingArmorEffect) armorModule).Factor());
+                damage *= ((AbsorbingArmorEffect) armorModule).Factor();
+                Console.WriteLine(damage);
             }
+
 
             return damage;
         }
@@ -369,13 +372,11 @@ namespace TXServer.Core.Battles
             float minSplashDamagePercent = damageComponent.MinSplashDamagePercent;
 
             if (distance < radiusOfMaxSplashDamage)
-            {
                 return 1;
-            }
+
             if (distance > radiusOfMinSplashDamage)
-            {
                 return 0;
-            }
+
 
             return 0.01f * (minSplashDamagePercent + (radiusOfMinSplashDamage - distance) * (100f - minSplashDamagePercent) / (radiusOfMinSplashDamage - radiusOfMaxSplashDamage));
         }

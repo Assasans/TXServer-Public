@@ -25,7 +25,7 @@ namespace TXServer.Core.Battles.Effect
             StartCooldown();
 
             IsImmune = true;
-            ImmunityEndTime = DateTimeOffset.Now.AddMilliseconds(HolyshieldDuration);
+            ImmunityEndTime = DateTimeOffset.UtcNow.AddMilliseconds(HolyshieldDuration);
 
             EffectEntity = EmergencyProtectionEffectTemplate.CreateEntity(MatchPlayer);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);

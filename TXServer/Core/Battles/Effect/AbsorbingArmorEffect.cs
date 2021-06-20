@@ -51,7 +51,11 @@ namespace TXServer.Core.Battles.Effect
         }
 
 
-        public float Factor => IsSupply ? 1.5f : ModuleFactor;
+        public float Factor()
+        {
+            if (IsCheat) return 0;
+            return IsSupply ? 0.5f : ModuleFactor;
+        }
         private float ModuleFactor { get; set; }
 
     }

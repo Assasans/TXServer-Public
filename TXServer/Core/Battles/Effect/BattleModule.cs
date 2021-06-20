@@ -55,13 +55,13 @@ namespace TXServer.Core.Battles.Effect {
                 ModuleEntity.ChangeComponent<InventorySlotTemporaryBlockedByServerComponent>(component =>
                 {
                     component.BlockTimeMS += (long)duration;
-                    component.StartBlockTime = DateTime.Now;
+                    component.StartBlockTime = DateTime.UtcNow;
                 });
             else
                 ModuleEntity.AddComponent(
-                    new InventorySlotTemporaryBlockedByServerComponent((long) duration, DateTime.Now));
+                    new InventorySlotTemporaryBlockedByServerComponent((long) duration, DateTime.UtcNow));
 
-            EmpLockEnd = DateTimeOffset.Now.AddMilliseconds(duration);
+            EmpLockEnd = DateTimeOffset.UtcNow.AddMilliseconds(duration);
 
             if (IsAffectedByEmp) Deactivate();
         }
@@ -212,7 +212,7 @@ namespace TXServer.Core.Battles.Effect {
         public bool IsEnabled { get; set; }
         public bool IsSupply { get; set; }
         public bool EffectIsActive => EffectEntity is not null || EffectEntities.Any();
-        protected bool IsEmpLocked => EmpLockEnd != null && EmpLockEnd > DateTimeOffset.Now;
+        protected bool IsEmpLocked => EmpLockEnd != null && EmpLockEnd > DateTimeOffset.UtcNow;
 
         public bool ActivateOnTankSpawn { get; set; }
         public bool AlwaysActiveExceptEmp { get; set; }

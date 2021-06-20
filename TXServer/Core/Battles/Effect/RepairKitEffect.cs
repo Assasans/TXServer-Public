@@ -1,22 +1,26 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
-using TXServer.ECSSystem.Events.Battle;
 
 namespace TXServer.Core.Battles.Effect
 {
-	public class RepairKitModule : BattleModule
+    public class RepairKitModule : BattleModule
     {
-		public RepairKitModule(MatchPlayer matchPlayer, Entity garageModule) : base(
-			matchPlayer,
+        public RepairKitModule(MatchPlayer matchPlayer, Entity garageModule) : base(
+            matchPlayer,
             ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
-		) { }
+        )
+        {
+        }
 
         public override void Activate()
         {
+            LastTickTime = DateTimeOffset.UtcNow.AddMilliseconds(-TickPeriod);
+
             float duration = IsSupply || IsCheat ? 3000 : Duration;
             if (EffectIsActive)
             {
@@ -24,11 +28,11 @@ namespace TXServer.Core.Battles.Effect
                 return;
             }
 
-            EffectEntity = HealingEffectTemplate.CreateEntity(MatchPlayer, (long)duration);
+            EffectEntity = HealingEffectTemplate.CreateEntity(MatchPlayer, (long) duration);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
+
             MatchPlayer.Tank.ChangeComponent(new TemperatureComponent(0));
-            Damage.ApplySelfHeal(MatchPlayer.Tank.GetComponent<HealthComponent>().MaxHealth, MatchPlayer);
 
             Schedule(TimeSpan.FromMilliseconds(duration), Deactivate);
         }
@@ -47,5 +51,30 @@ namespace TXServer.Core.Battles.Effect
             EffectEntity = null;
             IsCheat = false;
         }
+
+        protected override void Tick()
+        {
+            base.Tick();
+
+            if (EffectIsActive && DifferenceToLastHeal.TotalMilliseconds > 250)
+            {
+                LastTickTime = DateTimeOffset.UtcNow;
+
+                HealthComponent healthComponent = MatchPlayer.Tank.GetComponent<HealthComponent>();
+                if (healthComponent.CurrentHealth >= healthComponent.MaxHealth) return;
+
+                float healHp = healthComponent.CurrentHealth + TickPeriod * HpPerMs > healthComponent.MaxHealth
+                    ? healthComponent.MaxHealth - healthComponent.CurrentHealth
+                    : TickPeriod * HpPerMs;
+
+                Damage.ApplySelfHeal(healHp, MatchPlayer);
+            }
+        }
+
+        private float HpPerMs { get; set; } = 0.633f;
+        private float TickPeriod { get; set; } = 250;
+
+        private DateTimeOffset LastTickTime { get; set; }
+        private TimeSpan DifferenceToLastHeal => LastTickTime == default ? default : DateTimeOffset.UtcNow - LastTickTime;
     }
 }
