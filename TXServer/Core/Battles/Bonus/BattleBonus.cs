@@ -61,7 +61,7 @@ namespace TXServer.Core.Battles
                     break;
                 default:
                     (Type, Entity) desc = _bonusToModule[BonusType];
-                    if (!player.BattlePlayer.MatchPlayer.HasModule(desc.Item1, out BattleModule module))
+                    if (!player.BattlePlayer.MatchPlayer.TryGetModule(desc.Item1, out BattleModule module))
                     {
                         module =
                             (BattleModule) Activator.CreateInstance(desc.Item1, player.BattlePlayer.MatchPlayer,

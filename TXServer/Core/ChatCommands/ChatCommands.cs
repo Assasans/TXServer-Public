@@ -260,7 +260,7 @@ namespace TXServer.Core.ChatCommands
                     foreach (BattleTankPlayer target in targets)
                     foreach ((Type, Entity) desc in cheats.Select(bonusCheat => BonusToModule[bonusCheat]))
                     {
-                        if (!target.MatchPlayer.HasModule(desc.Item1, out BattleModule module))
+                        if (!target.MatchPlayer.TryGetModule(desc.Item1, out BattleModule module))
                         {
                             module =
                                 (BattleModule) Activator.CreateInstance(desc.Item1, target.MatchPlayer,

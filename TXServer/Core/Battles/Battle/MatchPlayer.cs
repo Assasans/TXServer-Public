@@ -135,9 +135,15 @@ namespace TXServer.Core.Battles
         }
 
 
-        public bool HasModule(Type moduleType, out BattleModule module)
+        public bool TryGetModule(Type moduleType, out BattleModule module)
         {
             module = Modules.SingleOrDefault(m => m.GetType() == moduleType);
+            return module != null;
+        }
+
+        public bool TryGetModule<T>(out T module) where T : BattleModule
+        {
+            module = Modules.SingleOrDefault(m => m.GetType() == typeof(T)) as T;
             return module != null;
         }
 

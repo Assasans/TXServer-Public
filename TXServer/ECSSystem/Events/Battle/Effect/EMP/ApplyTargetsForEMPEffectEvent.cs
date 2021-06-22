@@ -11,8 +11,8 @@ namespace TXServer.ECSSystem.Events.Battle.Effect.EMP
         public void Execute(Player player, Entity entity)
         {
             if (Targets.Length <= 0) return;
-            if (player.BattlePlayer.MatchPlayer.HasModule(typeof(EmpModule), out BattleModule empModule))
-                ((EmpModule) empModule).ApplyEmpOnTargets(Targets);
+            if (player.BattlePlayer.MatchPlayer.TryGetModule(out EmpModule empModule))
+                empModule.ApplyEmpOnTargets(Targets);
         }
 
         public Entity[] Targets { get; set; }

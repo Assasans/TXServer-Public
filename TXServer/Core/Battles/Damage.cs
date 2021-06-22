@@ -40,10 +40,10 @@ namespace TXServer.Core.Battles
         private static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             HitTarget hitTarget, float damage)
         {
-            if (victim.HasModule(typeof(InvulnerabilityModule), out BattleModule module))
-                if (((InvulnerabilityModule) module).IsProtected) return;
-            if (victim.HasModule(typeof(EmergencyProtectionModule), out BattleModule epModule))
-                if (((EmergencyProtectionModule) epModule).IsImmune) return;
+            if (victim.TryGetModule(out InvulnerabilityModule module))
+                if (module.IsProtected) return;
+            if (victim.TryGetModule(out EmergencyProtectionModule epModule))
+                if (epModule.IsImmune) return;
 
             damage = DamageWithEffects(damage, victim, damager, IsModule(weaponMarketItem));
 
@@ -59,7 +59,7 @@ namespace TXServer.Core.Battles
 
                     if (component.CurrentHealth <= 0)
                     {
-                        if (victim.HasModule(typeof(EmergencyProtectionModule), out BattleModule ep) &&
+                        if (victim.TryGetModule(out EmergencyProtectionModule ep) &&
                             !ep.IsOnCooldown)
                             ep.Activate();
                         else
@@ -81,19 +81,19 @@ namespace TXServer.Core.Battles
         private static float DamageWithEffects(float damage, MatchPlayer target, MatchPlayer shooter,
             bool module)
         {
-            if (!module && shooter.HasModule(typeof(IncreasedDamageModule), out BattleModule damageModule))
+            if (!module && shooter.TryGetModule(out IncreasedDamageModule damageModule))
             {
                 if (damageModule.IsCheat)
                     damage = target.Tank.GetComponent<HealthComponent>().CurrentHealth;
                 else
-                    damage *= ((IncreasedDamageModule) damageModule).Factor;
+                    damage *= damageModule.Factor;
             }
 
-            if (target.HasModule(typeof(AbsorbingArmorEffect), out BattleModule armorModule))
+            if (target.TryGetModule(out AbsorbingArmorEffect armorModule))
             {
                 Console.WriteLine(damage);
-                Console.WriteLine(((AbsorbingArmorEffect) armorModule).Factor());
-                damage *= ((AbsorbingArmorEffect) armorModule).Factor();
+                Console.WriteLine(armorModule.Factor());
+                damage *= armorModule.Factor();
                 Console.WriteLine(damage);
             }
 
@@ -342,8 +342,8 @@ namespace TXServer.Core.Battles
 
             ProcessKillAssists(victim, killer);
 
-            if (killer.HasModule(typeof(LifeStealModule), out BattleModule module))
-                ((LifeStealModule) module).Activate();
+            if (killer.TryGetModule(out LifeStealModule module))
+                module.Activate();
         }
 
         private static void ProcessKillAssists(MatchPlayer victim, MatchPlayer damager)
