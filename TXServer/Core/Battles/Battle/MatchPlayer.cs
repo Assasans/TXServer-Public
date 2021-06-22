@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using TXServer.Core.Battles.Effect;
+using TXServer.Core.Configuration;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
@@ -45,6 +47,12 @@ namespace TXServer.Core.Battles
                 SpawnCoordinates = handler.BattleViewFor(Player.BattlePlayer).SpawnPoints;
             else
                 SpawnCoordinates = ((DMHandler)Battle.ModeHandler).SpawnPoints;
+
+            var cooldownComponent = Config.GetComponent<WeaponCooldownComponent>(battlePlayer.Player.CurrentPreset.WeaponItem.TemplateAccessor.ConfigPath, false);
+            if (cooldownComponent != null)
+            {
+                ShotCooldown = cooldownComponent.CooldownIntervalSec;
+            }
         }
 
         public IEnumerable<Entity> GetEntities()
@@ -339,6 +347,8 @@ namespace TXServer.Core.Battles
 
         public bool Paused { get; set; }
         public DateTime? IdleKickTime { get; set; }
+
+        public float? ShotCooldown { get; set; }
 
 
         public Dictionary<BattleTankPlayer, TankDamageCooldown> DamageCooldowns { get; } = new();
