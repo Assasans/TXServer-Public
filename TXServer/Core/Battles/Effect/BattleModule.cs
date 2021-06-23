@@ -160,9 +160,9 @@ namespace TXServer.Core.Battles.Effect {
 
         private void CheckCheatWaitingForTank()
         {
-            if (!CheatWaitingForTank || MatchPlayer.TankState != TankState.Active) return;
+            if (!IsWaitingForTank || MatchPlayer.TankState != TankState.Active) return;
 
-            CheatWaitingForTank = false;
+            IsWaitingForTank = false;
             IsCheat = true;
             Activate();
         }
@@ -231,25 +231,42 @@ namespace TXServer.Core.Battles.Effect {
         public Entity SlotEntity { get; }
         public Entity ModuleEntity { get; }
         public Entity EffectEntity { get; protected set; }
-        protected List<Entity> EffectEntities { get; set; } = new();
+        protected List<Entity> EffectEntities { get; } = new();
         public ModuleBehaviourType ModuleType { get; set; }
 
         public bool IsCheat { get; set; }
-        public bool IsEnabled { get; protected set; }
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            protected set
+            {
+                if (value == _isEnabled) return;
+
+                _isEnabled = value;
+                if (value is false)
+                    ModuleEntity.TryRemoveComponent<InventoryEnabledStateComponent>();
+                else if (!ModuleEntity.HasComponent<InventoryEnabledStateComponent>())
+                    ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
+            }
+        }
+        private bool _isEnabled = true;
         public bool IsSupply { get; set; }
         public bool EffectIsActive => EffectEntity is not null || EffectEntities.Any();
-        protected bool IsEmpLocked => EmpLockEnd != null && EmpLockEnd > DateTimeOffset.UtcNow;
 
         public bool ActivateOnTankSpawn { get; protected set; }
         protected bool AlwaysActiveExceptEmp { get; set; }
-        public bool CheatWaitingForTank { get; set; }
+        public bool IsWaitingForTank { get; set; }
         public bool DeactivateCheat { get; set; }
         public bool DeactivateOnTankDisable { get; protected set; } = true;
+
+        private DateTimeOffset? EmpLockEnd { get; set; }
         protected bool IsAffectedByEmp { get; set; } = true;
+        protected bool IsEmpLocked => EmpLockEnd != null && EmpLockEnd > DateTimeOffset.UtcNow;
 
         public float CooldownDuration { get; set; }
-        public float Duration { get; set; }
         private DateTimeOffset? CooldownEnd { get; set; }
+        public float Duration { get; set; }
+        public bool IsOnCooldown => CurrentAmmunition < 1;
 
         public int CurrentAmmunition
         {
@@ -264,7 +281,7 @@ namespace TXServer.Core.Battles.Effect {
                 MatchPlayer.SendEvent(new InventoryAmmunitionChangedEvent(), ModuleEntity);
             }
         }
-        protected int MaxAmmunition
+        private int MaxAmmunition
         {
             get => ModuleEntity.GetComponent<InventoryAmmunitionComponent>().MaxCount;
             set
@@ -279,21 +296,14 @@ namespace TXServer.Core.Battles.Effect {
                     ModuleEntity.AddComponent(new InventoryAmmunitionComponent(value));
             }
         }
-
         private int AmmunitionWaitingOnCooldown { get; set; }
-
-        public bool IsOnCooldown => CurrentAmmunition < 1;
-
-
-
-        private DateTimeOffset? EmpLockEnd { get; set; }
 
         public string ConfigPath { get; set; }
         public int Level { get; set; }
 
         public readonly List<TickHandler> TickHandlers;
         private readonly List<Action> _nextTickHandlers;
-	}
+    }
 
     public class TickHandler {
         public TickHandler(DateTimeOffset time, Action action) {

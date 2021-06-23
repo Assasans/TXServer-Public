@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using TXServer.Core.Commands;
 using TXServer.Core.Data.Database;
@@ -8,6 +9,8 @@ using TXDatabase.NetworkEvents.PlayerSettings;
 using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.EntityTemplates;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core
 {
@@ -18,7 +21,7 @@ namespace TXServer.Core
 
         public long UniqueId { get; }
         public string Email { get; protected set; }
-        public bool EmailVerified { get; protected set; }
+        protected bool EmailVerified { get; set; }
         public bool Subscribed { get; protected set; }
         public string Username { get; set; }
         public string HashedPassword { get; set; }
@@ -36,9 +39,13 @@ namespace TXServer.Core
         public long XCrystals { get; protected set; }
         public long Crystals { get; protected set; }
         public long Experience { get; protected set; }
+        public int GoldBoxes { get; set; } = 5;
+
         public Entity League { get; protected set; }
         public long Reputation { get; protected set; }
+
         public DateTime PremiumExpirationDate { get; protected set; }
+
         public List<Entity> Presets { get; } = new();
 
         public List<long> AcceptedFriendIds { get; protected set; }
@@ -63,7 +70,8 @@ namespace TXServer.Core
             ConfirmedUserEmailComponent component = SetValue<ConfirmedUserEmailComponent>(email);
             Email = email;
             if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetEmail { uid = UniqueId, email = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(email) });
+                Server.DatabaseNetwork.Socket.emit(new SetEmail
+                    {uid = UniqueId, email = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(email)});
             return component;
         }
 
@@ -81,14 +89,21 @@ namespace TXServer.Core
             Username = username;
             Player.User.ChangeComponent(new UserUidComponent(username));
             if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetUsername { uid = UniqueId, username = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(username) });
+                Server.DatabaseNetwork.Socket.emit(new SetUsername
+                {
+                    uid = UniqueId, username = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(username)
+                });
         }
 
         public void SetHashedPassword(string hashedPassword)
         {
             HashedPassword = hashedPassword;
             if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetHashedPassword { uid = UniqueId, hashedPassword = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(hashedPassword) });
+                Server.DatabaseNetwork.Socket.emit(new SetHashedPassword
+                {
+                    uid = UniqueId,
+                    hashedPassword = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(hashedPassword)
+                });
         }
 
         public void SetCountryCode(string countryCode)
@@ -96,7 +111,11 @@ namespace TXServer.Core
             CountryCode = countryCode;
             Player.User.ChangeComponent(new UserCountryComponent(countryCode));
             if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetCountryCode { uid = UniqueId, countryCode = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(countryCode) });
+                Server.DatabaseNetwork.Socket.emit(new SetCountryCode
+                {
+                    uid = UniqueId,
+                    countryCode = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(countryCode)
+                });
         }
 
         public void SetAvatar(string avatarId)
@@ -104,7 +123,8 @@ namespace TXServer.Core
             Avatar = avatarId;
             Player.User.ChangeComponent(new UserAvatarComponent(avatarId));
             if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetAvatar { uid = UniqueId, avatar = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(avatarId) });
+                Server.DatabaseNetwork.Socket.emit(new SetAvatar
+                    {uid = UniqueId, avatar = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(avatarId)});
         }
 
         public void SetAdmin(bool admin)
@@ -140,6 +160,15 @@ namespace TXServer.Core
             Player.User.ChangeComponent(new UserExperienceComponent(value));
             if (rankUpCheck) Player.CheckRankUp();
         }
+        public void SetGoldBoxes(int value)
+        {
+            GoldBoxes = value;
+
+            // todo: better solution for this
+            var goldBonus = Player.EntityList.Single(i => i.TemplateAccessor.Template is GoldBonusUserItemTemplate);
+            goldBonus.ChangeComponent<UserItemCounterComponent>(component => component.Count = value);
+        }
+
         public void SetReputation(long value)
         {
             Reputation = value;

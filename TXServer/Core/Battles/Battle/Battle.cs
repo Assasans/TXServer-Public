@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Battles.Matchmaking;
 using TXServer.Core.HeightMaps;
@@ -42,8 +41,8 @@ namespace TXServer.Core.Battles
             BattleLobbyChatEntity = BattleLobbyChatTemplate.CreateEntity();
             GeneralBattleChatEntity = GeneralBattleChatTemplate.CreateEntity();
 
-            tickHandlers = new List<TickHandler>();
-            nextTickHandlers = new List<Action>();
+            _tickHandlers = new List<TickHandler>();
+            _nextTickHandlers = new List<Action>();
         }
 
         public void CreateBattle()
@@ -212,7 +211,7 @@ namespace TXServer.Core.Battles
 
                 Random random = new();
                 List<BattleBonus> supplyBonuses =
-                    new(BattleBonuses.Where(b => b.BonusType != BonusType.GOLD).OrderBy(b => random.Next()));
+                    new(BattleBonuses.Where(b => b.BonusType != BonusType.GOLD).OrderBy(_ => random.Next()));
                 foreach (BattleBonus battleBonus in supplyBonuses.ToList())
                 {
                     battleBonus.StateChangeCountdown = random.Next(10, 120);
@@ -247,8 +246,14 @@ namespace TXServer.Core.Battles
                     component.Experience += battlePlayer.MatchPlayer.UserResult.ScoreWithoutPremium - battlePlayer.MatchPlayer.AlreadyAddedExperience);
 
                 if (JoinedTankPlayers.Count() <= 3 ||
-                    (ModeHandler is TeamBattleHandler tbHandler && Math.Abs(tbHandler.RedTeamPlayers.Count - tbHandler.BlueTeamPlayers.Count) >= 2))
+                    ModeHandler is TeamBattleHandler tbHandler && Math.Abs(tbHandler.RedTeamPlayers.Count - tbHandler.BlueTeamPlayers.Count) >= 2)
                     battlePlayer.MatchPlayer.UserResult.UnfairMatching = true;
+            }
+
+            foreach (Player player in WaitingGoldBoxSenders.ToList())
+            {
+                WaitingGoldBoxSenders.Remove(player);
+                player.Data.SetGoldBoxes(player.Data.GoldBoxes + 1);
             }
 
             IsWarmUpCompleted = false;
@@ -288,43 +293,29 @@ namespace TXServer.Core.Battles
             {
                 BattleTankPlayer tankPlayer = (BattleTankPlayer)battlePlayer;
 
-                MatchPlayer matchPlayer = new(tankPlayer, BattleEntity, (ModeHandler as TeamBattleHandler)?.BattleViewFor(tankPlayer).AllyTeamResults ?? ((DMHandler)ModeHandler).Results);
+                MatchPlayer matchPlayer =
+                    new(tankPlayer, BattleEntity, (ModeHandler as TeamBattleHandler)?.BattleViewFor(tankPlayer)
+                        .AllyTeamResults ?? ((DMHandler) ModeHandler).Results);
                 tankPlayer.MatchPlayer = matchPlayer;
 
                 if (!Params.DisabledModules)
                 {
-                    foreach ((Entity garageSlot, Entity garageModule) in battlePlayer.Player.CurrentPreset.Modules.Where(
-                        (entry) => entry.Value?.GetComponent<MountedItemComponent>() != null
+                    // add all selected modules
+                    foreach ((Entity _, Entity garageModule) in battlePlayer.Player.CurrentPreset.Modules.Where(
+                        entry => entry.Value?.GetComponent<MountedItemComponent>() != null
                     ))
                     {
-                        try
-                        {
-                            BattleModule module = Server.Instance.ModuleRegistry.CreateModule(
-                                matchPlayer,
-                                garageModule
-                            );
-                            if (module == null)
-                                throw new InvalidOperationException(
-                                    $"Failed to create module '{garageModule.EntityId}'"
-                                );
-
-                            matchPlayer.Modules.Add(module);
-                            battlePlayer.ShareEntities(module.SlotEntity, module.ModuleEntity);
-                        }
-                        catch (Exception exception)
-                        {
-                            // ignored
-                        }
+                        BattleModule module =
+                            Server.Instance.ModuleRegistry.CreateModule(matchPlayer, garageModule);
+                        matchPlayer.Modules.Add(module);
+                        battlePlayer.ShareEntities(module.SlotEntity, module.ModuleEntity);
                     }
 
-                    if (IsMatchMaking || battlePlayer.Player.Data.Admin)
+                    // add gold module
+                    if (IsMatchMaking)
                     {
-                        BattleModule module = Server.Instance.ModuleRegistry.CreateModule(
-                            matchPlayer,
-                            Modules.GlobalItems.Gold
-                        );
-                        if (module == null) throw new InvalidOperationException($"Failed to create module '{Modules.GlobalItems.Gold.EntityId}'");
-
+                        BattleModule module =
+                            Server.Instance.ModuleRegistry.CreateModule(matchPlayer, Modules.GlobalItems.Gold);
                         matchPlayer.Modules.Add(module);
                         battlePlayer.ShareEntities(module.SlotEntity, module.ModuleEntity);
                     }
@@ -464,16 +455,16 @@ namespace TXServer.Core.Battles
                 ProcessMatchPlayers();
                 ProcessBonuses(deltaTime);
 
-                foreach (TickHandler handler in tickHandlers.Where(handler => DateTimeOffset.UtcNow >= handler.Time).ToArray())
+                foreach (TickHandler handler in _tickHandlers.Where(handler => DateTimeOffset.UtcNow >= handler.Time).ToArray())
                 {
-                    tickHandlers.Remove(handler);
+                    _tickHandlers.Remove(handler);
 
                     handler.Action();
                 }
 
-                foreach (Action handler in nextTickHandlers.ToArray())
+                foreach (Action handler in _nextTickHandlers.ToArray())
                 {
-                    nextTickHandlers.Remove(handler);
+                    _nextTickHandlers.Remove(handler);
 
                     handler();
                 }
@@ -490,7 +481,7 @@ namespace TXServer.Core.Battles
             PlayersInMap.SendEvent(new RoundScoreUpdatedEvent(), RoundEntity);
         }
 
-        public void DropSpecificBonusType(BonusType bonusType, string sender)
+        public void DropSpecificBonusType(BonusType bonusType, Player sender = null)
         {
             List<int> suppliesIndex = new();
             int index = 0;
@@ -498,22 +489,32 @@ namespace TXServer.Core.Battles
             {
                 if (battleBonus.BonusType == bonusType)
                 {
-                    if (bonusType != BonusType.GOLD && battleBonus.State != BonusState.Spawned || bonusType == BonusType.GOLD && battleBonus.State == BonusState.Unused)
+                    if (bonusType != BonusType.GOLD && battleBonus.State != BonusState.Spawned ||
+                        bonusType == BonusType.GOLD && battleBonus.State == BonusState.Unused)
                         suppliesIndex.Add(index);
                 }
                 ++index;
             }
 
-            if (!suppliesIndex.Any()) return;
+            if (bonusType == BonusType.GOLD && DroppedGoldBoxes + 1 > MaxDroppedGoldBoxes) return;
+            if (!suppliesIndex.Any())
+            {
+                if (bonusType == BonusType.GOLD && sender is not null && DroppedGoldBoxes + 1 <= MaxDroppedGoldBoxes)
+                    WaitingGoldBoxSenders.Add(sender);
+                return;
+            }
 
             int supplyIndex = suppliesIndex[new Random().Next(suppliesIndex.Count)];
+
             if (bonusType != BonusType.GOLD)
                 BattleBonuses[supplyIndex].StateChangeCountdown = 0;
             else
             {
                 BattleBonuses[supplyIndex].State = BonusState.New;
-                if (string.IsNullOrWhiteSpace(sender)) sender = "";
-                PlayersInMap.SendEvent(new GoldScheduleNotificationEvent(sender), RoundEntity);
+                DroppedGoldBoxes++;
+
+                PlayersInMap.SendEvent(new GoldScheduleNotificationEvent(sender is null ? "" : sender.Data.Username),
+                    RoundEntity);
             }
         }
 
@@ -559,13 +560,16 @@ namespace TXServer.Core.Battles
 
         public List<BattleBonus> BattleBonuses { get; set; } = new();
         public IEnumerable<BattleBonus> GoldBonuses => BattleBonuses.Where(b => b.BonusType == BonusType.GOLD);
+        public int DroppedGoldBoxes { get; set; }
+        public List<Player> WaitingGoldBoxSenders { get; set; } = new();
+        public const int MaxDroppedGoldBoxes = 16;
 
         public BattleState BattleState
         {
-            get => _BattleState;
+            get => _battleState;
             set
             {
-                switch (_BattleState)
+                switch (_battleState)
                 {
                     case BattleState.StartCountdown:
                         BattleLobbyEntity.RemoveComponent<MatchMakingLobbyStartTimeComponent>();
@@ -602,7 +606,7 @@ namespace TXServer.Core.Battles
                         break;
                 }
 
-                _BattleState = value;
+                _battleState = value;
             }
         }
 
@@ -612,7 +616,7 @@ namespace TXServer.Core.Battles
         /// <param name="handler">Action to run at next battle tick</param>
         public void Schedule(Action handler)
         {
-            nextTickHandlers.Add(handler);
+            _nextTickHandlers.Add(handler);
         }
 
         /// <summary>
@@ -622,7 +626,7 @@ namespace TXServer.Core.Battles
         /// <param name="handler">Action to run at specified time</param>
         private void Schedule(DateTimeOffset time, Action handler)
         {
-            tickHandlers.Add(new TickHandler(time, handler));
+            _tickHandlers.Add(new TickHandler(time, handler));
         }
 
         /// <summary>
@@ -635,10 +639,10 @@ namespace TXServer.Core.Battles
             Schedule(DateTimeOffset.UtcNow + timeSpan, handler);
         }
 
-        private readonly List<TickHandler> tickHandlers;
-        private readonly List<Action> nextTickHandlers;
+        private readonly List<TickHandler> _tickHandlers;
+        private readonly List<Action> _nextTickHandlers;
 
-        private BattleState _BattleState;
+        private BattleState _battleState;
         public bool KeepRunning { get; set; }
 
         public IBattleTypeHandler TypeHandler { get; }

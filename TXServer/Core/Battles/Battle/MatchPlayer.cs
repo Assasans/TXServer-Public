@@ -179,7 +179,7 @@ namespace TXServer.Core.Battles
                     module.DeactivateCheat = true;
                     module.Deactivate();
                     module.DeactivateCheat = false;
-                    module.CheatWaitingForTank = true;
+                    module.IsWaitingForTank = true;
                     continue;
                 }
                 module.Deactivate();

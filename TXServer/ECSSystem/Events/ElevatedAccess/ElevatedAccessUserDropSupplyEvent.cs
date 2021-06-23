@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
         {
             if (!player.Data.Admin) return;
 
-            player.BattlePlayer?.Battle.DropSpecificBonusType(BonusType, null);
+            player.BattlePlayer?.Battle.DropSpecificBonusType(BonusType);
         }
 		public BonusType BonusType { get; set; }
 	}

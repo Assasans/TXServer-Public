@@ -9,9 +9,14 @@ namespace TXServer.Core.Battles.Effect {
 			GoldBonusModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
 		) { }
 
-		public override void Activate() {
-			MatchPlayer.Battle.DropSpecificBonusType(BonusType.GOLD, MatchPlayer.Player.Data.Username);
-		}
+		public override void Activate()
+        {
+            // todo: fix module counter, SetGoldBoxes works only for garage
+            MatchPlayer.Player.Data.SetGoldBoxes(MatchPlayer.Player.Data.GoldBoxes - 1);
+
+            MatchPlayer.Battle.DropSpecificBonusType(BonusType.GOLD, MatchPlayer.Player);
+            MatchPlayer.Battle.DroppedGoldBoxes++;
+        }
 
         public override void Init()
         {
@@ -20,9 +25,10 @@ namespace TXServer.Core.Battles.Effect {
         }
 
         protected override void Tick() {
-			base.Tick();
-
-			IsEnabled &= MatchPlayer.Battle.IsMatchMaking && MatchPlayer.Battle.BattleState == BattleState.Running;
+            IsEnabled = MatchPlayer.Player.Data.GoldBoxes > 0 &&
+                        MatchPlayer.Battle.BattleState is BattleState.Running &&
+                        MatchPlayer.Battle.DroppedGoldBoxes < Battle.MaxDroppedGoldBoxes &&
+                        !MatchPlayer.Battle.WaitingGoldBoxSenders.Contains(MatchPlayer.Player);
 		}
 	}
 }

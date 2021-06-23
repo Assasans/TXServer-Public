@@ -20,6 +20,9 @@ namespace TXServer.ECSSystem.GlobalEntities
             {
                 Entity item = info.GetValue(items) as Entity;
                 item.Components.Add(new UserGroupComponent(player.User));
+
+                if (item.TemplateAccessor.Template is GoldBonusUserItemTemplate)
+                    item.AddComponent(new UserItemCounterComponent(player.Data.GoldBoxes));
             }
 
             return items;
@@ -64,8 +67,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             }
 
             public Entity Goldbonus { get; } = new Entity(new TemplateAccessor(new GoldBonusUserItemTemplate(), "garage/goldbonus"),
-                new MarketItemGroupComponent(636909271),
-                new UserItemCounterComponent(100));
+                new MarketItemGroupComponent(636909271));
             public Entity Premiumboost { get; } = new Entity(new TemplateAccessor(new PremiumBoostUserItemTemplate(), "garage/premium/boost"),
                 new MarketItemGroupComponent(-1816745725),
                 new DurationUserItemComponent());

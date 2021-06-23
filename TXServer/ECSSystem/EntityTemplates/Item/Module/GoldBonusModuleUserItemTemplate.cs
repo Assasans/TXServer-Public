@@ -7,10 +7,13 @@ using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Types;
 
-namespace TXServer.ECSSystem.EntityTemplates.Item.Module {
+namespace TXServer.ECSSystem.EntityTemplates.Item.Module
+{
 	[SerialVersionUID(1531929899999L)]
-	public class GoldBonusModuleUserItemTemplate : IEntityTemplate {
-		public static Entity CreateEntity(Entity garageModule, BattleTankPlayer battlePlayer) {
+	public class GoldBonusModuleUserItemTemplate : IEntityTemplate
+    {
+		public static Entity CreateEntity(Entity garageModule, BattleTankPlayer battlePlayer)
+        {
 			Entity slot = battlePlayer.Player.CurrentPreset.Modules.SingleOrDefault(x => x.Value == garageModule).Key;
 			Component slotUserItemInfoComponent = slot != null
 				? slot.GetComponent<SlotUserItemInfoComponent>()
@@ -22,13 +25,10 @@ namespace TXServer.ECSSystem.EntityTemplates.Item.Module {
 				slotUserItemInfoComponent,
                 new InventoryEnabledStateComponent(),
 				new ModuleUsesCounterComponent(),
-				new UserItemCounterComponent(100),
-				battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
+                battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
 				battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>()
 			);
 			return entity;
 		}
-
-		// "/garage/module/prebuildmodule/common/active/1/gold"
-	}
+    }
 }
