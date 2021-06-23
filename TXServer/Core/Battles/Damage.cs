@@ -170,8 +170,6 @@ namespace TXServer.Core.Battles
             if (!IsModule(weaponMarketItem) && IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
 
             float damage = GetRandomDamage(weapon, weaponMarketItem, damager);
-            damage = GetStreamDamage(damage, damager);
-
             DealDamage(weaponMarketItem, victim, damager, hitTarget, damage);
         }
 
@@ -183,8 +181,6 @@ namespace TXServer.Core.Battles
             float distance = hitTarget.HitDistance;
 
             float damage = GetRandomDamage(weapon, weaponMarketItem, damager);
-            damage = GetStreamDamage(damage, damager);
-
             float damageMultiplier = GetSplashDamageMultiplier(weapon, weaponMarketItem, distance, victim, damager);
             int splashDamage = (int) Math.Round(damage * damageMultiplier);
 
@@ -258,7 +254,7 @@ namespace TXServer.Core.Battles
             cooldown.LastDamageTime = DateTimeOffset.UtcNow;
 
             // Если время беспрерывной стрельбы больше X
-            if (cooldown.DamageTime.TotalMilliseconds > damager.ShotCooldown)
+            if (cooldown.DamageTime.TotalMilliseconds > 1000)
             {
                 // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
                 //     $"[Damage] Сброс времени беспрерывной стрельбы (старое значение: {(long)sus.DamageTime.TotalMilliseconds} ms)",
@@ -279,12 +275,6 @@ namespace TXServer.Core.Battles
 
             // Времени беспрерывной стрельбы недостаточно
             return true;
-        }
-
-        private static float GetStreamDamage(float damagePerSecond, MatchPlayer damager)
-        {
-            if (damager.ShotCooldown == null) return damagePerSecond;
-            return damagePerSecond * damager.ShotCooldown.Value;
         }
 
         public static void IsisHeal(Entity weapon, MatchPlayer target, MatchPlayer healer, HitTarget hitTarget)
