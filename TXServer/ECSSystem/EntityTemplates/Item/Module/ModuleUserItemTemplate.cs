@@ -26,7 +26,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Item.Module {
 				    UpgradeLevel = 1
 				},
 				*/
-				new InventoryAmmunitionComponent(2),
                 /*
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
                 new ModuleTankPartComponent(TankPartModuleType.TANK),
@@ -35,7 +34,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Item.Module {
                 },
                 */
 				new ModuleUsesCounterComponent(),
-				new UserItemCounterComponent(100),
+				//new UserItemCounterComponent(100),
 				battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
 				battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>()
 			);

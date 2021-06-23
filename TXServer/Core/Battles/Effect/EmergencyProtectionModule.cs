@@ -22,7 +22,7 @@ namespace TXServer.Core.Battles.Effect
             if (IsOnCooldown || IsEmpLocked) return;
             if (EffectEntity != null) Deactivate();
 
-            StartCooldown();
+            CurrentAmmunition--;
 
             IsImmune = true;
             ImmunityEndTime = DateTimeOffset.UtcNow.AddMilliseconds(HolyshieldDuration);
@@ -57,6 +57,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            base.Init();
+
             AdditiveHpFactor = Config
                 .GetComponent<ModuleEmergencyProtectionEffectAdditiveHPFactorPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];

@@ -47,7 +47,10 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            base.Init();
+
             ActivateOnTankSpawn = true;
+            AlwaysActiveExceptEmp = true;
             DeactivateOnTankDisable = false;
 
             HullRotation = Config.GetComponent<ModuleAcceleratedGearsEffectHullRotationSpeedPropertyComponent>(ConfigPath)

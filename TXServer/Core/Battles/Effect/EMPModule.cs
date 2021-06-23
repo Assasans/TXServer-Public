@@ -30,6 +30,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            base.Init();
+
             Radius = Config
                 .GetComponent<ModuleEMPEffectRadiusPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];

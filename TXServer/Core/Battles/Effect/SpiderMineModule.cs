@@ -47,6 +47,7 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            base.Init();
             IsAffectedByEmp = false;
 
             Acceleration = Config.GetComponent<ModuleEffectAccelerationPropertyComponent>(ConfigPath)

@@ -10,15 +10,15 @@ namespace TXServer.ECSSystem.Events.Battle
     {
 		public void Execute(Player player, Entity entity)
         {
-			BattleModule module = player.BattlePlayer.MatchPlayer.Modules.Find(m => m.ModuleEntity == entity);
+            BattleModule module = player.BattlePlayer.MatchPlayer.Modules.Find(m => m.ModuleEntity == entity);
 
             if (module is null || !module.IsEnabled || module.IsOnCooldown) return;
 
             module.IsSupply = module.IsCheat = false;
 
-            module.StartCooldown();
             module.Activate();
-		}
+            module.CurrentAmmunition--;
+        }
 
 		public int ClientTime { get; set; }
 	}

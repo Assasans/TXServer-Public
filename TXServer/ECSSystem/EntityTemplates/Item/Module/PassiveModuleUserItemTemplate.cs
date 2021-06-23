@@ -21,10 +21,9 @@ namespace TXServer.ECSSystem.EntityTemplates {
 				),
 				new SlotTankPartComponent(garageModule.GetComponent<ModuleTankPartComponent>().TankPart),
 				slotUserItemInfoComponent,
-				new InventoryAmmunitionComponent(2),
-				new InventoryEnabledStateComponent(),
+                new InventoryEnabledStateComponent(),
 				new ModuleUsesCounterComponent(),
-				new UserItemCounterComponent(100),
+				//new UserItemCounterComponent(100),
 				battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
 				battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>()
 			);

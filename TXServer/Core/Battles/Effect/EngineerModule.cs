@@ -21,6 +21,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            base.Init();
+
             ActivateOnTankSpawn = true;
             DeactivateOnTankDisable = false;
 

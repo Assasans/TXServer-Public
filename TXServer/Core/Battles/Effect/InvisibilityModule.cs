@@ -13,10 +13,12 @@ namespace TXServer.Core.Battles.Effect
             ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
 		) { }
 
-		public override void Activate() {
-			if (EffectEntity != null) Deactivate();
+		public override void Activate()
+        {
+            if (CurrentAmmunition <= 0) return;
+            if (EffectEntity != null) Deactivate();
 
-			EffectEntity = InvisibilityEffectTemplate.CreateEntity(MatchPlayer);
+            EffectEntity = InvisibilityEffectTemplate.CreateEntity(MatchPlayer);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
             Schedule(TimeSpan.FromMilliseconds(Duration), Deactivate);

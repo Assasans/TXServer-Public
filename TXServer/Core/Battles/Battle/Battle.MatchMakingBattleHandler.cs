@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TXServer.Core.Battles.Effect;
 using TXServer.Core.Battles.Matchmaking;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Components;
@@ -122,7 +123,7 @@ namespace TXServer.Core.Battles
                                     foreach (BattleTankPlayer battlePlayer in Battle.MatchTankPlayers)
                                     {
                                         battlePlayer.MatchPlayer.KeepDisabled = true;
-                                        battlePlayer.MatchPlayer.DisableTank();
+                                        battlePlayer.MatchPlayer.DisableTank(true);
                                     }
 
                                     Battle.CompleteWarmUp();

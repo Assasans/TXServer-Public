@@ -25,7 +25,7 @@ namespace TXServer.Core.Battles.Effect
 
             if (!(healthComponent.CurrentHealth < healthComponent.MaxHealth)) return;
 
-            StartCooldown();
+            CurrentAmmunition--;
 
             EffectEntity = LifestealEffectTemplate.CreateEntity(MatchPlayer);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
@@ -45,6 +45,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            base.Init();
+
             AdditiveHpFactor = Config.GetComponent<ModuleLifestealEffectAdditiveHPFactorPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
             FixedHp = Config.GetComponent<ModuleLifestealEffectFixedHPPropertyComponent>(ConfigPath)

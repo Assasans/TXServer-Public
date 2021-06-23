@@ -90,13 +90,7 @@ namespace TXServer.Core.Battles
             }
 
             if (target.TryGetModule(out AbsorbingArmorEffect armorModule))
-            {
-                Console.WriteLine(damage);
-                Console.WriteLine(armorModule.Factor());
                 damage *= armorModule.Factor();
-                Console.WriteLine(damage);
-            }
-
 
             return damage;
         }

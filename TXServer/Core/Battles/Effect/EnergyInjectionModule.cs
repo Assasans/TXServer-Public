@@ -19,6 +19,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            base.Init();
+
             ReloadEnergyPercent = Config
                 .GetComponent<ModuleEnergyInjectionEffectReloadPercentPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];

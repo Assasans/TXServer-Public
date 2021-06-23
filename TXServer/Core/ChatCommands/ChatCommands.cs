@@ -287,7 +287,7 @@ namespace TXServer.Core.ChatCommands
                     {
                         amount += 1;
                         effect.DeactivateCheat = true;
-                        effect.tickHandlers.Clear();
+                        effect.TickHandlers.Clear();
                         effect.Deactivate();
                     }
                     string cheatString = amount == 1 ? "cheat" : "cheats";

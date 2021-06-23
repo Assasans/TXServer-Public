@@ -46,6 +46,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            base.Init();
+
             ModuleFactor = Config.GetComponent<ModuleArmorEffectPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
         }

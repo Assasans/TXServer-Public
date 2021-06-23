@@ -71,6 +71,7 @@ namespace TXServer.Core.Battles.Effect
             }
         }
 
+        // TODO: find configs for repair kit module (card) & init
         private float HpPerMs { get; set; } = 0.633f;
         private float TickPeriod { get; set; } = 250;
 

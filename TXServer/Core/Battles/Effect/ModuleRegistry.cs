@@ -9,12 +9,12 @@ using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core.Battles.Effect {
 	public class ModuleRegistry {
-		private readonly Dictionary<string, Type> name2Module;
+		private readonly Dictionary<string, Type> _name2Module;
 
-        private readonly Type stubModule = typeof(StubModule);
+        private readonly Type _stubModule = typeof(StubModule);
 
 		public ModuleRegistry() {
-			name2Module = new Dictionary<string, Type>();
+			_name2Module = new Dictionary<string, Type>();
 		}
 
         public void Register(Dictionary<string, Type> modules) {
@@ -24,17 +24,13 @@ namespace TXServer.Core.Battles.Effect {
             }
         }
 
-		public void Register(string name, Type type) {
-			name2Module.Add(name, type);
+        private void Register(string name, Type type) {
+			_name2Module.Add(name, type);
 		}
 
-		public Type Get(string name)
-        {
-            if (!name2Module.ContainsKey(name)) return stubModule;
-			return name2Module[name];
-		}
+        private Type Get(string name) => !_name2Module.ContainsKey(name) ? _stubModule : _name2Module[name];
 
-		public BattleModule CreateModule(MatchPlayer player, Entity garageModule)
+        public BattleModule CreateModule(MatchPlayer player, Entity garageModule)
         {
 			string name = garageModule.TemplateAccessor.ConfigPath;
 
@@ -43,6 +39,8 @@ namespace TXServer.Core.Battles.Effect {
 
 			BattleModule module = (BattleModule)Activator.CreateInstance(type, player, garageModule);
             module.ModuleType = garageModule.GetComponent<ModuleBehaviourTypeComponent>().Type;
+            module.MarketItem = Modules.GlobalItems.GetAllItems().Single(m =>
+                m.TemplateAccessor.ConfigPath.Split("/").Last() == name.Split("/").Last());
 
             if (module is StubModule)
             {
@@ -52,21 +50,11 @@ namespace TXServer.Core.Battles.Effect {
             else
             {
                 module.ConfigPath = $"garage/module/upgrade/properties/{name.Split('/').Last()}";
-
-                var durationComponent = Config.GetComponent<ModuleEffectDurationPropertyComponent>(module.ConfigPath, false);
-                var cooldownComponent = Config.GetComponent<ModuleCooldownPropertyComponent>(module.ConfigPath);
-
                 module.Level = 1;
                 if (module is not GoldModule)
                     module.Level = module.ModuleEntity.GetComponent<SlotUserItemInfoComponent>().UpgradeLevel;
-
-                module.Duration = durationComponent?.UpgradeLevel2Values[module.Level - 1] ?? 0;
-                module.CooldownDuration = cooldownComponent.UpgradeLevel2Values[module.Level - 1];
+                module.Init();
             }
-
-            module.MarketItem = Modules.GlobalItems.GetAllItems().Single(m =>
-                m.TemplateAccessor.ConfigPath.Split("/").Last() == name.Split("/").Last());
-            module.Init();
 
             return module;
 		}

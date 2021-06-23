@@ -47,6 +47,7 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            base.Init();
             // min & max factor are the same for this module
             ModuleFactor = (long) Config.GetComponent<ModuleDamageEffectMaxFactorPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];

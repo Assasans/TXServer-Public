@@ -37,6 +37,7 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            base.Init();
             IsAffectedByEmp = false;
 
             ActivationTime = (long) Config.GetComponent<ModuleEffectActivationTimePropertyComponent>(ConfigPath)

@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Effect;
 using TXServer.ECSSystem.Components.Battle.Effect.EMP;
 using TXServer.ECSSystem.Components.Battle.Module;
+using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.EntityTemplates.Item.Slot;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Types;
@@ -22,34 +24,68 @@ namespace TXServer.Core.Battles.Effect {
 			    SlotEntity = SlotUserItemTemplate.CreateEntity(moduleEntity, matchPlayer.Player.BattlePlayer);
 			ModuleEntity = moduleEntity;
 
-			tickHandlers = new List<TickHandler>();
-			nextTickHandlers = new List<Action>();
+			TickHandlers = new List<TickHandler>();
+			_nextTickHandlers = new List<Action>();
 		}
 
-        // TODO(Assasans): Cooldown has visual bugs on client
-		public void StartCooldown()
-        {
-            DateTimeOffset time = DateTimeOffset.UtcNow;
-
-			CooldownStart = time;
-
-			/*if(!ModuleEntity.HasComponent<InventorySlotTemporaryBlockedByServerComponent>()) {
-				ModuleEntity.AddComponent(
-					new InventorySlotTemporaryBlockedByServerComponent((long) CooldownDuration, time.UtcDateTime)
-				);
-			}*/
-
-            ModuleEntity.TryRemoveComponent<InventoryEnabledStateComponent>();
-            ModuleEntity.AddComponent(new InventoryCooldownStateComponent((int) CooldownDuration, time.UtcDateTime));
-            MatchPlayer.SendEvent(new BattleUserInventoryCooldownSpeedChangedEvent(), ModuleEntity);
-		}
-
-		public abstract void Activate();
+        public abstract void Activate();
 		public virtual void Deactivate() { }
-        public virtual void Init() {}
+        public virtual void Init()
+        {
+            var ammunitionComponent = Config.GetComponent<ModuleAmmunitionPropertyComponent>(ConfigPath);
+            var cooldownComponent = Config.GetComponent<ModuleCooldownPropertyComponent>(ConfigPath);
+            var durationComponent = Config.GetComponent<ModuleEffectDurationPropertyComponent>(ConfigPath, false);
+
+            CooldownDuration = cooldownComponent.UpgradeLevel2Values[Level - 1];
+            Duration = durationComponent?.UpgradeLevel2Values[Level - 1] ?? 0;
+            MaxAmmunition = (int) ammunitionComponent.UpgradeLevel2Values[Level - 1];
+        }
+
+        private void ActivateCooldown()
+        {
+            if (CooldownEnd is not null)
+                AmmunitionWaitingOnCooldown++;
+            else
+            {
+                CooldownEnd = DateTimeOffset.UtcNow.AddMilliseconds(CooldownDuration);
+                ModuleEntity.AddComponent(new InventoryCooldownStateComponent((int) CooldownDuration, DateTime.UtcNow));
+            }
+        }
+        private void CheckForCooldownEnd()
+        {
+            if (CooldownEnd is not null && DateTimeOffset.UtcNow >= CooldownEnd)
+                DeactivateCooldown();
+        }
+
+        public void DeactivateCooldown()
+        {
+            CurrentAmmunition++;
+            if (AmmunitionWaitingOnCooldown > 0)
+            {
+                CooldownEnd = DateTimeOffset.UtcNow.AddMilliseconds(CooldownDuration);
+                AmmunitionWaitingOnCooldown--;
+            }
+            else
+            {
+                CooldownEnd = null;
+                ModuleEntity.TryRemoveComponent<InventoryCooldownStateComponent>();
+            }
+        }
 
         public void ActivateEmpLock(float duration)
         {
+            if (IsSupply || IsCheat)
+            {
+                Deactivate();
+                return;
+            }
+
+            if (IsEmpLocked && EmpLockEnd != null)
+            {
+                EmpLockEnd = EmpLockEnd.Value.AddMilliseconds(duration);
+                return;
+            }
+
             ModuleEntity.AddComponent(new SlotLockedByEMPComponent());
             if (ModuleEntity.HasComponent<InventorySlotTemporaryBlockedByServerComponent>())
                 ModuleEntity.ChangeComponent<InventorySlotTemporaryBlockedByServerComponent>(component =>
@@ -65,8 +101,10 @@ namespace TXServer.Core.Battles.Effect {
 
             if (IsAffectedByEmp) Deactivate();
         }
-        private void DeactivateEmpLock()
+        private void CheckForEmpEnd()
         {
+            if (EmpLockEnd == null || IsEmpLocked) return;
+
             ModuleEntity.RemoveComponent<SlotLockedByEMPComponent>();
             ModuleEntity.RemoveComponent<InventorySlotTemporaryBlockedByServerComponent>();
             EmpLockEnd = null;
@@ -96,7 +134,7 @@ namespace TXServer.Core.Battles.Effect {
 
         protected void ChangeDuration(float duration)
         {
-            tickHandlers.Clear();
+            TickHandlers.Clear();
 
             if (IsCheat)
             {
@@ -120,6 +158,16 @@ namespace TXServer.Core.Battles.Effect {
             Schedule(TimeSpan.FromMilliseconds(duration), Deactivate);
         }
 
+        private void CheckCheatWaitingForTank()
+        {
+            if (!CheatWaitingForTank || MatchPlayer.TankState != TankState.Active) return;
+
+            CheatWaitingForTank = false;
+            IsCheat = true;
+            Activate();
+        }
+
+
 		protected virtual void Tick()
         {
 			IsEnabled = MatchPlayer.Battle.BattleState is BattleState.Running or BattleState.WarmUp &&
@@ -128,52 +176,30 @@ namespace TXServer.Core.Battles.Effect {
 
         public void ModuleTick()
         {
-            if (CooldownStart != null && DateTimeOffset.UtcNow >= CooldownEnd)
-            {
-                ModuleEntity.TryRemoveComponent<InventoryCooldownStateComponent>();
-
-                if (ModuleType is not ModuleBehaviourType.PASSIVE)
-                    ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
-
-                CooldownStart = null;
-			}
-
-            if (EmpLockEnd != null && !IsEmpLocked) DeactivateEmpLock();
+            CheckForCooldownEnd();
+            CheckForEmpEnd();
 
             if (!EffectIsActive && !IsEmpLocked && AlwaysActiveExceptEmp &&
                 MatchPlayer.Battle.BattleState is BattleState.WarmUp or BattleState.MatchBegins or BattleState.Running)
                 Activate();
 
-            foreach(TickHandler handler in tickHandlers.Where(handler => DateTimeOffset.UtcNow >= handler.Time).ToArray())
+            ProcessDelayedActions();
+            CheckCheatWaitingForTank();
+            Tick();
+        }
+
+        private void ProcessDelayedActions()
+        {
+            foreach(TickHandler handler in TickHandlers.Where(handler => DateTimeOffset.UtcNow >= handler.Time).ToArray())
             {
-				tickHandlers.Remove(handler);
+                TickHandlers.Remove(handler);
                 handler.Action();
-			}
-
-			foreach(Action handler in nextTickHandlers.ToArray())
-            {
-				nextTickHandlers.Remove(handler);
-                handler();
-			}
-
-			Tick();
-
-            if (ModuleEntity is not null && ModuleType is not ModuleBehaviourType.PASSIVE)
-            {
-                if (IsEnabled && !IsOnCooldown)
-                {
-                    if (ModuleEntity.HasComponent<InventoryEnabledStateComponent>()) return;
-                    ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
-                }
-                else
-                    ModuleEntity.TryRemoveComponent<InventoryEnabledStateComponent>();
             }
 
-            if (CheatWaitingForTank && MatchPlayer.TankState == TankState.Active)
+            foreach(Action handler in _nextTickHandlers.ToArray())
             {
-                CheatWaitingForTank = false;
-                IsCheat = true;
-                Activate();
+                _nextTickHandlers.Remove(handler);
+                handler();
             }
         }
 
@@ -182,7 +208,7 @@ namespace TXServer.Core.Battles.Effect {
         /// </summary>
         /// <param name="handler">Action to run at next module tick</param>
         protected void Schedule(Action handler) {
-            nextTickHandlers.Add(handler);
+            _nextTickHandlers.Add(handler);
         }
 
         /// <summary>
@@ -190,7 +216,7 @@ namespace TXServer.Core.Battles.Effect {
         /// </summary>
         /// <param name="time">Time at which action should run</param>
         /// <param name="handler">Action to run at specified time</param>
-        protected void Schedule(DateTimeOffset time, Action handler) => tickHandlers.Add(new TickHandler(time, handler));
+        private void Schedule(DateTimeOffset time, Action handler) => TickHandlers.Add(new TickHandler(time, handler));
 
         /// <summary>
         /// Schedules an action to run after specified time
@@ -204,40 +230,69 @@ namespace TXServer.Core.Battles.Effect {
         public Entity MarketItem { get; set; }
         public Entity SlotEntity { get; }
         public Entity ModuleEntity { get; }
-        public Entity EffectEntity { get; set; }
-        public List<Entity> EffectEntities { get; set; } = new();
+        public Entity EffectEntity { get; protected set; }
+        protected List<Entity> EffectEntities { get; set; } = new();
         public ModuleBehaviourType ModuleType { get; set; }
 
         public bool IsCheat { get; set; }
-        public bool IsEnabled { get; set; }
+        public bool IsEnabled { get; protected set; }
         public bool IsSupply { get; set; }
         public bool EffectIsActive => EffectEntity is not null || EffectEntities.Any();
         protected bool IsEmpLocked => EmpLockEnd != null && EmpLockEnd > DateTimeOffset.UtcNow;
 
-        public bool ActivateOnTankSpawn { get; set; }
-        public bool AlwaysActiveExceptEmp { get; set; }
+        public bool ActivateOnTankSpawn { get; protected set; }
+        protected bool AlwaysActiveExceptEmp { get; set; }
         public bool CheatWaitingForTank { get; set; }
         public bool DeactivateCheat { get; set; }
-        public bool DeactivateOnTankDisable { get; set; } = true;
+        public bool DeactivateOnTankDisable { get; protected set; } = true;
         protected bool IsAffectedByEmp { get; set; } = true;
 
-
+        public float CooldownDuration { get; set; }
         public float Duration { get; set; }
+        private DateTimeOffset? CooldownEnd { get; set; }
+
+        public int CurrentAmmunition
+        {
+            get => ModuleEntity.GetComponent<InventoryAmmunitionComponent>().CurrentCount;
+            set
+            {
+                if (CurrentAmmunition > value) ActivateCooldown();
+
+                ModuleEntity.ChangeComponent<InventoryAmmunitionComponent>(component =>
+                    component.CurrentCount = value);
+
+                MatchPlayer.SendEvent(new InventoryAmmunitionChangedEvent(), ModuleEntity);
+            }
+        }
+        protected int MaxAmmunition
+        {
+            get => ModuleEntity.GetComponent<InventoryAmmunitionComponent>().MaxCount;
+            set
+            {
+                if (ModuleEntity.HasComponent<InventoryAmmunitionComponent>())
+                {
+                    ModuleEntity.ChangeComponent<InventoryAmmunitionComponent>(component =>
+                        component.CurrentCount = component.MaxCount = value);
+                    MatchPlayer.SendEvent(new InventoryAmmunitionChangedEvent(), ModuleEntity);
+                }
+                else
+                    ModuleEntity.AddComponent(new InventoryAmmunitionComponent(value));
+            }
+        }
+
+        private int AmmunitionWaitingOnCooldown { get; set; }
+
+        public bool IsOnCooldown => CurrentAmmunition < 1;
+
+
 
         private DateTimeOffset? EmpLockEnd { get; set; }
-
-        public float CooldownDuration { get; set; }
-        public DateTimeOffset? CooldownStart { get; set; }
-        public DateTimeOffset? CooldownEnd => CooldownStart?.AddMilliseconds(CooldownDuration);
-
-        public bool IsOnCooldown =>
-            ModuleEntity is not null && ModuleEntity.HasComponent<InventoryCooldownStateComponent>();
 
         public string ConfigPath { get; set; }
         public int Level { get; set; }
 
-        public readonly List<TickHandler> tickHandlers;
-        private readonly List<Action> nextTickHandlers;
+        public readonly List<TickHandler> TickHandlers;
+        private readonly List<Action> _nextTickHandlers;
 	}
 
     public class TickHandler {

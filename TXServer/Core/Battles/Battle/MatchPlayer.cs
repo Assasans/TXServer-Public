@@ -58,7 +58,7 @@ namespace TXServer.Core.Battles
         {
             { TankState.New, (typeof(TankNewStateComponent), 0) },
             { TankState.Spawn, (typeof(TankSpawnStateComponent), 1.5) },
-            { TankState.SemiActive, (typeof(TankSemiActiveStateComponent), .25) },
+            { TankState.SemiActive, (typeof(TankSemiActiveStateComponent), 1.75) },
             { TankState.Active, (typeof(TankActiveStateComponent), 0) },
             { TankState.Dead, (typeof(TankDeadStateComponent), 3) },
         };
@@ -165,7 +165,7 @@ namespace TXServer.Core.Battles
                 module.Activate();
         }
 
-        public void DisableTank()
+        public void DisableTank(bool deactivateModuleCooldown = false)
         {
             if (KeepDisabled)
                 Tank.TryRemoveComponent(TankStates[_TankState].Item1);
@@ -173,7 +173,7 @@ namespace TXServer.Core.Battles
 
             foreach (BattleModule module in Modules.ToArray().Where(m => m.DeactivateOnTankDisable))
             {
-                module.tickHandlers.Clear();
+                module.TickHandlers.Clear();
                 if (module.IsCheat)
                 {
                     module.DeactivateCheat = true;
@@ -183,6 +183,8 @@ namespace TXServer.Core.Battles
                     continue;
                 }
                 module.Deactivate();
+
+                if (deactivateModuleCooldown && module.IsOnCooldown) module.DeactivateCooldown();
             }
 
             if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
@@ -340,14 +342,15 @@ namespace TXServer.Core.Battles
         public bool Paused { get; set; }
         public DateTime? IdleKickTime { get; set; }
 
+        public float? ShotCooldown { get; private set; }
 
         public Dictionary<BattleTankPlayer, TankDamageCooldown> DamageCooldowns { get; } = new();
         public Dictionary<MatchPlayer, float> DamageAssistants { get; } = new();
         public int AlreadyAddedExperience { get; set; }
 
         private readonly IList<SpawnPoint> SpawnCoordinates;
-        public SpawnPoint LastSpawnPoint { get; set; }
-        public TeleportPoint LastTeleportPoint { get; set; }
+        public SpawnPoint LastSpawnPoint { get; private set; }
+        public TeleportPoint LastTeleportPoint { get; private set; }
         public TeleportPoint NextTeleportPoint { get; set; }
     }
 
