@@ -35,9 +35,9 @@ namespace TXServer.ECSSystem.GlobalEntities
             public Entity Acceleratedgears { get; } = new Entity(1379340193, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/acceleratedgears"),
                 new ParentGroupComponent(Modules.GlobalItems.Acceleratedgears),
                 new MarketItemGroupComponent(1379340193));
-            /*public Entity Adrenaline { get; } = new Entity(1384519921, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/adrenaline"),
+            public Entity Adrenaline { get; } = new Entity(1384519921, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/adrenaline"),
                 new ParentGroupComponent(Modules.GlobalItems.Adrenaline),
-                new MarketItemGroupComponent(1384519921));*/
+                new MarketItemGroupComponent(1384519921));
             /*public Entity Backhitdefence { get; } = new Entity(-1143816664, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/backhitdefence"),
                 new ParentGroupComponent(Modules.GlobalItems.Backhitdefence),
                 new MarketItemGroupComponent(-1143816664));*/

@@ -223,13 +223,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(0),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
                 new ModuleCardsCompositionComponent());
-            /*public Entity Adrenaline { get; } = new Entity(1367280061, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/passive/2/adrenaline"),
+            public Entity Adrenaline { get; } = new Entity(1367280061, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/passive/2/adrenaline"),
                 new ParentGroupComponent(1367280061),
                 new MarketItemGroupComponent(1367280061),
                 new ModuleTankPartComponent(TankPartModuleType.WEAPON),
                 new ModuleTierComponent(1),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             /*public Entity Rage { get; } = new Entity(1215656773, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/trigger/1/rage"),
                 new ParentGroupComponent(1215656773),
                 new MarketItemGroupComponent(1215656773),

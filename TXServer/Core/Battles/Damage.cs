@@ -33,7 +33,7 @@ namespace TXServer.Core.Battles
                     component.CurrentHealth += healHp;
             });
             matchPlayer.SendEvent(new DamageInfoEvent(healHp, matchPlayer.TankPosition, false, true), matchPlayer.Tank);
-            matchPlayer.SendEvent(new HealthChangedEvent(), matchPlayer.Tank);
+            matchPlayer.HealthChanged();
             // Todo: fix position of self heal info
         }
 
@@ -74,7 +74,7 @@ namespace TXServer.Core.Battles
                 }
 
                 damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false, false), victim.Tank);
-                victim.Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), victim.Tank);
+                victim.HealthChanged();
             });
         }
 
@@ -302,7 +302,7 @@ namespace TXServer.Core.Battles
 
             if (healed)
             {
-                target.Player.BattlePlayer.Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), target.Tank);
+                target.Player.BattlePlayer.MatchPlayer.HealthChanged();
                 healer.Battle.Spectators.Concat(new[] {(IPlayerPart) healer})
                     .SendEvent(new DamageInfoEvent(415, hitTarget.LocalHitPoint, false, true), target.Tank);
                 healer.SendEvent(new VisualScoreHealEvent(healer.GetScoreWithPremium(4)), healer.BattleUser);

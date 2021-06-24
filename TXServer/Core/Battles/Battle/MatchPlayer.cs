@@ -6,7 +6,9 @@ using System.Numerics;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Health;
+using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Weapon;
@@ -42,9 +44,9 @@ namespace TXServer.Core.Battles
             UserResult = new UserResult(battlePlayer, userResults);
 
             if (Battle.ModeHandler is TeamBattleHandler handler)
-                SpawnCoordinates = handler.BattleViewFor(Player.BattlePlayer).SpawnPoints;
+                _spawnCoordinates = handler.BattleViewFor(Player.BattlePlayer).SpawnPoints;
             else
-                SpawnCoordinates = ((DMHandler)Battle.ModeHandler).SpawnPoints;
+                _spawnCoordinates = ((DMHandler)Battle.ModeHandler).SpawnPoints;
         }
 
         public IEnumerable<Entity> GetEntities()
@@ -90,6 +92,13 @@ namespace TXServer.Core.Battles
             return score;
         }
 
+        public void HealthChanged()
+        {
+            Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), Tank);
+
+            if (TryGetModule(out AdrenalineModule adrenalineModule))
+                adrenalineModule.CheckActivationNecessity();
+        }
 
         private void PrepareForRespawning()
         {
@@ -112,10 +121,10 @@ namespace TXServer.Core.Battles
 
             if (NextTeleportPoint == null)
             {
-                LastSpawnPoint = SpawnCoordinates.Count == 1
-                    ? SpawnCoordinates[0]
-                    : SpawnCoordinates.Where(spawnCoordinate => spawnCoordinate.Number != LastSpawnPoint?.Number)
-                        .ElementAt(new Random().Next(SpawnCoordinates.Count - 1));
+                LastSpawnPoint = _spawnCoordinates.Count == 1
+                    ? _spawnCoordinates[0]
+                    : _spawnCoordinates.Where(spawnCoordinate => spawnCoordinate.Number != LastSpawnPoint?.Number)
+                        .ElementAt(new Random().Next(_spawnCoordinates.Count - 1));
             }
             else
             {
@@ -168,7 +177,7 @@ namespace TXServer.Core.Battles
         public void DisableTank(bool deactivateModuleCooldown = false)
         {
             if (KeepDisabled)
-                Tank.TryRemoveComponent(TankStates[_TankState].Item1);
+                Tank.TryRemoveComponent(TankStates[_tankState].Item1);
             Tank.TryRemoveComponent<SelfDestructionComponent>();
 
             foreach (BattleModule module in Modules.ToArray().Where(m => m.DeactivateOnTankDisable))
@@ -268,6 +277,7 @@ namespace TXServer.Core.Battles
             }
         }
 
+
         public readonly Battle Battle;
         public Player Player { get; }
         public Entity BattleUser { get; }
@@ -287,9 +297,11 @@ namespace TXServer.Core.Battles
         public UserResult UserResult { get; }
 
         public long CollisionsPhase { get; set; } = -1;
+        public bool KeepDisabled { get; set; }
+        public DateTime? SelfDestructionTime { get; set; }
         public TankState TankState
         {
-            get => _TankState;
+            get => _tankState;
             set
             {
                 switch (value)
@@ -319,39 +331,54 @@ namespace TXServer.Core.Battles
                         break;
                 }
 
-                Tank.TryRemoveComponent(TankStates[_TankState].Item1);
+                Tank.TryRemoveComponent(TankStates[_tankState].Item1);
                 Tank.AddComponent((Component)Activator.CreateInstance(TankStates[value].Item1));
-                _TankState = value;
+                _tankState = value;
 
                 TankStateChangeTime = DateTime.UtcNow.AddSeconds(TankStates[value].Item2);
             }
         }
-        private TankState _TankState;
-        public bool KeepDisabled { get; set; }
-
+        private TankState _tankState;
         private DateTime TankStateChangeTime { get; set; }
-        public DateTime? SelfDestructionTime { get; set; }
         private bool WaitingForTankActivation { get; set; }
-
-        public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new();
 
         public Vector3 TankPosition { get; set; }
         public Vector3 PrevTankPosition { get; set; }
         public Quaternion TankQuaternion { get; set; }
 
+        public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new();
+
+        public float ModuleCooldownSpeedCoeff
+        {
+            get => _moduleCooldownSpeedCoeff;
+            set
+            {
+                BattleUser.TryRemoveComponent<BattleUserInventoryCooldownSpeedComponent>();
+                BattleUser.AddComponent(new BattleUserInventoryCooldownSpeedComponent(value));
+                this.SendEvent(new BattleUserInventoryCooldownSpeedChangedEvent(), BattleUser);
+
+                foreach (BattleModule module in Modules.Where(m => m.ModuleEntity is not null))
+                    module.UpdateCooldownSpeedCoeff(value is 1 ? _moduleCooldownSpeedCoeff : value, value is 1);
+
+                _moduleCooldownSpeedCoeff = value;
+            }
+        }
+        private float _moduleCooldownSpeedCoeff = 1;
+
+        public float? ShotCooldown { get; private set; }
+        public Dictionary<BattleTankPlayer, TankDamageCooldown> DamageCooldowns { get; } = new();
+
         public bool Paused { get; set; }
         public DateTime? IdleKickTime { get; set; }
 
-        public float? ShotCooldown { get; private set; }
-
-        public Dictionary<BattleTankPlayer, TankDamageCooldown> DamageCooldowns { get; } = new();
-        public Dictionary<MatchPlayer, float> DamageAssistants { get; } = new();
         public int AlreadyAddedExperience { get; set; }
 
-        private readonly IList<SpawnPoint> SpawnCoordinates;
+        public Dictionary<MatchPlayer, float> DamageAssistants { get; } = new();
+
         public SpawnPoint LastSpawnPoint { get; private set; }
         public TeleportPoint LastTeleportPoint { get; private set; }
         public TeleportPoint NextTeleportPoint { get; set; }
+        private readonly IList<SpawnPoint> _spawnCoordinates;
     }
 
     public class TankDamageCooldown

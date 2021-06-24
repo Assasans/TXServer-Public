@@ -31,6 +31,7 @@ namespace TXServer.Core
             {
                 ["garage/module/module/tank/active/1/absorbingarmor"] = typeof(AbsorbingArmorEffect),
                 ["garage/module/module/tank/passive/2/acceleratedgears"] = typeof(AcceleratedGearsModule),
+                ["garage/module/module/weapon/passive/2/adrenaline"] = typeof(AdrenalineModule),
                 ["garage/module/module/tank/trigger/3/emergencyprotection"] = typeof(EmergencyProtectionModule),
                 ["garage/module/module/weapon/active/1/emp"] = typeof(EmpModule),
                 ["garage/module/module/weapon/active/3/energyinjection"] = typeof(EnergyInjectionModule),

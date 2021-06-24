@@ -43,31 +43,45 @@ namespace TXServer.Core.Battles.Effect {
 
         private void ActivateCooldown()
         {
-            if (CooldownEnd is not null)
+            if (CooldownEndTime is not null)
                 AmmunitionWaitingOnCooldown++;
             else
             {
-                CooldownEnd = DateTimeOffset.UtcNow.AddMilliseconds(CooldownDuration);
+                CooldownEndTime = DateTimeOffset.UtcNow.AddMilliseconds(CooldownDuration);
                 ModuleEntity.AddComponent(new InventoryCooldownStateComponent((int) CooldownDuration, DateTime.UtcNow));
             }
+
+            UpdateCooldownSpeedCoeff(MatchPlayer.ModuleCooldownSpeedCoeff);
         }
         private void CheckForCooldownEnd()
         {
-            if (CooldownEnd is not null && DateTimeOffset.UtcNow >= CooldownEnd)
+            if (CooldownEndTime is not null && DateTimeOffset.UtcNow >= CooldownEndTime)
                 DeactivateCooldown();
         }
+        public void UpdateCooldownSpeedCoeff(float speedCoeff, bool normalize = false)
+        {
+            if (CooldownEndTime is null) return;
 
+            double timeToActivation = (CooldownEndTime - DateTimeOffset.UtcNow).Value.TotalMilliseconds;
+            timeToActivation = normalize
+                ? timeToActivation * speedCoeff
+                : timeToActivation / speedCoeff;
+
+            CooldownEndTime = DateTimeOffset.UtcNow.AddMilliseconds(timeToActivation);
+        }
         public void DeactivateCooldown()
         {
+            ModuleEntity.TryRemoveComponent<BattleUserInventoryCooldownSpeedComponent>();
+
             CurrentAmmunition++;
             if (AmmunitionWaitingOnCooldown > 0)
             {
-                CooldownEnd = DateTimeOffset.UtcNow.AddMilliseconds(CooldownDuration);
+                CooldownEndTime = DateTimeOffset.UtcNow.AddMilliseconds(CooldownDuration);
                 AmmunitionWaitingOnCooldown--;
             }
             else
             {
-                CooldownEnd = null;
+                CooldownEndTime = null;
                 ModuleEntity.TryRemoveComponent<InventoryCooldownStateComponent>();
             }
         }
@@ -264,9 +278,8 @@ namespace TXServer.Core.Battles.Effect {
         protected bool IsEmpLocked => EmpLockEnd != null && EmpLockEnd > DateTimeOffset.UtcNow;
 
         public float CooldownDuration { get; set; }
-        private DateTimeOffset? CooldownEnd { get; set; }
+        private DateTimeOffset? CooldownEndTime { get; set; }
         public float Duration { get; set; }
-        public bool IsOnCooldown => CurrentAmmunition < 1;
 
         public int CurrentAmmunition
         {
@@ -297,6 +310,8 @@ namespace TXServer.Core.Battles.Effect {
             }
         }
         private int AmmunitionWaitingOnCooldown { get; set; }
+
+        public bool IsOnCooldown => CurrentAmmunition < 1;
 
         public string ConfigPath { get; set; }
         public int Level { get; set; }

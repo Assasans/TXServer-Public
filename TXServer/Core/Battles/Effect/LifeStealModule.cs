@@ -36,11 +36,10 @@ namespace TXServer.Core.Battles.Effect
                 component.CurrentHealth += FixedHp;
             });
 
-            MatchPlayer.Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), MatchPlayer.Tank);
             MatchPlayer.Battle.PlayersInMap.SendEvent(new TriggerEffectExecuteEvent(), EffectEntity);
-            Schedule(() => {
-                MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
-            });
+            MatchPlayer.HealthChanged();
+
+            Schedule(() => { MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity); });
         }
 
         public override void Init()
