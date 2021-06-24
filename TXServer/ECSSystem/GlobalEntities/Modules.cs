@@ -230,13 +230,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(1),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
                 new ModuleCardsCompositionComponent());
-            /*public Entity Rage { get; } = new Entity(1215656773, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/trigger/1/rage"),
+            public Entity Rage { get; } = new Entity(1215656773, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/trigger/1/rage"),
                 new ParentGroupComponent(1215656773),
                 new MarketItemGroupComponent(1215656773),
                 new ModuleTankPartComponent(TankPartModuleType.WEAPON),
                 new ModuleTierComponent(0),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             /*public Entity Kamikadze { get; } = new Entity(-1603423529, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/trigger/2/kamikadze"),
                 new ParentGroupComponent(-1603423529),
                 new MarketItemGroupComponent(-1603423529),

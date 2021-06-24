@@ -49,11 +49,11 @@ namespace TXServer.Core.Battles.Effect
         {
             base.Init();
             // min & max factor are the same for this module
-            ModuleFactor = (long) Config.GetComponent<ModuleDamageEffectMaxFactorPropertyComponent>(ConfigPath)
+            ModuleFactor = Config.GetComponent<ModuleDamageEffectMaxFactorPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
         }
 
         public float Factor => IsSupply ? 1.5f : ModuleFactor;
-        public float ModuleFactor { get; set; }
+        private float ModuleFactor { get; set; }
     }
 }

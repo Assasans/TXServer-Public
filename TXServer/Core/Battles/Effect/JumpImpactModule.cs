@@ -22,9 +22,7 @@ namespace TXServer.Core.Battles.Effect
             /*MatchPlayer.Tank.ChangeComponent<TemperatureComponent>(component =>
                 component.Temperature += WorkingTemperature);*/
 
-            Schedule(() => {
-				MatchPlayer.Battle.JoinedTankPlayers.UnshareEntities(EffectEntity);
-			});
+            Schedule(() => { MatchPlayer.Battle.JoinedTankPlayers.UnshareEntities(EffectEntity); });
 		}
 
         public override void Init()

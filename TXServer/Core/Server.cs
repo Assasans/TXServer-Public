@@ -47,6 +47,7 @@ namespace TXServer.Core
                 ["garage/module/module/tank/active/2/jumpimpact"] = typeof(JumpImpactModule),
                 ["garage/module/module/weapon/trigger/3/lifesteal"] = typeof(LifeStealModule),
                 ["garage/module/module/weapon/active/1/mine"] = typeof(MineModule),
+                ["garage/module/module/weapon/trigger/1/rage"] = typeof(RageModule),
                 ["garage/module/module/tank/active/1/repairkit"] = typeof(RepairKitModule),
                 ["garage/module/module/weapon/active/1/sonar"] = typeof(SonarModule),
                 ["garage/module/module/weapon/active/2/spidermine"] = typeof(SpiderMineModule),

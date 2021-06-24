@@ -92,9 +92,9 @@ namespace TXServer.ECSSystem.GlobalEntities
             /*public Entity Mine { get; } = new Entity(1384378871, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/mine"),
                 new ParentGroupComponent(Modules.GlobalItems.Mine),
                 new MarketItemGroupComponent(1384378871));*/
-            /*public Entity Rage { get; } = new Entity(-786092160, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/rage"),
+            public Entity Rage { get; } = new Entity(-786092160, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/rage"),
                 new ParentGroupComponent(Modules.GlobalItems.Rage),
-                new MarketItemGroupComponent(-786092160));*/
+                new MarketItemGroupComponent(-786092160));
             /*public Entity Sapper { get; } = new Entity(-887306593, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/sapper"),
                 new ParentGroupComponent(Modules.GlobalItems.Sapper),
                 new MarketItemGroupComponent(-887306593));*/

@@ -81,7 +81,7 @@ namespace TXServer.Core.Battles
         private static float DamageWithEffects(float damage, MatchPlayer target, MatchPlayer shooter,
             bool module)
         {
-            if (!module && shooter.TryGetModule(out IncreasedDamageModule damageModule))
+            if (!module && shooter.TryGetModule(out IncreasedDamageModule damageModule) && damageModule.EffectIsActive)
             {
                 if (damageModule.IsCheat)
                     damage = target.Tank.GetComponent<HealthComponent>().CurrentHealth;
@@ -89,7 +89,10 @@ namespace TXServer.Core.Battles
                     damage *= damageModule.Factor;
             }
 
-            if (target.TryGetModule(out AbsorbingArmorEffect armorModule))
+            if (!module && shooter.TryGetModule(out AdrenalineModule adrenalineModule) && adrenalineModule.EffectIsActive)
+                damage *= adrenalineModule.DamageFactor;
+
+            if (target.TryGetModule(out AbsorbingArmorEffect armorModule) && armorModule.EffectIsActive)
                 damage *= armorModule.Factor();
 
             return damage;
@@ -338,6 +341,8 @@ namespace TXServer.Core.Battles
 
             if (killer.TryGetModule(out LifeStealModule module))
                 module.Activate();
+            if (killer.TryGetModule(out RageModule rageModule))
+                rageModule.Activate();
         }
 
         private static void ProcessKillAssists(MatchPlayer victim, MatchPlayer damager)
