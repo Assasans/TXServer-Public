@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
@@ -35,7 +36,7 @@ namespace TXServer.Core.Battles.Effect
 
             CurrentAmmunition--;
 
-            Schedule(Deactivate);
+            Schedule(TimeSpan.FromMilliseconds(Duration), Deactivate);
         }
 
         public override void Deactivate()

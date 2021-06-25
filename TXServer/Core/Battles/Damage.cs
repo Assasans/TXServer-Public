@@ -45,7 +45,7 @@ namespace TXServer.Core.Battles
             if (victim.TryGetModule(out EmergencyProtectionModule epModule))
                 if (epModule.IsImmune) return;
 
-            damage = DamageWithEffects(damage, victim, damager, IsModule(weaponMarketItem));
+            damage = DamageWithEffects(damage, victim, damager, IsModule(weaponMarketItem), weaponMarketItem);
 
             // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
             //     $"[Damage] Dealt {damage} damage units to {victim.Player.Data.Username}",
@@ -79,9 +79,15 @@ namespace TXServer.Core.Battles
         }
 
         private static float DamageWithEffects(float damage, MatchPlayer target, MatchPlayer shooter,
-            bool module)
+            bool isModule, Entity weaponMarketItem)
         {
-            if (!module && shooter.TryGetModule(out IncreasedDamageModule damageModule) && damageModule.EffectIsActive)
+            if (target.TryGetModule(out AbsorbingArmorEffect armorModule) && armorModule.EffectIsActive)
+                damage *= armorModule.Factor();
+
+            if (!isModule && shooter.TryGetModule(out AdrenalineModule adrenalineModule) && adrenalineModule.EffectIsActive)
+                damage *= adrenalineModule.DamageFactor;
+
+            if (!isModule && shooter.TryGetModule(out IncreasedDamageModule damageModule) && damageModule.EffectIsActive)
             {
                 if (damageModule.IsCheat)
                     damage = target.Tank.GetComponent<HealthComponent>().CurrentHealth;
@@ -89,11 +95,10 @@ namespace TXServer.Core.Battles
                     damage *= damageModule.Factor;
             }
 
-            if (!module && shooter.TryGetModule(out AdrenalineModule adrenalineModule) && adrenalineModule.EffectIsActive)
-                damage *= adrenalineModule.DamageFactor;
-
-            if (target.TryGetModule(out AbsorbingArmorEffect armorModule) && armorModule.EffectIsActive)
-                damage *= armorModule.Factor();
+            // todo: add common mine to mine boolean when added
+            bool mine = isModule && weaponMarketItem == Modules.GlobalItems.Spidermine;
+            if (mine && target.TryGetModule(out SapperModule sapperModule) && !sapperModule.IsOnCooldown)
+                damage = sapperModule.ReduceDamage(damage);
 
             return damage;
         }
