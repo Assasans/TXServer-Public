@@ -1,32 +1,27 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.GlobalEntities;
 
-namespace TXServer.Core.Battles.Effect {
-	public class ModuleRegistry {
+namespace TXServer.Core.Battles.Effect
+{
+	public class ModuleRegistry
+    {
 		private readonly Dictionary<string, Type> _name2Module;
 
         private readonly Type _stubModule = typeof(StubModule);
 
-		public ModuleRegistry() {
-			_name2Module = new Dictionary<string, Type>();
-		}
+		public ModuleRegistry() => _name2Module = new Dictionary<string, Type>();
 
-        public void Register(Dictionary<string, Type> modules) {
-            foreach ((string name, Type type) in modules)
-            {
-                Register(name, type);
-            }
+        public void Register(Dictionary<Entity, Type> modules)
+        {
+            foreach ((Entity garageModule, Type type) in modules)
+                Register(garageModule.TemplateAccessor.ConfigPath, type);
         }
 
-        private void Register(string name, Type type) {
-			_name2Module.Add(name, type);
-		}
+        private void Register(string name, Type type) => _name2Module.Add(name, type);
 
         private Type Get(string name) => !_name2Module.ContainsKey(name) ? _stubModule : _name2Module[name];
 

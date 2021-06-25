@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using TXServer.Core.Battles.Effect;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
@@ -167,13 +170,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(0),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
                 new ModuleCardsCompositionComponent());
-            /*public Entity Externalimpact { get; } = new Entity(-1334156852, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/2/externalimpact"),
+            public Entity Externalimpact { get; } = new Entity(-1334156852, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/2/externalimpact"),
                 new ParentGroupComponent(-1334156852),
                 new MarketItemGroupComponent(-1334156852),
                 new ModuleTankPartComponent(TankPartModuleType.WEAPON),
                 new ModuleTierComponent(1),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             public Entity Increaseddamage { get; } = new Entity(676407818, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/2/increaseddamage"),
                 new ParentGroupComponent(676407818),
                 new MarketItemGroupComponent(676407818),
@@ -260,5 +263,31 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleCardsCompositionComponent(),
                 new ImmutableModuleItemComponent());
         }
+
+        public static readonly Dictionary<Entity, Type> ModuleToType = new()
+        {
+            [GlobalItems.Absorbingarmor] = typeof(AbsorbingArmorEffect),
+            [GlobalItems.Acceleratedgears] = typeof(AcceleratedGearsModule),
+            [GlobalItems.Adrenaline] = typeof(AdrenalineModule),
+            [GlobalItems.Emergencyprotection] = typeof(EmergencyProtectionModule),
+            [GlobalItems.Emp] = typeof(EmpModule),
+            [GlobalItems.Energyinjection] = typeof(EnergyInjectionModule),
+            [GlobalItems.Engineer] = typeof(EngineerModule),
+            [GlobalItems.Explosivemass] = typeof(ExplosiveMassModule),
+            [GlobalItems.Externalimpact] = typeof(ExternalImpactModule),
+            [GlobalItems.Forcefield] = typeof(ForceFieldModule),
+            [GlobalItems.Gold] = typeof(GoldModule),
+            [GlobalItems.Increaseddamage] = typeof(IncreasedDamageModule),
+            [GlobalItems.Invisibility] = typeof(InvisibilityModule),
+            [GlobalItems.Invulnerability] = typeof(InvulnerabilityModule),
+            [GlobalItems.Jumpimpact] = typeof(JumpImpactModule),
+            [GlobalItems.Lifesteal] = typeof(LifeStealModule),
+            [GlobalItems.Rage] = typeof(RageModule),
+            [GlobalItems.Repairkit] = typeof(RepairKitModule),
+            [GlobalItems.Sapper] = typeof(SapperModule),
+            [GlobalItems.Sonar] = typeof(SonarModule),
+            [GlobalItems.Spidermine] = typeof(SpiderMineModule),
+            [GlobalItems.Turbospeed] = typeof(TurboSpeedModule)
+        };
     }
 }

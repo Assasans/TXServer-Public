@@ -6,6 +6,8 @@ using TXServer.Core.Battles.Effect;
 using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;
 using TXServer.Core.Database;
+using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core
 {
@@ -27,37 +29,8 @@ namespace TXServer.Core
 
         public Server()
         {
-            Dictionary<string, Type> modules = new()
-            {
-                ["garage/module/module/tank/active/1/absorbingarmor"] = typeof(AbsorbingArmorEffect),
-                ["garage/module/module/tank/passive/2/acceleratedgears"] = typeof(AcceleratedGearsModule),
-                ["garage/module/module/weapon/passive/2/adrenaline"] = typeof(AdrenalineModule),
-                ["garage/module/module/tank/trigger/3/emergencyprotection"] = typeof(EmergencyProtectionModule),
-                ["garage/module/module/weapon/active/1/emp"] = typeof(EmpModule),
-                ["garage/module/module/weapon/active/3/energyinjection"] = typeof(EnergyInjectionModule),
-                ["garage/module/module/weapon/passive/1/engineer"] = typeof(EngineerModule),
-                ["garage/module/module/weapon/active/3/explosivemass"] = typeof(ExplosiveMassModule),
-                ["garage/module/module/weapon/active/2/externalimpact"] = typeof(ExternalImpactModule),
-                ["garage/module/module/tank/active/3/firering"] = typeof(FireRingModule),
-                ["garage/module/module/tank/active/2/forcefield"] = typeof(ForceFieldModule),
-                ["garage/module/prebuildmodule/common/active/1/gold"] = typeof(GoldModule),
-                ["garage/module/module/weapon/active/2/increaseddamage"] = typeof(IncreasedDamageModule),
-                ["garage/module/module/tank/active/2/invisibility"] = typeof(InvisibilityModule),
-                ["garage/module/module/tank/active/3/invulnerability"] = typeof(InvulnerabilityModule),
-                ["garage/module/module/tank/active/2/jumpimpact"] = typeof(JumpImpactModule),
-                ["garage/module/module/weapon/trigger/3/lifesteal"] = typeof(LifeStealModule),
-                ["garage/module/module/weapon/active/1/mine"] = typeof(MineModule),
-                ["garage/module/module/weapon/trigger/1/rage"] = typeof(RageModule),
-                ["garage/module/module/tank/active/1/repairkit"] = typeof(RepairKitModule),
-                ["garage/module/module/tank/trigger/2/sapper"] = typeof(SapperModule),
-                ["garage/module/module/weapon/active/1/sonar"] = typeof(SonarModule),
-                ["garage/module/module/weapon/active/2/spidermine"] = typeof(SpiderMineModule),
-                ["garage/module/module/tank/active/1/turbospeed"] = typeof(TurboSpeedModule),
-                ["garage/module/module/weapon/active/3/drone"] = typeof(TurretDroneModule)
-            };
-
             ModuleRegistry = new ModuleRegistry();
-            ModuleRegistry.Register(modules);
+            ModuleRegistry.Register(Modules.ModuleToType);
         }
 
         public void Start()
