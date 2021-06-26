@@ -69,8 +69,7 @@ namespace TXServer.Core.Battles.Effect
 
         private void CheckLifeTime()
         {
-            if (DateTimeOffset.UtcNow > TimeOfDeath)
-                Explode();
+            if (DateTimeOffset.UtcNow > TimeOfDeath) Explode();
         }
 
         public void Explode()

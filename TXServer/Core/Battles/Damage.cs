@@ -13,6 +13,7 @@ using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Weapon;
+using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
 using TXServer.ECSSystem.GlobalEntities;
@@ -181,8 +182,7 @@ namespace TXServer.Core.Battles
             {
                 // Weapon
 
-                string path = Weapons.GlobalItems.GetAllItems()
-                    .First((item) => item == weaponMarketItem).TemplateAccessor.ConfigPath;
+                string path = damager.Player.CurrentPreset.Weapon.TemplateAccessor.ConfigPath;
 
                 var damageComponent = Config.GetComponent<ServerComponents.Damage.DamagePerSecondPropertyComponent>(path, false);
                 if (damageComponent != null)
@@ -274,7 +274,8 @@ namespace TXServer.Core.Battles
         }
 
         private static bool IsModule(Entity weaponMarketItem) =>
-            Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem) || weaponMarketItem.HasComponent<EffectComponent>();
+            Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem) ||
+            weaponMarketItem.HasComponent<EffectComponent>();
 
         private static bool IsStreamOnCooldown(Entity weapon, MatchPlayer victim, MatchPlayer damager, HitTarget hitTarget)
         {
@@ -439,8 +440,13 @@ namespace TXServer.Core.Battles
 
         }
 
-        public static Entity WeaponToModuleMarketItem(Entity weapon, Player player) =>
-            player.BattlePlayer.MatchPlayer.Modules.SingleOrDefault(m => m.EffectEntity == weapon)?.MarketItem;
+        public static Entity WeaponToModuleMarketItem(Entity weapon, Player player)
+        {
+            if (weapon.TemplateAccessor.Template is DroneWeaponTemplate) return Modules.GlobalItems.Drone;
+
+            return player.BattlePlayer.MatchPlayer.Modules.SingleOrDefault(m => m.EffectEntity == weapon)
+                ?.MarketItem;
+        }
 
 
         private static readonly Dictionary<int, int> KillStreakScores = new()

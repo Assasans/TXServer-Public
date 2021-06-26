@@ -15,12 +15,10 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
     [SerialVersionUID(1485337553359L)]
     public class SpiderEffectTemplate : EffectBaseTemplate
     {
-        private static readonly string _configPath = "/battle/effect/spidermine";
-
         public static Entity CreateEntity(MatchPlayer matchPlayer, float acceleration, long activationTime,
             float beginHideDistance, float hideRange, float impact, float speed)
         {
-            Entity effect = CreateEntity(new SpiderEffectTemplate(), _configPath, matchPlayer, addTeam:true);
+            Entity effect = CreateEntity(new SpiderEffectTemplate(), "/battle/effect/spidermine", matchPlayer, addTeam:true);
             effect.AddComponent(matchPlayer.Player.User.GetComponent<UserGroupComponent>());
 
             effect.AddComponent(new EffectActiveComponent());

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;

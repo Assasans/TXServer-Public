@@ -198,6 +198,9 @@ namespace TXServer.Core.Battles
 
             if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
             Weapon.TryRemoveComponent<ShootableComponent>();
+
+            // trigger Drone to stay
+            if (TryGetModule(out TurretDroneModule turretDroneModule)) turretDroneModule.Stay();
         }
 
         public void Tick()
@@ -365,7 +368,6 @@ namespace TXServer.Core.Battles
         }
         private float _moduleCooldownSpeedCoeff = 1;
 
-        public float? ShotCooldown { get; private set; }
         public Dictionary<BattleTankPlayer, TankDamageCooldown> DamageCooldowns { get; } = new();
 
         public bool Paused { get; set; }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
-using System.Numerics;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle.Effect.Unit;
+using TXServer.ECSSystem.Components.Battle.Effect.Drone;
+using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
+using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
-using TXServer.ECSSystem.Events.Battle.Effect;
 
 namespace TXServer.Core.Battles.Effect
 {
@@ -17,59 +18,67 @@ namespace TXServer.Core.Battles.Effect
             ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
         ) { }
 
-        public override void Activate() {
-            if (EffectEntities.Any())
-            {
-                Deactivate();
-                IsActive = false;
-            }
+        public override void Activate()
+        {
+            if (EffectIsActive) Deactivate();
 
-            EffectEntities.Add(DroneEffectTemplate.CreateEntity(MatchPlayer));
-            EffectEntities.Add(DroneWeaponTemplate.CreateEntity(MatchPlayer, EffectEntities.First()));
+            EffectEntities.Add(DroneWeaponTemplate.CreateEntity(MatchPlayer));
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntities);
 
-            TimeOfDeath = DateTimeOffset.UtcNow.AddSeconds(180);
-            IsActive = true;
+            EffectEntities.Add(DroneEffectTemplate.CreateEntity(duration: Duration,
+                targetingDistance: TargetingDistance, targetingPeriod: TargetingPeriod, weapon: EffectEntities[0],
+                matchPlayer: MatchPlayer));
+            MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntities.Last());
+
+            TimeOfDeath = DateTimeOffset.UtcNow.AddMilliseconds(Duration);
         }
 
         public override void Deactivate()
         {
-            if (EffectEntity == null) return;
-            MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
-            EffectEntity = null;
+            if (!EffectIsActive) return;
+
+            MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntities);
+            EffectEntities.Clear();
         }
+
+        public override void Init()
+        {
+            base.Init();
+            DeactivateOnTankDisable = false;
+            IsAffectedByEmp = false;
+
+            TargetingDistance = Config.GetComponent<ModuleEffectTargetingDistancePropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level - 1];
+            TargetingPeriod = Config.GetComponent<ModuleEffectTargetingPeriodPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level - 1];
+        }
+
+
+        public void Stay() => EffectEntities.Single(e => e.HasComponent<DroneEffectComponent>())
+            .TryRemoveComponent<TankGroupComponent>();
 
         private void CheckLifeTime()
         {
-            if (DateTimeOffset.UtcNow > TimeOfDeath)
-                Explode();
+            if (DateTimeOffset.UtcNow > TimeOfDeath) Explode();
         }
 
-        public void Explode()
+        private void Explode()
         {
-            return;
-            MatchPlayer.Battle.MatchTankPlayers.SendEvent(new MineExplosionEvent(), EffectEntities[0]);
-            IsActive = false;
-            //StopFollowing();
+            // todo: let drone explode on deactivation
             Deactivate();
-            TimeOfDeath = null;
         }
 
         protected override void Tick()
         {
             base.Tick();
 
-            if (!IsActive || !EffectEntities.Any()) return;
+            if (!EffectIsActive || !EffectEntities.Any()) return;
 
             CheckLifeTime();
-            //else TrackTarget();
         }
 
-        public const float Damage = 700;
-        private bool Hunting { get; set; }
-        private bool IsActive { get; set; }
-        private Vector3 MinePosition => EffectEntities[0].GetComponent<UnitMoveComponent>().LastPosition;
-        private MatchPlayer Target { get; set; }
+        private float TargetingDistance { get; set; }
+        private float TargetingPeriod { get; set; }
         private DateTimeOffset? TimeOfDeath { get; set; }
     }
 }

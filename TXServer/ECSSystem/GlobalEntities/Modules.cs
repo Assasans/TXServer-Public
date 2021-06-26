@@ -191,13 +191,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(1),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
                 new ModuleCardsCompositionComponent());
-            /*public Entity Drone { get; } = new Entity(1392039140, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/3/drone"),
+            public Entity Drone { get; } = new Entity(1392039140, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/3/drone"),
                 new ParentGroupComponent(1392039140),
                 new MarketItemGroupComponent(1392039140),
                 new ModuleTankPartComponent(TankPartModuleType.WEAPON),
                 new ModuleTierComponent(2),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             public Entity Energyinjection { get; } = new Entity(1128679079, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/3/energyinjection"),
                 new ParentGroupComponent(1128679079),
                 new MarketItemGroupComponent(1128679079),
@@ -269,6 +269,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             [GlobalItems.Absorbingarmor] = typeof(AbsorbingArmorEffect),
             [GlobalItems.Acceleratedgears] = typeof(AcceleratedGearsModule),
             [GlobalItems.Adrenaline] = typeof(AdrenalineModule),
+            [GlobalItems.Drone] = typeof(TurretDroneModule),
             [GlobalItems.Emergencyprotection] = typeof(EmergencyProtectionModule),
             [GlobalItems.Emp] = typeof(EmpModule),
             [GlobalItems.Energyinjection] = typeof(EnergyInjectionModule),
