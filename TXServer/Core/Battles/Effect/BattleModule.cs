@@ -183,9 +183,12 @@ namespace TXServer.Core.Battles.Effect {
 
 		protected virtual void Tick()
         {
-			IsEnabled = ModuleType is not ModuleBehaviourType.PASSIVE &&
-                        MatchPlayer.Battle.BattleState is BattleState.Running or BattleState.WarmUp &&
-                        MatchPlayer.TankState == TankState.Active;
+            if (IsModule)
+            {
+                IsEnabled = ModuleType is not ModuleBehaviourType.PASSIVE &&
+                            MatchPlayer.Battle.BattleState is BattleState.Running or BattleState.WarmUp &&
+                            MatchPlayer.TankState == TankState.Active;
+            }
         }
 
         public void ModuleTick()
@@ -276,6 +279,8 @@ namespace TXServer.Core.Battles.Effect {
         private DateTimeOffset? EmpLockEnd { get; set; }
         protected bool IsAffectedByEmp { get; set; } = true;
         protected bool IsEmpLocked => EmpLockEnd != null && EmpLockEnd > DateTimeOffset.UtcNow;
+
+        private bool IsModule => ModuleEntity is not null;
 
         public float CooldownDuration { get; set; }
         public DateTimeOffset? CooldownEndTime { get; set; }
