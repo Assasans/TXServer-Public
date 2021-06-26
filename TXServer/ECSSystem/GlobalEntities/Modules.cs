@@ -240,13 +240,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(0),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
                 new ModuleCardsCompositionComponent());
-            /*public Entity Kamikadze { get; } = new Entity(-1603423529, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/trigger/2/kamikadze"),
+            public Entity Kamikadze { get; } = new Entity(-1603423529, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/trigger/2/kamikadze"),
                 new ParentGroupComponent(-1603423529),
                 new MarketItemGroupComponent(-1603423529),
                 new ModuleTankPartComponent(TankPartModuleType.WEAPON),
                 new ModuleTierComponent(1),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             public Entity Lifesteal { get; } = new Entity(-246333323, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/trigger/3/lifesteal"),
                 new ParentGroupComponent(-246333323),
                 new MarketItemGroupComponent(-246333323),
@@ -283,6 +283,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             [GlobalItems.Invisibility] = typeof(InvisibilityModule),
             [GlobalItems.Invulnerability] = typeof(InvulnerabilityModule),
             [GlobalItems.Jumpimpact] = typeof(JumpImpactModule),
+            [GlobalItems.Kamikadze] = typeof(KamikadzeModule),
             [GlobalItems.Lifesteal] = typeof(LifeStealModule),
             [GlobalItems.Rage] = typeof(RageModule),
             [GlobalItems.Repairkit] = typeof(RepairKitModule),

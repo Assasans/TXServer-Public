@@ -320,8 +320,8 @@ namespace TXServer.Core.Battles
                         break;
                     case TankState.Dead:
 
-                        DisableTank();
                         Player.SendEvent(new SelfTankExplosionEvent(), Tank);
+                        DisableTank();
                         if (Battle.ModeHandler is CTFHandler handler)
                         {
                             foreach (Flag flag in handler.Flags.Values.Where(flag =>

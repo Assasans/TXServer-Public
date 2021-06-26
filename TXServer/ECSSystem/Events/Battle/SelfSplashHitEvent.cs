@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
@@ -17,12 +18,12 @@ namespace TXServer.ECSSystem.Events.Battle
 		{
             SelfEvent.Execute(this, player, weapon);
 
-            if (player.BattlePlayer.MatchPlayer.TankState == TankState.Dead)
-                return;
-
             Entity weaponMarketItem = Damage.WeaponToModuleMarketItem(weapon, player) ?? player.CurrentPreset.Weapon;
             BattleTankPlayer battlePlayer = player.BattlePlayer;
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
+
+            if (!Damage.IsModule(weaponMarketItem) && player.BattlePlayer.MatchPlayer.TankState == TankState.Dead)
+                return;
 
 			foreach (HitTarget hitTarget in Targets)
 			{

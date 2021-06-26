@@ -83,9 +83,9 @@ namespace TXServer.ECSSystem.GlobalEntities
             public Entity Jumpimpact { get; } = new Entity(-1596570946, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/jumpimpact"),
                 new ParentGroupComponent(Modules.GlobalItems.Jumpimpact),
                 new MarketItemGroupComponent(-1596570946));
-            /*public Entity Kamikadze { get; } = new Entity(489948195, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/kamikadze"),
+            public Entity Kamikadze { get; } = new Entity(489948195, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/kamikadze"),
                 new ParentGroupComponent(Modules.GlobalItems.Kamikadze),
-                new MarketItemGroupComponent(489948195));*/
+                new MarketItemGroupComponent(489948195));
             public Entity Lifesteal { get; } = new Entity(2010921135, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/lifesteal"),
                 new ParentGroupComponent(Modules.GlobalItems.Lifesteal),
                 new MarketItemGroupComponent(2010921135));

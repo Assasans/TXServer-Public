@@ -19,11 +19,16 @@ namespace TXServer.Core.Battles.Effect
 			EffectEntity = JumpEffectTemplate.CreateEntity(MatchPlayer, ForceMultiplier);
             MatchPlayer.Battle.JoinedTankPlayers.ShareEntities(EffectEntity);
 
-            /*MatchPlayer.Tank.ChangeComponent<TemperatureComponent>(component =>
-                component.Temperature += WorkingTemperature);*/
-
-            Schedule(() => { MatchPlayer.Battle.JoinedTankPlayers.UnshareEntities(EffectEntity); });
+            Schedule(Deactivate);
 		}
+
+        public override void Deactivate()
+        {
+            if (EffectEntity == null) return;
+
+            MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
+            EffectEntity = null;
+        }
 
         public override void Init()
         {
