@@ -114,13 +114,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(2),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
                 new ModuleCardsCompositionComponent());
-            /*public Entity Backhitdefence { get; } = new Entity(-1962420821, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/passive/1/backhitdefence"),
+            public Entity Backhitdefence { get; } = new Entity(-1962420821, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/passive/1/backhitdefence"),
                 new ParentGroupComponent(-1962420821),
                 new MarketItemGroupComponent(-1962420821),
                 new ModuleTankPartComponent(TankPartModuleType.TANK),
                 new ModuleTierComponent(0),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             /*public Entity Tempblock { get; } = new Entity(596921121, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/passive/1/tempblock"),
                 new ParentGroupComponent(596921121),
                 new MarketItemGroupComponent(596921121),
@@ -269,6 +269,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             [GlobalItems.Absorbingarmor] = typeof(AbsorbingArmorEffect),
             [GlobalItems.Acceleratedgears] = typeof(AcceleratedGearsModule),
             [GlobalItems.Adrenaline] = typeof(AdrenalineModule),
+            [GlobalItems.Backhitdefence] = typeof(BackhitDefenceModule),
             [GlobalItems.Drone] = typeof(TurretDroneModule),
             [GlobalItems.Emergencyprotection] = typeof(EmergencyProtectionModule),
             [GlobalItems.Emp] = typeof(EmpModule),

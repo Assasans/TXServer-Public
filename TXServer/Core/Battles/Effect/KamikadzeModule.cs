@@ -41,7 +41,6 @@ namespace TXServer.Core.Battles.Effect
             base.Init();
             DeactivateOnTankDisable = false;
 
-            Level = 10;
             DamageMinPercent = Config.GetComponent<ModuleEffectSplashDamageMinPercentPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
             Impact = Config.GetComponent<ModuleEffectImpactPropertyComponent>(ConfigPath)

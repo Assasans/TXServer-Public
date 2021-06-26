@@ -20,11 +20,10 @@ namespace TXServer.Core.Battles.Effect
         public override void Activate()
         {
             if (IsOnCooldown || IsEmpLocked) return;
-            if (EffectEntity != null) Deactivate();
+            if (EffectIsActive) Deactivate();
 
             CurrentAmmunition--;
 
-            IsImmune = true;
             ImmunityEndTime = DateTimeOffset.UtcNow.AddMilliseconds(HolyshieldDuration);
 
             EffectEntity = EmergencyProtectionEffectTemplate.CreateEntity(MatchPlayer);
@@ -51,7 +50,6 @@ namespace TXServer.Core.Battles.Effect
             MatchPlayer.Weapon.AddComponent(new ShootableComponent());
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
 
-            IsImmune = false;
             EffectEntity = null;
         }
 
@@ -70,7 +68,6 @@ namespace TXServer.Core.Battles.Effect
         }
 
         private DateTimeOffset ImmunityEndTime { get; set; }
-        public bool IsImmune { get; set; }
 
         private float AdditiveHpFactor { get; set; }
         private float FixedHp { get; set; }

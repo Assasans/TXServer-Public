@@ -69,10 +69,15 @@ namespace TXServer.Core.Battles
         private static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             HitTarget hitTarget, float damage)
         {
-            if (victim.TryGetModule(out InvulnerabilityModule module))
-                if (module.IsProtected) return;
-            if (victim.TryGetModule(out EmergencyProtectionModule epModule))
-                if (epModule.IsImmune) return;
+            // triggers for Invulnerability & Emergency Protection modules
+            if (victim.TryGetModule(out InvulnerabilityModule module)) if (module.EffectIsActive) return;
+            if (victim.TryGetModule(out EmergencyProtectionModule epModule)) if (epModule.EffectIsActive) return;
+
+            // todo: set this correctly when back hits are detected
+            const bool backHit = false;
+            if (backHit && victim.TryGetModule(out BackhitDefenceModule backhitDefModule) &&
+                backhitDefModule.EffectIsActive)
+                    damage = backhitDefModule.GetReducedDamage(damage);
 
             DealTemperature(weaponMarketItem, victim:victim, damager:damager);
 
@@ -105,7 +110,7 @@ namespace TXServer.Core.Battles
                 }
 
                 if (!IsModule(weaponMarketItem) || IsModule(weaponMarketItem) && damage != 0)
-                    damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false, false), victim.Tank);
+                    damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, backHit, false), victim.Tank);
                 victim.HealthChanged();
             });
         }
