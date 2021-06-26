@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Linq;
-using System.Numerics;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle.Effect.Unit;
 using TXServer.ECSSystem.Components.Battle.Module.Mine;
 using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
@@ -21,21 +18,16 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Activate()
         {
-            if (EffectEntity != null)
-            {
-                if (Hunting) StopHunting();
-                Deactivate();
-                IsDropped = false;
-            }
+            if (EffectIsActive) Deactivate();
 
-            EffectEntity = SpiderEffectTemplate.CreateEntity(MatchPlayer, acceleration: Acceleration,
-                activationTime: ActivationTime, beginHideDistance: BeginHideDistance, hideRange: HideRange,
-                impact: Impact, speed: Speed);
+            EffectEntity = SpiderEffectTemplate.CreateEntity(MatchPlayer, acceleration:Acceleration,
+                activationTime:ActivationTime, beginHideDistance: BeginHideDistance, hideRange:HideRange,
+                impact: Impact, damageMaxRadius: DamageMaxRadius, damageMinRadius: DamageMinRadius,
+                damageMinPercent: DamageMinPercent, speed:Speed, targetingDistance:TargetingDistance,
+                targetingPeriod:TargetingPeriod);
             TimeOfDeath = DateTimeOffset.UtcNow.AddSeconds(180);
 
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
-
-            IsDropped = true;
         }
 
         public override void Deactivate()
@@ -60,9 +52,20 @@ namespace TXServer.Core.Battles.Effect
                 .UpgradeLevel2Values[Level - 1];
             Impact = Config.GetComponent<ModuleMineEffectImpactPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
+            DamageMaxRadius = Config
+                .GetComponent<ModuleMineEffectSplashDamageMaxRadiusPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level - 1];
+            DamageMinRadius = Config
+                .GetComponent<ModuleMineEffectSplashDamageMinRadiusPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level - 1];
+            DamageMinPercent = Config
+                .GetComponent<ModuleMineEffectSplashDamageMinPercentPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level - 1];
             Speed = Config.GetComponent<ModuleEffectSpeedPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
             TargetingDistance = Config.GetComponent<ModuleEffectTargetingDistancePropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level - 1];
+            TargetingPeriod = Config.GetComponent<ModuleEffectTargetingPeriodPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
         }
 
@@ -75,62 +78,19 @@ namespace TXServer.Core.Battles.Effect
         public void Explode()
         {
             MatchPlayer.Battle.PlayersInMap.SendEvent(new MineExplosionEvent(), EffectEntity);
-            IsDropped = false;
-            StopHunting();
             Deactivate();
             TimeOfDeath = null;
-        }
-
-        private void StartHunting(MatchPlayer target)
-        {
-            EffectEntity.AddComponent(new UnitTargetComponent(target.Tank, target.Incarnation));
-            Target = target;
-            Hunting = true;
-        }
-
-        private void StopHunting()
-        {
-            EffectEntity?.TryRemoveComponent<UnitTargetComponent>();
-            Hunting = false;
-            Target = null;
-        }
-
-        private void SearchTargets()
-        {
-            if (EffectEntity == null) return;
-            foreach (MatchPlayer loopedPlayer in MatchPlayer.Battle.MatchTankPlayers.Select(b => b.MatchPlayer))
-            {
-                if (Vector3.Distance(loopedPlayer.TankPosition, MinePosition) <= TargetingDistance &&
-                    loopedPlayer.IsEnemyOf(MatchPlayer) && loopedPlayer.TankState == TankState.Active)
-                {
-                    StartHunting(loopedPlayer);
-                    return;
-                }
-            }
-        }
-
-        private void TrackTarget()
-        {
-            if (Vector3.Distance(Target.TankPosition, MinePosition) >= TargetingDistance ||
-                Target.TankState == TankState.Dead)
-                StopHunting();
         }
 
         protected override void Tick()
         {
             base.Tick();
 
-            if (!IsDropped || EffectEntity == null) return;
+            if (EffectIsActive) return;
 
             CheckLifeTime();
-            if (!Hunting) SearchTargets();
-            else TrackTarget();
         }
 
-        private bool Hunting { get; set; }
-        private bool IsDropped { get; set; }
-        private Vector3 MinePosition => EffectEntity.GetComponent<UnitMoveComponent>().LastPosition;
-        private MatchPlayer Target { get; set; }
         private DateTimeOffset? TimeOfDeath { get; set; }
 
         private float Acceleration { get; set; }
@@ -138,7 +98,11 @@ namespace TXServer.Core.Battles.Effect
         private float BeginHideDistance { get; set; }
         private float HideRange { get; set; }
         private float Impact { get; set; }
+        private float DamageMaxRadius { get; set; }
+        private float DamageMinRadius { get; set; }
+        private float DamageMinPercent { get; set; }
         private float Speed { get; set; }
         private float TargetingDistance { get; set; }
+        private float TargetingPeriod { get; set; }
     }
 }
