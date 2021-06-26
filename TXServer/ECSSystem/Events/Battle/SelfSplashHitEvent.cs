@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events.Battle
     [SerialVersionUID(196833391289212110L)]
 	public class SelfSplashHitEvent : SelfHitEvent, ISelfEvent
 	{
-		public void Execute(Player player, Entity weapon)
+        public void Execute(Player player, Entity weapon)
 		{
             SelfEvent.Execute(this, player, weapon);
 

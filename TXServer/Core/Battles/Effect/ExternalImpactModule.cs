@@ -1,7 +1,6 @@
 ﻿using System;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
@@ -19,7 +18,7 @@ namespace TXServer.Core.Battles.Effect
         {
             if (EffectEntity != null) Deactivate();
 
-            EffectEntity = ExternalImpactEffectTemplate.CreateEntity(
+            EffectEntity = ExternalImpactEffectTemplate.CreateEntity(damageMinPercent: DamageMinPercent,
                 friendlyFire: MatchPlayer.Battle.Params.FriendlyFire, impact: Impact, splashRadius: SplashRadius,
                 MatchPlayer);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
@@ -44,18 +43,12 @@ namespace TXServer.Core.Battles.Effect
                 .UpgradeLevel2Values[Level - 1];
             Impact = Config.GetComponent<ModuleEffectImpactPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
-            MaxDamage = Config.GetComponent<ModuleEffectMaxDamagePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
-            MinDamage = Config.GetComponent<ModuleEffectMinDamagePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
             SplashRadius = Config.GetComponent<ModuleEffectSplashRadiusPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
         }
 
         private float DamageMinPercent { get; set; }
         private float Impact { get; set; }
-        private float MaxDamage { get; set; }
-        private float MinDamage { get; set; }
         private float SplashRadius { get; set; }
     }
 }

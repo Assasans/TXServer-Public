@@ -93,13 +93,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(1),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
                 new ModuleCardsCompositionComponent());
-            /*public Entity Firering { get; } = new Entity(1896579342, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/3/firering"),
+            public Entity Firering { get; } = new Entity(1896579342, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/3/firering"),
                 new ParentGroupComponent(1896579342),
                 new MarketItemGroupComponent(1896579342),
                 new ModuleTankPartComponent(TankPartModuleType.TANK),
                 new ModuleTierComponent(2),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             /*public Entity Icetrap { get; } = new Entity(-1177680131, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/3/icetrap"),
                 new ParentGroupComponent(-1177680131),
                 new MarketItemGroupComponent(-1177680131),
@@ -275,6 +275,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             [GlobalItems.Engineer] = typeof(EngineerModule),
             [GlobalItems.Explosivemass] = typeof(ExplosiveMassModule),
             [GlobalItems.Externalimpact] = typeof(ExternalImpactModule),
+            [GlobalItems.Firering] = typeof(FireRingModule),
             [GlobalItems.Forcefield] = typeof(ForceFieldModule),
             [GlobalItems.Gold] = typeof(GoldModule),
             [GlobalItems.Increaseddamage] = typeof(IncreasedDamageModule),

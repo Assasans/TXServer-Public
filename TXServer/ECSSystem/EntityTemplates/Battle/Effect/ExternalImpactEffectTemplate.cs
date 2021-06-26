@@ -11,7 +11,8 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
     [SerialVersionUID(1542270967570L)]
     public class ExternalImpactEffectTemplate : EffectBaseTemplate
     {
-        public static Entity CreateEntity(bool friendlyFire, float impact, float splashRadius, MatchPlayer matchPlayer)
+        public static Entity CreateEntity(float damageMinPercent, bool friendlyFire, float impact, float splashRadius,
+            MatchPlayer matchPlayer)
         {
             Entity effect = CreateEntity(new ExternalImpactEffectTemplate(), "battle/effect/externalimpact", matchPlayer);
 
@@ -19,10 +20,10 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
             effect.AddComponent(new ExternalImpactEffectComponent());
 
             effect.AddComponent(new SplashEffectComponent(friendlyFire));
-            effect.AddComponent(new SplashWeaponComponent(40f, 0, splashRadius));
+            effect.AddComponent(new SplashWeaponComponent(damageMinPercent, 0, splashRadius));
             effect.AddComponent(new SplashImpactComponent(impact));
 
-            effect.AddComponent(new DamageWeakeningByDistanceComponent(70, 0, splashRadius));
+            effect.AddComponent(new DamageWeakeningByDistanceComponent(damageMinPercent, 0, splashRadius));
             effect.AddComponent(new DiscreteWeaponComponent());
 
             return effect;

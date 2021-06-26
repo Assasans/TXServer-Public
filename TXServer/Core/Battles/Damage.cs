@@ -5,9 +5,11 @@ using TXServer.Core.Battles.Effect;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Battle.Effect;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
-using TXServer.ECSSystem.Components.Battle.Module;
+using TXServer.ECSSystem.Components.Battle.Module.Icetrap;
+using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Weapon;
@@ -37,47 +39,6 @@ namespace TXServer.Core.Battles
             // Todo: fix position of self heal info
         }
 
-        private static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
-            HitTarget hitTarget, float damage)
-        {
-            if (victim.TryGetModule(out InvulnerabilityModule module))
-                if (module.IsProtected) return;
-            if (victim.TryGetModule(out EmergencyProtectionModule epModule))
-                if (epModule.IsImmune) return;
-
-            damage = DamageWithEffects(damage, victim, damager, IsModule(weaponMarketItem), weaponMarketItem);
-
-            // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
-            //     $"[Damage] Dealt {damage} damage units to {victim.Player.Data.Username}",
-            //     damager.Battle.GeneralBattleChatEntity, damager.Player
-            // );
-
-            victim.Tank.ChangeComponent<HealthComponent>(component =>
-            {
-                if (component.CurrentHealth >= 0) {}
-                    component.CurrentHealth -= damage;
-
-                    if (component.CurrentHealth <= 0)
-                    {
-                        if (victim.TryGetModule(out EmergencyProtectionModule ep) &&
-                            !ep.IsOnCooldown)
-                            ep.Activate();
-                        else
-                            ProcessKill(weaponMarketItem, victim, damager, hitTarget, damage);
-                    }
-                    else
-                {
-                    if (victim.DamageAssistants.ContainsKey(damager))
-                        victim.DamageAssistants[damager] += damage;
-                    else
-                        victim.DamageAssistants.Add(damager, damage);
-                }
-
-                damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false, false), victim.Tank);
-                victim.HealthChanged();
-            });
-        }
-
         private static float DamageWithEffects(float damage, MatchPlayer target, MatchPlayer shooter,
             bool isModule, Entity weaponMarketItem)
         {
@@ -103,6 +64,97 @@ namespace TXServer.Core.Battles
             return damage;
         }
 
+        private static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
+            HitTarget hitTarget, float damage)
+        {
+            if (victim.TryGetModule(out InvulnerabilityModule module))
+                if (module.IsProtected) return;
+            if (victim.TryGetModule(out EmergencyProtectionModule epModule))
+                if (epModule.IsImmune) return;
+
+            DealTemperature(weaponMarketItem, victim:victim, damager:damager);
+
+            damage = DamageWithEffects(damage, victim, damager, IsModule(weaponMarketItem), weaponMarketItem);
+
+            // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
+            //     $"[Damage] Dealt {damage} damage units to {victim.Player.Data.Username}",
+            //     damager.Battle.GeneralBattleChatEntity, damager.Player
+            // );
+
+            victim.Tank.ChangeComponent<HealthComponent>(component =>
+            {
+                if (component.CurrentHealth >= 0) {}
+                component.CurrentHealth -= damage;
+
+                if (component.CurrentHealth <= 0)
+                {
+                    if (victim.TryGetModule(out EmergencyProtectionModule ep) &&
+                        !ep.IsOnCooldown)
+                        ep.Activate();
+                    else
+                        ProcessKill(weaponMarketItem, victim, damager, hitTarget, damage);
+                }
+                else
+                {
+                    if (victim.DamageAssistants.ContainsKey(damager))
+                        victim.DamageAssistants[damager] += damage;
+                    else
+                        victim.DamageAssistants.Add(damager, damage);
+                }
+
+                if (!IsModule(weaponMarketItem) || IsModule(weaponMarketItem) && damage != 0)
+                    damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false, false), victim.Tank);
+                victim.HealthChanged();
+            });
+        }
+
+        private static void DealTemperature(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager)
+        {
+            // todo: add all turrets + modules, proper temperature management
+            if (IsModule(weaponMarketItem))
+            {
+                // module
+
+                BattleModule module = damager.Modules.Single(m => m.MarketItem == weaponMarketItem);
+                if (module.MarketItem != Modules.GlobalItems.Firering) return;
+
+                victim.Tank.ChangeComponent<TemperatureComponent>(component =>
+                {
+                    component.Temperature += Config
+                        .GetComponent<ModuleIcetrapEffectTemperatureDeltaPropertyComponent>(module.ConfigPath)
+                        .UpgradeLevel2Values[module.Level - 1];
+                });
+            }
+        }
+
+        public static void DealNormalDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
+            HitTarget hitTarget)
+        {
+            if (!IsModule(weaponMarketItem) && IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
+
+            float damage = GetRandomDamage(weapon, weaponMarketItem, damager);
+            DealDamage(weaponMarketItem, victim, damager, hitTarget, damage);
+        }
+
+        public static void DealSplashDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
+            HitTarget hitTarget)
+        {
+            if (!IsModule(weaponMarketItem) && !IsModule(weapon) &&
+                IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
+
+            float distance = hitTarget.HitDistance;
+
+            float damage = GetRandomDamage(weapon, weaponMarketItem, damager);
+            float damageMultiplier = GetSplashDamageMultiplier(weapon, weaponMarketItem, distance, victim, damager);
+            int splashDamage = (int) Math.Round(damage * damageMultiplier);
+
+            /*TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
+                $"[Damage] Random damage: {damage} | Splash multiplier: {damageMultiplier} | Calculated damage: {splashDamage}",
+                victim.Battle.GeneralBattleChatEntity, damager.Player);*/
+
+            DealDamage(weaponMarketItem, victim, damager, hitTarget, splashDamage);
+        }
+
         private static float GetRandomDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer damager)
         {
             float damage;
@@ -117,16 +169,11 @@ namespace TXServer.Core.Battles
                     damager.Modules.First(m =>
                         m.EffectEntity?.TemplateAccessor.Template == weapon.TemplateAccessor.Template);
 
-                string upgradePath =
-                    $"garage/module/upgrade/properties/{module.ModuleEntity.TemplateAccessor.ConfigPath.Split('/').Last()}";
+                var minDamageComponent = Config.GetComponent<ModuleEffectMinDamagePropertyComponent>(module.ConfigPath);
+                var maxDamageComponent = Config.GetComponent<ModuleEffectMaxDamagePropertyComponent>(module.ConfigPath);
 
-                int level = module.ModuleEntity.GetComponent<SlotUserItemInfoComponent>().UpgradeLevel;
-
-                var minDamageComponent = Config.GetComponent<ModuleEffectMinDamagePropertyComponent>(upgradePath);
-                var maxDamageComponent = Config.GetComponent<ModuleEffectMaxDamagePropertyComponent>(upgradePath);
-
-                float minDamage = minDamageComponent.UpgradeLevel2Values[level - 1];
-                float maxDamage = maxDamageComponent.UpgradeLevel2Values[level - 1];
+                float minDamage = minDamageComponent.UpgradeLevel2Values[module.Level - 1];
+                float maxDamage = maxDamageComponent.UpgradeLevel2Values[module.Level - 1];
 
                 damage = (int) Math.Round(new Random().NextGaussianRange(minDamage, maxDamage));
             }
@@ -166,33 +213,68 @@ namespace TXServer.Core.Battles
             return damage;
         }
 
-        public static void DealNormalDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
-            HitTarget hitTarget)
+        private static float GetSplashDamageMultiplier(Entity weapon, Entity weaponMarketItem, float distance,
+            MatchPlayer victim, MatchPlayer damager)
         {
-            if (!IsModule(weaponMarketItem) && IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
+            if (IsModule(weaponMarketItem)) return 1;
 
-            float damage = GetRandomDamage(weapon, weaponMarketItem, damager);
-            DealDamage(weaponMarketItem, victim, damager, hitTarget, damage);
+            var damageComponent = damager.Weapon.GetComponent<SplashWeaponComponent>();
+
+            float radiusOfMaxSplashDamage = damageComponent.RadiusOfMaxSplashDamage;
+            float radiusOfMinSplashDamage = damageComponent.RadiusOfMinSplashDamage;
+            float minSplashDamagePercent = damageComponent.MinSplashDamagePercent;
+
+            if (distance < radiusOfMaxSplashDamage)
+                return 1;
+
+            if (distance > radiusOfMinSplashDamage)
+                return 0;
+
+
+            return 0.01f * (minSplashDamagePercent + (radiusOfMinSplashDamage - distance) * (100f - minSplashDamagePercent) / (radiusOfMinSplashDamage - radiusOfMaxSplashDamage));
         }
 
-        public static void DealSplashDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
-            HitTarget hitTarget)
+        public static void IsisHeal(Entity weapon, MatchPlayer target, MatchPlayer healer, HitTarget hitTarget)
         {
-            if (!IsModule(weaponMarketItem) && IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
+            if (IsStreamOnCooldown(weapon, target, healer, hitTarget)) return;
 
-            float distance = hitTarget.HitDistance;
+            bool healed = false;
+            target.Tank.ChangeComponent<TemperatureComponent>(component =>
+            {
+                if (component.Temperature.CompareTo(0) < 0)
+                    component.Temperature = 0;
+                else if (component.Temperature > 0)
+                    component.Temperature -= 2;
+                else if (component.Temperature < 0)
+                    component.Temperature += 2;
+            });
 
-            float damage = GetRandomDamage(weapon, weaponMarketItem, damager);
-            float damageMultiplier = GetSplashDamageMultiplier(weapon, weaponMarketItem, distance, victim, damager);
-            int splashDamage = (int) Math.Round(damage * damageMultiplier);
+            target.Tank.ChangeComponent<HealthComponent>(component =>
+            {
+                // todo: fix overpowered healing (doesn't seem to be correct)
+                int healingPerSecond = 415;
+                if (component.CurrentHealth != component.MaxHealth)
+                {
+                    healed = true;
+                    if (component.MaxHealth - component.CurrentHealth > healingPerSecond)
+                        component.CurrentHealth += healingPerSecond;
+                    else
+                        component.CurrentHealth = component.MaxHealth;
+                }
+            });
 
-            // TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
-            //     $"[Damage] Random damage: {damage} | Splash multiplier: {damageMultiplier} | Calculated damage: {splashDamage}",
-            //     victim.Battle.GeneralBattleChatEntity, damager.Player
-            // );
-
-            DealDamage(weaponMarketItem, victim, damager, hitTarget, splashDamage);
+            if (healed)
+            {
+                target.Player.BattlePlayer.MatchPlayer.HealthChanged();
+                healer.Battle.Spectators.Concat(new[] {(IPlayerPart) healer})
+                    .SendEvent(new DamageInfoEvent(415, hitTarget.LocalHitPoint, false, true), target.Tank);
+                healer.SendEvent(new VisualScoreHealEvent(healer.GetScoreWithPremium(4)), healer.BattleUser);
+                healer.UpdateStatistics(additiveScore: 4, 0, 0, 0, null);
+            }
         }
+
+        private static bool IsModule(Entity weaponMarketItem) =>
+            Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem) || weaponMarketItem.HasComponent<EffectComponent>();
 
         private static bool IsStreamOnCooldown(Entity weapon, MatchPlayer victim, MatchPlayer damager, HitTarget hitTarget)
         {
@@ -279,45 +361,6 @@ namespace TXServer.Core.Battles
             return true;
         }
 
-        public static void IsisHeal(Entity weapon, MatchPlayer target, MatchPlayer healer, HitTarget hitTarget)
-        {
-            if(IsStreamOnCooldown(weapon, target, healer, hitTarget)) return;
-
-            bool healed = false;
-            target.Tank.ChangeComponent<TemperatureComponent>(component =>
-            {
-                if (component.Temperature.CompareTo(0) < 0)
-                    component.Temperature = 0;
-                else if (component.Temperature > 0)
-                    component.Temperature -= 2;
-                else if (component.Temperature < 0)
-                    component.Temperature += 2;
-            });
-
-            target.Tank.ChangeComponent<HealthComponent>(component =>
-            {
-                // todo: fix overpowered healing (doesn't seem to be correct)
-                int healingPerSecond = 415;
-                if (component.CurrentHealth != component.MaxHealth)
-                {
-                    healed = true;
-                    if (component.MaxHealth - component.CurrentHealth > healingPerSecond)
-                        component.CurrentHealth += healingPerSecond;
-                    else
-                        component.CurrentHealth = component.MaxHealth;
-                }
-            });
-
-            if (healed)
-            {
-                target.Player.BattlePlayer.MatchPlayer.HealthChanged();
-                healer.Battle.Spectators.Concat(new[] {(IPlayerPart) healer})
-                    .SendEvent(new DamageInfoEvent(415, hitTarget.LocalHitPoint, false, true), target.Tank);
-                healer.SendEvent(new VisualScoreHealEvent(healer.GetScoreWithPremium(4)), healer.BattleUser);
-                healer.UpdateStatistics(additiveScore: 4, 0, 0, 0, null);
-            }
-        }
-
         private static void ProcessKill(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer killer, HitTarget hitTarget, float damage)
         {
             victim.TankState = TankState.Dead;
@@ -364,27 +407,6 @@ namespace TXServer.Core.Battles
             victim.DamageAssistants.Clear();
         }
 
-        private static float GetSplashDamageMultiplier(Entity weapon, Entity weaponMarketItem, float distance,
-            MatchPlayer victim, MatchPlayer damager)
-        {
-            if (IsModule(weaponMarketItem)) return 1;
-
-            var damageComponent = damager.Weapon.GetComponent<SplashWeaponComponent>();
-
-            float radiusOfMaxSplashDamage = damageComponent.RadiusOfMaxSplashDamage;
-            float radiusOfMinSplashDamage = damageComponent.RadiusOfMinSplashDamage;
-            float minSplashDamagePercent = damageComponent.MinSplashDamagePercent;
-
-            if (distance < radiusOfMaxSplashDamage)
-                return 1;
-
-            if (distance > radiusOfMinSplashDamage)
-                return 0;
-
-
-            return 0.01f * (minSplashDamagePercent + (radiusOfMinSplashDamage - distance) * (100f - minSplashDamagePercent) / (radiusOfMinSplashDamage - radiusOfMaxSplashDamage));
-        }
-
         public static void ProcessKillStreak(int additiveKills, bool died, MatchPlayer victim, MatchPlayer killer)
         {
             if (additiveKills > 0)
@@ -416,9 +438,6 @@ namespace TXServer.Core.Battles
             }
 
         }
-
-        private static bool IsModule(Entity weaponMarketItem) =>
-            Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem);
 
         public static Entity WeaponToModuleMarketItem(Entity weapon, Player player) =>
             player.BattlePlayer.MatchPlayer.Modules.SingleOrDefault(m => m.EffectEntity == weapon)?.MarketItem;

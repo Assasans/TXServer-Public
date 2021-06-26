@@ -62,9 +62,9 @@ namespace TXServer.ECSSystem.GlobalEntities
             public Entity Externalimpact { get; } = new Entity(1032613237, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/externalimpact"),
                 new ParentGroupComponent(Modules.GlobalItems.Externalimpact),
                 new MarketItemGroupComponent(1032613237));
-            /*public Entity Firering { get; } = new Entity(-627265270, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/firering"),
+            public Entity Firering { get; } = new Entity(-627265270, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/firering"),
                 new ParentGroupComponent(Modules.GlobalItems.Firering),
-                new MarketItemGroupComponent(-627265270));*/
+                new MarketItemGroupComponent(-627265270));
             public Entity Forcefield { get; } = new Entity(2100727840, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/forcefield"),
                 new ParentGroupComponent(Modules.GlobalItems.Forcefield),
                 new MarketItemGroupComponent(2100727840));
