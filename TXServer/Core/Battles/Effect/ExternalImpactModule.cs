@@ -23,7 +23,7 @@ namespace TXServer.Core.Battles.Effect
                 MatchPlayer);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
-            Schedule(TimeSpan.FromMilliseconds(Duration), Deactivate);
+            Schedule(TimeSpan.FromMilliseconds(3000), Deactivate);
         }
 
         public override void Deactivate()

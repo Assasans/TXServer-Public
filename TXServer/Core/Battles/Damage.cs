@@ -216,9 +216,9 @@ namespace TXServer.Core.Battles
         private static float GetSplashDamageMultiplier(Entity weapon, Entity weaponMarketItem, float distance,
             MatchPlayer victim, MatchPlayer damager)
         {
-            if (IsModule(weaponMarketItem)) return 1;
+            if (IsModule(weapon) || IsModule(weaponMarketItem)) return 1;
 
-            var damageComponent = damager.Weapon.GetComponent<SplashWeaponComponent>();
+            SplashWeaponComponent damageComponent = damager.Weapon.GetComponent<SplashWeaponComponent>();
 
             float radiusOfMaxSplashDamage = damageComponent.RadiusOfMaxSplashDamage;
             float radiusOfMinSplashDamage = damageComponent.RadiusOfMinSplashDamage;
