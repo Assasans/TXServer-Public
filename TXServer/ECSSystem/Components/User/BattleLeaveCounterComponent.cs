@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using TXServer.Core.Protocol;
+﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Components.User

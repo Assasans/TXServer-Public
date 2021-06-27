@@ -12,20 +12,30 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
     [SerialVersionUID(1486709084156L)]
     public class MineEffectTemplate : EffectBaseTemplate
     {
-        private static readonly string _configPath = "/battle/effect/mine";
+        public static Entity CreateEntity(MatchPlayer matchPlayer, long activationTime, float beginHideDistance,
+            float damageMaxRadius, float damageMinRadius, float damageMinPercent, float hideRange, float impact)
+        {
+            Entity effect = CreateEntity(new MineEffectTemplate(), "/battle/effect/mine", matchPlayer, addTeam:true);
+            effect.Components.UnionWith(new Component[]
+            {
+                new EffectActiveComponent(),
 
-        public static Entity CreateEntity(MatchPlayer matchPlayer, long activationTime, float beginHideDistance, float hideRange, float impact) {
-            Entity effect = CreateEntity(new MineEffectTemplate(), _configPath, matchPlayer, addTeam:true);
-            effect.AddComponent(matchPlayer.Player.User.GetComponent<UserGroupComponent>());
+                new MineConfigComponent(activationTime: activationTime,
+                    beginHideDistance: beginHideDistance, hideRange: hideRange, impact: impact),
+                new MinePositionComponent(matchPlayer.TankPosition),
+                new MineEffectTriggeringAreaComponent(),
 
-            effect.AddComponent(new EffectActiveComponent());
-            effect.AddComponent(new MineConfigComponent(activationTime: activationTime,
-                beginHideDistance: beginHideDistance, hideRange: hideRange, impact: impact));
-            effect.AddComponent(new MinePositionComponent(matchPlayer.TankPosition));
-            effect.AddComponent(new MineEffectTriggeringAreaComponent());
+                new SplashWeaponComponent(damageMinPercent,  damageMaxRadius, damageMinRadius),
+                new SplashEffectComponent(matchPlayer.Battle.Params.FriendlyFire),
+                new SplashImpactComponent(impact),
 
-            effect.AddComponent(matchPlayer.Battle.BattleEntity.GetComponent<BattleGroupComponent>());
-            effect.AddComponent(new SplashWeaponComponent(40f, 0f, 15f));
+                new DamageWeakeningByDistanceComponent(damageMinPercent, damageMaxRadius, damageMinRadius),
+                new DiscreteWeaponComponent(),
+
+                matchPlayer.Battle.BattleEntity.GetComponent<BattleGroupComponent>(),
+                matchPlayer.Player.User.GetComponent<UserGroupComponent>()
+            });
+
             return effect;
         }
     }

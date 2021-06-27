@@ -349,15 +349,10 @@ namespace TXServer.Core
 
             MatchPlayer matchPlayer = BattlePlayer?.MatchPlayer;
 
-            long totalExperience = User.GetComponent<UserExperienceComponent>().Experience;
+            long totalExperience = Data.Experience;
             if (IsInMatch && matchPlayer != null)
-            {
-                int battleExperience = matchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
-                if (IsPremium)
-                    totalExperience += battleExperience * 2;
-                else
-                    totalExperience += battleExperience;
-            }
+                totalExperience += BattlePlayer.MatchPlayer.GetScoreWithPremium(matchPlayer.RoundUser
+                    .GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses);
 
             int correctRank = experienceForRank.IndexOf(experienceForRank.LastOrDefault(x => x <= totalExperience)) + 1;
 

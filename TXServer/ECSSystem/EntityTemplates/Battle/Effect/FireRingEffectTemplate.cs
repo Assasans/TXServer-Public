@@ -14,17 +14,19 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
             MatchPlayer matchPlayer)
         {
             Entity effect = CreateEntity(new FireRingEffectTemplate(), "/battle/effect/firering", matchPlayer, addTeam:true);
+            effect.Components.UnionWith(new Component[]
+            {
+                new SplashEffectComponent(friendlyFire),
+                new SplashWeaponComponent(damageMinPercent, 0, splashRadius),
+                new SplashImpactComponent(impact),
 
-            effect.AddComponent(new SplashEffectComponent(friendlyFire));
-            effect.AddComponent(new SplashWeaponComponent(damageMinPercent, 0, splashRadius));
-            effect.AddComponent(new SplashImpactComponent(impact));
+                new DamageWeakeningByDistanceComponent(damageMinPercent, 0, splashRadius),
+                new DiscreteWeaponComponent(),
 
-            effect.AddComponent(new DamageWeakeningByDistanceComponent(damageMinPercent, 0, splashRadius));
-            effect.AddComponent(new DiscreteWeaponComponent());
+                matchPlayer.Battle.BattleEntity.GetComponent<BattleGroupComponent>(),
 
-            effect.AddComponent(matchPlayer.Battle.BattleEntity.GetComponent<BattleGroupComponent>());
-            effect.AddComponent(new FireRingEffectComponent());
-
+                new FireRingEffectComponent()
+            });
             return effect;
         }
     }

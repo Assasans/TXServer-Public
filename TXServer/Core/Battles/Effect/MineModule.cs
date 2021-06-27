@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
@@ -21,7 +22,9 @@ namespace TXServer.Core.Battles.Effect
         public override void Activate() {
 
             Entity mine = MineEffectTemplate.CreateEntity(MatchPlayer, activationTime: ActivationTime,
-                beginHideDistance: BeginHideDistance, hideRange: HideRange, impact: Impact);
+                beginHideDistance: BeginHideDistance, damageMaxRadius: DamageMaxRadius,
+                damageMinRadius: DamageMinRadius, damageMinPercent: DamageMinPercent, hideRange: HideRange,
+                impact: Impact);
             EffectEntities.Add(mine);
             Positions.Add(mine, mine.GetComponent<MinePositionComponent>().Position);
 
@@ -44,6 +47,15 @@ namespace TXServer.Core.Battles.Effect
                 .UpgradeLevel2Values[Level - 1];
             BeginHideDistance = Config.GetComponent<ModuleMineEffectBeginHideDistancePropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
+            DamageMaxRadius = Config
+                .GetComponent<ModuleMineEffectSplashDamageMaxRadiusPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level - 1];
+            DamageMinRadius = Config
+                .GetComponent<ModuleMineEffectSplashDamageMinRadiusPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level - 1];
+            DamageMinPercent = Config
+                .GetComponent<ModuleMineEffectSplashDamageMinPercentPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level - 1];
             ExplosionDelayMs = Config.GetComponent<ModuleMineEffectExplosionDelayMSPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level - 1];
             HideRange = Config.GetComponent<ModuleMineEffectHideRangePropertyComponent>(ConfigPath)
@@ -55,19 +67,17 @@ namespace TXServer.Core.Battles.Effect
         }
 
 
-        private void Explode(Entity mine)
+        public void Explode(Entity mine)
         {
-            Positions.Remove(mine);
-            MatchPlayer.Battle.JoinedTankPlayers.SendEvent(new MineTryExplosionEvent(), mine);
-            MatchPlayer.Battle.JoinedTankPlayers.SendEvent(new MineExplosionEvent(), mine);
-            MatchPlayer.Battle.JoinedTankPlayers.UnshareEntities(mine);
+            MatchPlayer.Battle.PlayersInMap.SendEvent(new MineExplosionEvent(), mine);
+            MatchPlayer.Battle.PlayersInMap.UnshareEntities(mine);
+            EffectEntities.Remove(mine);
         }
 
-        private void RemoveMine(Entity mine)
+        private void TryExplode(Entity mine)
         {
             Positions.Remove(mine);
-            EffectEntities.Remove(mine);
-            MatchPlayer.Battle.JoinedTankPlayers.UnshareEntities(mine);
+            MatchPlayer.Battle.PlayersInMap.SendEvent(new MineTryExplosionEvent(), mine);
         }
 
         protected override void Tick()
@@ -75,11 +85,11 @@ namespace TXServer.Core.Battles.Effect
             base.Tick();
 
             foreach ((Entity mine, Vector3 position) in Positions)
-            foreach (BattleTankPlayer player in MatchPlayer.Battle.JoinedTankPlayers)
+            foreach (BattleTankPlayer player in MatchPlayer.Battle.MatchTankPlayers)
             {
                 if (!MatchPlayer.IsEnemyOf(player.MatchPlayer)) return;
-                if (Vector3.Distance(player.MatchPlayer.TankPosition, position) < 2.1)
-                    Explode(mine);
+                if (Vector3.Distance(player.MatchPlayer.TankPosition, position) < TriggeringArea + 1.7)
+                    TryExplode(mine);
             }
         }
 
@@ -87,6 +97,9 @@ namespace TXServer.Core.Battles.Effect
 
         private long ActivationTime { get; set; }
         private float BeginHideDistance { get; set; }
+        private float DamageMaxRadius { get; set; }
+        private float DamageMinRadius { get; set; }
+        private float DamageMinPercent { get; set; }
         private float ExplosionDelayMs { get; set; }
         private float HideRange { get; set; }
         private float Impact { get; set; }

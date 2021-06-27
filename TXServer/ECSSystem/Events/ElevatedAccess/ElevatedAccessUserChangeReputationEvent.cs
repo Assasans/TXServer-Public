@@ -1,7 +1,6 @@
 ﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
 
 namespace TXServer.ECSSystem.Events.ElevatedAccess
 {
@@ -12,7 +11,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 		{
             if (!player.Data.Admin) return;
 
-			player.Data.SetReputation(player.Data.Reputation + Count);
+			player.Data.Reputation = Count;
 		}
 		public int Count { get; set; }
 	}

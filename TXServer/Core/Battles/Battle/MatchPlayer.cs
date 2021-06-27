@@ -41,6 +41,8 @@ namespace TXServer.Core.Battles
             Modules = new List<BattleModule>();
             Incarnation = TankIncarnationTemplate.CreateEntity(Tank);
             RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, Tank);
+
+            PersonalBattleResult = new PersonalBattleResultForClient(Player);
             UserResult = new UserResult(battlePlayer, userResults);
 
             if (Battle.ModeHandler is TeamBattleHandler handler)
@@ -86,11 +88,7 @@ namespace TXServer.Core.Battles
             if (Battle.IsMatchMaking) Player.CheckRankUp();
         }
 
-        public int GetScoreWithPremium(int score)
-        {
-            if (Player.IsPremium) return score * 2;
-            return score;
-        }
+        public int GetScoreWithPremium(int score) => Player.IsPremium ? score * 2 : score;
 
         public void HealthChanged()
         {
@@ -297,6 +295,7 @@ namespace TXServer.Core.Battles
         public Entity Shell { get; }
         public List<BattleModule> Modules { get; }
 
+        public PersonalBattleResultForClient PersonalBattleResult { get; }
         public UserResult UserResult { get; }
 
         public long CollisionsPhase { get; set; } = -1;

@@ -73,6 +73,8 @@ namespace TXServer.Core.Battles
             if (victim.TryGetModule(out InvulnerabilityModule module)) if (module.EffectIsActive) return;
             if (victim.TryGetModule(out EmergencyProtectionModule epModule)) if (epModule.EffectIsActive) return;
 
+            damager.UserResult.Damage += (int) damage;
+
             // todo: set this correctly when back hits are detected
             const bool backHit = false;
             if (backHit && victim.TryGetModule(out BackhitDefenceModule backhitDefModule) &&
@@ -149,6 +151,12 @@ namespace TXServer.Core.Battles
             if (!IsModule(weaponMarketItem) && !IsModule(weapon) &&
                 IsStreamOnCooldown(weapon, victim, damager, hitTarget)) return;
 
+            if (weapon.TemplateAccessor.Template is MineEffectTemplate)
+            {
+                damager.TryGetModule(out MineModule mineModule);
+                mineModule.Explode(weapon);
+            }
+
             if (weapon.TemplateAccessor.Template is KamikadzeEffectTemplate)
             {
                 damager.TryGetModule(out KamikadzeModule kamikadzeModule);
@@ -162,9 +170,9 @@ namespace TXServer.Core.Battles
             float damageMultiplier = GetSplashDamageMultiplier(weapon, weaponMarketItem, distance, victim, damager);
             int splashDamage = (int) Math.Round(damage * damageMultiplier);
 
-            TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
+            /*TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
                 $"[Damage] Random damage: {damage} | Splash multiplier: {damageMultiplier} | Calculated damage: {splashDamage}",
-                victim.Battle.GeneralBattleChatEntity, damager.Player);
+                victim.Battle.GeneralBattleChatEntity, damager.Player);*/
 
             DealDamage(weaponMarketItem, victim, damager, hitTarget, splashDamage);
         }
@@ -400,8 +408,6 @@ namespace TXServer.Core.Battles
             victim.UpdateStatistics(0, 0, 0, 1, killer);
 
             if (battle.ModeHandler is TDMHandler) battle.UpdateScore(killer.Player.BattlePlayer.Team);
-
-            killer.UserResult.Damage += (int) damage;
 
             ProcessKillAssists(victim, killer);
 

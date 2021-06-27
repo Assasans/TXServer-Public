@@ -19,11 +19,27 @@ namespace TXServer.Core
         protected PlayerData Original { get; set; }
         public Player Player { get; set; }
 
+        public string Username
+        {
+            get => _username;
+            set
+            {
+                _username = value;
+
+                if (Player?.User is null) return;
+                Player.User.ChangeComponent(new UserUidComponent(value));
+                if (Server.DatabaseNetwork.IsReady)
+                    Server.DatabaseNetwork.Socket.emit(new SetUsername
+                    {
+                        uid = UniqueId, username = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(value)
+                    });
+            }
+        }
         public long UniqueId { get; }
         public string Email { get; protected set; }
         protected bool EmailVerified { get; set; }
         public bool Subscribed { get; protected set; }
-        public string Username { get; set; }
+
         public string HashedPassword { get; set; }
         public string HardwareId { get; set; }
         public string AutoLoginToken { get; protected set; }
@@ -42,7 +58,18 @@ namespace TXServer.Core
         public int GoldBoxes { get; set; } = 5;
 
         public Entity League { get; protected set; }
-        public long Reputation { get; protected set; }
+        public int Reputation
+        {
+            get => _reputation;
+            set
+            {
+                _reputation = value;
+
+                if (Player?.User is null) return;
+                Player.User.ChangeComponent<UserReputationComponent>(component => component.Reputation = value);
+                SetLeague(value);
+            }
+        }
 
         public DateTime PremiumExpirationDate { get; protected set; }
 
@@ -65,6 +92,20 @@ namespace TXServer.Core
         public PlayerData(long uniqueId)
             => UniqueId = uniqueId;
 
+        private void SetLeague(int reputation)
+        {
+            League = reputation switch
+            {
+                <= 139 => Leagues.GlobalItems.Training,
+                >= 140 and <= 999 => Leagues.GlobalItems.Bronze,
+                >= 1000 and <= 2999 => Leagues.GlobalItems.Silver,
+                >= 3000 and <= 4499 => Leagues.GlobalItems.Gold,
+                >= 4500 => Leagues.GlobalItems.Master
+            };
+            Player.User.TryRemoveComponent<LeagueGroupComponent>();
+            Player.User.AddComponent(League.GetComponent<LeagueGroupComponent>());
+        }
+
         public ConfirmedUserEmailComponent SetEmail(string email)
         {
             ConfirmedUserEmailComponent component = SetValue<ConfirmedUserEmailComponent>(email);
@@ -82,17 +123,6 @@ namespace TXServer.Core
             if (Server.DatabaseNetwork.IsReady)
                 Server.DatabaseNetwork.Socket.emit(new SetSubscribed { uid = UniqueId, state = subscribed });
             return component;
-        }
-
-        public void SetUsername(string username)
-        {
-            Username = username;
-            Player.User.ChangeComponent(new UserUidComponent(username));
-            if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetUsername
-                {
-                    uid = UniqueId, username = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(username)
-                });
         }
 
         public void SetHashedPassword(string hashedPassword)
@@ -169,11 +199,6 @@ namespace TXServer.Core
             goldBonus.ChangeComponent<UserItemCounterComponent>(component => component.Count = value);
         }
 
-        public void SetReputation(long value)
-        {
-            Reputation = value;
-            Player.User.ChangeComponent(new UserReputationComponent(value));
-        }
         public void SetAutoLogin(bool value)
         {
             RememberMe = value;
@@ -314,5 +339,9 @@ namespace TXServer.Core
 
             return clone;
         }
+
+
+        private string _username;
+        private int _reputation;
     }
 }

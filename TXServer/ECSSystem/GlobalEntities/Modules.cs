@@ -156,13 +156,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(0),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
                 new ModuleCardsCompositionComponent());
-            /*public Entity Mine { get; } = new Entity(1133911248, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/1/mine"),
+            public Entity Mine { get; } = new Entity(1133911248, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/1/mine"),
                 new ParentGroupComponent(1133911248),
                 new MarketItemGroupComponent(1133911248),
                 new ModuleTankPartComponent(TankPartModuleType.WEAPON),
                 new ModuleTierComponent(0),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
-                new ModuleCardsCompositionComponent());*/
+                new ModuleCardsCompositionComponent());
             public Entity Sonar { get; } = new Entity(-1318192334, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/weapon/active/1/sonar"),
                 new ParentGroupComponent(-1318192334),
                 new MarketItemGroupComponent(-1318192334),
@@ -286,6 +286,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             [GlobalItems.Jumpimpact] = typeof(JumpImpactModule),
             [GlobalItems.Kamikadze] = typeof(KamikadzeModule),
             [GlobalItems.Lifesteal] = typeof(LifeStealModule),
+            [GlobalItems.Mine] = typeof(MineModule),
             [GlobalItems.Rage] = typeof(RageModule),
             [GlobalItems.Repairkit] = typeof(RepairKitModule),
             [GlobalItems.Sapper] = typeof(SapperModule),

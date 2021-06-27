@@ -237,17 +237,13 @@ namespace TXServer.Core.Battles
                 battlePlayer.MatchPlayer.KeepDisabled = true;
                 battlePlayer.MatchPlayer.DisableTank();
 
-                PersonalBattleResultForClient personalResult = new(battlePlayer.Player, ModeHandler.TeamBattleResultFor(battlePlayer));
-                BattleResultForClient battleResultForClient = new(this, ModeHandler, personalResult);
+                battlePlayer.MatchPlayer.PersonalBattleResult.FinalizeResult();
+                BattleResultForClient battleResultForClient = new(this, ModeHandler, battlePlayer.MatchPlayer.PersonalBattleResult);
                 battlePlayer.SendEvent(new BattleResultForClientEvent(battleResultForClient), battlePlayer.Player.User);
 
-                battlePlayer.MatchPlayer.UserResult.ScoreWithoutPremium = battlePlayer.MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
                 battlePlayer.Player.User.ChangeComponent<UserExperienceComponent>(component =>
-                    component.Experience += battlePlayer.MatchPlayer.UserResult.ScoreWithoutPremium - battlePlayer.MatchPlayer.AlreadyAddedExperience);
-
-                if (JoinedTankPlayers.Count() <= 3 ||
-                    ModeHandler is TeamBattleHandler tbHandler && Math.Abs(tbHandler.RedTeamPlayers.Count - tbHandler.BlueTeamPlayers.Count) >= 2)
-                    battlePlayer.MatchPlayer.UserResult.UnfairMatching = true;
+                    component.Experience += battlePlayer.MatchPlayer.UserResult.ScoreWithoutPremium -
+                                            battlePlayer.MatchPlayer.AlreadyAddedExperience);
             }
 
             foreach (Player player in WaitingGoldBoxSenders.ToList())
@@ -331,6 +327,8 @@ namespace TXServer.Core.Battles
 
             // Add other players' entities
             battlePlayer.ShareEntities(MatchTankPlayers.Where(x => x != battlePlayer).SelectMany(x => x.MatchPlayer.GetEntities()));
+
+
         }
 
         private void RemoveMatchPlayer(BaseBattlePlayer baseBattlePlayer)

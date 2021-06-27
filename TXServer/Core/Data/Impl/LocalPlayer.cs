@@ -28,7 +28,7 @@ namespace TXServer.Core.Data.Database.Impl
                 Crystals = 1000000;
                 XCrystals = 50000;
                 Experience = 0;
-                Reputation = 0;
+                Reputation = 100;
                 League = Leagues.GlobalItems.Training;
                 PremiumExpirationDate = DateTime.MinValue;
 

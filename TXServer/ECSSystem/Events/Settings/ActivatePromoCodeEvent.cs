@@ -34,7 +34,7 @@ namespace TXServer.ECSSystem.Events.Settings
                         break;
                     case { } s when s.StartsWith("r"):
                         if (int.TryParse(Code[1..], out int number))
-                            player.Data.SetReputation(player.Data.Reputation + number);
+                            player.Data.Reputation += number;
                         break;
                     case { } s when s.StartsWith("xp"):
                         if (int.TryParse(Code.Substring(2, Code.Length - 2), out int i))

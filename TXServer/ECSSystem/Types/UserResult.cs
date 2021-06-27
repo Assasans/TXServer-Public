@@ -4,7 +4,7 @@ using System.Linq;
 using TXServer.Core.Battles;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.GlobalEntities;
+using TXServer.ECSSystem.Components.Battle.Round;
 
 namespace TXServer.ECSSystem.Types
 {
@@ -12,57 +12,66 @@ namespace TXServer.ECSSystem.Types
     {
         public UserResult(BattleTankPlayer battlePlayer, IEnumerable<UserResult> userResults)
         {
-            BattlePlayer = battlePlayer;
-            UserResults = userResults;
+            _battlePlayer = battlePlayer;
+            _userResults = userResults;
 
-            Entity user = BattlePlayer.User;
-            UserId = user.EntityId;
-            Uid = user.GetComponent<UserUidComponent>().Uid;
-            Rank = user.GetComponent<UserRankComponent>().Rank;
-            AvatarId = user.GetComponent<UserAvatarComponent>().Id;
             EnterTime = DateTime.UtcNow.Ticks;
-            foreach (Entity module in battlePlayer.Player.CurrentPreset.Modules.Values)
-            {
-                if (module != null)
-                    Modules.Add(new ModuleInfo(module.GetComponent<MarketItemGroupComponent>().Key, module.GetComponent<ModuleUpgradeLevelComponent>().Level));
-            }
-            League = Leagues.GlobalItems.Silver;
+
+            foreach (Entity module in battlePlayer.Player.CurrentPreset.Modules.Values.Where(module => module != null))
+                Modules.Add(new ModuleInfo(module.GetComponent<MarketItemGroupComponent>().Key,
+                    module.GetComponent<ModuleUpgradeLevelComponent>().Level));
+
         }
 
-        private readonly IEnumerable<UserResult> UserResults;
-        private readonly BattleTankPlayer BattlePlayer;
+        private readonly IEnumerable<UserResult> _userResults;
+        private readonly BattleTankPlayer _battlePlayer;
 
-        public long UserId { get; set; }
-        public string Uid { get; set; }
-        public int Rank { get; set; }
-        public string AvatarId { get; set; }
-        public long BattleUserId => BattlePlayer.MatchPlayer.BattleUser.EntityId;
-        public double ReputationInBattle { get; set; } = 0;
+        public long UserId => _battlePlayer.User.EntityId;
+        public string Uid => _battlePlayer.User.GetComponent<UserUidComponent>().Uid;
+        public int Rank => _battlePlayer.User.GetComponent<UserRankComponent>().Rank;
+        public string AvatarId => _battlePlayer.User.GetComponent<UserAvatarComponent>().Id;
+        public long BattleUserId => _battlePlayer.MatchPlayer.BattleUser.EntityId;
+        public double ReputationInBattle => _battlePlayer.Player.Data.Reputation;
+
         public long EnterTime { get; set; }
-        public int Place => UserResults.OrderBy(x => x.ScoreWithoutPremium).ToList().IndexOf(this);
+
+        public int Place => _userResults.OrderBy(x => x.ScoreWithoutPremium).ToList().IndexOf(this);
         public int Kills { get; set; } = 0;
-        public int KillAssists { get; set; } = 0;
-        public int KillStrike { get; set; } = 0;
-        public int Deaths { get; set; } = 0;
-        public int Damage { get; set; } = 0;
-        public int Score { get; set; } = 0;
-        public int ScoreWithoutPremium { get; set; }
-        public int ScoreToExperience { get; set; } = 0;
-        public int RankExpDelta { get; set; } = 0;
+        public int KillAssists { get; set; }
+        public int KillStrike { get; set; }
+        public int Deaths { get; set; }
+        public int Damage { get; set; }
+
+        public int Score => _battlePlayer.MatchPlayer.GetScoreWithPremium(ScoreWithoutPremium);
+        public int ScoreWithoutPremium => _battlePlayer.MatchPlayer.RoundUser
+            .GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
+        public int ScoreToExperience => Score;
+
+        public int RankExpDelta => (int) _battlePlayer.Player.Data.Experience;
+
         public int ItemsExpDelta { get; set; } = 0;
-        public int Flags { get; set; } = 0;
-        public int FlagAssists { get; set; } = 0;
-        public int FlagReturns { get; set; } = 0;
-        public long WeaponId => BattlePlayer.Player.CurrentPreset.Weapon.GetComponent<MarketItemGroupComponent>().Key;
-        public long HullId => BattlePlayer.Player.CurrentPreset.Hull.GetComponent<MarketItemGroupComponent>().Key;
-        public long PaintId => BattlePlayer.Player.CurrentPreset.TankPaint.GetComponent<MarketItemGroupComponent>().Key;
-        public long CoatingId => BattlePlayer.Player.CurrentPreset.WeaponPaint.GetComponent<MarketItemGroupComponent>().Key;
-        public long HullSkinId => BattlePlayer.Player.CurrentPreset.HullSkins[BattlePlayer.Player.CurrentPreset.HullItem].GetComponent<MarketItemGroupComponent>().Key;
-        public long WeaponSkinId => BattlePlayer.Player.CurrentPreset.WeaponSkins[BattlePlayer.Player.CurrentPreset.WeaponItem].GetComponent<MarketItemGroupComponent>().Key;
-        public List<ModuleInfo> Modules { get; set; } = new List<ModuleInfo>() { };
+
+        public int Flags { get; set; }
+        public int FlagAssists { get; set; }
+        public int FlagReturns { get; set; }
+
+        public long WeaponId => _battlePlayer.Player.CurrentPreset.Weapon.GetComponent<MarketItemGroupComponent>().Key;
+        public long HullId => _battlePlayer.Player.CurrentPreset.Hull.GetComponent<MarketItemGroupComponent>().Key;
+        public long PaintId => _battlePlayer.Player.CurrentPreset.TankPaint.GetComponent<MarketItemGroupComponent>().Key;
+        public long CoatingId => _battlePlayer.Player.CurrentPreset.WeaponPaint.GetComponent<MarketItemGroupComponent>().Key;
+        public long HullSkinId => _battlePlayer.Player.CurrentPreset
+            .HullSkins[_battlePlayer.Player.CurrentPreset.HullItem].GetComponent<MarketItemGroupComponent>().Key;
+        public long WeaponSkinId => _battlePlayer.Player.CurrentPreset
+            .WeaponSkins[_battlePlayer.Player.CurrentPreset.WeaponItem].GetComponent<MarketItemGroupComponent>().Key;
+        public List<ModuleInfo> Modules { get; set; } = new();
+
         public int BonusesTaken { get; set; } = 0;
-        public bool UnfairMatching { get; set; }
+
+        public bool UnfairMatching => _battlePlayer.Battle.JoinedTankPlayers.Count() <= 3 ||
+                                      _battlePlayer.Battle.ModeHandler is Battle.TeamBattleHandler tbHandler &&
+                                      Math.Abs(tbHandler.RedTeamPlayers.Count - tbHandler.BlueTeamPlayers.Count) >= 2;
         public bool Deserted { get; set; }
-        public Entity League { get; set; }
+
+        public Entity League => _battlePlayer.Player.Data.League;
     }
 }

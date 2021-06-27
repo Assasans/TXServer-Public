@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Events.Settings
 		public void Execute(Player player, Entity entity)
 		{
 			player.Data.SetXCrystals(player.Data.XCrystals - Price);
-			player.Data.SetUsername(Uid);
+			player.Data.Username = Uid;
 			player.SendEvent(new CompleteBuyUIDChangeEvent(true), entity);
 
 			Entity notification = UIDChangedNotificationTemplate.CreateEntity(Uid, entity);
