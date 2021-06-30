@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -16,7 +17,14 @@ namespace TXServer.Core.Commands
             ComponentType = componentType ?? throw new ArgumentNullException(nameof(componentType));
         }
 
-        public void OnReceive(Player player) => Target.RemoveComponent(ComponentType, player);
+        public void OnReceive(Player player)
+        {
+            Component component = Target.Components.Single(c => c.GetType() == ComponentType);
+            ComponentType.GetMethod("OnRemove", new[] { typeof(Player), typeof(Entity) })
+                ?.Invoke(component, new object[] { player, Target });
+
+            Target.RemoveComponent(ComponentType, player);
+        }
 
         public override string ToString() => $"ComponentRemoveCommand [Entity: {Target}, Component: {ComponentType.Name}]";
     }

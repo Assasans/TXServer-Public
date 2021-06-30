@@ -367,7 +367,8 @@ namespace TXServer.Core.Battles
         }
         private float _moduleCooldownSpeedCoeff = 1;
 
-        public Dictionary<BattleTankPlayer, TankDamageCooldown> DamageCooldowns { get; } = new();
+        public Dictionary<MatchPlayer, DateTimeOffset> HitCooldownTimers { get; } = new();
+        public Dictionary<MatchPlayer, (double, DateTimeOffset)> StreamHitLengths { get; } = new();
 
         public bool Paused { get; set; }
         public DateTime? IdleKickTime { get; set; }
@@ -380,13 +381,5 @@ namespace TXServer.Core.Battles
         public TeleportPoint LastTeleportPoint { get; private set; }
         public TeleportPoint NextTeleportPoint { get; set; }
         private readonly IList<SpawnPoint> _spawnCoordinates;
-    }
-
-    public class TankDamageCooldown
-    {
-        public DateTimeOffset LastDamageTime { get; set; }
-        public TimeSpan DamageTime { get; set; }
-
-        public TimeSpan DifferenceToLastShot => LastDamageTime == default ? default : DateTimeOffset.UtcNow - LastDamageTime;
     }
 }

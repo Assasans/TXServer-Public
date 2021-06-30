@@ -10,6 +10,9 @@ namespace TXServer.ECSSystem.Components.Battle.Weapon
         public void OnAttached(Player player, Entity battleUser) =>
             player.BattlePlayer.MatchPlayer.TryDeactivateInvisibility();
 
+        public void OnRemove(Player player, Entity battleUser) =>
+            player.BattlePlayer.MatchPlayer.StreamHitLengths.Clear();
+
         public int Time { get; set; }
 	}
 }

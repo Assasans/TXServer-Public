@@ -7,7 +7,7 @@ namespace TXServer.ECSSystem.Events.Battle
     [SerialVersionUID(1494934093730L)]
     public class DamageInfoEvent : ECSEvent
     {
-        public DamageInfoEvent(float damage, Vector3 hitPoint, bool backHit, bool healHit)
+        public DamageInfoEvent(float damage, Vector3 hitPoint, bool backHit = false, bool healHit = false)
         {
             Damage = damage;
             HitPoint = hitPoint;

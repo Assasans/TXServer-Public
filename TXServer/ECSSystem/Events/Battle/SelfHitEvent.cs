@@ -25,23 +25,9 @@ namespace TXServer.ECSSystem.Events.Battle
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
             foreach (HitTarget hitTarget in Targets)
             {
-                BattleTankPlayer victim = battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
+                MatchPlayer victim = battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity).MatchPlayer;
 
-                if (battle.Params.BattleMode != BattleMode.DM)
-                {
-                    if (victim.Player.User.GetComponent<TeamColorComponent>().TeamColor == player.User.GetComponent<TeamColorComponent>().TeamColor)
-                    {
-                        if (weapon.TemplateAccessor.Template.GetType() == typeof(IsisBattleItemTemplate))
-                        {
-                            Damage.IsisHeal(weapon, victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget);
-                            return;
-                        }
-                        if (!battle.Params.FriendlyFire)
-                            return;
-                    }
-                }
-
-                victim.MatchPlayer.Tank.ChangeComponent<TemperatureComponent>(component =>
+                victim.Tank.ChangeComponent<TemperatureComponent>(component =>
                 {
                     component.Temperature += weapon.TemplateAccessor.Template switch
                     {
@@ -51,8 +37,7 @@ namespace TXServer.ECSSystem.Events.Battle
                     };
                 });
 
-                Entity weaponMarketItem = Damage.WeaponToModuleMarketItem(weapon, player) ?? player.CurrentPreset.Weapon;
-                Damage.DealNormalDamage(weapon, weaponMarketItem, victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget);
+                Damage.HandleHit(weapon, victim, player.BattlePlayer.MatchPlayer, hitTarget);
             }
         }
 

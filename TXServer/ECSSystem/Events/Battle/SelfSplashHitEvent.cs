@@ -17,32 +17,31 @@ namespace TXServer.ECSSystem.Events.Battle
 		{
             SelfEvent.Execute(this, player, weapon);
 
-            Entity weaponMarketItem = Damage.WeaponToModuleMarketItem(weapon, player) ?? player.CurrentPreset.Weapon;
             BattleTankPlayer battlePlayer = player.BattlePlayer;
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
 
-            if (!Damage.IsModule(weaponMarketItem) && player.BattlePlayer.MatchPlayer.TankState == TankState.Dead)
-                return;
+            //if (!Damage.IsModule(weaponMarketItem) && player.BattlePlayer.MatchPlayer.TankState == TankState.Dead)
+                //return;
 
 			foreach (HitTarget hitTarget in Targets)
 			{
-				BattleTankPlayer victim = battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity);
+				MatchPlayer victim = battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity).MatchPlayer;
 
-				if (player.BattlePlayer.Battle.Params.BattleMode != BattleMode.DM &&
-				    victim.Team == player.BattlePlayer.Team && !battle.Params.FriendlyFire)
-					return;
+				//if (player.BattlePlayer.Battle.Params.BattleMode != BattleMode.DM &&
+				    //victim.Team == player.BattlePlayer.Team && !battle.Params.FriendlyFire)
+					//return;
 
-				Damage.DealNormalDamage(weapon, weaponMarketItem, victim.MatchPlayer, battlePlayer.MatchPlayer, hitTarget);
+				Damage.HandleHit(weapon, victim, player.BattlePlayer.MatchPlayer, hitTarget);
 			}
 
             foreach (HitTarget splashTarget in SplashTargets)
 			{
-                BattleTankPlayer hitPlayer = battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == splashTarget.IncarnationEntity);
+                MatchPlayer target = battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == splashTarget.IncarnationEntity).MatchPlayer;
 
-                if (player.BattlePlayer.Battle.Params.BattleMode != BattleMode.DM &&
-                    hitPlayer.Team.EntityId == player.BattlePlayer.Team.EntityId && hitPlayer != player.BattlePlayer &&
-                    !battle.Params.FriendlyFire)
-					continue;
+                //if (player.BattlePlayer.Battle.Params.BattleMode != BattleMode.DM &&
+                    //hitPlayer.Team.EntityId == player.BattlePlayer.Team.EntityId && hitPlayer != player.BattlePlayer &&
+                    //!battle.Params.FriendlyFire)
+					//continue;
 
                 if (weapon.TemplateAccessor.Template.GetType() == typeof(SpiderEffectTemplate))
                 {
@@ -52,7 +51,7 @@ namespace TXServer.ECSSystem.Events.Battle
                     spiderMineModule?.Explode();
                 }
 
-                Damage.DealSplashDamage(weapon, weaponMarketItem, hitPlayer.MatchPlayer, battlePlayer.MatchPlayer, splashTarget);
+                Damage.HandleHit(weapon, target, player.BattlePlayer.MatchPlayer, splashTarget);
 			}
 		}
 

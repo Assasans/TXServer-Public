@@ -44,7 +44,7 @@ namespace TXServer.Core.Battles.Effect
             if (DateTimeOffset.UtcNow >= ImmunityEndTime)
             {
                 float healHp = FixedHp + AdditiveHpFactor * MatchPlayer.Tank.GetComponent<HealthComponent>().MaxHealth;
-                Damage.ApplySelfHeal(healHp, MatchPlayer);
+                Damage.DealHeal(healHp, MatchPlayer);
             }
 
             MatchPlayer.Weapon.AddComponent(new ShootableComponent());

@@ -67,7 +67,7 @@ namespace TXServer.Core.Battles.Effect
                     ? healthComponent.MaxHealth - healthComponent.CurrentHealth
                     : TickPeriod * HpPerMs;
 
-                Damage.ApplySelfHeal(healHp, MatchPlayer);
+                Damage.DealHeal(healHp, MatchPlayer);
             }
         }
 

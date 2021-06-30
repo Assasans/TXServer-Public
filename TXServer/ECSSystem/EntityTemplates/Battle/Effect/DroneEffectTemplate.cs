@@ -36,8 +36,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
                 matchPlayer.Player.User.GetComponent<UserGroupComponent>(),
             });
 
-            DroneMoveConfigComponent e = effect.GetComponent<DroneMoveConfigComponent>();
-
             return effect;
         }
     }
