@@ -11,7 +11,8 @@ namespace TXServer.Library
 
             double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
 
-            return mean + deviation * randStdNormal;
+            // Source: https://stackoverflow.com/a/1303406
+            return mean + deviation / 3 * randStdNormal;
         }
 
         public static double NextGaussianRange(this Random random, double minValue, double maxValue)
