@@ -1,7 +1,11 @@
-﻿using TXServer.Core;
+﻿using System;
+using TXServer.Core;
+using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Battle.Round;
+using TXServer.ECSSystem.Components.User;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.ECSSystem.Types
@@ -12,7 +16,6 @@ namespace TXServer.ECSSystem.Types
         {
             _player = player;
 
-            _oldRankExp = _player.Data.Experience;
             PrevLeague = _player.Data.League;
             Reward = BattleRewards.GlobalItems.XCrystalBonus;
 			UserTeamColor = player.User.GetComponent<TeamColorComponent>().TeamColor;
@@ -21,19 +24,31 @@ namespace TXServer.ECSSystem.Types
         public void FinalizeResult()
         {
             TeamBattleResult = _player.BattlePlayer.Battle.ModeHandler.TeamBattleResultFor(_player.BattlePlayer);
-            League = _player.Data.League;
 
-            RankExp = (int) _player.Data.Experience;
-            RankExpDelta = (int) (RankExp - _oldRankExp);
+            if (MatchPlayer.Battle.IsMatchMaking)
+            {
+                // Rank
+                _player.Data.SetExperience(_player.Data.Experience +
+                                           MatchPlayer.GetScoreWithPremium(MatchPlayer.UserResult.ScoreWithoutPremium -
+                                                                           MatchPlayer.AlreadyAddedExperience));
+                RankExp = (int) _player.Data.Experience;
+                RankExpDelta = MatchPlayer.GetScoreWithPremium(
+                    MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses);
 
-            // todo: calculate earned reputation
-            Reputation = _player.Data.Reputation + (TeamBattleResult == TeamBattleResult.DEFEAT ? -11 : 11);
-            ReputationDelta = Reputation - _player.Data.Reputation;
-            _player.Data.Reputation = (int) Reputation;
+                // Reputation
+                // todo: calculate earned reputation
+                ReputationDelta = TeamBattleResult == TeamBattleResult.DEFEAT ? -15 : 25;
+                _player.Data.Reputation += (int) ReputationDelta;
+
+                // Container reward
+                ContainerScoreDelta = MatchPlayer.GetScoreWithPremium(
+                    MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses);
+                _player.Data.LeagueChestScore += ContainerScoreDelta;
+            }
         }
 
         private readonly Player _player;
-        private readonly long _oldRankExp;
+        private MatchPlayer MatchPlayer => _player.BattlePlayer.MatchPlayer;
 
 
         public TeamColor UserTeamColor { get; set; }
@@ -43,9 +58,10 @@ namespace TXServer.ECSSystem.Types
 		public int CrystalsForExtraEnergy { get; set; } = 0;
 		[OptionalMapped]
 		public EnergySource MaxEnergySource { get; set; } = EnergySource.MVP_BONUS;
+
         public int CurrentBattleSeries { get; set; }
-		public int MaxBattleSeries { get; set; } = 0;
-		public float ScoreBattleSeriesMultiplier { get; set; } = 0;
+		public int MaxBattleSeries { get; set; }
+		public float ScoreBattleSeriesMultiplier { get; set; }
 		public int RankExp { get; set; }
 		public int RankExpDelta { get; set; }
 		public int WeaponExp { get; set; } = 0;
@@ -57,16 +73,19 @@ namespace TXServer.ECSSystem.Types
 		public int TankInitExp { get; set; } = 0;
 		public int TankFinalExp { get; set; } = 0;
 		public int ItemsExpDelta { get; set; } = 0;
-		public int ContainerScore { get; set; } = 0;
-		public int ContainerScoreDelta { get; set; } = 0;
-		public int ContainerScoreLimit { get; set; } = 0;
+		public int ContainerScore => (int) _player.User.GetComponent<GameplayChestScoreComponent>().Current;
+		public int ContainerScoreDelta { get; set; }
+		public int ContainerScoreLimit => (int) _player.User.GetComponent<GameplayChestScoreComponent>().Limit;
         public Entity Container => _player.Data.League.GetComponent<ChestBattleRewardComponent>().Chest;
-		public float ContainerScoreMultiplier { get; set; } = 0;
-		public double Reputation { get; set; } = 0;
-		public double ReputationDelta { get; set; } = 0;
-		public Entity League { get; set; }
-		public Entity PrevLeague { get; set; }
+		public float ContainerScoreMultiplier { get; set; }
+
+        public double Reputation => _player.Data.Reputation;
+		public double ReputationDelta { get; set; }
+        public Entity League => _player.Data.League;
+        public Entity PrevLeague { get; set; }
+
 		public int LeaguePlace { get; set; } = 1;
+
 		[OptionalMapped]
 		public Entity Reward { get; set; }
 	}

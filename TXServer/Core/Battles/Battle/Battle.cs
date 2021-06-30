@@ -240,10 +240,6 @@ namespace TXServer.Core.Battles
                 battlePlayer.MatchPlayer.PersonalBattleResult.FinalizeResult();
                 BattleResultForClient battleResultForClient = new(this, ModeHandler, battlePlayer.MatchPlayer.PersonalBattleResult);
                 battlePlayer.SendEvent(new BattleResultForClientEvent(battleResultForClient), battlePlayer.Player.User);
-
-                battlePlayer.Player.User.ChangeComponent<UserExperienceComponent>(component =>
-                    component.Experience += battlePlayer.MatchPlayer.UserResult.ScoreWithoutPremium -
-                                            battlePlayer.MatchPlayer.AlreadyAddedExperience);
             }
 
             foreach (Player player in WaitingGoldBoxSenders.ToList())

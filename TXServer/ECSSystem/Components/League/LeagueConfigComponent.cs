@@ -6,10 +6,11 @@ namespace TXServer.ECSSystem.Components
     [SerialVersionUID(1502713060357L)]
 	public class LeagueConfigComponent : Component
 	{
-		public LeagueConfigComponent(int LeagueIndex)
+		public LeagueConfigComponent(int leagueIndex, double reputationToEnter)
 		{
-			this.LeagueIndex = LeagueIndex;
-		}
+			LeagueIndex = leagueIndex;
+            ReputationToEnter = reputationToEnter;
+        }
 
 		public int LeagueIndex { get; set; }
 

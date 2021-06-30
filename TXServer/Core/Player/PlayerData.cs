@@ -9,6 +9,7 @@ using TXDatabase.NetworkEvents.PlayerSettings;
 using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.User;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.GlobalEntities;
 
@@ -55,7 +56,7 @@ namespace TXServer.Core
         public long XCrystals { get; protected set; }
         public long Crystals { get; protected set; }
         public long Experience { get; protected set; }
-        public int GoldBoxes { get; set; } = 5;
+        public int GoldBoxes { get; private set; } = 5;
 
         public Entity League { get; protected set; }
         public int Reputation
@@ -66,8 +67,21 @@ namespace TXServer.Core
                 _reputation = value;
 
                 if (Player?.User is null) return;
+                //todo: save in db
                 Player.User.ChangeComponent<UserReputationComponent>(component => component.Reputation = value);
                 SetLeague(value);
+            }
+        }
+        public long LeagueChestScore
+        {
+            get => _leagueChestScore;
+            set
+            {
+                _leagueChestScore = value;
+
+                if (Player?.User is null) return;
+                //todo: save in db
+                Player.User.ChangeComponent<GameplayChestScoreComponent>(component => component.Current = value);
             }
         }
 
@@ -343,5 +357,6 @@ namespace TXServer.Core
 
         private string _username;
         private int _reputation;
+        private long _leagueChestScore;
     }
 }

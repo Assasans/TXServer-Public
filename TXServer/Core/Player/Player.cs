@@ -150,20 +150,13 @@ namespace TXServer.Core
             Logger.Log($"{this}: Logged in as {Data.Username}.");
 
             Entity user = new(new TemplateAccessor(new UserTemplate(), ""),
+                new UserComponent(),
+                new UserOnlineComponent(),
+
+                new UserUidComponent(Data.Username),
                 new UserCountryComponent(Data.CountryCode),
                 new UserAvatarComponent(Data.Avatar),
-                new UserComponent(),
-                //new FractionGroupComponent(Fractions.GlobalItems.Frontier),
-                //new UserDailyBonusCycleComponent(1),
-                new TutorialCompleteIdsComponent(),
                 new RegistrationDateComponent(),
-                new LeagueGroupComponent(Data.League),
-                new UserStatisticsComponent(),
-                new PersonalChatOwnerComponent(),
-                new GameplayChestScoreComponent(),
-                new BlackListComponent(),
-                new UserUidComponent(Data.Username),
-                //new FractionUserScoreComponent(500),
 
                 new UserMoneyComponent(Data.Crystals),
                 new UserXCrystalsComponent(Data.XCrystals),
@@ -171,22 +164,33 @@ namespace TXServer.Core
                 new UserExperienceComponent(Data.Experience),
                 new UserReputationComponent(Data.Reputation),
 
-                /*
-				new UserDailyBonusCycleComponent(1),
-				new UserDailyBonusReceivedRewardsComponent(),
-				new UserDailyBonusZoneComponent(1),
-				new UserDailyBonusNextReceivingDateComponent(),
-				new UserDailyBonusInitializedComponent(),
-				*/
+                //new FractionGroupComponent(Fractions.GlobalItems.Frontier),
+                //new FractionUserScoreComponent(500),
+
+                new TutorialCompleteIdsComponent(),
+
+                new UserStatisticsComponent(),
+                new FavoriteEquipmentStatisticsComponent(),
+                new KillsEquipmentStatisticsComponent(),
+                new BattleLeaveCounterComponent(0, 0),
+
+                new PersonalChatOwnerComponent(),
+
+                new LeagueGroupComponent(Data.League),
+                new GameplayChestScoreComponent(0),
+
+                new BlackListComponent(),
+
+				//new UserDailyBonusCycleComponent(1),
+				//new UserDailyBonusReceivedRewardsComponent(),
+				//new UserDailyBonusZoneComponent(1),
+				//new UserDailyBonusNextReceivingDateComponent(),
+				//new UserDailyBonusInitializedComponent(),
 
                 new QuestReadyComponent(),
                 new UserPublisherComponent(),
-                new FavoriteEquipmentStatisticsComponent(),
                 new ConfirmedUserEmailComponent(Data.Email, Data.Subscribed),
-                new UserSubscribeComponent(),
-                new KillsEquipmentStatisticsComponent(),
-                new BattleLeaveCounterComponent(0, 0),
-                new UserOnlineComponent());
+                new UserSubscribeComponent());
             user.Components.Add(new UserGroupComponent(user));
 
             User = user;
@@ -364,18 +368,8 @@ namespace TXServer.Core
             if (!IsInMatch || matchPlayer == null) return;
             BattlePlayer.Battle.PlayersInMap.SendEvent(new UpdateRankEvent(), User);
             int currentScoreInBattle = matchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
-            Data.SetExperience(Data.Experience + matchPlayer.GetScoreWithPremium(currentScoreInBattle));
+            Data.SetExperience(Data.Experience + matchPlayer.GetScoreWithPremium(currentScoreInBattle), false);
             matchPlayer.AlreadyAddedExperience += currentScoreInBattle;
-        }
-
-        public bool IsInBattleWith(Player player)
-        {
-            return IsInBattle && BattlePlayer.Battle.JoinedTankPlayers.Contains(player.BattlePlayer);
-        }
-
-        public bool IsInSquadWith(Player player)
-        {
-            return IsInSquad && SquadPlayer.Squad.Participants.Contains(player.SquadPlayer);
         }
 
         /// <summary>

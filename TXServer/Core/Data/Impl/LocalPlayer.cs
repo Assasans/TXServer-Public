@@ -28,9 +28,11 @@ namespace TXServer.Core.Data.Database.Impl
                 Crystals = 1000000;
                 XCrystals = 50000;
                 Experience = 0;
+                PremiumExpirationDate = DateTime.MinValue;
+
                 Reputation = 100;
                 League = Leagues.GlobalItems.Training;
-                PremiumExpirationDate = DateTime.MinValue;
+                LeagueChestScore = 0;
 
                 AcceptedFriendIds = new List<long>();
                 IncomingFriendIds = new List<long>();
