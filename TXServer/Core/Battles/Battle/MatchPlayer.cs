@@ -209,7 +209,10 @@ namespace TXServer.Core.Battles
                 {
                     TankState = TankState.Dead;
                     Battle.PlayersInMap.SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
+
                     UpdateStatistics(-10, -1, 0, 1, null);
+                    Player.User.ChangeComponent<UserStatisticsComponent>(
+                        component => component.Statistics["SUICIDES"]++);
 
                     TankPosition = new();
                     PrevTankPosition = new();

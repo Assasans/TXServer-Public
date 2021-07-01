@@ -356,13 +356,15 @@ namespace TXServer.Core
             long totalExperience = Data.Experience;
             if (IsInMatch && matchPlayer != null)
                 totalExperience += BattlePlayer.MatchPlayer.GetScoreWithPremium(matchPlayer.RoundUser
-                    .GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses);
+                    .GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses) -
+                                   BattlePlayer.MatchPlayer.AlreadyAddedExperience;
 
             int correctRank = experienceForRank.IndexOf(experienceForRank.LastOrDefault(x => x <= totalExperience)) + 1;
 
             if (User.GetComponent<UserRankComponent>().Rank >= correctRank) return;
             User.ChangeComponent(new UserRankComponent(correctRank));
-            // todo: load rank rewards from configs (https://vignette2.wikia.nocookie.net/tanki-x/images/f/fb/Rankit.png/revision/latest?cb=20170629172052)
+            // todo: load rank rewards from configs
+            // (https://vignette2.wikia.nocookie.net/tanki-x/images/f/fb/Rankit.png/revision/latest?cb=20170629172052)
             ShareEntities(UserRankRewardNotificationTemplate.CreateEntity(100, 5000, correctRank));
 
             if (!IsInMatch || matchPlayer == null) return;

@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
@@ -19,42 +18,21 @@ namespace TXServer.ECSSystem.GlobalEntities
                 Entity item = info.GetValue(items) as Entity;
                 item.EntityId = Entity.GenerateId();
 
-                switch (item.TemplateAccessor.Template)
+                item.TemplateAccessor.Template = item.TemplateAccessor.Template switch
                 {
-                    case FlamethrowerMarketItemTemplate _:
-                        item.TemplateAccessor.Template = new FlamethrowerUserItemTemplate();
-                        break;
-                    case FreezeMarketItemTemplate _:
-                        item.TemplateAccessor.Template = new FreezeUserItemTemplate();
-                        break;
-                    case HammerMarketItemTemplate _:
-                        item.TemplateAccessor.Template = new HammerUserItemTemplate();
-                        break;
-                    case IsisMarketItemTemplate _:
-                        item.TemplateAccessor.Template = new IsisUserItemTemplate();
-                        break;
-                    case RailgunMarketItemTemplate _:
-                        item.TemplateAccessor.Template = new RailgunUserItemTemplate();
-                        break;
-                    case RicochetMarketItemTemplate _:
-                        item.TemplateAccessor.Template = new RicochetUserItemTemplate();
-                        break;
-                    case ShaftMarketItemTemplate _:
-                        item.TemplateAccessor.Template = new ShaftUserItemTemplate();
-                        break;
-                    case SmokyMarketItemTemplate _:
-                        item.TemplateAccessor.Template = new SmokyUserItemTemplate();
-                        break;
-                    case ThunderMarketItemTemplate _:
-                        item.TemplateAccessor.Template = new ThunderUserItemTemplate();
-                        break;
-                    case TwinsMarketItemTemplate _:
-                        item.TemplateAccessor.Template = new TwinsUserItemTemplate();
-                        break;
-                    case VulcanMarketItemTemplate _:
-                        item.TemplateAccessor.Template = new VulcanUserItemTemplate();
-                        break;
-                }
+                    FlamethrowerMarketItemTemplate => new FlamethrowerUserItemTemplate(),
+                    FreezeMarketItemTemplate => new FreezeUserItemTemplate(),
+                    HammerMarketItemTemplate => new HammerUserItemTemplate(),
+                    IsisMarketItemTemplate => new IsisUserItemTemplate(),
+                    RailgunMarketItemTemplate => new RailgunUserItemTemplate(),
+                    RicochetMarketItemTemplate => new RicochetUserItemTemplate(),
+                    ShaftMarketItemTemplate => new ShaftUserItemTemplate(),
+                    SmokyMarketItemTemplate => new SmokyUserItemTemplate(),
+                    ThunderMarketItemTemplate => new ThunderUserItemTemplate(),
+                    TwinsMarketItemTemplate => new TwinsUserItemTemplate(),
+                    VulcanMarketItemTemplate => new VulcanUserItemTemplate(),
+                    _ => item.TemplateAccessor.Template
+                };
 
                 item.Components.Add(new UserGroupComponent(user.EntityId));
                 item.Components.Add(new ExperienceItemComponent());

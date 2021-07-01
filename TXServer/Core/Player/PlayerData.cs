@@ -53,8 +53,10 @@ namespace TXServer.Core
         public bool Beta { get; protected set; }
         public bool Mod { get; set; }
 
-        public long XCrystals { get; protected set; }
         public long Crystals { get; protected set; }
+        public long XCrystals { get; protected set; }
+
+        public int CurrentBattleSeries { get; set; }
         public long Experience { get; protected set; }
         public int GoldBoxes { get; private set; } = 5;
 

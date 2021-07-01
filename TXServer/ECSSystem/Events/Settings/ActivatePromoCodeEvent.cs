@@ -4,10 +4,8 @@ using TXServer.Core;
 using TXServer.Core.Logging;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.GlobalEntities;
-using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Settings
 {

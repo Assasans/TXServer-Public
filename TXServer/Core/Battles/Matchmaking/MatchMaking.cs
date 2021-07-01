@@ -72,8 +72,6 @@ namespace TXServer.Core.Battles.Matchmaking
 
         public static void ProcessDeserterState(Player player, Battle battle)
         {
-            if (!battle.IsMatchMaking) return;
-
             player.User.ChangeComponent<BattleLeaveCounterComponent>(component =>
             {
                 if (battle.BattleState == BattleState.Ended)
@@ -85,7 +83,7 @@ namespace TXServer.Core.Battles.Matchmaking
                     }
                     else
                     {
-                        if (component.GoodBattlesInRow == 2)
+                        if (component.GoodBattlesInRow >= 2)
                         {
                             component.GoodBattlesInRow = 0;
                             if (component.Value != 0 && component.NeedGoodBattles != 0)
@@ -103,6 +101,8 @@ namespace TXServer.Core.Battles.Matchmaking
                         if (component.NeedGoodBattles == 0) component.NeedGoodBattles = 3;
                         else component.NeedGoodBattles += (int) component.Value / 2;
                     }
+
+                    player.Data.CurrentBattleSeries = 0;
                 }
             });
         }
