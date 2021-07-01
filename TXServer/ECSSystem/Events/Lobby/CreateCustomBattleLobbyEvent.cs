@@ -3,7 +3,7 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
 
-namespace TXServer.ECSSystem.Events.Battle
+namespace TXServer.ECSSystem.Events.Lobby
 {
     [SerialVersionUID(1496750075382L)]
 	public class CreateCustomBattleLobbyEvent : ECSEvent

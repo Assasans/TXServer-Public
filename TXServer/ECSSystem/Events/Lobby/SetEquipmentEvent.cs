@@ -2,7 +2,7 @@
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Events.Matchmaking
+namespace TXServer.ECSSystem.Events.Lobby
 {
     [SerialVersionUID(1496905821016L)]
     public class SetEquipmentEvent : ECSEvent

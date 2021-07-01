@@ -1,9 +1,7 @@
 ﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Types;
-using TXServer.Core;
 
-namespace TXServer.ECSSystem.Events.Battle
+namespace TXServer.ECSSystem.Events.Lobby
 {
 	[SerialVersionUID(1547709389410L)]
 	public class EnterBattleLobbyFailedEvent : ECSEvent

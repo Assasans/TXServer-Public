@@ -66,9 +66,9 @@ namespace TXServer.Core.Battles
                 ModeHandler.SetupBattle();
 
             if (!Server.Instance.Settings.DisableHeightMaps)
-            {
-                HeightMap = ServerConnection.HeightMaps[ServerConnection.ServerMapInfo.First((entry) => entry.Value.MapId == Params.MapId).Key];
-            }
+                HeightMap = ServerConnection.HeightMaps[
+                    ServerConnection.ServerMapInfo.First(entry => entry.Value.MapId == Params.MapId).Key];
+
         }
 
         private (Entity, int) ConvertMapParams(ClientBattleParams newParams, bool isMatchMaking)
@@ -112,6 +112,17 @@ namespace TXServer.Core.Battles
             }
 
             CreateBattle();
+
+            if (Params.BattleMode is not BattleMode.DM)
+            {
+                var handler = (TeamBattleHandler)ModeHandler;
+                foreach (BattleTankPlayer battlePlayer in JoinedTankPlayers.ToList())
+                {
+                    BattleView view = handler.BattleViewFor(battlePlayer);
+                    battlePlayer.User.RemoveComponent<TeamColorComponent>();
+                    battlePlayer.User.AddComponent(new TeamColorComponent(view.AllyTeamColor));
+                }
+            }
         }
 
         public void AddPlayer(Player player, bool isSpectator)

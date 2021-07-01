@@ -1,10 +1,9 @@
-﻿using System;
-using TXServer.Core;
+﻿using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using static TXServer.Core.Battles.Battle;
 
-namespace TXServer.ECSSystem.Events.Matchmaking
+namespace TXServer.ECSSystem.Events.Lobby
 {
 	[SerialVersionUID(1547630520757L)]
 	public class OpenCustomLobbyEvent : ECSEvent

@@ -5,12 +5,12 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Types;
 
-namespace TXServer.ECSSystem.Events.Battle
+namespace TXServer.ECSSystem.Events.Lobby
 {
     [SerialVersionUID(1499172594697L)]
 	public class SwitchTeamEvent : ECSEvent
 	{
-		public void Execute(Player player, Entity mode)
+		public void Execute(Player player, Entity lobby)
 		{
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
 			BattleTankPlayer battlePlayer = player.BattlePlayer;

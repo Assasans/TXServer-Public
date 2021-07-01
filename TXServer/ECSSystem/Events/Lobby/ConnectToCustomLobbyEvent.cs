@@ -1,10 +1,11 @@
-﻿using TXServer.Core.Protocol;
-using TXServer.ECSSystem.Base;
+﻿using System.Linq;
 using TXServer.Core;
-using System.Linq;
+using TXServer.Core.Protocol;
+using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Events.Battle;
 using static TXServer.Core.Battles.Battle;
 
-namespace TXServer.ECSSystem.Events.Battle
+namespace TXServer.ECSSystem.Events.Lobby
 {
     [SerialVersionUID(1547616531111L)]
     public class ConnectToCustomLobbyEvent : ECSEvent

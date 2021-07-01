@@ -1,9 +1,9 @@
-﻿using TXServer.Core.Protocol;
+﻿using TXServer.Core;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
-using TXServer.Core;
 
-namespace TXServer.ECSSystem.Events.Battle
+namespace TXServer.ECSSystem.Events.Lobby
 {
 	[SerialVersionUID(1497614958932L)]
 	public class UpdateBattleParamsEvent : ECSEvent
