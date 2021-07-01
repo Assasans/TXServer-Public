@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
@@ -39,8 +39,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
                 matchPlayer.Battle.BattleEntity.GetComponent<BattleGroupComponent>(),
                 matchPlayer.Player.User.GetComponent<UserGroupComponent>()
             });
-
-            Console.WriteLine(targetingDistance);
 
             return effect;
         }

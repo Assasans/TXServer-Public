@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core;
 using TXServer.Core.ChatCommands;
 using TXServer.Core.Protocol;
@@ -16,7 +16,6 @@ namespace TXServer.ECSSystem.Events.OldChatCommands
             if (!player.Data.Admin || !player.Data.Mod) return;
 
             string chatCmd = $"!mute {UserUid} forever";
-            Console.WriteLine(chatCmd);
             ModCommands.CheckForCommand(player, chatCmd, out string commandReply);
             ChatMessageReceivedEvent.SystemMessageTarget(commandReply, player);
         }

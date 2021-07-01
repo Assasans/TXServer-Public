@@ -8,6 +8,7 @@ using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
+using TXServer.ECSSystem.Events.Battle.Effect;
 
 namespace TXServer.Core.Battles.Effect
 {
@@ -64,7 +65,8 @@ namespace TXServer.Core.Battles.Effect
 
         private void Explode()
         {
-            // todo: let drone explode on deactivation
+            Entity drone = EffectEntities.Single(e => e.HasComponent<DroneMoveConfigComponent>());
+            MatchPlayer.Battle.PlayersInMap.SendEvent(new RemoveEffectEvent(), drone);
             Deactivate();
         }
 

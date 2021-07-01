@@ -18,7 +18,7 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Activate()
         {
-            if (EffectIsActive) Deactivate();
+            if (EffectIsActive) ReplaceMine();
 
             EffectEntity = SpiderEffectTemplate.CreateEntity(MatchPlayer, acceleration:Acceleration,
                 activationTime:ActivationTime, beginHideDistance: BeginHideDistance, hideRange:HideRange,
@@ -35,6 +35,7 @@ namespace TXServer.Core.Battles.Effect
             if (EffectEntity == null) return;
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
             EffectEntity = null;
+            TimeOfDeath = null;
         }
 
         public override void Init()
@@ -79,14 +80,19 @@ namespace TXServer.Core.Battles.Effect
         {
             MatchPlayer.Battle.PlayersInMap.SendEvent(new MineExplosionEvent(), EffectEntity);
             Deactivate();
-            TimeOfDeath = null;
+        }
+
+        private void ReplaceMine()
+        {
+            MatchPlayer.Battle.PlayersInMap.SendEvent(new RemoveEffectEvent(), EffectEntity);
+            Deactivate();
         }
 
         protected override void Tick()
         {
             base.Tick();
 
-            if (EffectIsActive) return;
+            if (!EffectIsActive) return;
 
             CheckLifeTime();
         }
