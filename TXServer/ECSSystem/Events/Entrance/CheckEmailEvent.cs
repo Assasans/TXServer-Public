@@ -1,7 +1,8 @@
-﻿using TXServer.Core;
+﻿using System.Net.Mail;
+using TXServer.Core;
+using TXServer.Core.Database;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.Core.Database;
 
 namespace TXServer.ECSSystem.Events
 {
@@ -17,7 +18,7 @@ namespace TXServer.ECSSystem.Events
 		{
 			try
 			{
-				var addr = new System.Net.Mail.MailAddress(Email);
+				var addr = new MailAddress(Email);
 
                 if (Server.DatabaseNetwork.IsReady)
                     PacketSorter.EmailAvailable(addr.Address, result =>

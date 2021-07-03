@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;

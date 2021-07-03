@@ -1,9 +1,8 @@
-using System;
 using System.Linq;
 using TXServer.Core;
+using TXServer.Core.Database;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.Core.Database;
 
 namespace TXServer.ECSSystem.Events.Entrance
 {

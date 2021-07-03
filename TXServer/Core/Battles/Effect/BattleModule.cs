@@ -10,6 +10,7 @@ using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.EntityTemplates.Item.Slot;
 using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Events.Battle.Effect;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles.Effect {

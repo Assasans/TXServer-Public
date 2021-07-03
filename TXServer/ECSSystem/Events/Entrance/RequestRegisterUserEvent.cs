@@ -1,11 +1,11 @@
-using TXServer.Core;
-using TXServer.Core.Protocol;
-using TXServer.ECSSystem.Base;
-using TXServer.Core.Database;
 using System;
 using System.Text;
 using TXDatabase.NetworkEvents.PlayerAuth;
+using TXServer.Core;
+using TXServer.Core.Database;
 using TXServer.Core.Logging;
+using TXServer.Core.Protocol;
+using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Events.Entrance
 {

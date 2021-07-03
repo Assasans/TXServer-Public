@@ -1,7 +1,7 @@
 using TXServer.Core;
+using TXServer.Core.Logging;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.Core.Logging;
 
 namespace TXServer.ECSSystem.Events
 {

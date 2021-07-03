@@ -9,6 +9,7 @@ using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 using TXServer.ECSSystem.Events.Battle.Effect;
+using TXServer.ECSSystem.Events.Battle.Effect.Mine;
 
 namespace TXServer.Core.Battles.Effect
 {

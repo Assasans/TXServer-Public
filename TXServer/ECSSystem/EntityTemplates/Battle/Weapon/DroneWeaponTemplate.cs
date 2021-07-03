@@ -21,7 +21,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Weapon
                 new DroneWeaponComponent(),
 
                 matchPlayer.Battle.BattleEntity.GetComponent<BattleGroupComponent>(),
-                matchPlayer.Tank.GetComponent<TeamGroupComponent>(),
                 matchPlayer.Tank.GetComponent<UserGroupComponent>(),
 
                 new ShootableComponent(),
@@ -29,6 +28,9 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Weapon
 
                 new WeaponComponent(),
                 Config.GetComponent<WeaponCooldownComponent>(ConfigPath));
+
+            if (matchPlayer.Battle.ModeHandler is Core.Battles.Battle.TeamBattleHandler)
+                effect.AddComponent(matchPlayer.Tank.GetComponent<TeamGroupComponent>());
 
             effect.AddComponent(new UnitGroupComponent(effect));
 

@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using TXServer.Core;
-using TXServer.Core.Battles;
 using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Events.Battle

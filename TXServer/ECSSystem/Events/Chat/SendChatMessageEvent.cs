@@ -10,7 +10,6 @@ using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Chat;
 using TXServer.ECSSystem.Types;
-using Punishment = TXServer.Core.ChatCommands.Punishment;
 
 namespace TXServer.ECSSystem.Events.Chat
 {
