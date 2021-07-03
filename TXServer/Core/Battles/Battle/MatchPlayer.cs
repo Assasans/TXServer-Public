@@ -197,8 +197,10 @@ namespace TXServer.Core.Battles
             if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
             Weapon.TryRemoveComponent<ShootableComponent>();
 
-            // trigger Drone to stay
-            if (TryGetModule(out TurretDroneModule turretDroneModule)) turretDroneModule.Stay();
+            // trigger: Drone Module (stay after tank disable)
+            if (TryGetModule(out TurretDroneModule turretDroneModule))
+                foreach (var droneTuple in turretDroneModule.Drones)
+                    TurretDroneModule.Stay(droneTuple.Item1);
         }
 
         public void Tick()

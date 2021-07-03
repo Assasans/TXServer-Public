@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle.Effect.Drone;
 using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
@@ -21,17 +21,22 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Activate()
         {
-            if (EffectIsActive) Deactivate();
+            if (EffectEntities.Count >= 2) DeactivateSingleDrone(Drones.First().Item1);
 
-            EffectEntities.Add(DroneWeaponTemplate.CreateEntity(MatchPlayer));
-            MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntities);
+            (Entity, Entity, DateTimeOffset?) droneTuple = new() {
+                Item2 = DroneWeaponTemplate.CreateEntity(MatchPlayer)};
 
-            EffectEntities.Add(DroneEffectTemplate.CreateEntity(duration: Duration,
-                targetingDistance: TargetingDistance, targetingPeriod: TargetingPeriod, weapon: EffectEntities[0],
-                matchPlayer: MatchPlayer));
-            MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntities.Last());
+            MatchPlayer.Battle.PlayersInMap.ShareEntities(droneTuple.Item2);
 
-            TimeOfDeath = DateTimeOffset.UtcNow.AddMilliseconds(Duration);
+            droneTuple.Item1 = DroneEffectTemplate.CreateEntity(duration: Duration,
+                targetingDistance: TargetingDistance, targetingPeriod: TargetingPeriod, weapon: droneTuple.Item2,
+                matchPlayer: MatchPlayer);
+            MatchPlayer.Battle.PlayersInMap.ShareEntities(droneTuple.Item1);
+
+            droneTuple.Item3 = DateTimeOffset.UtcNow.AddMilliseconds(Duration);
+
+            EffectEntities.Add(droneTuple.Item1);
+            Drones.Add(droneTuple);
         }
 
         public override void Deactivate()
@@ -40,6 +45,21 @@ namespace TXServer.Core.Battles.Effect
 
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntities);
             EffectEntities.Clear();
+        }
+
+        private void DeactivateSingleDrone(Entity drone)
+        {
+            if (!EffectEntities.Contains(drone)) return;
+
+            (Entity, Entity, DateTimeOffset?) droneTuple = Drones.Single(t => t.Item1 == drone);
+
+            EffectEntities.Remove(drone);
+            Drones.Remove(droneTuple);
+
+            MatchPlayer.Battle.PlayersInMap.SendEvent(new RemoveEffectEvent(), drone);
+
+            MatchPlayer.Battle.PlayersInMap.UnshareEntities(droneTuple.Item1);
+            MatchPlayer.Battle.PlayersInMap.UnshareEntities(droneTuple.Item2);
         }
 
         public override void Init()
@@ -55,32 +75,26 @@ namespace TXServer.Core.Battles.Effect
         }
 
 
-        public void Stay() => EffectEntities.Single(e => e.HasComponent<DroneEffectComponent>())
-            .TryRemoveComponent<TankGroupComponent>();
+        public static void Stay(Entity drone) => drone.TryRemoveComponent<TankGroupComponent>();
 
         private void CheckLifeTime()
         {
-            if (DateTimeOffset.UtcNow > TimeOfDeath) Explode();
-        }
-
-        private void Explode()
-        {
-            Entity drone = EffectEntities.Single(e => e.HasComponent<DroneMoveConfigComponent>());
-            MatchPlayer.Battle.PlayersInMap.SendEvent(new RemoveEffectEvent(), drone);
-            Deactivate();
+            foreach (var droneTuple in Drones.ToList().Where(pair => DateTimeOffset.UtcNow >= pair.Item3))
+                DeactivateSingleDrone(droneTuple.Item1);
         }
 
         protected override void Tick()
         {
             base.Tick();
 
-            if (!EffectIsActive || !EffectEntities.Any()) return;
+            if (!Drones.Any()) return;
 
             CheckLifeTime();
         }
 
+        public List<(Entity, Entity, DateTimeOffset?)> Drones { get; } = new();
+
         private float TargetingDistance { get; set; }
         private float TargetingPeriod { get; set; }
-        private DateTimeOffset? TimeOfDeath { get; set; }
     }
 }

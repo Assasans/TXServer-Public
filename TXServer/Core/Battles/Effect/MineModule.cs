@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Numerics;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
@@ -8,7 +7,6 @@ using TXServer.ECSSystem.Components.Battle.Module.Mine;
 using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
-using TXServer.ECSSystem.Events.Battle.Effect;
 using TXServer.ECSSystem.Events.Battle.Effect.Mine;
 
 namespace TXServer.Core.Battles.Effect
@@ -20,8 +18,8 @@ namespace TXServer.Core.Battles.Effect
             ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
         ) { }
 
-        public override void Activate() {
-
+        public override void Activate()
+        {
             Entity mine = MineEffectTemplate.CreateEntity(MatchPlayer, activationTime: ActivationTime,
                 beginHideDistance: BeginHideDistance, damageMaxRadius: DamageMaxRadius,
                 damageMinRadius: DamageMinRadius, damageMinPercent: DamageMinPercent, hideRange: HideRange,
