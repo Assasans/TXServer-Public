@@ -36,10 +36,19 @@ namespace TXServer.Core.Battles
             if (victim.TryGetModule(out InvulnerabilityModule module)) if (module.EffectIsActive) return;
             if (victim.TryGetModule(out EmergencyProtectionModule epModule)) if (epModule.EffectIsActive) return;
 
+            // var a1 = victim.Tank.GetComponent<TankMovementComponent>().Movement.Orientation;
+            // var a2 = victim.TankQuaternion;
+
             damager.UserResult.Damage += (int) damage;
+            double diff = hitTarget.HitDirection.Y - victim.TankQuaternion.Y;
+
+            TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
+                $"[Damage] Rotation: {diff}",
+                damager.Battle.GeneralBattleChatEntity, damager.Player
+            );
 
             // todo: set this correctly when back hits can be detected
-            const bool backHit = false;
+            bool backHit = diff is < -0.8 and > -1.2;
             if (backHit && victim.TryGetModule(out BackhitDefenceModule backhitDefModule) &&
                 backhitDefModule.EffectIsActive)
                     damage = backhitDefModule.GetReducedDamage(damage);
