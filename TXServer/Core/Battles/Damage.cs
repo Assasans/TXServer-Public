@@ -206,7 +206,36 @@ namespace TXServer.Core.Battles
             }
         }
 
-        private static float GetDamageDistanceMultiplier(Entity weapon, float distance, MatchPlayer damager)
+        private static float GetDamageDistanceMultiplier(Entity weapon, Entity weaponMarketItem, float distance, MatchPlayer damager)
+        {
+            if (IsModule(weapon)) return 1;
+
+            string path = weaponMarketItem.TemplateAccessor.ConfigPath;
+
+            switch (weapon.TemplateAccessor.Template)
+            {
+                default:
+                    var minDamageDistance =
+                        Config.GetComponent<ServerComponents.DamageWeakeningByDistance.MinDamageDistancePropertyComponent>(path);
+                    var maxDamageDistance =
+                        Config.GetComponent<ServerComponents.DamageWeakeningByDistance.MaxDamageDistancePropertyComponent>(path);
+
+                    var minDamagePercent =
+                        Config.GetComponent<ServerComponents.DamageWeakeningByDistance.MinDamagePercentPropertyComponent>(path);
+
+                    float distanceModifier;
+
+                    if (distance < maxDamageDistance.FinalValue)
+                        distanceModifier = 1;
+                    else
+                        distanceModifier = MathUtils.Map(distance, maxDamageDistance.FinalValue, minDamageDistance.FinalValue, 1, minDamagePercent.FinalValue / 100);
+
+                    return distanceModifier;
+            }
+        }
+
+
+        private static float GetSplashDamageDistanceMultiplier(Entity weapon, float distance, MatchPlayer damager)
         {
             if (IsModule(weapon)) return 1;
 
@@ -286,14 +315,13 @@ namespace TXServer.Core.Battles
                 case HammerBattleItemTemplate or SmokyBattleItemTemplate or ThunderBattleItemTemplate or
                     VulcanBattleItemTemplate:
                     damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
-                    float damageMultiplier = GetDamageDistanceMultiplier(weapon, hitTarget.HitDistance, shooter);
-                    float splashDamage = (int) Math.Round(damage * damageMultiplier);
+                    float distanceModifier = GetDamageDistanceMultiplier(weapon, weaponMarketItem, hitTarget.HitDistance, shooter);
 
                     //TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
                     //$"[Damage] Random damage: {damage} | Splash multiplier: {damageMultiplier} | Calculated damage: {splashDamage}",
                     //target.Battle.GeneralBattleChatEntity, shooter.Player);
 
-                    damage = splashDamage;
+                    damage = (int) Math.Round(damage * distanceModifier);
                     break;
                 case IsisBattleItemTemplate:
                     damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
