@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using TXServer.Core.Battles;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Data.Database;
@@ -27,6 +28,8 @@ namespace TXServer.Core
         public static ServerConfig Config => ServerConfig.Instance;
         public static DatabaseNetwork DatabaseNetwork => DatabaseNetwork.Instance;
 
+        public static string Version => Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
+
         public Server()
         {
             ModuleRegistry = new ModuleRegistry();
@@ -36,6 +39,7 @@ namespace TXServer.Core
         public void Start()
         {
             Logger.Log("Starting server...");
+            Logger.Log($"Version: {Version}");
 
             // The database needs the config so load it
             ServerConfig.Load("Config.json");
