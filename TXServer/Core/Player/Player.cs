@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -21,6 +20,7 @@ using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 using TXServer.Core.Database;
 using TXDatabase.NetworkEvents.Communications;
+using TXServer.ECSSystem.Components.User.Tutorial;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core
@@ -31,7 +31,6 @@ namespace TXServer.Core
     public sealed class Player : IDisposable
     {
         public bool IsLoggedIn => User != null;
-        public bool IsPremium => Data.PremiumExpirationDate > DateTime.UtcNow;
 
         public bool IsInSquad => SquadPlayer != null;
         public bool IsSquadLeader => IsInSquad && SquadPlayer.IsLeader;
@@ -167,7 +166,7 @@ namespace TXServer.Core
                 //new FractionGroupComponent(Fractions.GlobalItems.Frontier),
                 //new FractionUserScoreComponent(500),
 
-                new TutorialCompleteIdsComponent(),
+                new TutorialCompleteIdsComponent(Data.CompletedTutorialIds),
 
                 new UserStatisticsComponent(),
                 new FavoriteEquipmentStatisticsComponent(),
@@ -208,7 +207,7 @@ namespace TXServer.Core
             if (Data.Admin)
             {
                 user.Components.Add(new UserAdminComponent());
-                if (!IsPremium)
+                if (!Data.IsPremium)
                     Data.RenewPremium(new TimeSpan(23999976, 0, 0));
             }
             if (Data.Beta) user.Components.Add(new ClosedBetaQuestAchievementComponent());

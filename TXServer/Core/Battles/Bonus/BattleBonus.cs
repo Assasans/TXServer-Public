@@ -56,7 +56,7 @@ namespace TXServer.Core.Battles
             switch (BonusType)
             {
                 case BonusType.GOLD:
-                    player.Data.SetCrystals(player.Data.Crystals + CurrentCrystals);
+                    player.Data.Crystals += CurrentCrystals;
                     Battle.PlayersInMap.UnshareEntities(BonusRegion);
                     break;
                 default:

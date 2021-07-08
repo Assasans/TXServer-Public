@@ -39,7 +39,12 @@ namespace TXServer.Core.Data.Database.Impl
                 OutgoingFriendIds = new List<long>();
                 BlockedPlayerIds = new List<long>();
                 ReportedPlayerIds = new List<long>();
+
                 Punishments = new List<Punishment>();
+                CompletedTutorialIds = new List<ulong>();
+
+                Modules = new Dictionary<long, (int, int)>();
+
                 Original = (PlayerData) Clone();
             }
             catch (Exception e)

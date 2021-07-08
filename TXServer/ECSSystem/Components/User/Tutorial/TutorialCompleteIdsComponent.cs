@@ -2,13 +2,20 @@
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Components
+namespace TXServer.ECSSystem.Components.User.Tutorial
 {
     [SerialVersionUID(1505286737090)]
     public class TutorialCompleteIdsComponent : Component
     {
-        // Обучение полностью пройдено.
-        public List<ulong> CompletedIds { get; set; } = new List<ulong>
+        public TutorialCompleteIdsComponent(List<ulong> completedIds)
+        {
+            CompletedIds = _allIds;
+        }
+
+        public List<ulong> CompletedIds { get; set; }
+        public bool TutorialSkipped { get; set; }
+
+        private readonly List<ulong> _allIds = new()
         {
             0x00000000190828D4,
             0x000000006C508645,
@@ -22,7 +29,5 @@ namespace TXServer.ECSSystem.Components
             0xFFFFFFFFF60C1145,
             0x000000006EC527F6
         };
-
-        public bool TutorialSkipped { get; set; }
     }
 }

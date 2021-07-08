@@ -67,15 +67,15 @@ namespace TXServer.ECSSystem.GlobalEntities
             CollectGlobalEntities();
         }
 
-        private volatile static Entity[] collectedGlobalEntities = Array.Empty<Entity>();
+        private static volatile Entity[] _collectedGlobalEntities = Array.Empty<Entity>();
 
         public static Entity[] GetEntities(Player player, Entity user)
         {
             Entity[] userEntities = GetUserEntities(player, user);
 
-            Entity[] entities = new Entity[collectedGlobalEntities.Length + userEntities.Length];
-            collectedGlobalEntities.CopyTo(entities, 0);
-            userEntities.CopyTo(entities, collectedGlobalEntities.Length);
+            Entity[] entities = new Entity[_collectedGlobalEntities.Length + userEntities.Length];
+            _collectedGlobalEntities.CopyTo(entities, 0);
+            userEntities.CopyTo(entities, _collectedGlobalEntities.Length);
 
             return entities;
         }
@@ -91,7 +91,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 entities.AddRange(((ItemList)info.GetValue(null)).GetAllItems());
             }
 
-            collectedGlobalEntities = entities.ToArray();
+            _collectedGlobalEntities = entities.ToArray();
         }
 
         private static Entity[] GetUserEntities(Player player, Entity user)

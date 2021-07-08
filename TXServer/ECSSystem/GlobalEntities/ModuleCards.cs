@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
@@ -9,7 +10,7 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static Items GlobalItems { get; } = new Items();
 
-        public static Items GetUserItems(Entity user)
+        public static Items GetUserItems(Player player)
         {
             Items items = new Items();
 
@@ -20,8 +21,12 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.TemplateAccessor.Template = new ModuleCardUserItemTemplate();
 
-                item.Components.Add(new UserGroupComponent(user.EntityId));
-                item.Components.Add(new UserItemCounterComponent(0));
+                item.Components.Add(new UserGroupComponent(player.User.EntityId));
+
+                long moduleId = item.GetComponent<ParentGroupComponent>().Key;
+                item.Components.Add(new UserItemCounterComponent(player.Data.Modules.ContainsKey(moduleId)
+                    ? player.Data.Modules[moduleId].Item2
+                    : 0));
             }
 
             return items;

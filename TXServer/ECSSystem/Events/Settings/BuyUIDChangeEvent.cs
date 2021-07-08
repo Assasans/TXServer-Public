@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Events.Settings
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			player.Data.SetXCrystals(player.Data.XCrystals - Price);
+			player.Data.XCrystals -= Price;
 			player.Data.Username = Uid;
 			player.SendEvent(new CompleteBuyUIDChangeEvent(true), entity);
 

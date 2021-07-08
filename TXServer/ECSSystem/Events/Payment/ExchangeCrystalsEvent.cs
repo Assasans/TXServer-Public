@@ -9,10 +9,10 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity user)
 		{
-			player.Data.SetXCrystals(player.Data.XCrystals - XCrystals);
-			player.Data.SetCrystals(player.Data.Crystals + XCrystals * 50);
+			player.Data.XCrystals -= XCrystals;
+			player.Data.Crystals += XCrystals * 50;
 		}
-		
+
 		public long XCrystals { get; set; }
 	}
 }

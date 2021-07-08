@@ -9,8 +9,12 @@ using TXDatabase.NetworkEvents.PlayerSettings;
 using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Item.Module;
 using TXServer.ECSSystem.Components.User;
+using TXServer.ECSSystem.Components.User.Tutorial;
 using TXServer.ECSSystem.EntityTemplates;
+using TXServer.ECSSystem.EntityTemplates.Item.Module;
+using TXServer.ECSSystem.Events.Garage.Module;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core
@@ -53,8 +57,30 @@ namespace TXServer.Core
         public bool Beta { get; protected set; }
         public bool Mod { get; set; }
 
-        public long Crystals { get; protected set; }
-        public long XCrystals { get; protected set; }
+        public long Crystals
+        {
+            get => _crystals;
+            set
+            {
+                _crystals = value;
+                if (Player?.User is null) return;
+
+                // todo: database set
+                Player.User.ChangeComponent(new UserMoneyComponent(value));
+            }
+        }
+        public long XCrystals
+        {
+            get => _crystals;
+            set
+            {
+                _xCrystals = value;
+                if (Player?.User is null) return;
+
+                // todo: database set
+                Player.User.ChangeComponent(new UserXCrystalsComponent(value));
+            }
+        }
 
         public int CurrentBattleSeries { get; set; }
         public long Experience { get; protected set; }
@@ -97,7 +123,10 @@ namespace TXServer.Core
         public List<long> BlockedPlayerIds { get; protected set; }
         public List<long> ReportedPlayerIds { get; protected set; }
 
+        public List<ulong> CompletedTutorialIds { get; set; }
         public List<ChatCommands.Punishment> Punishments { get; protected set; }
+
+        public Dictionary<long, (int, int)> Modules { get; protected set; }
 
 
         public PlayerData(string uid)
@@ -107,6 +136,8 @@ namespace TXServer.Core
 
         public PlayerData(long uniqueId)
             => UniqueId = uniqueId;
+
+        public bool IsPremium => PremiumExpirationDate > DateTime.UtcNow;
 
         private void SetLeague(int reputation)
         {
@@ -190,16 +221,6 @@ namespace TXServer.Core
             Beta = beta;
         }
 
-        public void SetCrystals(long value)
-        {
-            Crystals = value;
-            Player.User.ChangeComponent(new UserMoneyComponent(value));
-        }
-        public void SetXCrystals(long value)
-        {
-            XCrystals = value;
-            Player.User.ChangeComponent(new UserXCrystalsComponent(value));
-        }
         public void SetExperience(long value, bool rankUpCheck = true)
         {
             Experience = value;
@@ -222,10 +243,8 @@ namespace TXServer.Core
         }
         public void RenewPremium(TimeSpan additionalPremiumTime)
         {
-            if (Player.IsPremium)
-                PremiumExpirationDate += additionalPremiumTime;
-            else
-                PremiumExpirationDate = DateTime.UtcNow + additionalPremiumTime;
+            if (IsPremium) PremiumExpirationDate += additionalPremiumTime;
+            else PremiumExpirationDate = DateTime.UtcNow + additionalPremiumTime;
 
             PremiumAccountBoostComponent component = new() { EndDate = PremiumExpirationDate };
 
@@ -268,6 +287,44 @@ namespace TXServer.Core
         public void AddReportedPlayer(long userId)
         {
             ReportedPlayerIds.Add(userId);
+        }
+
+        public void AddCompletedTutorial(ulong tutorialId)
+        {
+            Player.User.ChangeComponent<TutorialCompleteIdsComponent>(component =>
+                component.CompletedIds.Add((ulong) tutorialId));
+            CompletedTutorialIds.Add(tutorialId);
+        }
+
+        public void UpgradeModule(Entity marketItem)
+        {
+            if (!Modules.ContainsKey(marketItem.GetComponent<ParentGroupComponent>().Key)) return;
+
+            long id = marketItem.GetComponent<ParentGroupComponent>().Key;
+            (int level, int cards) infos = Modules[id];
+
+            Entity moduleItem = Player.EntityList.Single(e => e.TemplateAccessor.Template is
+                ModuleUserItemTemplate && e.GetComponent<ParentGroupComponent>().Key == id);
+            Entity cardItem = Player.EntityList.Single(e => e.TemplateAccessor.Template is
+                ModuleCardUserItemTemplate && e.GetComponent<ParentGroupComponent>().Key == id);
+
+            infos.level++;
+            infos.cards -= moduleItem.GetComponent<ModuleCardsCompositionComponent>().AllPrices[infos.level].Cards;
+            Modules[id] = infos;
+
+            moduleItem.ChangeComponent<ModuleUpgradeLevelComponent>(component => component.Level = infos.level);
+            cardItem.ChangeComponent<UserItemCounterComponent>(component => component.Count = infos.cards);
+
+            if (!moduleItem.HasComponent<UserGroupComponent>())
+            {
+                // research module
+                moduleItem.AddComponent(new UserGroupComponent(Player.User.EntityId));
+                Player.SendEvent(new ModuleAssembledEvent(), moduleItem);
+                return;
+            }
+
+            // upgrade module
+            Player.SendEvent(new ModuleUpgradedEvent(), moduleItem);
         }
 
         private T SetValue<T>(object value) where T : Component
@@ -360,5 +417,7 @@ namespace TXServer.Core
         private string _username;
         private int _reputation;
         private long _leagueChestScore;
+        private long _crystals;
+        private long _xCrystals;
     }
 }

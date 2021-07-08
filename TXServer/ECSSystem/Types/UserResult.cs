@@ -5,6 +5,7 @@ using TXServer.Core.Battles;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Round;
+using TXServer.ECSSystem.Components.Item.Module;
 
 namespace TXServer.ECSSystem.Types
 {

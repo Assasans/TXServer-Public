@@ -10,10 +10,8 @@ namespace TXServer.ECSSystem.Events.Lobby
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			int price = 1000;  // 1000 Blue-Crystals standard price for opening custom battles
-			if (player.IsPremium)
-				price = 0;  // official premium pass feature: open custom battles for free
-			player.Data.SetCrystals(player.Data.Crystals - price);
+			// 1000 Blue-Crystals standard, 0 with premium
+            player.Data.Crystals -= player.Data.IsPremium ? 0 : 1000;
 
 			((CustomBattleHandler)player.BattlePlayer.Battle.TypeHandler).OpenBattle();
 		}

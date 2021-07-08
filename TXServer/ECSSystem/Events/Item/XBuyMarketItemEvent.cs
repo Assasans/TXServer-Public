@@ -23,7 +23,7 @@ namespace TXServer.ECSSystem.Events
 			((IUserItemTemplate)newItem.TemplateAccessor.Template).AddUserItemComponents(player, newItem);
 
 			player.ShareEntities(newItem);
-			player.Data.SetXCrystals(player.Data.XCrystals - Price);
+			player.Data.XCrystals -= Price;
 
 			if (newItem.TemplateAccessor.Template is IMountableItemTemplate)
 				new MountItemEvent().Execute(player, newItem);

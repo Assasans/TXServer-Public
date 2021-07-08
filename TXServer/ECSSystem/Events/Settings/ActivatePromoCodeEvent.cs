@@ -64,9 +64,9 @@ namespace TXServer.ECSSystem.Events.Settings
                 player.ShareEntities(NewItemNotificationTemplate.CreateEntity(entity, item));
 
 				if (item.Key == ExtraItems.GlobalItems.Crystal)
-					player.Data.SetCrystals(player.Data.Crystals + item.Value);
+					player.Data.Crystals += item.Value;
 	            else if (item.Key == ExtraItems.GlobalItems.Xcrystal)
-		            player.Data.SetXCrystals(player.Data.XCrystals + item.Value);
+		            player.Data.XCrystals += item.Value;
 	            else if (item.Key == ExtraItems.GlobalItems.Premiumboost)
 					player.Data.RenewPremium(new TimeSpan(item.Value, 0, 0, 0));
             }

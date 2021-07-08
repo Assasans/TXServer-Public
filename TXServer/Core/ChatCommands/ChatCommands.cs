@@ -847,7 +847,7 @@ namespace TXServer.Core.ChatCommands
                 conditions |= ChatCommandConditions.Admin;
             if (player.Data.Beta || player.Data.Admin)
                 conditions |= ChatCommandConditions.Tester;
-            if (player.IsPremium)
+            if (player.Data.IsPremium)
                 conditions |= ChatCommandConditions.Premium;
 
             if (player.IsInBattle)

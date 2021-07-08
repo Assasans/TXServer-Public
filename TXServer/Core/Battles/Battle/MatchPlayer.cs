@@ -88,7 +88,7 @@ namespace TXServer.Core.Battles
             if (Battle.IsMatchMaking) Player.CheckRankUp();
         }
 
-        public int GetScoreWithPremium(int score) => Player.IsPremium ? score * 2 : score;
+        public int GetScoreWithPremium(int score) => Player.Data.IsPremium ? score * 2 : score;
 
         public void HealthChanged()
         {
