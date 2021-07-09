@@ -10,17 +10,17 @@ using TXServer.Core.Logging;
 using TXServer.Core.Squads;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.User;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.Events;
-using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 using TXServer.Core.Database;
 using TXDatabase.NetworkEvents.Communications;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Components.User.Tutorial;
+using TXServer.ECSSystem.ServerComponents;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core
@@ -244,121 +244,18 @@ namespace TXServer.Core
 
         public void CheckRankUp()
         {
-            // todo: load this list from configs
-            List<long> experienceForRank = new()
-            {
-                0,
-                200,
-                800,
-                1800,
-                3200,
-                5000,
-                7200,
-                9800,
-                12800,
-                16200,
-                20000,
-                24200,
-                28800,
-                33800,
-                39200,
-                45000,
-                51200,
-                57800,
-                64800,
-                72200,
-                80000,
-                88200,
-                96800,
-                105800,
-                115200,
-                125000,
-                135200,
-                145800,
-                156800,
-                168200,
-                180000,
-                192200,
-                204800,
-                217800,
-                231200,
-                245000,
-                259200,
-                273800,
-                288800,
-                304200,
-                320000,
-                336200,
-                352800,
-                369800,
-                387200,
-                405000,
-                423200,
-                441800,
-                460800,
-                480200,
-                500000,
-                520200,
-                540800,
-                561800,
-                583200,
-                605000,
-                627200,
-                649800,
-                672800,
-                696200,
-                720000,
-                744200,
-                768800,
-                793800,
-                819200,
-                845000,
-                871200,
-                897800,
-                924800,
-                952200,
-                980000,
-                1008200,
-                1036800,
-                1065800,
-                1095200,
-                1125000,
-                1155200,
-                1185800,
-                1216800,
-                1248200,
-                1280000,
-                1312200,
-                1344800,
-                1377800,
-                1411200,
-                1445000,
-                1479200,
-                1513800,
-                1548800,
-                1584200,
-                1620000,
-                1656200,
-                1692800,
-                1729800,
-                1767200,
-                1805000,
-                1843200,
-                1881800,
-                1920800,
-                1960200,
-                2000000
-            };
+            List<int> experiencePerRank = Config.GetComponent<RanksExperiencesConfigComponent>("ranksconfig").RanksExperiences;
+            experiencePerRank.Insert(0, 0);
+            experiencePerRank.Sort((a, b) => a.CompareTo(b));
 
             MatchPlayer matchPlayer = BattlePlayer?.MatchPlayer;
 
             long totalExperience = Data.Experience;
             if (IsInMatch && matchPlayer != null)
-                totalExperience += BattlePlayer.MatchPlayer.GetScoreWithPremium(matchPlayer.RoundUser
-                    .GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses) -
+                totalExperience += BattlePlayer.MatchPlayer.UserResult.ScoreToExperience -
                                    BattlePlayer.MatchPlayer.AlreadyAddedExperience;
 
-            int correctRank = experienceForRank.IndexOf(experienceForRank.LastOrDefault(x => x <= totalExperience)) + 1;
+            int correctRank = experiencePerRank.IndexOf(experiencePerRank.LastOrDefault(x => x <= totalExperience)) + 1;
 
             if (User.GetComponent<UserRankComponent>().Rank >= correctRank) return;
             User.ChangeComponent(new UserRankComponent(correctRank));
@@ -366,11 +263,7 @@ namespace TXServer.Core
             // (https://vignette2.wikia.nocookie.net/tanki-x/images/f/fb/Rankit.png/revision/latest?cb=20170629172052)
             ShareEntities(UserRankRewardNotificationTemplate.CreateEntity(100, 5000, correctRank));
 
-            if (!IsInMatch || matchPlayer == null) return;
-            BattlePlayer.Battle.PlayersInMap.SendEvent(new UpdateRankEvent(), User);
-            int currentScoreInBattle = matchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
-            Data.SetExperience(Data.Experience + matchPlayer.GetScoreWithPremium(currentScoreInBattle), false);
-            matchPlayer.AlreadyAddedExperience += currentScoreInBattle;
+            if (IsInMatch) BattlePlayer.MatchPlayer.RankUp();
         }
 
         /// <summary>

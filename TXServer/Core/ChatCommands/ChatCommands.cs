@@ -765,8 +765,10 @@ namespace TXServer.Core.ChatCommands
                     List<BattleTankPlayer> targets = FindTargets(args[0], player);
                     if (targets.Count == 1)
                     {
+                        if (!targets[0].Player.IsInMatch)
+                            return "Command error, target is in the battle lobby";
                         if (targets[0].MatchPlayer.TankState is TankState.Dead or TankState.Spawn)
-                            return "Command error, targeted player is currently spawning";
+                            return "Command error, targeted is currently spawning";
                         if (targets[0] == player.BattlePlayer)
                             return "Nope";
 

@@ -141,6 +141,12 @@ namespace TXServer.Core.Battles
             Tank.AddComponent(new TankMovementComponent(new Movement(position, Vector3.Zero, Vector3.Zero, rotation), new MoveControl(), 0, 0));
         }
 
+        public void RankUp()
+        {
+            Battle.PlayersInMap.SendEvent(new UpdateRankEvent(), Player.User);
+            Player.Data.SetExperience(Player.Data.Experience + GetScoreWithPremium(UserResult.Score), false);
+            AlreadyAddedExperience += UserResult.Score;
+        }
 
         public bool TryGetModule(Type moduleType, out BattleModule module)
         {
