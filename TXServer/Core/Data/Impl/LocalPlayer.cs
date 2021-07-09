@@ -43,12 +43,15 @@ namespace TXServer.Core.Data.Database.Impl
                 Punishments = new List<Punishment>();
                 CompletedTutorialIds = new List<ulong>();
 
+                Containers = new Dictionary<long, int>();
                 Covers = new List<long> {-172249613};
                 Graffities = new List<long> {1001404575};
                 Hulls = new List<long> {537781597};
                 HullSkins = new List<long> {1589207088};
                 Modules = new Dictionary<long, (int, int)>();
                 Paints = new List<long> {-20020438};
+                Shells = new List<long> {-966935184, 807172229, 357929046, 48235025, 1067800943, 1322064226, 70311513,
+                    530945311, -1408603862, 139800007, 366763244};
                 Weapons = new List<long> {-2005747272};
                 WeaponSkins = new List<long> {2008385753};
 

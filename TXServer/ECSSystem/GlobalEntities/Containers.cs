@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Reflection;
 using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -9,13 +10,14 @@ namespace TXServer.ECSSystem.GlobalEntities
     public static class Containers
     {
         public static Items GlobalItems { get; } = new Items();
-        public static Items GetUserItems(Entity user)
+        public static Items GetUserItems(Player player)
         {
             Items items = new Items();
 
             foreach (PropertyInfo info in typeof(Items).GetProperties())
             {
                 Entity item = info.GetValue(items) as Entity;
+                long id = item.EntityId;
                 item.EntityId = Entity.GenerateId();
 
                 switch (item.TemplateAccessor.Template)
@@ -35,8 +37,9 @@ namespace TXServer.ECSSystem.GlobalEntities
                 }
 
                 item.Components.Remove(new RestrictionByUserFractionComponent());
-                item.Components.Add(new UserGroupComponent(user.EntityId));
-                item.Components.Add(new UserItemCounterComponent(0));
+                item.Components.Add(new UserGroupComponent(player.User));
+                item.Components.Add(
+                    new UserItemCounterComponent(player.Data.Containers.TryGetValue(id, out int amount) ? amount : 0));
                 item.Components.Add(new NotificationGroupComponent(item.EntityId));
             }
 

@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Events.Item
 		public void Execute(Player player, Entity user, Entity item)
         {
             player.Data.XCrystals -= Price;
-            BuyMarketItemEvent.HandleNewItem(player, item);
+            BuyMarketItemEvent.HandleNewItem(player, item, Amount);
         }
 
 		public int Price { get; set; }

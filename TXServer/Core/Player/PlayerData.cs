@@ -126,12 +126,14 @@ namespace TXServer.Core
         public List<ulong> CompletedTutorialIds { get; set; }
         public List<ChatCommands.Punishment> Punishments { get; protected set; }
 
+        public Dictionary<long, int> Containers { get; protected set; }
         public List<long> Covers { get; protected set; }
         public List<long> Graffities { get; protected set; }
         public List<long> Hulls { get; protected set; }
         public List<long> HullSkins { get; protected set; }
         public Dictionary<long, (int, int)> Modules { get; protected set; }
         public List<long> Paints { get; protected set; }
+        public List<long> Shells { get; protected set; }
         public List<long> Weapons { get; protected set; }
         public List<long> WeaponSkins { get; protected set; }
 

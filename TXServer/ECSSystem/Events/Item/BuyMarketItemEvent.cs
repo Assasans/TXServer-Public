@@ -15,11 +15,12 @@ namespace TXServer.ECSSystem.Events.Item
         public void Execute(Player player, Entity user, Entity item)
         {
             player.Data.Crystals -= Price;
-            HandleNewItem(player, item);
+            HandleNewItem(player, item, Amount);
         }
 
-        public static void HandleNewItem(Player player, Entity item)
+        public static void HandleNewItem(Player player, Entity item, int amount)
         {
+            bool mountItem = true;
             Type templateType;
             switch (item.TemplateAccessor.Template)
             {
@@ -27,9 +28,21 @@ namespace TXServer.ECSSystem.Events.Item
                     templateType = typeof(GraffitiUserItemTemplate);
                     player.Data.Graffities.Add(item.EntityId);
                     break;
+                case ContainerPackPriceMarketItemTemplate or GameplayChestMarketItemTemplate or
+                    TutorialGameplayChestMarketItemTemplate or DonutChestMarketItemTemplate:
+                    templateType = ContainerTemplates[item.TemplateAccessor.Template.GetType()];
+                    mountItem = false;
+
+                    player.Data.Containers.TryGetValue(item.EntityId, out int oldAmount);
+                    player.Data.Containers[item.EntityId] = oldAmount + amount;
+                    break;
                 case HullSkinMarketItemTemplate:
                     templateType = typeof(HullSkinUserItemTemplate);
                     player.Data.HullSkins.Add(item.EntityId);
+                    break;
+                case ShellMarketItemTemplate:
+                    templateType = typeof(ShellUserItemTemplate);
+                    player.Data.Shells.Add(item.EntityId);
                     break;
                 case TankPaintMarketItemTemplate:
                     templateType = typeof(TankPaintUserItemTemplate);
@@ -39,8 +52,8 @@ namespace TXServer.ECSSystem.Events.Item
                     templateType = typeof(TankUserItemTemplate);
                     player.Data.Hulls.Add(item.EntityId);
                     break;
-                case { } n when WeaponTypes.Keys.Contains(n.GetType()):
-                    templateType = WeaponTypes[item.TemplateAccessor.Template.GetType()];
+                case { } n when WeaponTemplates.Keys.Contains(n.GetType()):
+                    templateType = WeaponTemplates[item.TemplateAccessor.Template.GetType()];
                     player.Data.Weapons.Add(item.EntityId);
                     break;
                 case WeaponSkinMarketItemTemplate:
@@ -60,15 +73,29 @@ namespace TXServer.ECSSystem.Events.Item
                 templateType == e.TemplateAccessor.Template.GetType() &&
                 e.GetComponent<MarketItemGroupComponent>().Key == item.EntityId);
 
-            userItem.AddComponent(new UserGroupComponent(player.User));
+            if (!userItem.HasComponent<UserGroupComponent>())
+                userItem.AddComponent(new UserGroupComponent(player.User));
+            if (userItem.HasComponent<UserItemCounterComponent>())
+            {
+                userItem.ChangeComponent<UserItemCounterComponent>(component => component.Count += amount);
+                player.SendEvent(new ItemsCountChangedEvent(amount), userItem);
+            }
 
-            new MountItemEvent().Execute(player, userItem);
+            if (mountItem)
+                new MountItemEvent().Execute(player, userItem);
         }
 
         public int Price { get; set; }
         public int Amount { get; set; }
 
-        private static readonly Dictionary<Type, Type> WeaponTypes = new()
+        private static readonly Dictionary<Type, Type> ContainerTemplates = new()
+        {
+            {typeof(ContainerPackPriceMarketItemTemplate), typeof(ContainerUserItemTemplate)},
+            {typeof(GameplayChestMarketItemTemplate), typeof(GameplayChestUserItemTemplate)},
+            {typeof(TutorialGameplayChestMarketItemTemplate), typeof(TutorialGameplayChestUserItemTemplate)},
+            {typeof(DonutChestMarketItemTemplate), typeof(SimpleChestUserItemTemplate)}
+        };
+        private static readonly Dictionary<Type, Type> WeaponTemplates = new()
         {
             {typeof(FlamethrowerMarketItemTemplate), typeof(FlamethrowerUserItemTemplate)},
             {typeof(FreezeMarketItemTemplate), typeof(FreezeUserItemTemplate)},
