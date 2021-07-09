@@ -6,10 +6,10 @@ using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Item.Module;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 
-namespace TXServer.ECSSystem.Events.Garage.Module
+namespace TXServer.ECSSystem.Events.Item
 {
-    [SerialVersionUID(636329559762986136L)]
-    public class UpgradeModuleWithCrystalsEvent : ECSEvent
+    [SerialVersionUID(636407242256473252L)]
+    public class UpgradeModuleWithXCrystalsEvent : ECSEvent
     {
         public static void Execute(Player player, Entity marketItem)
         {
@@ -18,8 +18,8 @@ namespace TXServer.ECSSystem.Events.Garage.Module
             Entity moduleItem = player.EntityList.Single(e => e.TemplateAccessor.Template is
                 ModuleUserItemTemplate && e.GetComponent<ParentGroupComponent>().Key == id);
 
-            player.Data.Crystals -= moduleItem.GetComponent<ModuleCardsCompositionComponent>()
-                .AllPrices[infos.level + 1].Crystals;
+            player.Data.XCrystals -= moduleItem.GetComponent<ModuleCardsCompositionComponent>()
+                .AllPrices[infos.level + 1].XCrystals;
 
             player.Data.UpgradeModule(marketItem);
         }

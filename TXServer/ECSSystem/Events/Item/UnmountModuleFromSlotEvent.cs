@@ -3,7 +3,7 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 
-namespace TXServer.ECSSystem.Events
+namespace TXServer.ECSSystem.Events.Item
 {
     [SerialVersionUID(1485777830853L)]
 	public class UnmountModuleFromSlotEvent : ECSEvent

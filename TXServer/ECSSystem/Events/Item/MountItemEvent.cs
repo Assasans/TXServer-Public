@@ -7,7 +7,7 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
 
-namespace TXServer.ECSSystem.Events
+namespace TXServer.ECSSystem.Events.Item
 {
     [SerialVersionUID(1434530333851L)]
 	public class MountItemEvent : ECSEvent

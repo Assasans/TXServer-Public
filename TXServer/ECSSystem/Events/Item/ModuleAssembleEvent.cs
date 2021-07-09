@@ -2,7 +2,7 @@ using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Events.Garage.Module
+namespace TXServer.ECSSystem.Events.Item
 {
     [SerialVersionUID(1485504324992L)]
     public class ModuleAssembleEvent : ECSEvent

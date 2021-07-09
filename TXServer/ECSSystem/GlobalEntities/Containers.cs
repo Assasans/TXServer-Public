@@ -1,5 +1,4 @@
-﻿
-using System.Reflection;
+﻿using System.Reflection;
 using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -37,7 +36,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.Components.Remove(new RestrictionByUserFractionComponent());
                 item.Components.Add(new UserGroupComponent(user.EntityId));
-                item.Components.Add(new UserItemCounterComponent(2));
+                item.Components.Add(new UserItemCounterComponent(0));
                 item.Components.Add(new NotificationGroupComponent(item.EntityId));
             }
 

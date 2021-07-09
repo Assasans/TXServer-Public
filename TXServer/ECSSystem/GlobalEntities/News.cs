@@ -13,13 +13,13 @@ namespace TXServer.ECSSystem.GlobalEntities
         public class Items : ItemList
         {
             // todo: host pictures on yourself & store news items in json
-            public Entity AllFree { get; } = new Entity(-1837531154,
+            /*public Entity AllFree { get; } = new Entity(-1837531154,
                 new TemplateAccessor(new ConfiguredNewsItemTemplate(), null),
                 new NewsItemComponent(headerText:"Everything is free!",
                     previewImageUrl:"https://i.imgur.com/XKNu1OE.png",
                     toolTip:"Everything is free in the current state of the server",
                     layout:NewsItemLayout.MEDIUM),
-                new NewsItemSaleLabelComponent("100%"));
+                new NewsItemSaleLabelComponent("100%"));*/
             public Entity Discord { get; } = new Entity(-1837531150,
                 new TemplateAccessor(new ConfiguredNewsItemTemplate(), null),
                 new NewsItemComponent(headerText:"Discord Server",

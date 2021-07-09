@@ -43,7 +43,14 @@ namespace TXServer.Core.Data.Database.Impl
                 Punishments = new List<Punishment>();
                 CompletedTutorialIds = new List<ulong>();
 
+                Covers = new List<long> {-172249613};
+                Graffities = new List<long> {1001404575};
+                Hulls = new List<long> {537781597};
+                HullSkins = new List<long> {1589207088};
                 Modules = new Dictionary<long, (int, int)>();
+                Paints = new List<long> {-20020438};
+                Weapons = new List<long> {-2005747272};
+                WeaponSkins = new List<long> {2008385753};
 
                 Original = (PlayerData) Clone();
             }

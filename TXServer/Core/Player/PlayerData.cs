@@ -14,7 +14,7 @@ using TXServer.ECSSystem.Components.User;
 using TXServer.ECSSystem.Components.User.Tutorial;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
-using TXServer.ECSSystem.Events.Garage.Module;
+using TXServer.ECSSystem.Events.Item;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core
@@ -126,7 +126,14 @@ namespace TXServer.Core
         public List<ulong> CompletedTutorialIds { get; set; }
         public List<ChatCommands.Punishment> Punishments { get; protected set; }
 
+        public List<long> Covers { get; protected set; }
+        public List<long> Graffities { get; protected set; }
+        public List<long> Hulls { get; protected set; }
+        public List<long> HullSkins { get; protected set; }
         public Dictionary<long, (int, int)> Modules { get; protected set; }
+        public List<long> Paints { get; protected set; }
+        public List<long> Weapons { get; protected set; }
+        public List<long> WeaponSkins { get; protected set; }
 
 
         public PlayerData(string uid)

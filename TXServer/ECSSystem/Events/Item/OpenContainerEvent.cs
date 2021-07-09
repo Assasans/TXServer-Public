@@ -7,7 +7,7 @@ using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 
-namespace TXServer.ECSSystem.Events
+namespace TXServer.ECSSystem.Events.Item
 {
     [SerialVersionUID(1480325268669L)]
 	public class OpenContainerEvent : ECSEvent
