@@ -3,7 +3,7 @@ using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Events.Battle
+namespace TXServer.ECSSystem.Events.Battle.Flag
 {
     [SerialVersionUID(-1910863908782544246L)]
     public class FlagDropRequestEvent : ECSEvent
@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events.Battle
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
             var handler = (Core.Battles.Battle.CTFHandler)battle.ModeHandler;
 
-            Flag enemyFlag = handler.BattleViewFor(player.BattlePlayer).EnemyTeamFlag;
+            Core.Battles.Flag enemyFlag = handler.BattleViewFor(player.BattlePlayer).EnemyTeamFlag;
 
             if (enemyFlag.State == FlagState.Captured)
                 enemyFlag.Drop(true);

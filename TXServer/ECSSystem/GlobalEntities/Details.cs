@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;

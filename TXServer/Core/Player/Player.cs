@@ -19,6 +19,7 @@ using static TXServer.Core.Battles.Battle;
 using TXServer.Core.Database;
 using TXDatabase.NetworkEvents.Communications;
 using TXServer.Core.Configuration;
+using TXServer.ECSSystem.Components.DailyBonus;
 using TXServer.ECSSystem.Components.User.Tutorial;
 using TXServer.ECSSystem.ServerComponents;
 using TXServer.ECSSystem.Types;
@@ -179,11 +180,11 @@ namespace TXServer.Core
 
                 new BlackListComponent(),
 
-				//new UserDailyBonusCycleComponent(1),
-				//new UserDailyBonusReceivedRewardsComponent(),
-				//new UserDailyBonusZoneComponent(1),
-				//new UserDailyBonusNextReceivingDateComponent(),
-				//new UserDailyBonusInitializedComponent(),
+                new UserDailyBonusInitializedComponent(),
+				new UserDailyBonusCycleComponent(Data.DailyBonusCycle),
+				new UserDailyBonusReceivedRewardsComponent(),
+				new UserDailyBonusZoneComponent(Data.DailyBonusZone),
+				new UserDailyBonusNextReceivingDateComponent(Data.DailyBonusNextReceiveDate),
 
                 new QuestReadyComponent(),
                 new UserPublisherComponent(),

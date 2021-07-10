@@ -10,7 +10,7 @@ using TXServer.ECSSystem.Events.Battle.VisualScore;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
-namespace TXServer.ECSSystem.Events.Battle
+namespace TXServer.ECSSystem.Events.Battle.Flag
 {
     [SerialVersionUID(1463741053998L)]
     public class FlagCollisionRequestEvent : ECSEvent
@@ -20,10 +20,10 @@ namespace TXServer.ECSSystem.Events.Battle
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
             var handler = (CTFHandler)battle.ModeHandler;
 
-            Flag flag = handler.Flags.Values.First(x => x.FlagEntity == flagEntity);
+            Core.Battles.Flag flag = handler.Flags.Values.First(x => x.FlagEntity == flagEntity);
 
             BattleView view = handler.BattleViewFor(player.BattlePlayer);
-            
+
             if (battle.BattleState == BattleState.WarmUp)
                 return;
 
@@ -32,7 +32,7 @@ namespace TXServer.ECSSystem.Events.Battle
                 case FlagState.Home:
                     if (flagEntity.GetComponent<TeamGroupComponent>().Key == tank.GetComponent<TeamGroupComponent>().Key)
                     {
-                        Flag carriedFlag = handler.Flags.Values.First(x => x != flag);
+                        Core.Battles.Flag carriedFlag = handler.Flags.Values.First(x => x != flag);
 
                         if (carriedFlag.State != FlagState.Captured) return;
                         if (carriedFlag.FlagEntity.GetComponent<TankGroupComponent>()?.Key != tank.EntityId) return;

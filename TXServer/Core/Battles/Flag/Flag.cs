@@ -14,6 +14,7 @@ using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Events.Battle.Flag;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
 using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.Types;

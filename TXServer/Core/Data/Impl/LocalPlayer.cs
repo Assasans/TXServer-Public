@@ -29,6 +29,11 @@ namespace TXServer.Core.Data.Database.Impl
                 Experience = 0;
                 PremiumExpirationDate = DateTime.MinValue;
 
+                DailyBonusCycle = 0;
+                DailyBonusNextReceiveDate = DateTime.UtcNow;
+                DailyBonusReceivedRewards = new List<long>();
+                DailyBonusZone = 0;
+
                 Reputation = 100;
                 League = Leagues.GlobalItems.Training;
                 LeagueChestScore = 0;

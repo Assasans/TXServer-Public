@@ -10,11 +10,13 @@ using TXServer.Core.Configuration;
 using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.DailyBonus;
 using TXServer.ECSSystem.Components.Item.Module;
 using TXServer.ECSSystem.Components.User;
 using TXServer.ECSSystem.Components.User.Tutorial;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
+using TXServer.ECSSystem.Events.DailyBonus;
 using TXServer.ECSSystem.Events.Item;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents;
@@ -101,6 +103,48 @@ namespace TXServer.Core
         public int CurrentBattleSeries { get; set; }
         public long Experience { get; protected set; }
         public int GoldBoxes { get; private set; } = 5;
+
+        public int DailyBonusCycle
+        {
+            get => _dailyBonusCycle;
+            set
+            {
+                _dailyBonusCycle = value;
+                if (Player?.User is null) return;
+
+                Player.User.ChangeComponent<UserDailyBonusCycleComponent>(component => component.CycleNumber = value);
+                Player.SendEvent(new DailyBonusCycleSwitchedEvent(), Player.User);
+            }
+        }
+        public DateTime DailyBonusNextReceiveDate
+        {
+            get => _dailyBonusNextReceiveDate;
+            set
+            {
+                _dailyBonusNextReceiveDate = value;
+                if (Player?.User is null) return;
+
+                Player.User.ChangeComponent<UserDailyBonusNextReceivingDateComponent>(component =>
+                {
+                    component.Date = value;
+                    component.TotalMillisLength = (long) (value - DateTime.UtcNow).TotalMilliseconds;
+                });
+            }
+        }
+
+        protected List<long> DailyBonusReceivedRewards { get; set; }
+        public int DailyBonusZone
+        {
+            get => _dailyBonusZone;
+            set
+            {
+                _dailyBonusZone = value;
+                if (Player?.User is null) return;
+
+                Player.User.ChangeComponent<UserDailyBonusZoneComponent>(component => component.ZoneNumber = value);
+                Player.SendEvent(new DailyBonusZoneSwitchedEvent(), Player.User);
+            }
+        }
 
         public Entity League { get; protected set; }
         public int Reputation
@@ -277,6 +321,13 @@ namespace TXServer.Core
                 Server.DatabaseNetwork.Socket.emit(new SetPremiumExpiration() { uid = UniqueId, expiration = PremiumExpirationDate.Ticks });
         }
 
+        public void AddDailyBonusReward(long code)
+        {
+            DailyBonusReceivedRewards.Add(code);
+            Player.User.ChangeComponent<UserDailyBonusReceivedRewardsComponent>(component =>
+                            component.ReceivedRewards.Add(code));
+        }
+
         public void AddIncomingFriend(long userId)
         {
             IncomingFriendIds.Add(userId);
@@ -443,5 +494,9 @@ namespace TXServer.Core
         private long _xCrystals;
 
         private long _avatar;
+
+        private int _dailyBonusCycle;
+        private DateTime _dailyBonusNextReceiveDate;
+        private int _dailyBonusZone;
     }
 }

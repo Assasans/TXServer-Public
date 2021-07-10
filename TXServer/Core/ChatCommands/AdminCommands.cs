@@ -15,6 +15,7 @@ namespace TXServer.Core.ChatCommands
         private static readonly Dictionary<string, (string, ChatCommandConditions, Func<Player, string[], string>)> Commands = new()
         {
             { "battlemode", ("battlemode [opt: shortcut]", ChatCommandConditions.InactiveBattle, ChangeBattleMode) },
+            { "dailybonus", (null, ChatCommandConditions.None, DailyBonusRecharge)},
             { "finish", (null, ChatCommandConditions.ActiveBattle, Finish) },
             { "friendlyfire", (null, ChatCommandConditions.InactiveBattle, ChangeFriendlyFire) },
             { "goldrain", (null, ChatCommandConditions.ActiveBattle, GoldboxRain) },
@@ -108,6 +109,16 @@ namespace TXServer.Core.ChatCommands
             player.BattlePlayer.Battle.UpdateParams(newParams);
 
             return $"{(newParams.DisabledModules ? "Deactivated" : "Activated")} modules";
+        }
+
+        private static string DailyBonusRecharge(Player player, string[] args)
+        {
+            bool alreadyAvailable = player.Data.DailyBonusNextReceiveDate <= DateTime.UtcNow;
+            player.Data.DailyBonusNextReceiveDate = DateTime.UtcNow;
+
+            return alreadyAvailable
+                ? "Command: daily bonus is already available"
+                : "Command: recharged teleportation device";
         }
 
 

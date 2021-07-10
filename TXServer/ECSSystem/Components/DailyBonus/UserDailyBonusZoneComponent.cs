@@ -1,7 +1,7 @@
 ﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Components
+namespace TXServer.ECSSystem.Components.DailyBonus
 {
     [SerialVersionUID(636459062089487176)]
     public class UserDailyBonusZoneComponent : Component
