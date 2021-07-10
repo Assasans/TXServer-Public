@@ -20,7 +20,6 @@ namespace TXServer.Core.Data.Database.Impl
                 HashedPassword = "abc";
                 RememberMe = true;
                 CountryCode = "EN";
-                Avatar = "8b74e6a3-849d-4a8d-a20e-be3c142fd5e8";
                 Admin = true;
                 Beta = true;
                 Mod = true;
@@ -43,6 +42,7 @@ namespace TXServer.Core.Data.Database.Impl
                 Punishments = new List<Punishment>();
                 CompletedTutorialIds = new List<ulong>();
 
+                Avatar = 6224;
                 Avatars = new List<long> {6224};
                 Containers = new Dictionary<long, int>();
                 Covers = new List<long> {-172249613};

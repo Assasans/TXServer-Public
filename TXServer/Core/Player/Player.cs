@@ -123,7 +123,6 @@ namespace TXServer.Core
             {
                 dataProxy.SetSettings(
                     Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(settingsData.countryCode),
-                    Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(settingsData.avatar),
                     new DateTime(settingsData.premiumExpiration),
                     settingsData.subscribed
                 );
@@ -154,7 +153,7 @@ namespace TXServer.Core
 
                 new UserUidComponent(Data.Username),
                 new UserCountryComponent(Data.CountryCode),
-                new UserAvatarComponent(Data.Avatar),
+                new UserAvatarComponent("8b74e6a3-849d-4a8d-a20e-be3c142fd5e8"),
                 new RegistrationDateComponent(),
 
                 new UserMoneyComponent(Data.Crystals),

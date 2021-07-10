@@ -6,6 +6,7 @@ using TXServer.Core.Commands;
 using TXServer.Core.Data.Database;
 using TXDatabase.NetworkEvents.PlayerAuth;
 using TXDatabase.NetworkEvents.PlayerSettings;
+using TXServer.Core.Configuration;
 using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -16,6 +17,7 @@ using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 using TXServer.ECSSystem.Events.Item;
 using TXServer.ECSSystem.GlobalEntities;
+using TXServer.ECSSystem.ServerComponents;
 
 namespace TXServer.Core
 {
@@ -51,7 +53,21 @@ namespace TXServer.Core
         public bool RememberMe { get; set; }
 
         public string CountryCode { get; protected set; }
-        public string Avatar { get; protected set; }
+
+        public long Avatar
+        {
+            get => _avatar;
+            set
+            {
+                _avatar = value;
+                if (Player?.User is null) return;
+
+                // todo: database set
+                string configPath = Player.EntityList.Single(e => e.EntityId == value).TemplateAccessor.ConfigPath;
+                string avatarId = Config.GetComponent<AvatarItemComponent>(configPath).Id;
+                Player.User.ChangeComponent<UserAvatarComponent>(component => component.Id = avatarId);
+            }
+        }
 
         public bool Admin { get; set; }
         public bool Beta { get; protected set; }
@@ -206,15 +222,6 @@ namespace TXServer.Core
                     uid = UniqueId,
                     countryCode = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(countryCode)
                 });
-        }
-
-        public void SetAvatar(string avatarId)
-        {
-            Avatar = avatarId;
-            Player.User.ChangeComponent(new UserAvatarComponent(avatarId));
-            if (Server.DatabaseNetwork.IsReady)
-                Server.DatabaseNetwork.Socket.emit(new SetAvatar
-                    {uid = UniqueId, avatar = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(avatarId)});
         }
 
         public void SetAdmin(bool admin)
@@ -428,9 +435,13 @@ namespace TXServer.Core
 
 
         private string _username;
+
         private int _reputation;
         private long _leagueChestScore;
+
         private long _crystals;
         private long _xCrystals;
+
+        private long _avatar;
     }
 }

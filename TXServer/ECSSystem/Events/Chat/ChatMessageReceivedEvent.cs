@@ -6,6 +6,7 @@ using TXServer.Core.ChatCommands;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.User;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.ECSSystem.Events.Chat

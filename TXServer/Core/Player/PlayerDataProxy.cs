@@ -31,7 +31,7 @@ namespace TXServer.Core
                 Username = "tim";
                 HashedPassword = "abc";
                 CountryCode = "EN";
-                Avatar = "8b74e6a3-849d-4a8d-a20e-be3c142fd5e8";
+                Avatar = 6224;
                 Admin = true;
                 Beta = false;
                 Crystals = 1000000;
@@ -46,10 +46,11 @@ namespace TXServer.Core
             return this;
         }
 
-        public void SetSettings(string countryCode, string avatar, DateTime premiumExpiration, bool subscribed)
+        public void SetSettings(string countryCode, DateTime premiumExpiration, bool subscribed)
         {
             CountryCode = countryCode;
-            Avatar = avatar;
+            // todo: fix avatar in db (set to long [Entity ID] instead of string]
+            Avatar = 6224;
             PremiumExpirationDate = premiumExpiration;
             Subscribed = subscribed;
         }
