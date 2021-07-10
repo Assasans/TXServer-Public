@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using TXServer.Core;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.EntityTemplates;
+using TXServer.ECSSystem.Events.Item;
 
 namespace TXServer.ECSSystem.GlobalEntities
 {
@@ -112,5 +116,93 @@ namespace TXServer.ECSSystem.GlobalEntities
 
             return entities.ToArray();
         }
+
+        public static Entity GetUserItem(Player player, Entity marketItem)
+        {
+            return player.EntityList.Single(e =>
+                MarketToUserTemplate[marketItem.TemplateAccessor.Template.GetType()] ==
+                e.TemplateAccessor.Template.GetType() &&
+                e.GetComponent<MarketItemGroupComponent>().Key == marketItem.EntityId);
+        }
+
+        public static void SaveNewMarketItem(Player player, Entity marketItem, int amount)
+        {
+            switch (marketItem.TemplateAccessor.Template)
+            {
+                case AvatarMarketItemTemplate:
+                    player.Data.Avatars.Add(marketItem.EntityId);
+                    break;
+                case ChildGraffitiMarketItemTemplate or GraffitiMarketItemTemplate:
+                    player.Data.Graffities.Add(marketItem.EntityId);
+                    break;
+                case ContainerPackPriceMarketItemTemplate or GameplayChestMarketItemTemplate or
+                    TutorialGameplayChestMarketItemTemplate or DonutChestMarketItemTemplate:
+                    player.Data.Containers.TryGetValue(marketItem.EntityId, out int oldAmount);
+                    player.Data.Containers[marketItem.EntityId] = oldAmount + amount;
+                    break;
+                case HullSkinMarketItemTemplate:
+                    player.Data.HullSkins.Add(marketItem.EntityId);
+                    break;
+                case ShellMarketItemTemplate:
+                    player.Data.Shells.Add(marketItem.EntityId);
+                    break;
+                case TankPaintMarketItemTemplate:
+                    player.Data.Paints.Add(marketItem.EntityId);
+                    break;
+                case TankMarketItemTemplate:
+                    player.Data.Hulls.Add(marketItem.EntityId);
+                    break;
+                case { } n when MarketToUserTemplate.Keys.Contains(n.GetType()):
+                    player.Data.Weapons.Add(marketItem.EntityId);
+                    break;
+                case WeaponSkinMarketItemTemplate:
+                    player.Data.WeaponSkins.Add(marketItem.EntityId);
+                    break;
+                case WeaponPaintMarketItemTemplate:
+                    player.Data.Covers.Add(marketItem.EntityId);
+                    break;
+            }
+
+            Entity userItem = GetUserItem(player, marketItem);
+            if (!userItem.HasComponent<UserGroupComponent>())
+                userItem.AddComponent(new UserGroupComponent(player.User));
+            if (userItem.HasComponent<UserItemCounterComponent>())
+            {
+                userItem.ChangeComponent<UserItemCounterComponent>(component => component.Count += amount);
+                player.SendEvent(new ItemsCountChangedEvent(amount), userItem);
+            }
+        }
+
+        private static readonly Dictionary<Type, Type> MarketToUserTemplate = new()
+        {
+            {typeof(AvatarMarketItemTemplate), typeof(AvatarUserItemTemplate)},
+
+            {typeof(ChildGraffitiMarketItemTemplate), typeof(GraffitiUserItemTemplate)},
+            {typeof(GraffitiMarketItemTemplate), typeof(GraffitiUserItemTemplate)},
+
+            {typeof(ContainerPackPriceMarketItemTemplate), typeof(ContainerUserItemTemplate)},
+            {typeof(GameplayChestMarketItemTemplate), typeof(GameplayChestUserItemTemplate)},
+            {typeof(TutorialGameplayChestMarketItemTemplate), typeof(TutorialGameplayChestUserItemTemplate)},
+            {typeof(DonutChestMarketItemTemplate), typeof(SimpleChestUserItemTemplate)},
+
+            {typeof(HullSkinMarketItemTemplate), typeof(HullSkinUserItemTemplate)},
+            {typeof(ShellMarketItemTemplate), typeof(ShellUserItemTemplate)},
+            {typeof(TankPaintMarketItemTemplate), typeof(TankPaintUserItemTemplate)},
+            {typeof(TankMarketItemTemplate), typeof(TankUserItemTemplate)},
+            {typeof(WeaponSkinMarketItemTemplate), typeof(WeaponSkinUserItemTemplate)},
+            {typeof(WeaponPaintMarketItemTemplate), typeof(WeaponPaintUserItemTemplate)},
+
+            {typeof(FlamethrowerMarketItemTemplate), typeof(FlamethrowerUserItemTemplate)},
+            {typeof(FreezeMarketItemTemplate), typeof(FreezeUserItemTemplate)},
+            {typeof(HammerMarketItemTemplate), typeof(HammerUserItemTemplate)},
+            {typeof(IsisMarketItemTemplate), typeof(IsisUserItemTemplate)},
+            {typeof(RailgunMarketItemTemplate), typeof(RailgunUserItemTemplate)},
+            {typeof(RicochetMarketItemTemplate), typeof(RicochetUserItemTemplate)},
+            {typeof(ShaftMarketItemTemplate), typeof(ShaftUserItemTemplate)},
+            {typeof(SmokyMarketItemTemplate), typeof(SmokyUserItemTemplate)},
+            {typeof(ThunderMarketItemTemplate), typeof(ThunderUserItemTemplate)},
+            {typeof(TwinsMarketItemTemplate), typeof(TwinsUserItemTemplate)},
+            {typeof(VulcanMarketItemTemplate), typeof(VulcanUserItemTemplate)}
+        };
     }
 }

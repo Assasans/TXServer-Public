@@ -10,18 +10,20 @@ namespace TXServer.ECSSystem.GlobalEntities
     {
         public static Items GlobalItems { get; } = new Items();
 
-        public static Items GetUserItems(Entity user)
+        public static Items GetUserItems(Player player)
         {
             Items items = new Items();
 
             foreach (PropertyInfo info in typeof(Items).GetProperties())
             {
                 Entity item = info.GetValue(items) as Entity;
+                long id = item.EntityId;
                 item.EntityId = Entity.GenerateId();
 
                 item.TemplateAccessor.Template = new AvatarUserItemTemplate();
 
-                item.Components.Add(new UserGroupComponent(user.EntityId));
+                if (player.Data.Hulls.Contains(id))
+                    item.Components.Add(new UserGroupComponent(player.User));
             }
 
             return items;

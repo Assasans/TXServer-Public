@@ -43,6 +43,7 @@ namespace TXServer.Core.Data.Database.Impl
                 Punishments = new List<Punishment>();
                 CompletedTutorialIds = new List<ulong>();
 
+                Avatars = new List<long> {6224};
                 Containers = new Dictionary<long, int>();
                 Covers = new List<long> {-172249613};
                 Graffities = new List<long> {1001404575};

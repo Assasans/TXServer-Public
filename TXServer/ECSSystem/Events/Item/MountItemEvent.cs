@@ -106,7 +106,7 @@ namespace TXServer.ECSSystem.Events.Item
 					prevItem = prevPreset.Preset;
                     break;
 				default:
-					throw new NotImplementedException();
+                    return;
 			}
 
 			prevItem.RemoveComponent<MountedItemComponent>();

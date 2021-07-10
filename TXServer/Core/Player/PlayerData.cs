@@ -71,7 +71,7 @@ namespace TXServer.Core
         }
         public long XCrystals
         {
-            get => _crystals;
+            get => _xCrystals;
             set
             {
                 _xCrystals = value;
@@ -126,6 +126,7 @@ namespace TXServer.Core
         public List<ulong> CompletedTutorialIds { get; set; }
         public List<ChatCommands.Punishment> Punishments { get; protected set; }
 
+        public List<long> Avatars { get; protected set; }
         public Dictionary<long, int> Containers { get; protected set; }
         public List<long> Covers { get; protected set; }
         public List<long> Graffities { get; protected set; }
@@ -146,6 +147,9 @@ namespace TXServer.Core
         public PlayerData(long uniqueId)
             => UniqueId = uniqueId;
 
+        public bool OwnsMarketItem(Entity marketItem) => Avatars.Concat(Covers).Concat(Graffities).Concat(Hulls)
+            .Concat(HullSkins).Concat(Paints).Concat(Shells).Concat(Weapons).Concat(WeaponSkins)
+            .Contains(marketItem.EntityId);
         public bool IsPremium => PremiumExpirationDate > DateTime.UtcNow;
 
         private void SetLeague(int reputation)
