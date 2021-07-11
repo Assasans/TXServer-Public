@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Item.Module.Slot;
 using TXServer.ECSSystem.EntityTemplates.Item.Slot;
 using TXServer.ECSSystem.Types;
 

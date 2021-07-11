@@ -10,6 +10,7 @@ using TXServer.ECSSystem.Components.Battle.Energy;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Weapon;
+using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.ECSSystem.EntityTemplates.Battle

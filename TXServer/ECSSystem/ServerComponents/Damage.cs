@@ -12,6 +12,17 @@ namespace TXServer.ECSSystem.ServerComponents
         {
         }
 
+        public class HealingPropertyComponent : RangedComponent
+        {
+        }
+
+        public class AimingMaxDamageProperty : RangedComponent
+        {
+        }
+        public class AimingMinDamageProperty : RangedComponent
+        {
+        }
+
         public class MinDamagePropertyComponent : RangedComponent
         {
         }

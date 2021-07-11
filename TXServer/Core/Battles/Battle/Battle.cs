@@ -342,7 +342,7 @@ namespace TXServer.Core.Battles
         {
             Player player = baseBattlePlayer.Player;
 
-            MatchMaking.ProcessDeserterState(player, this);
+            if (IsMatchMaking) MatchMaking.ProcessDeserterState(player, this);
 
             player.UnshareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
 

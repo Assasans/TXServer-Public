@@ -42,16 +42,14 @@ namespace TXServer.Core.Battles
             damager.UserResult.Damage += (int) damage;
             double diff = hitTarget.HitDirection.Y - victim.TankQuaternion.Y;
 
-            TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
-                $"[Damage] Rotation: {diff}",
-                damager.Battle.GeneralBattleChatEntity, damager.Player
-            );
+            //TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget($"[Damage] Rotation: {diff}",
+                //damager.Battle.GeneralBattleChatEntity, damager.Player);
 
-            // todo: set this correctly when back hits can be detected
+            /*// todo: set this correctly when back hits can be detected
             bool backHit = diff is < -0.8 and > -1.2;
             if (backHit && victim.TryGetModule(out BackhitDefenceModule backhitDefModule) &&
                 backhitDefModule.EffectIsActive)
-                    damage = backhitDefModule.GetReducedDamage(damage);
+                    damage = backhitDefModule.GetReducedDamage(damage);*/
 
             DealTemperature(weaponMarketItem, victim:victim, damager:damager);
 
@@ -79,7 +77,7 @@ namespace TXServer.Core.Battles
                 }
 
                 if (!IsModule(weaponMarketItem) || IsModule(weaponMarketItem) && damage != 0)
-                    damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, backHit), victim.Tank);
+                    damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false), victim.Tank);
                 victim.HealthChanged();
             });
         }
@@ -87,7 +85,6 @@ namespace TXServer.Core.Battles
         public static bool DealHeal(float healHp, MatchPlayer matchPlayer)
         {
             bool healed = true;
-
             matchPlayer.Tank.ChangeComponent<HealthComponent>(component =>
             {
                 if (component.MaxHealth.Equals(component.CurrentHealth))
@@ -101,6 +98,8 @@ namespace TXServer.Core.Battles
                 else
                     component.CurrentHealth += healHp;
             });
+            if (!healed) return healed;
+
             matchPlayer.SendEvent(new DamageInfoEvent(healHp, matchPlayer.TankPosition, healHit:true), matchPlayer.Tank);
             matchPlayer.HealthChanged();
             // Todo: fix position of heal info
@@ -108,7 +107,7 @@ namespace TXServer.Core.Battles
             return healed;
         }
 
-        public static void DealIsisHeal(float hp, MatchPlayer healer, MatchPlayer target, HitTarget hitTarget)
+        private static void DealIsisHeal(float hp, MatchPlayer healer, MatchPlayer target, HitTarget hitTarget)
         {
             target.Tank.ChangeComponent<TemperatureComponent>(component =>
             {
@@ -174,17 +173,18 @@ namespace TXServer.Core.Battles
                         Config.GetComponent<ServerComponents.Damage.DamagePerSecondPropertyComponent>(path);
                     WeaponCooldownComponent cooldownComponent = Config
                         .GetComponent<WeaponCooldownComponent>("battle/weapon/" + path.Split('/').Last());
-                    if (weapon.TemplateAccessor.Template is VulcanBattleItemTemplate)
-                        cooldownComponent.CooldownIntervalSec *= 2;
 
                     return (int) damageComponent.FinalValue * cooldownComponent.CooldownIntervalSec;
+                case HammerBattleItemTemplate:
+                    return Config.GetComponent<ServerComponents.Damage.DamagePerPelletPropertyComponent>(path
+                    ).FinalValue;
                 case IsisBattleItemTemplate:
                     float dps;
                     if (shooter.IsEnemyOf(target))
                         dps = Config.GetComponent<ServerComponents.Damage.DamagePerSecondPropertyComponent>(path)
                             .FinalValue;
                     else
-                        dps = Config.GetComponent<ServerComponents.Damage.DamagePerSecondPropertyComponent>(path)
+                        dps = Config.GetComponent<ServerComponents.Damage.HealingPropertyComponent>(path)
                             .FinalValue;
 
                     float cooldown = Config
@@ -192,9 +192,14 @@ namespace TXServer.Core.Battles
                         .CooldownIntervalSec;
 
                     return (int) dps * cooldown;
-                case HammerBattleItemTemplate:
-                    return Config.GetComponent<ServerComponents.Damage.DamagePerPelletPropertyComponent>(path
-                    ).FinalValue;
+                case RicochetBattleItemTemplate:
+                    var minAimingDamageComponent =
+                        Config.GetComponent<ServerComponents.Damage.MinDamagePropertyComponent>(path);
+                    var maxAimingDamageComponent =
+                        Config.GetComponent<ServerComponents.Damage.MaxDamagePropertyComponent>(path);
+
+                    return (int) Math.Round(new Random().NextGaussianRange(minAimingDamageComponent.FinalValue,
+                        maxAimingDamageComponent.FinalValue));
                 default:
                     var minDamageComponent =
                         Config.GetComponent<ServerComponents.Damage.MinDamagePropertyComponent>(path);
@@ -228,7 +233,7 @@ namespace TXServer.Core.Battles
                     if (distance < maxDamageDistance.FinalValue)
                         distanceModifier = 1;
                     else
-                        distanceModifier = MathUtils.Map(distance, maxDamageDistance.FinalValue, minDamageDistance.FinalValue, 1, minDamagePercent.FinalValue / 100);
+                        distanceModifier = MathUtils.Map(distance, minDamageDistance.FinalValue, maxDamageDistance.FinalValue, minDamagePercent.FinalValue / 100, 1);
 
                     return distanceModifier;
             }
@@ -306,20 +311,19 @@ namespace TXServer.Core.Battles
             {
                 case FireRingEffectTemplate:
                     DealTemperature(weaponMarketItem, target, shooter);
-
                     damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
                     break;
                 case FlamethrowerBattleItemTemplate or FreezeBattleItemTemplate:
                     damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
                     break;
-                case HammerBattleItemTemplate or SmokyBattleItemTemplate or ThunderBattleItemTemplate or
-                    VulcanBattleItemTemplate:
+                case HammerBattleItemTemplate or RicochetBattleItemTemplate or SmokyBattleItemTemplate or
+                    ThunderBattleItemTemplate or TwinsBattleItemTemplate or VulcanBattleItemTemplate:
                     damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
                     float distanceModifier = GetDamageDistanceMultiplier(weapon, weaponMarketItem, hitTarget.HitDistance, shooter);
 
-                    //TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
-                    //$"[Damage] Random damage: {damage} | Splash multiplier: {damageMultiplier} | Calculated damage: {splashDamage}",
-                    //target.Battle.GeneralBattleChatEntity, shooter.Player);
+                    /*TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
+                    $"[Damage] Random damage: {damage} | Distance multiplier: {distanceModifier} | Calculated damage: {Math.Round(damage * distanceModifier)}",
+                    target.Battle.GeneralBattleChatEntity, shooter.Player);*/
 
                     damage = (int) Math.Round(damage * distanceModifier);
                     break;
@@ -388,7 +392,7 @@ namespace TXServer.Core.Battles
                         return true;
                     }
 
-                    if ((DateTimeOffset.UtcNow - shooter.HitCooldownTimers[target]).TotalMilliseconds < 200)
+                    if ((DateTimeOffset.UtcNow - shooter.HitCooldownTimers[target]).TotalMilliseconds <= 100)
                         return true;
 
                     shooter.HitCooldownTimers.Remove(target);

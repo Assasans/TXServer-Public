@@ -1,21 +1,29 @@
 ﻿using TXServer.Core.Battles;
+using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 
-namespace TXServer.ECSSystem.EntityTemplates.Battle
+namespace TXServer.ECSSystem.EntityTemplates.Battle.Weapon
 {
     [SerialVersionUID(-2537616944465628484L)]
     public class ShaftBattleItemTemplate : DiscreteWeaponTemplate
     {
+        private const string GarageWeaponConfig = "garage/weapon/shaft";
+
         public static Entity CreateEntity(Entity tank, BattleTankPlayer battlePlayer)
         {
-            Entity entity = CreateEntity(new ShaftBattleItemTemplate(), "garage/weapon/shaft", tank, battlePlayer);
-            entity.Components.Add(new ShaftComponent());
-            entity.Components.Add(new ShaftStateConfigComponent(1, 1, 1));
-            entity.Components.Add(new ShaftAimingImpactComponent(1));
-            entity.Components.Add(new ShaftEnergyComponent(1, 1, 1, 1));
-            entity.Components.Add(new ShaftAimingSpeedComponent(1, 1, 1, 1));
+            Entity entity = CreateEntity(new ShaftBattleItemTemplate(), GarageWeaponConfig, tank, battlePlayer);
+            entity.Components.UnionWith(new Component[]
+            {
+                new ShaftComponent(),
+
+                Config.GetComponent<ShaftAimingImpactComponent>(GarageWeaponConfig),
+                Config.GetComponent<ShaftAimingSpeedComponent>(GarageWeaponConfig),
+                new ShaftEnergyComponent(1, 1, 1, 1),
+                Config.GetComponent<ShaftStateConfigComponent>("battle/weapon/shaft")
+            });
+
             return entity;
         }
     }

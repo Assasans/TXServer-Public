@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.Battles;
+using TXServer.Core.Configuration;
 using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -9,6 +10,7 @@ using TXServer.ECSSystem.Components.Groups;
 using TXServer.ECSSystem.Components.Squad;
 using TXServer.ECSSystem.EntityTemplates.Chat;
 using TXServer.ECSSystem.EntityTemplates.Squad;
+using TXServer.ECSSystem.ServerComponents;
 
 namespace TXServer.Core.Squads
 {
@@ -30,7 +32,7 @@ namespace TXServer.Core.Squads
             player.SquadPlayer = new SquadPlayer(player, Leader == player, this);
             player.SharePlayers(Participants.Select(x => x.Player));
             Participants.SharePlayers(player);
-            
+
             if (SquadChatEntity == null)
                 SquadChatEntity = SquadChatTemplate.CreateEntity(player);
             else
@@ -42,7 +44,7 @@ namespace TXServer.Core.Squads
 
             Participants.Add(player.SquadPlayer);
         }
-        
+
         public void RemovePlayer(Player player, bool disband)
         {
             Logger.Log($"{player}: Left squad {SquadEntity.EntityId}");
@@ -50,13 +52,13 @@ namespace TXServer.Core.Squads
             Participants.Remove(player.SquadPlayer);
             player.UnsharePlayers(Participants.Select(x => x.Player));
             Participants.UnsharePlayers(player);
-            
+
             player.UnshareEntities(SquadEntity, SquadChatEntity);
             player.User.RemoveComponent<SquadGroupComponent>();
-            
+
             SquadChatEntity.ChangeComponent<ChatParticipantsComponent>(component =>
             { component.Users.Remove(player.User); });
-            
+
             if (player.SquadPlayer.IsLeader)
             {
                 player.User.RemoveComponent<SquadLeaderComponent>();
@@ -67,7 +69,7 @@ namespace TXServer.Core.Squads
                     newLeader.IsLeader = true;
                 }
             }
-            
+
             player.SquadPlayer = null;
 
             if (Participants.Count == 1 && !disband) DisbandSquad();
@@ -96,12 +98,12 @@ namespace TXServer.Core.Squads
                 else if (Leader.IsInBattle) RemovePlayer(player, false);
             }
         }
-        
+
         public Entity SquadEntity { get; }
         private Entity SquadChatEntity { get; set; }
         private Player Leader { get; }
         public List<SquadPlayer> Participants { get; } = new();
         public IEnumerable<SquadPlayer> ParticipantsWithoutLeader => Participants.Where(x => !x.IsLeader);
-        public const int MaxSquadPlayers = 4;
+        public static int MaxSquadSize => Config.GetComponent<SquadConfigComponent>("squad").MaxSquadSize;
     }
 }

@@ -13,6 +13,7 @@ using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
+using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.GlobalEntities;

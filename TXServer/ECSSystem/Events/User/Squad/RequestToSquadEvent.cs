@@ -17,7 +17,7 @@ namespace TXServer.ECSSystem.Events.User.Squad
                 player.SendEvent(new RequestToSquadRejectedEvent(RejectRequestToSquadReason.RECEIVER_REJECTED, remotePlayer), player.User);
                 return;
             }
-            if (remotePlayer.SquadPlayer.Squad.Participants.Count >= Core.Squads.Squad.MaxSquadPlayers)
+            if (remotePlayer.SquadPlayer.Squad.Participants.Count >= Core.Squads.Squad.MaxSquadSize)
             {
                 player.SendEvent(new RequestToSquadRejectedEvent(RejectRequestToSquadReason.SQUAD_IS_FULL, remotePlayer), player.User);
                 return;
