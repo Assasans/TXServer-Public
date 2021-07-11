@@ -50,7 +50,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
             typeof(BattleRewards),
 
-            //typeof(Details),
+            typeof(Details),
             //typeof(DailyBonuses),
             //typeof(Quests),
 
@@ -140,6 +140,12 @@ namespace TXServer.ECSSystem.GlobalEntities
                     player.Data.Containers.TryGetValue(marketItem.EntityId, out int oldAmount);
                     player.Data.Containers[marketItem.EntityId] = oldAmount + amount;
                     break;
+                case DetailMarketItemTemplate:
+                    if (player.Data.Shards.ContainsKey(marketItem.EntityId))
+                        player.Data.Shards[marketItem.EntityId] += amount;
+                    else
+                        player.Data.Shards[marketItem.EntityId] = amount;
+                    break;
                 case HullSkinMarketItemTemplate:
                     player.Data.HullSkins.Add(marketItem.EntityId);
                     break;
@@ -184,6 +190,8 @@ namespace TXServer.ECSSystem.GlobalEntities
             {typeof(GameplayChestMarketItemTemplate), typeof(GameplayChestUserItemTemplate)},
             {typeof(TutorialGameplayChestMarketItemTemplate), typeof(TutorialGameplayChestUserItemTemplate)},
             {typeof(DonutChestMarketItemTemplate), typeof(SimpleChestUserItemTemplate)},
+
+            {typeof(DetailMarketItemTemplate), typeof(DetailUserItemTemplate)},
 
             {typeof(HullSkinMarketItemTemplate), typeof(HullSkinUserItemTemplate)},
             {typeof(ShellMarketItemTemplate), typeof(ShellUserItemTemplate)},

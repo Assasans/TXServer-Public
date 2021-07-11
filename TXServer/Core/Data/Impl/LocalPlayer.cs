@@ -4,7 +4,7 @@ using TXServer.Core.ChatCommands;
 using TXServer.Core.Logging;
 using TXServer.ECSSystem.GlobalEntities;
 
-namespace TXServer.Core.Data.Database.Impl
+namespace TXServer.Core.Data.Impl
 {
     public class LocalPlayer : PlayerData
     {
@@ -56,6 +56,7 @@ namespace TXServer.Core.Data.Database.Impl
                 HullSkins = new List<long> {1589207088};
                 Modules = new Dictionary<long, (int, int)>();
                 Paints = new List<long> {-20020438};
+                Shards = new Dictionary<long, int>();
                 Shells = new List<long> {-966935184, 807172229, 357929046, 48235025, 1067800943, 1322064226, 70311513,
                     530945311, -1408603862, 139800007, 366763244};
                 Weapons = new List<long> {-2005747272};

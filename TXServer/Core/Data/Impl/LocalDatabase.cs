@@ -1,4 +1,6 @@
-﻿namespace TXServer.Core.Data.Database.Impl
+﻿using TXServer.Core.Data.Impl;
+
+namespace TXServer.Core.Data.Database.Impl
 {
     public class LocalDatabase : IDatabase
     {

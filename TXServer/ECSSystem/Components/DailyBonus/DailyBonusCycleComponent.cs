@@ -8,7 +8,7 @@ namespace TXServer.ECSSystem.Components.DailyBonus
         public DailyBonusData[] DailyBonuses { get; set; }
     }
 
-    public class DailyBonusData
+    public class DailyBonusData : Component
     {
         public long Code { get; set; }
         public long CryAmount { get; set; }
@@ -18,7 +18,7 @@ namespace TXServer.ECSSystem.Components.DailyBonus
         public DailyBonusGarageItemReward DetailReward { get; set; }
     }
 
-    public class DailyBonusGarageItemReward
+    public class DailyBonusGarageItemReward : Component
     {
         public long MarketItemId { get; set; }
         public long Amount { get; set; }

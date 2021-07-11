@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Components
 			{ "CTF_CARRIAGE_SCORE", 0 },
 			{ "SCORE", 0 },
 			{ "ENERGY_COMPENSATION", 0 },
-			{ "BATTLES_PARTICIPATED", 0 },
+			{ "BATTLES_PARTICIPATED", 5 },
 			{ "DEATHS", 0 },
 			{ "CTF_RETURN_SCORE", 0 },
 			{ "SUICIDES", 0 },

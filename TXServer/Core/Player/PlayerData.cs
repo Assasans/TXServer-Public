@@ -131,7 +131,6 @@ namespace TXServer.Core
                 });
             }
         }
-
         protected List<long> DailyBonusReceivedRewards { get; set; }
         public int DailyBonusZone
         {
@@ -194,6 +193,7 @@ namespace TXServer.Core
         public List<long> HullSkins { get; protected set; }
         public Dictionary<long, (int, int)> Modules { get; protected set; }
         public List<long> Paints { get; protected set; }
+        public Dictionary<long, int> Shards { get; protected set; }
         public List<long> Shells { get; protected set; }
         public List<long> Weapons { get; protected set; }
         public List<long> WeaponSkins { get; protected set; }
@@ -326,6 +326,12 @@ namespace TXServer.Core
             DailyBonusReceivedRewards.Add(code);
             Player.User.ChangeComponent<UserDailyBonusReceivedRewardsComponent>(component =>
                             component.ReceivedRewards.Add(code));
+        }
+        public void ResetDailyBonusRewards()
+        {
+            DailyBonusReceivedRewards.Clear();
+            Player.User.ChangeComponent<UserDailyBonusReceivedRewardsComponent>(component =>
+                component.ReceivedRewards.Clear());
         }
 
         public void AddIncomingFriend(long userId)

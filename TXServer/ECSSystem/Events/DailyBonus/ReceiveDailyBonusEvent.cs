@@ -1,10 +1,12 @@
 using System;
+using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.DailyBonus;
+using ResourceManager = TXServer.ECSSystem.GlobalEntities.ResourceManager;
 
 namespace TXServer.ECSSystem.Events.DailyBonus
 {
@@ -28,6 +30,22 @@ namespace TXServer.ECSSystem.Events.DailyBonus
                 bonusConfig.BattleCountToUnlockDailyBonuses)
                 return;
 
+            // collect reward
+            DailyBonusData reward = cycleComponent.DailyBonuses.Single(db => db.Code == Code);
+            player.Data.Crystals += reward.CryAmount;
+            player.Data.XCrystals += reward.XcryAmount;
+            if (reward.ContainerReward != null)
+            {
+                Entity marketItem = player.EntityList.Single(e => e.EntityId == reward.ContainerReward.MarketItemId);
+                ResourceManager.SaveNewMarketItem(player, marketItem, (int) reward.ContainerReward.Amount);
+            }
+            if (reward.DetailReward != null)
+            {
+                Entity marketItem = player.EntityList.Single(e => e.EntityId == reward.DetailReward.MarketItemId);
+                ResourceManager.SaveNewMarketItem(player, marketItem, (int) reward.DetailReward.Amount);
+            }
+
+            // set next daily bonus
             player.Data.AddDailyBonusReward(Code);
             player.Data.DailyBonusNextReceiveDate =
                 DateTime.UtcNow.AddSeconds(bonusConfig.ReceivingBonusIntervalInSeconds /
