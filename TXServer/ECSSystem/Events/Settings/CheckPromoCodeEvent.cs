@@ -42,12 +42,6 @@ namespace TXServer.ECSSystem.Events.Settings
 					// easter egg: Tanki X discontinuation promo code
 					result = PromoCodeCheckResult.VALID;
 					break;
-
-                case "teleport":
-                    // for teleport command testing
-                    // TODO: remove later when premium is fully integrated
-                    result = PromoCodeCheckResult.VALID;
-                    break;
             }
 
 			player.SendEvent(new PromoCodeCheckResultEvent(Code, result), entity);

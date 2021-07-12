@@ -51,17 +51,11 @@ namespace TXServer.ECSSystem.Events.Settings
 					rewards.Add(ExtraItems.GlobalItems.Xcrystal, 10000);
 					rewards.Add(ExtraItems.GlobalItems.Premiumboost, 7);
 					break;
-                case "teleport":
-                    // for teleport command testing
-                    // TODO: remove later when premium is fully integrated
-                    rewards.Add(ExtraItems.GlobalItems.Premiumboost, 2);
-                    player.Data.RenewPremium(new TimeSpan(1, 0, 0, 0));
-                    break;
-			}
+            }
 
 			foreach (KeyValuePair<Entity, int> item in rewards)
             {
-                player.ShareEntities(NewItemNotificationTemplate.CreateEntity(entity, item));
+                player.ShareEntities(NewItemNotificationTemplate.CreateEntity(entity, item.Key, item.Value));
 
 				if (item.Key == ExtraItems.GlobalItems.Crystal)
 					player.Data.Crystals += item.Value;

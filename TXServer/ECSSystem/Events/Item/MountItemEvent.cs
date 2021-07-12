@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
-using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
-using TXServer.ECSSystem.ServerComponents;
 
 namespace TXServer.ECSSystem.Events.Item
 {

@@ -1,4 +1,6 @@
-﻿using TXServer.Core;
+﻿using System;
+using TXServer.Core;
+using TXServer.Core.Battles.Effect;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -11,7 +13,11 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 		{
 			if (!player.IsInMatch || !player.Data.Admin) return;
 
-            // TODO: something
+            foreach (BattleModule module in player.BattlePlayer.MatchPlayer.Modules)
+            {
+                if (module.IsOnCooldown) return;
+                module.CooldownEndTime = DateTimeOffset.UtcNow;
+            }
         }
 	}
 }

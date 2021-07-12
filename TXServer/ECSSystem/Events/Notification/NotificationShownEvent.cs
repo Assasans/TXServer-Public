@@ -7,9 +7,6 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1454667308567L)]
 	public class NotificationShownEvent : ECSEvent
 	{
-		public void Execute(Player player, Entity notification)
-		{
-			player.UnshareEntities(notification);
-		}
-	}
+		public void Execute(Player player, Entity notification) => player.UnshareEntities(notification);
+    }
 }

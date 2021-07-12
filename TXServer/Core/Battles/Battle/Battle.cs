@@ -54,10 +54,9 @@ namespace TXServer.Core.Battles
             IBattleModeHandler prevHandler = ModeHandler;
             ModeHandler = Params.BattleMode switch
             {
-                BattleMode.DM => new DMHandler { Battle = this },
-                BattleMode.TDM => new TDMHandler { Battle = this },
                 BattleMode.CTF => new CTFHandler { Battle = this },
-                _ => throw new NotImplementedException()
+                BattleMode.TDM => new TDMHandler { Battle = this },
+                BattleMode.DM or _ => new DMHandler { Battle = this },
             };
 
             if (prevHandler != null)

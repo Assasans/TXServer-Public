@@ -124,9 +124,16 @@ namespace TXServer.ECSSystem.GlobalEntities
                 e.TemplateAccessor.Template.GetType() &&
                 e.GetComponent<MarketItemGroupComponent>().Key == marketItem.EntityId);
         }
+        public static Entity GetModuleUserItem(Player player, long id)
+        {
+            return player.EntityList.Single(e => e.HasComponent<MarketItemGroupComponent>() &&
+                                                 e.GetComponent<MarketItemGroupComponent>().Key == id &&
+                                                 e.EntityId != id);
+        }
 
         public static void SaveNewMarketItem(Player player, Entity marketItem, int amount)
         {
+            Entity userItem = null;
             switch (marketItem.TemplateAccessor.Template)
             {
                 case AvatarMarketItemTemplate:
@@ -149,6 +156,20 @@ namespace TXServer.ECSSystem.GlobalEntities
                 case HullSkinMarketItemTemplate:
                     player.Data.HullSkins.Add(marketItem.EntityId);
                     break;
+                case ModuleCardMarketItemTemplate:
+                    long id = marketItem.GetComponent<ParentGroupComponent>().Key;
+                    userItem = player.EntityList.Single(e =>
+                        MarketToUserTemplate[marketItem.TemplateAccessor.Template.GetType()] ==
+                        e.TemplateAccessor.Template.GetType() && e.GetComponent<ParentGroupComponent>().Key == id);
+
+                    player.Data.Modules.TryGetValue(id, out (int level, int cards) moduleInfo);
+                    moduleInfo.cards += amount;
+                    player.Data.Modules[id] = moduleInfo;
+                    break;
+                case PremiumBoostMarketItemTemplate:
+                    Console.WriteLine(amount);
+                    player.Data.RenewPremium(new TimeSpan(days: amount, 0, 0, 0));
+                    break;
                 case ShellMarketItemTemplate:
                     player.Data.Shells.Add(marketItem.EntityId);
                     break;
@@ -169,7 +190,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                     break;
             }
 
-            Entity userItem = GetUserItem(player, marketItem);
+            if (userItem is null)
+                userItem = GetUserItem(player, marketItem);
             if (!userItem.HasComponent<UserGroupComponent>())
                 userItem.AddComponent(new UserGroupComponent(player.User));
             if (userItem.HasComponent<UserItemCounterComponent>())
@@ -179,7 +201,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             }
         }
 
-        private static readonly Dictionary<Type, Type> MarketToUserTemplate = new()
+        public static readonly Dictionary<Type, Type> MarketToUserTemplate = new()
         {
             {typeof(AvatarMarketItemTemplate), typeof(AvatarUserItemTemplate)},
 
@@ -192,6 +214,10 @@ namespace TXServer.ECSSystem.GlobalEntities
             {typeof(DonutChestMarketItemTemplate), typeof(SimpleChestUserItemTemplate)},
 
             {typeof(DetailMarketItemTemplate), typeof(DetailUserItemTemplate)},
+
+            {typeof(ModuleCardMarketItemTemplate), typeof(ModuleCardUserItemTemplate)},
+
+            {typeof(PremiumBoostMarketItemTemplate), typeof(PremiumBoostUserItemTemplate)},
 
             {typeof(HullSkinMarketItemTemplate), typeof(HullSkinUserItemTemplate)},
             {typeof(ShellMarketItemTemplate), typeof(ShellUserItemTemplate)},

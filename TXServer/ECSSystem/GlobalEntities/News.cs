@@ -37,6 +37,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             public Entity Logo { get; } = new Entity(-1837531152,
                 new TemplateAccessor(new ConfiguredNewsItemTemplate(), null),
                 new NewsItemComponent(previewImageUrl:"https://i.imgur.com/MFWktJN.png",
+                    toolTip:"Thx for playing ^-^",
                     layout:NewsItemLayout.SMALL));
             public Entity VideoUpdate2 { get; } = new Entity(-1837531153,
                 new TemplateAccessor(new ConfiguredNewsItemTemplate(), null),

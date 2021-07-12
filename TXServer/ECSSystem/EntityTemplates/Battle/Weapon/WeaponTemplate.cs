@@ -18,7 +18,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
     [SerialVersionUID(1430285417001)]
     public class WeaponTemplate : IEntityTemplate
     {
-        private static Dictionary<Type, Func<Entity, BattleTankPlayer, Entity>> userToBattleTemplate = new()
+        private static readonly Dictionary<Type, Func<Entity, BattleTankPlayer, Entity>> UserToBattleTemplate = new()
         {
             { typeof(SmokyUserItemTemplate), SmokyBattleItemTemplate.CreateEntity },
             { typeof(FlamethrowerUserItemTemplate), FlamethrowerBattleItemTemplate.CreateEntity },
@@ -35,7 +35,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
 
         public static Entity CreateEntity(Entity userItem, Entity tank, BattleTankPlayer battlePlayer)
         {
-            if (userToBattleTemplate.TryGetValue(userItem.TemplateAccessor.Template.GetType(),
+            if (UserToBattleTemplate.TryGetValue(userItem.TemplateAccessor.Template.GetType(),
                 out Func<Entity, BattleTankPlayer, Entity> method))
                 return method(tank, battlePlayer);
 

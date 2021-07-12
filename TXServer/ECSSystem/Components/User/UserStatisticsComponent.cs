@@ -7,13 +7,13 @@ namespace TXServer.ECSSystem.Components
 	[SerialVersionUID(1499174753575)]
 	public class UserStatisticsComponent : Component
 	{
-		public Dictionary<string, long> Statistics { get; set; } = new Dictionary<string, long>()
+		public Dictionary<string, long> Statistics { get; set; } = new()
 		{
 			{ "HEALED", 0 },
 			{ "CTF_CARRIAGE_SCORE", 0 },
 			{ "SCORE", 0 },
 			{ "ENERGY_COMPENSATION", 0 },
-			{ "BATTLES_PARTICIPATED", 5 },
+			{ "BATTLES_PARTICIPATED", 0 },
 			{ "DEATHS", 0 },
 			{ "CTF_RETURN_SCORE", 0 },
 			{ "SUICIDES", 0 },

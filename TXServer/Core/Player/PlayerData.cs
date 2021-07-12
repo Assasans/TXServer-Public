@@ -369,39 +369,38 @@ namespace TXServer.Core
         public void AddCompletedTutorial(ulong tutorialId)
         {
             Player.User.ChangeComponent<TutorialCompleteIdsComponent>(component =>
-                component.CompletedIds.Add((ulong) tutorialId));
+                component.CompletedIds.Add(tutorialId));
             CompletedTutorialIds.Add(tutorialId);
         }
 
-        public void UpgradeModule(Entity marketItem)
+        public void UpgradeModule(Entity marketItem, bool assemble = false)
         {
             if (!Modules.ContainsKey(marketItem.GetComponent<ParentGroupComponent>().Key)) return;
 
             long id = marketItem.GetComponent<ParentGroupComponent>().Key;
             (int level, int cards) infos = Modules[id];
 
-            Entity moduleItem = Player.EntityList.Single(e => e.TemplateAccessor.Template is
-                ModuleUserItemTemplate && e.GetComponent<ParentGroupComponent>().Key == id);
-            Entity cardItem = Player.EntityList.Single(e => e.TemplateAccessor.Template is
+            Entity moduleUserItem = ResourceManager.GetModuleUserItem(Player, id);
+            Entity cardUserItem = Player.EntityList.Single(e => e.TemplateAccessor.Template is
                 ModuleCardUserItemTemplate && e.GetComponent<ParentGroupComponent>().Key == id);
 
-            infos.level++;
-            infos.cards -= moduleItem.GetComponent<ModuleCardsCompositionComponent>().AllPrices[infos.level].Cards;
+            if (!assemble) infos.level++;
+            infos.cards -= moduleUserItem.GetComponent<ModuleCardsCompositionComponent>().AllPrices[infos.level].Cards;
             Modules[id] = infos;
 
-            moduleItem.ChangeComponent<ModuleUpgradeLevelComponent>(component => component.Level = infos.level);
-            cardItem.ChangeComponent<UserItemCounterComponent>(component => component.Count = infos.cards);
+            moduleUserItem.ChangeComponent<ModuleUpgradeLevelComponent>(component => component.Level = infos.level);
+            cardUserItem.ChangeComponent<UserItemCounterComponent>(component => component.Count = infos.cards);
 
-            if (!moduleItem.HasComponent<UserGroupComponent>())
+            if (!moduleUserItem.HasComponent<UserGroupComponent>())
             {
                 // research module
-                moduleItem.AddComponent(new UserGroupComponent(Player.User.EntityId));
-                Player.SendEvent(new ModuleAssembledEvent(), moduleItem);
+                moduleUserItem.AddComponent(new UserGroupComponent(Player.User.EntityId));
+                Player.SendEvent(new ModuleAssembledEvent(), moduleUserItem);
                 return;
             }
 
             // upgrade module
-            Player.SendEvent(new ModuleUpgradedEvent(), moduleItem);
+            Player.SendEvent(new ModuleUpgradedEvent(), moduleUserItem);
         }
 
         private T SetValue<T>(object value) where T : Component

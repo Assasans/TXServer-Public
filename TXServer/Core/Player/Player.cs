@@ -244,25 +244,33 @@ namespace TXServer.Core
 
         public void CheckRankUp()
         {
-            List<int> experiencePerRank = Config.GetComponent<RanksExperiencesConfigComponent>("ranksconfig").RanksExperiences;
+            List<int> experiencePerRank = new List<int> {0};
+            experiencePerRank.AddRange(Config.GetComponent<RanksExperiencesConfigComponent>("ranksconfig")
+                .RanksExperiences);
+            Console.WriteLine(experiencePerRank.Count);
             experiencePerRank.Insert(0, 0);
             experiencePerRank.Sort((a, b) => a.CompareTo(b));
 
-            MatchPlayer matchPlayer = BattlePlayer?.MatchPlayer;
-
             long totalExperience = Data.Experience;
-            if (IsInMatch && matchPlayer != null)
+            if (IsInMatch)
                 totalExperience += BattlePlayer.MatchPlayer.UserResult.ScoreToExperience -
                                    BattlePlayer.MatchPlayer.AlreadyAddedExperience;
 
-            int correctRank = experiencePerRank.IndexOf(experiencePerRank.LastOrDefault(x => x <= totalExperience)) + 1;
+            int correctRank = experiencePerRank.IndexOf(experiencePerRank.LastOrDefault(x => x <= totalExperience));
 
             if (User.GetComponent<UserRankComponent>().Rank >= correctRank) return;
             User.ChangeComponent(new UserRankComponent(correctRank));
-            // todo: load rank rewards from configs
-            // (https://vignette2.wikia.nocookie.net/tanki-x/images/f/fb/Rankit.png/revision/latest?cb=20170629172052)
-            ShareEntities(UserRankRewardNotificationTemplate.CreateEntity(100, 5000, correctRank));
 
+            // rank rewards
+            int crystals = correctRank * 100 - 100;
+            int xCrystals = 2 * correctRank - 2;
+            if (xCrystals % 10 != 0) xCrystals = 0;
+            Data.Crystals += crystals;
+            Data.XCrystals += xCrystals;
+
+
+            // notifications
+            ShareEntities(UserRankRewardNotificationTemplate.CreateEntity(xCrystals, crystals, correctRank));
             if (IsInMatch) BattlePlayer.MatchPlayer.RankUp();
         }
 

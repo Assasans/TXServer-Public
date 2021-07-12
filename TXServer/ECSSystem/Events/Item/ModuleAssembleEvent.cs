@@ -8,6 +8,6 @@ namespace TXServer.ECSSystem.Events.Item
     public class ModuleAssembleEvent : ECSEvent
     {
         public static void Execute(Player player, Entity marketItem, Entity user) =>
-            player.Data.UpgradeModule(marketItem);
+            player.Data.UpgradeModule(marketItem, true);
     }
 }
