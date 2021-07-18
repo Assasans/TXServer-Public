@@ -51,7 +51,7 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
                     spiderMineModule?.Explode();
                 }
 
-                Damage.HandleHit(weapon, target, player.BattlePlayer.MatchPlayer, splashTarget);
+                Damage.HandleHit(weapon, target, player.BattlePlayer.MatchPlayer, splashTarget, splash: true);
 			}
 		}
 

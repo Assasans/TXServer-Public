@@ -261,8 +261,7 @@ namespace TXServer.Core.Battles
                     if (distance > radiusOfMinSplashDamage)
                         return 0;
 
-                    return 0.01f * (minSplashDamagePercent + (radiusOfMinSplashDamage - distance) *
-                        (100f - minSplashDamagePercent) / (radiusOfMinSplashDamage - radiusOfMaxSplashDamage));
+                    return 1 - (1 / (radiusOfMinSplashDamage / distance));
             }
         }
 
@@ -301,7 +300,7 @@ namespace TXServer.Core.Battles
 
 
         public static void HandleHit(Entity weapon, MatchPlayer target, MatchPlayer shooter,
-            HitTarget hitTarget)
+            HitTarget hitTarget, bool splash = false)
         {
             Entity weaponMarketItem = GetWeaponMarketItem(weapon, shooter);
             if (!IsModule(weaponMarketItem) && IsOnCooldown(weapon, target, shooter)) return;
@@ -319,7 +318,11 @@ namespace TXServer.Core.Battles
                 case HammerBattleItemTemplate or RicochetBattleItemTemplate or SmokyBattleItemTemplate or
                     ThunderBattleItemTemplate or TwinsBattleItemTemplate or VulcanBattleItemTemplate:
                     damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
-                    float distanceModifier = GetDamageDistanceMultiplier(weapon, weaponMarketItem, hitTarget.HitDistance, shooter);
+                    float distanceModifier;
+                    if (splash)
+                        distanceModifier = GetSplashDamageDistanceMultiplier(weapon, hitTarget.HitDistance, shooter);
+                    else
+                        distanceModifier = GetDamageDistanceMultiplier(weapon, weaponMarketItem, hitTarget.HitDistance, shooter);
 
                     /*TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
                     $"[Damage] Random damage: {damage} | Distance multiplier: {distanceModifier} | Calculated damage: {Math.Round(damage * distanceModifier)}",
