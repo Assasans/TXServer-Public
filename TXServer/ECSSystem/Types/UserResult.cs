@@ -44,10 +44,10 @@ namespace TXServer.ECSSystem.Types
         public int Deaths { get; set; }
         public int Damage { get; set; }
 
-        public int Score => _battlePlayer.MatchPlayer.GetScoreWithPremium(ScoreWithoutPremium);
+        public int Score => _battlePlayer.MatchPlayer.GetScoreWithBonus(ScoreWithoutPremium);
         public int ScoreWithoutPremium => _battlePlayer.MatchPlayer.RoundUser
             .GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
-        public int ScoreToExperience => Score;
+        public int ScoreToExperience => _battlePlayer.MatchPlayer.PersonalBattleResult.ScoreWithBonus;
 
         public int RankExpDelta => (int) _battlePlayer.Player.Data.Experience;
 

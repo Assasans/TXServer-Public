@@ -3,6 +3,7 @@ using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Battle.Bonus
@@ -18,10 +19,15 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 
             battleBonus.Take(player);
 
-            if (battleBonus.BonusType == BonusType.GOLD && battle.WaitingGoldBoxSenders.Any())
+            if (battleBonus.BonusType == BonusType.GOLD)
             {
-                battle.DropSpecificBonusType(BonusType.GOLD, battle.WaitingGoldBoxSenders[0]);
-                battle.WaitingGoldBoxSenders.Remove(battle.WaitingGoldBoxSenders[0]);
+                player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["GOLDS"]++);
+
+                if (battle.WaitingGoldBoxSenders.Any())
+                {
+                    battle.DropSpecificBonusType(BonusType.GOLD, battle.WaitingGoldBoxSenders[0]);
+                    battle.WaitingGoldBoxSenders.Remove(battle.WaitingGoldBoxSenders[0]);
+                }
             }
         }
 	}

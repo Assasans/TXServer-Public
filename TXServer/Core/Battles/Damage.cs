@@ -124,7 +124,7 @@ namespace TXServer.Core.Battles
             target.Player.BattlePlayer.MatchPlayer.HealthChanged();
             healer.Battle.Spectators.Concat(new[] {(IPlayerPart) healer})
                 .SendEvent(new DamageInfoEvent(hp, hitTarget.LocalHitPoint, false, true), target.Tank);
-            healer.SendEvent(new VisualScoreHealEvent(healer.GetScoreWithPremium(4)), healer.BattleUser);
+            healer.SendEvent(new VisualScoreHealEvent(healer.GetScoreWithBonus(4)), healer.BattleUser);
 
             healer.UpdateStatistics(additiveScore: 4, 0, 0, 0, null);
         }
@@ -423,7 +423,7 @@ namespace TXServer.Core.Battles
                 killer.SendEvent(
                     new VisualScoreKillEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid,
                         victim.Player.User.GetComponent<UserRankComponent>().Rank,
-                        killer.GetScoreWithPremium(10)), killer.BattleUser);
+                        killer.GetScoreWithBonus(10)), killer.BattleUser);
                 killer.UpdateStatistics(10, additiveKills: 1, 0, 0, null);
             }
             else
@@ -449,7 +449,7 @@ namespace TXServer.Core.Battles
                 int percent = (int)(assist.Value / victim.Tank.GetComponent<HealthComponent>().MaxHealth * 100);
                 assist.Key.SendEvent(
                     new VisualScoreAssistEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid, percent,
-                        assist.Key.GetScoreWithPremium(5)), assist.Key.BattleUser);
+                        assist.Key.GetScoreWithBonus(5)), assist.Key.BattleUser);
             }
             victim.DamageAssistants.Clear();
         }
@@ -470,7 +470,7 @@ namespace TXServer.Core.Battles
                     if (component.Kills < 5 || component.Kills % 5 == 0)
                         victim.SendEvent(new KillStreakEvent(streakScore), victim.Incarnation);
                     if (component.Kills > 2)
-                        victim.SendEvent(new VisualScoreStreakEvent(victim.GetScoreWithPremium(streakScore)),
+                        victim.SendEvent(new VisualScoreStreakEvent(victim.GetScoreWithBonus(streakScore)),
                             victim.BattleUser);
                 });
             }

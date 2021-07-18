@@ -2,6 +2,7 @@
 using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Item.Tank;
 using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.ECSSystem.GlobalEntities
@@ -36,11 +37,17 @@ namespace TXServer.ECSSystem.GlobalEntities
                     _ => item.TemplateAccessor.Template
                 };
 
-                if (player.Data.Weapons.Contains(id))
+                if (player.Data.Weapons.ContainsKey(id))
                     item.Components.Add(new UserGroupComponent(player.User));
-                item.Components.Add(new ExperienceItemComponent());
-                item.Components.Add(new UpgradeLevelItemComponent());
-                item.Components.Add(new UpgradeMaxLevelItemComponent());
+
+                player.Data.Weapons.TryGetValue(id, out long xp);
+                item.Components.UnionWith(new Component[]
+                {
+                    new ExperienceItemComponent(xp),
+                    new ExperienceToLevelUpItemComponent(xp),
+                    new UpgradeLevelItemComponent(xp),
+                    new UpgradeMaxLevelItemComponent()
+                });
             }
 
             return items;

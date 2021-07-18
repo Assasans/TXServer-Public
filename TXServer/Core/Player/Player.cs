@@ -22,6 +22,7 @@ using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Components.DailyBonus;
 using TXServer.ECSSystem.Components.User.Tutorial;
 using TXServer.ECSSystem.ServerComponents;
+using TXServer.ECSSystem.ServerComponents.Experience;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core
@@ -242,37 +243,14 @@ namespace TXServer.Core
             return true;
         }
 
-        public void CheckRankUp()
-        {
-            List<int> experiencePerRank = new List<int> {0};
-            experiencePerRank.AddRange(Config.GetComponent<RanksExperiencesConfigComponent>("ranksconfig")
-                .RanksExperiences);
-            Console.WriteLine(experiencePerRank.Count);
-            experiencePerRank.Insert(0, 0);
-            experiencePerRank.Sort((a, b) => a.CompareTo(b));
+        public void CheckRankUp() => Leveling.CheckRankUp(this);
+        public void CheckTankRankUp(Entity item) => Leveling.CheckTankRankUp(item, this);
 
-            long totalExperience = Data.Experience;
-            if (IsInMatch)
-                totalExperience += BattlePlayer.MatchPlayer.UserResult.ScoreToExperience -
-                                   BattlePlayer.MatchPlayer.AlreadyAddedExperience;
+        public Entity GetUserItemByMarket(Entity marketItem) => ResourceManager.GetUserItem(this, marketItem);
+        public int GetUserItemLevel(Entity userItem) => ResourceManager.GetUserItemLevel(this, userItem);
 
-            int correctRank = experiencePerRank.IndexOf(experiencePerRank.LastOrDefault(x => x <= totalExperience));
-
-            if (User.GetComponent<UserRankComponent>().Rank >= correctRank) return;
-            User.ChangeComponent(new UserRankComponent(correctRank));
-
-            // rank rewards
-            int crystals = correctRank * 100 - 100;
-            int xCrystals = 2 * correctRank - 2;
-            if (xCrystals % 10 != 0) xCrystals = 0;
-            Data.Crystals += crystals;
-            Data.XCrystals += xCrystals;
-
-
-            // notifications
-            ShareEntities(UserRankRewardNotificationTemplate.CreateEntity(xCrystals, crystals, correctRank));
-            if (IsInMatch) BattlePlayer.MatchPlayer.RankUp();
-        }
+        public void SaveNewMarketItem(Entity marketItem, int amount = 1) =>
+            ResourceManager.SaveNewMarketItem(this, marketItem, amount);
 
         /// <summary>
         /// Shares users of players.

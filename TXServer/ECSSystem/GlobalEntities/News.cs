@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
         public class Items : ItemList
         {
-            // todo: host pictures on yourself & store news items in json
+            // todo: host pictures on ourself
             /*public Entity AllFree { get; } = new Entity(-1837531154,
                 new TemplateAccessor(new ConfiguredNewsItemTemplate(), null),
                 new NewsItemComponent(headerText:"Everything is free!",
@@ -30,9 +30,9 @@ namespace TXServer.ECSSystem.GlobalEntities
                     layout:NewsItemLayout.MEDIUM));
             public Entity Fakers { get; } = new Entity(-1837531151,
                 new TemplateAccessor(new ConfiguredNewsItemTemplate(), null),
-                new NewsItemComponent(headerText:"Don't fall for fakes!",
+                new NewsItemComponent(headerText:"Don't fall for fakers & imitators!",
                     previewImageUrl:"https://i.imgur.com/I4lhpKZ.png",
-                    toolTip:"RTX is free & the only official social network we have is Discord. Don't support fakes!",
+                    toolTip:"RTX is free & the only social network we have is Discord. Don't support imitators & fakers!",
                     layout:NewsItemLayout.LARGE));
             public Entity Logo { get; } = new Entity(-1837531152,
                 new TemplateAccessor(new ConfiguredNewsItemTemplate(), null),

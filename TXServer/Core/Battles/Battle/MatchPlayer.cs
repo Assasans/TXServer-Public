@@ -88,7 +88,7 @@ namespace TXServer.Core.Battles
             if (Battle.IsMatchMaking) Player.CheckRankUp();
         }
 
-        public int GetScoreWithPremium(int score) => Player.Data.IsPremium ? score * 2 : score;
+        public int GetScoreWithBonus(int score) => (int) (PersonalBattleResult.ScoreBattleSeriesMultiplier * score + (Player.Data.IsPremium ? score * 0.5 : 0));
 
         public void HealthChanged()
         {
@@ -144,8 +144,8 @@ namespace TXServer.Core.Battles
         public void RankUp()
         {
             Battle.PlayersInMap.SendEvent(new UpdateRankEvent(), Player.User);
-            Player.Data.SetExperience(Player.Data.Experience + GetScoreWithPremium(UserResult.Score), false);
-            AlreadyAddedExperience += UserResult.Score;
+            AlreadyAddedExperience += PersonalBattleResult.ScoreWithBonus - AlreadyAddedExperience;
+            Player.Data.SetExperience(Player.Data.Experience + AlreadyAddedExperience, false);
         }
 
         public bool TryGetModule(Type moduleType, out BattleModule module)

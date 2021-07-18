@@ -1,5 +1,6 @@
 ﻿using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.BattleRewards;
 using TXServer.ECSSystem.Components.League;
 using TXServer.ECSSystem.EntityTemplates;
 

@@ -33,7 +33,7 @@ namespace TXServer.ECSSystem.Components
 			{ "CTF_RETURN_XP", 0 },
 			{ "SHOTS", 0 },
 			{ "DRAWS", 0 },
-			{ "ALL_BATTLES_PARTICIPATED", 0 },
+			{ "ALL_BATTLES_PARTICIPATED", 4 },
 			{ "PUNISHMENT_SCORE", 0 },
 			{ "KILLS", 0 },
 			{ "HEAL_SCORE", 0 },

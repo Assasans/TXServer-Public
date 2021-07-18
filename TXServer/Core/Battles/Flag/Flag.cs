@@ -152,7 +152,7 @@ namespace TXServer.Core.Battles
             {
                 FlagEntity.AddComponent(new TankGroupComponent(battlePlayer.MatchPlayer.Tank));
                 // todo: calculate flag return score
-                battlePlayer.SendEvent(new VisualScoreFlagReturnEvent(battlePlayer.MatchPlayer.GetScoreWithPremium(5)), battlePlayer.MatchPlayer.BattleUser);
+                battlePlayer.SendEvent(new VisualScoreFlagReturnEvent(battlePlayer.MatchPlayer.GetScoreWithBonus(5)), battlePlayer.MatchPlayer.BattleUser);
             }
 
             if (!silent)

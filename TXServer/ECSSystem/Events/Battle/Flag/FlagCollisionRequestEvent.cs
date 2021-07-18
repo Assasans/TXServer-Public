@@ -43,7 +43,7 @@ namespace TXServer.ECSSystem.Events.Battle.Flag
                         if (deliverScore > 0)
                         {
                             carrier.Player.BattlePlayer.MatchPlayer.UpdateStatistics(additiveScore: deliverScore, 0, 0, 0, null);
-                            carrier.SendEvent(new VisualScoreFlagDeliverEvent(carrier.MatchPlayer.GetScoreWithPremium(deliverScore)), carrier.MatchPlayer.BattleUser);
+                            carrier.SendEvent(new VisualScoreFlagDeliverEvent(carrier.MatchPlayer.GetScoreWithBonus(deliverScore)), carrier.MatchPlayer.BattleUser);
                         }
 
                         UserResult carrierResult = carrier.MatchPlayer.UserResult;

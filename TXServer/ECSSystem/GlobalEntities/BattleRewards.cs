@@ -1,6 +1,7 @@
 ﻿using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
+using TXServer.ECSSystem.EntityTemplates.BattleReward;
 
 namespace TXServer.ECSSystem.GlobalEntities
 {

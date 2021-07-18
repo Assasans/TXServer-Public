@@ -12,6 +12,7 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.DailyBonus;
 using TXServer.ECSSystem.Components.Item.Module;
+using TXServer.ECSSystem.Components.Item.Tank;
 using TXServer.ECSSystem.Components.User;
 using TXServer.ECSSystem.Components.User.Tutorial;
 using TXServer.ECSSystem.EntityTemplates;
@@ -189,13 +190,13 @@ namespace TXServer.Core
         public Dictionary<long, int> Containers { get; protected set; }
         public List<long> Covers { get; protected set; }
         public List<long> Graffities { get; protected set; }
-        public List<long> Hulls { get; protected set; }
+        public Dictionary<long, long> Hulls { get; protected set; }
         public List<long> HullSkins { get; protected set; }
         public Dictionary<long, (int, int)> Modules { get; protected set; }
         public List<long> Paints { get; protected set; }
         public Dictionary<long, int> Shards { get; protected set; }
         public List<long> Shells { get; protected set; }
-        public List<long> Weapons { get; protected set; }
+        public Dictionary<long, long> Weapons { get; protected set; }
         public List<long> WeaponSkins { get; protected set; }
 
 
@@ -207,8 +208,8 @@ namespace TXServer.Core
         public PlayerData(long uniqueId)
             => UniqueId = uniqueId;
 
-        public bool OwnsMarketItem(Entity marketItem) => Avatars.Concat(Covers).Concat(Graffities).Concat(Hulls)
-            .Concat(HullSkins).Concat(Paints).Concat(Shells).Concat(Weapons).Concat(WeaponSkins)
+        public bool OwnsMarketItem(Entity marketItem) => Avatars.Concat(Covers).Concat(Graffities).Concat(Hulls.Keys)
+            .Concat(HullSkins).Concat(Paints).Concat(Shells).Concat(Weapons.Keys).Concat(WeaponSkins)
             .Contains(marketItem.EntityId);
         public bool IsPremium => PremiumExpirationDate > DateTime.UtcNow;
 
@@ -371,6 +372,21 @@ namespace TXServer.Core
             Player.User.ChangeComponent<TutorialCompleteIdsComponent>(component =>
                 component.CompletedIds.Add(tutorialId));
             CompletedTutorialIds.Add(tutorialId);
+        }
+
+        public void AddHullXp(int xp, Entity hull)
+        {
+            Hulls[hull.EntityId] += xp;
+            ResourceManager.GetUserItem(Player, hull)
+                .ChangeComponent<ExperienceItemComponent>(component => component.Experience = Hulls[hull.EntityId]);
+            // todo: save to database
+        }
+        public void AddWeaponXp(int xp, Entity weapon)
+        {
+            Weapons[weapon.EntityId] += xp;
+            ResourceManager.GetUserItem(Player, weapon).ChangeComponent<ExperienceItemComponent>(
+                component => component.Experience = Weapons[weapon.EntityId]);
+            // todo: save to database
         }
 
         public void UpgradeModule(Entity marketItem, bool assemble = false)

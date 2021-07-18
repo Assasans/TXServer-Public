@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
@@ -6,7 +7,8 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Round;
-using TXServer.ECSSystem.Components.User;
+using TXServer.ECSSystem.Components.BattleRewards;
+using TXServer.ECSSystem.Components.Item.Tank;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.ECSSystem.Types
@@ -18,20 +20,28 @@ namespace TXServer.ECSSystem.Types
             _player = player;
 
             PrevLeague = _player.Data.League;
-            Reward = BattleRewards.GlobalItems.XCrystalBonus;
-			UserTeamColor = player.User.GetComponent<TeamColorComponent>().TeamColor;
+            UserTeamColor = player.User.GetComponent<TeamColorComponent>().TeamColor;
+
+            WeaponFinalExp = WeaponUserItem.GetComponent<ExperienceToLevelUpItemComponent>()
+                .FinalLevelExperience;
         }
 
         public void FinalizeResult()
         {
             if (MatchPlayer.Battle.IsMatchMaking)
             {
-                _player.Data.CurrentBattleSeries++;
+                if (_player.User.GetComponent<UserStatisticsComponent>().Statistics["ALL_BATTLES_PARTICIPATED"] >= 4)
+                    _player.Data.CurrentBattleSeries++;
 
-                // Rank
-                _player.Data.SetExperience(_player.Data.Experience + ScoreWithBonus, false);
-                RankExp = (int) _player.Data.Experience;
-                RankExpDelta = ScoreWithBonus;
+                // Player experience
+                _player.Data.SetExperience(
+                    _player.Data.Experience + ScoreWithBonus - MatchPlayer.AlreadyAddedExperience, false);
+
+                // Weapon + Hull rank/experience
+                _player.Data.AddHullXp(ScoreWithBonus, _player.CurrentPreset.Hull);
+                _player.Data.AddWeaponXp(ScoreWithBonus, _player.CurrentPreset.Weapon);
+                _player.CheckTankRankUp(ResourceManager.GetUserItem(_player, _player.CurrentPreset.Hull));
+                _player.CheckTankRankUp(ResourceManager.GetUserItem(_player, _player.CurrentPreset.Weapon));
 
                 // Reputation
                 // todo: calculate earned reputation
@@ -39,9 +49,11 @@ namespace TXServer.ECSSystem.Types
                 _player.Data.Reputation += (int) ReputationDelta;
 
                 // Container reward
-                ContainerScoreDelta = ScoreWithBonus;
-                _player.Data.LeagueChestScore += ContainerScoreDelta;
-
+                _player.Data.LeagueChestScore += ScoreWithBonus;
+                int earnedContainerAmount = (int) Math.Floor((float)_player.Data.LeagueChestScore / ContainerScoreLimit);
+                _player.Data.LeagueChestScore -= earnedContainerAmount * ContainerScoreLimit;
+                if (earnedContainerAmount > 0)
+                    _player.SaveNewMarketItem(Container, earnedContainerAmount);
 
                 _player.User.ChangeComponent<UserStatisticsComponent>(component =>
                 {
@@ -52,6 +64,31 @@ namespace TXServer.ECSSystem.Types
                         MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().Deaths;
                     component.Statistics["KILLS"] =
                         MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().Kills;
+
+                    switch (_player.BattlePlayer.Battle.ModeHandler.TeamBattleResultFor(_player.BattlePlayer))
+                    {
+                        case TeamBattleResult.WIN:
+                            component.Statistics["VICTORIES"]++;
+                            break;
+                        case TeamBattleResult.DEFEAT:
+                            component.Statistics["DEFEATS"]++;
+                            break;
+                        case TeamBattleResult.DRAW or _:
+                            component.Statistics["DRAWS"]++;
+                            break;
+                    }
+                    switch (_player.BattlePlayer.Battle.Params.BattleMode)
+                    {
+                        case BattleMode.CTF:
+                            component.Statistics["CTF_PLAYED"]++;
+                            break;
+                        case BattleMode.TDM:
+                            component.Statistics["TDM_PLAYED"]++;
+                            break;
+                        case BattleMode.DM or _:
+                            component.Statistics["DM_PLAYED"]++;
+                            break;
+                    }
                 });
             }
             else
@@ -72,42 +109,49 @@ namespace TXServer.ECSSystem.Types
         private readonly Player _player;
         private MatchPlayer MatchPlayer => _player.BattlePlayer.MatchPlayer;
 
-        private static readonly Dictionary<int, int> BattleSeriesMultipliers = new()
-            {{1, 5}, {2, 10}, {3, 15}, {4, 20}, {5, 25}};
+        private static readonly Dictionary<int, float> BattleSeriesMultipliers = new()
+            {{0, 1}, {1, 1.05f}, {2, 1.10f}, {3, 1.15f}, {4, 1.2f}, {5, 1.25f}};
 
         private int Score => MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses;
-        private int ScoreWithBonus =>
-            (int) (MatchPlayer.GetScoreWithPremium(Score) + ScoreBattleSeriesMultiplier / 100 * Score);
+        [ProtocolIgnore] public int ScoreWithBonus => (int) (MatchPlayer.GetScoreWithBonus(Score) +
+                                                             ScoreBattleSeriesMultiplier / 100 * Score);
+
+        private Entity TankUserItem => ResourceManager.GetUserItem(_player, _player.CurrentPreset.Hull);
+        private Entity WeaponUserItem => ResourceManager.GetUserItem(_player, _player.CurrentPreset.Weapon);
+
 
         public TeamColor UserTeamColor { get; set; }
 		public TeamBattleResult TeamBattleResult =>
             _player.BattlePlayer.Battle.ModeHandler.TeamBattleResultFor(_player.BattlePlayer);
 
-		public int Energy { get; set; } = 0;
-		public int EnergyDelta { get; set; } = 0;
-		public int CrystalsForExtraEnergy { get; set; } = 0;
-		[OptionalMapped]
-		public EnergySource MaxEnergySource { get; set; } = EnergySource.MVP_BONUS;
+		public int Energy => 0;
+		public int EnergyDelta => 0;
+		public int CrystalsForExtraEnergy => 0;
+		[OptionalMapped] public EnergySource MaxEnergySource { get; set; }
 
         public int CurrentBattleSeries => _player.Data.CurrentBattleSeries;
         public int MaxBattleSeries => 5;
         public float ScoreBattleSeriesMultiplier =>
             BattleSeriesMultipliers[BattleSeriesMultipliers.Keys.Where(k => k <= CurrentBattleSeries).Max()];
 
-        public int RankExp { get; set; }
-		public int RankExpDelta { get; set; }
-		public int WeaponExp { get; set; } = 0;
-		public int TankLevel { get; set; } = 0;
-		public int WeaponLevel { get; set; } = 0;
-		public int WeaponInitExp { get; set; } = 0;
-		public int WeaponFinalExp { get; set; } = 0;
-		public int TankExp { get; set; } = 0;
-		public int TankInitExp { get; set; } = 0;
-		public int TankFinalExp { get; set; } = 0;
-		public int ItemsExpDelta { get; set; } = 0;
-		public int ContainerScore => (int) _player.User.GetComponent<GameplayChestScoreComponent>().Current;
-		public int ContainerScoreDelta { get; set; }
-		public int ContainerScoreLimit => (int) _player.User.GetComponent<GameplayChestScoreComponent>().Limit;
+        public int RankExp => (int) _player.Data.Experience;
+        public int RankExpDelta => ScoreWithBonus;
+		public int WeaponExp => (int) _player.Data.Weapons[_player.CurrentPreset.Weapon.EntityId];
+        public int TankLevel => _player.GetUserItemLevel(_player.CurrentPreset.Weapon);
+        public int WeaponLevel => _player.GetUserItemLevel(_player.CurrentPreset.Weapon);
+        public int WeaponInitExp =>
+            (int) WeaponUserItem.GetComponent<ExperienceItemComponent>().Experience - ScoreWithBonus;
+		public int WeaponFinalExp { get; set; }
+		public int TankExp => (int) _player.Data.Hulls[_player.CurrentPreset.Hull.EntityId];
+		public int TankInitExp => (int) TankUserItem.GetComponent<ExperienceItemComponent>().Experience -
+                                  ScoreWithBonus;
+		public int TankFinalExp => TankUserItem.GetComponent<ExperienceToLevelUpItemComponent>()
+            .FinalLevelExperience;
+        public int ItemsExpDelta => ScoreWithBonus;
+
+		public int ContainerScore => (int) _player.Data.LeagueChestScore;
+        public int ContainerScoreDelta => ScoreWithBonus;
+		public int ContainerScoreLimit => 1000;
         public Entity Container => _player.Data.League.GetComponent<ChestBattleRewardComponent>().Chest;
 		public float ContainerScoreMultiplier { get; set; }
 
@@ -118,7 +162,6 @@ namespace TXServer.ECSSystem.Types
 
 		public int LeaguePlace { get; set; } = 1;
 
-		[OptionalMapped]
-		public Entity Reward { get; set; }
+		[OptionalMapped] public Entity Reward { get; set; }
 	}
 }

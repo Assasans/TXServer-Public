@@ -1,12 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TXServer.Core;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.Events.Item;
+using TXServer.ECSSystem.ServerComponents.Experience;
 
 namespace TXServer.ECSSystem.GlobalEntities
 {
@@ -117,6 +119,12 @@ namespace TXServer.ECSSystem.GlobalEntities
             return entities.ToArray();
         }
 
+        public static Entity GetModuleUserItem(Player player, long id)
+        {
+            return player.EntityList.Single(e => e.HasComponent<MarketItemGroupComponent>() &&
+                                                 e.GetComponent<MarketItemGroupComponent>().Key == id &&
+                                                 e.EntityId != id);
+        }
         public static Entity GetUserItem(Player player, Entity marketItem)
         {
             return player.EntityList.Single(e =>
@@ -124,11 +132,22 @@ namespace TXServer.ECSSystem.GlobalEntities
                 e.TemplateAccessor.Template.GetType() &&
                 e.GetComponent<MarketItemGroupComponent>().Key == marketItem.EntityId);
         }
-        public static Entity GetModuleUserItem(Player player, long id)
+
+        public static int GetUserItemLevel(Player player, Entity userItem)
         {
-            return player.EntityList.Single(e => e.HasComponent<MarketItemGroupComponent>() &&
-                                                 e.GetComponent<MarketItemGroupComponent>().Key == id &&
-                                                 e.EntityId != id);
+            Dictionary<long, long> xpDictionary =
+                player.Data.Hulls.Concat(player.Data.Weapons).ToDictionary(x => x.Key, x => x.Value);
+            xpDictionary.TryGetValue(userItem.EntityId, out long xp);
+            return xp is 0 ? 1 : GetItemLevelByXp(xp);
+        }
+        public static int GetItemLevelByXp(long xp)
+        {
+            List<int> experiencePerRank = new List<int>{0};
+            experiencePerRank.AddRange(Config.GetComponent<UpgradeLevelsComponent>("garage").LevelsExperiences
+                .ToList());
+            experiencePerRank.Sort((a, b) => a.CompareTo(b));
+
+            return experiencePerRank.IndexOf(experiencePerRank.LastOrDefault(x => x <= xp)) + 1;
         }
 
         public static void SaveNewMarketItem(Player player, Entity marketItem, int amount)
@@ -167,7 +186,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                     player.Data.Modules[id] = moduleInfo;
                     break;
                 case PremiumBoostMarketItemTemplate:
-                    Console.WriteLine(amount);
                     player.Data.RenewPremium(new TimeSpan(days: amount, 0, 0, 0));
                     break;
                 case ShellMarketItemTemplate:
@@ -177,10 +195,10 @@ namespace TXServer.ECSSystem.GlobalEntities
                     player.Data.Paints.Add(marketItem.EntityId);
                     break;
                 case TankMarketItemTemplate:
-                    player.Data.Hulls.Add(marketItem.EntityId);
+                    player.Data.Hulls.Add(marketItem.EntityId, 0);
                     break;
                 case { } n when MarketToUserTemplate.Keys.Contains(n.GetType()):
-                    player.Data.Weapons.Add(marketItem.EntityId);
+                    player.Data.Weapons.Add(marketItem.EntityId, 0);
                     break;
                 case WeaponSkinMarketItemTemplate:
                     player.Data.WeaponSkins.Add(marketItem.EntityId);
@@ -190,8 +208,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                     break;
             }
 
-            if (userItem is null)
-                userItem = GetUserItem(player, marketItem);
+            userItem ??= GetUserItem(player, marketItem);
             if (!userItem.HasComponent<UserGroupComponent>())
                 userItem.AddComponent(new UserGroupComponent(player.User));
             if (userItem.HasComponent<UserItemCounterComponent>())
