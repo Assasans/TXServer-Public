@@ -3,6 +3,7 @@ using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Types;
@@ -20,6 +21,8 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
 
             if (battlePlayer.MatchPlayer.TankState == TankState.Dead)
                 return;
+
+            player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["SHOTS"]++);
 
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
             foreach (HitTarget hitTarget in Targets)
@@ -39,6 +42,8 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
 
                 Damage.HandleHit(weapon, victim, player.BattlePlayer.MatchPlayer, hitTarget);
             }
+
+            player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["HITS"] += Targets.Count);
         }
 
         public virtual IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteHitEvent>();

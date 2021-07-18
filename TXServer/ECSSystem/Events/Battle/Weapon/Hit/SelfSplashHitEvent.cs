@@ -5,6 +5,7 @@ using TXServer.Core.Battles;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.Types;
 
@@ -17,6 +18,8 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
 		{
             SelfEvent.Execute(this, player, weapon);
 
+            player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["SHOTS"]++);
+
             BattleTankPlayer battlePlayer = player.BattlePlayer;
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
 
@@ -25,7 +28,7 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
 
 			foreach (HitTarget hitTarget in Targets)
 			{
-				MatchPlayer victim = battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity).MatchPlayer;
+                MatchPlayer victim = battle.MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity).MatchPlayer;
 
 				//if (player.BattlePlayer.Battle.Params.BattleMode != BattleMode.DM &&
 				    //victim.Team == player.BattlePlayer.Team && !battle.Params.FriendlyFire)
@@ -53,6 +56,8 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
 
                 Damage.HandleHit(weapon, target, player.BattlePlayer.MatchPlayer, splashTarget, splash: true);
 			}
+
+            player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["HITS"] += Targets.Count + SplashTargets.Count);
 		}
 
 		public override IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteSplashHitEvent>();
