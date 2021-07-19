@@ -21,6 +21,7 @@ using TXDatabase.NetworkEvents.Communications;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Components.DailyBonus;
 using TXServer.ECSSystem.Components.User.Tutorial;
+using TXServer.ECSSystem.EntityTemplates.Notification;
 using TXServer.ECSSystem.ServerComponents;
 using TXServer.ECSSystem.ServerComponents.Experience;
 using TXServer.ECSSystem.Types;
@@ -245,6 +246,21 @@ namespace TXServer.Core
 
         public void CheckRankUp() => Leveling.CheckRankUp(this);
         public void CheckTankRankUp(Entity item) => Leveling.CheckTankRankUp(item, this);
+
+        public void CheckRecruitReward()
+        {
+            if (Data.LastRecruitReward is not null &&
+                (DateTimeOffset.UtcNow - Data.LastRecruitReward).Value.TotalHours < 24 ||
+                Data.RecruitRewardDay > 14)
+                return;
+
+            Data.LastRecruitReward = DateTimeOffset.UtcNow;
+            Data.RecruitRewardDay++;
+
+            Entity notification = LoginRewardNotificationTemplate.CreateEntity(this);
+            ShareEntities(notification);
+            SendEvent(new ShowNotificationGroupEvent(1), notification);
+        }
 
         public Entity GetUserItemByMarket(Entity marketItem) => ResourceManager.GetUserItem(this, marketItem);
         public int GetUserItemLevel(Entity userItem) => ResourceManager.GetUserItemLevel(this, userItem);

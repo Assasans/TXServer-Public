@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Battles.Matchmaking;
-using TXServer.Core.Configuration;
 using TXServer.Core.HeightMaps;
 using TXServer.Core.Logging;
 using TXServer.Core.ServerMapInformation;
@@ -16,11 +15,7 @@ using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Time;
 using TXServer.ECSSystem.Components.BattleRewards;
-using TXServer.ECSSystem.Components.Item;
-using TXServer.ECSSystem.Components.Item.Tank;
-using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
-using TXServer.ECSSystem.EntityTemplates.BattleReward;
 using TXServer.ECSSystem.EntityTemplates.Chat;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
@@ -265,6 +260,9 @@ namespace TXServer.Core.Battles
                     battlePlayer.Player.ShareEntities(unlockBattleReward);
                     battleResultForClient.PersonalResult.Reward = unlockBattleReward;
                 }
+
+                // recruit reward check
+                if (IsMatchMaking) battlePlayer.Player.CheckRecruitReward();
 
                 battlePlayer.SendEvent(new BattleResultForClientEvent(battleResultForClient), battlePlayer.Player.User);
             }

@@ -166,6 +166,9 @@ namespace TXServer.ECSSystem.GlobalEntities
                     player.Data.Containers.TryGetValue(marketItem.EntityId, out int oldAmount);
                     player.Data.Containers[marketItem.EntityId] = oldAmount + amount;
                     break;
+                case CrystalMarketItemTemplate:
+                    player.Data.Crystals += amount;
+                    break;
                 case DetailMarketItemTemplate:
                     if (player.Data.Shards.ContainsKey(marketItem.EntityId))
                         player.Data.Shards[marketItem.EntityId] += amount;
@@ -197,7 +200,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 case TankMarketItemTemplate:
                     player.Data.Hulls.Add(marketItem.EntityId, 0);
                     break;
-                case { } n when MarketToUserTemplate.Keys.Contains(n.GetType()):
+                case { } n when WeaponTemplates.Contains(n.GetType()):
                     player.Data.Weapons.Add(marketItem.EntityId, 0);
                     break;
                 case WeaponSkinMarketItemTemplate:
@@ -205,6 +208,9 @@ namespace TXServer.ECSSystem.GlobalEntities
                     break;
                 case WeaponPaintMarketItemTemplate:
                     player.Data.Covers.Add(marketItem.EntityId);
+                    break;
+                case XCrystalMarketItemTemplate:
+                    player.Data.XCrystals += amount;
                     break;
             }
 
@@ -224,6 +230,9 @@ namespace TXServer.ECSSystem.GlobalEntities
 
             {typeof(ChildGraffitiMarketItemTemplate), typeof(GraffitiUserItemTemplate)},
             {typeof(GraffitiMarketItemTemplate), typeof(GraffitiUserItemTemplate)},
+
+            {typeof(CrystalMarketItemTemplate), typeof(CrystalUserItemTemplate)},
+            {typeof(XCrystalMarketItemTemplate), typeof(XCrystalUserItemTemplate)},
 
             {typeof(ContainerPackPriceMarketItemTemplate), typeof(ContainerUserItemTemplate)},
             {typeof(GameplayChestMarketItemTemplate), typeof(GameplayChestUserItemTemplate)},
@@ -254,6 +263,21 @@ namespace TXServer.ECSSystem.GlobalEntities
             {typeof(ThunderMarketItemTemplate), typeof(ThunderUserItemTemplate)},
             {typeof(TwinsMarketItemTemplate), typeof(TwinsUserItemTemplate)},
             {typeof(VulcanMarketItemTemplate), typeof(VulcanUserItemTemplate)}
+        };
+
+        public static readonly List<Type> WeaponTemplates = new()
+        {
+            typeof(FlamethrowerMarketItemTemplate),
+            typeof(FreezeMarketItemTemplate),
+            typeof(HammerMarketItemTemplate),
+            typeof(IsisMarketItemTemplate),
+            typeof(RailgunMarketItemTemplate),
+            typeof(RicochetMarketItemTemplate),
+            typeof(ShaftMarketItemTemplate),
+            typeof(SmokyMarketItemTemplate),
+            typeof(ThunderMarketItemTemplate),
+            typeof(TwinsMarketItemTemplate),
+            typeof(VulcanMarketItemTemplate),
         };
     }
 }

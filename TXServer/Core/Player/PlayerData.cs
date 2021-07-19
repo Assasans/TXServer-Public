@@ -146,6 +146,10 @@ namespace TXServer.Core
             }
         }
 
+        public DateTimeOffset RegistrationDate { get; set; }
+        public DateTimeOffset? LastRecruitReward { get; set; }
+        public int RecruitRewardDay { get; set; }
+
         public Entity League { get; protected set; }
         public int Reputation
         {

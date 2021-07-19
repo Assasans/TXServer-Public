@@ -34,6 +34,10 @@ namespace TXServer.Core.Data.Impl
                 DailyBonusReceivedRewards = new List<long>();
                 DailyBonusZone = 0;
 
+                RegistrationDate = DateTimeOffset.UtcNow;
+                LastRecruitReward = null;
+                RecruitRewardDay = 0;
+
                 Reputation = 100;
                 League = Leagues.GlobalItems.Training;
                 LeagueChestScore = 0;

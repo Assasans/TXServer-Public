@@ -25,6 +25,7 @@ namespace TXServer.Core.ChatCommands
             { "open", (null, ChatCommandConditions.InBattle, Open) },
             { "pause", (null, ChatCommandConditions.InBattle, Pause) },
             { "positioninfo", (null, ChatCommandConditions.InMatch, PositionInfo) },
+            { "recruitreward", ("recruitReward [opt: check/reset]", ChatCommandConditions.None, RecruitReward) },
             { "reload", ("reload [opt: all]", ChatCommandConditions.None, Reload) },
             { "start", (null, ChatCommandConditions.InBattle, Start) },
             { "shutdown", (null, ChatCommandConditions.Admin, Shutdown) },
@@ -238,6 +239,22 @@ namespace TXServer.Core.ChatCommands
         {
             MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
             return $"Vector3: {matchPlayer.TankPosition} || Quaternion: {matchPlayer.TankQuaternion}";
+        }
+
+        private static string RecruitReward(Player player, string[] args)
+        {
+            switch (args[0])
+            {
+                case "reset":
+                    player.Data.RecruitRewardDay = 0;
+                    return "Command: recruit reward days counter has been reset";
+                case "skip":
+                    player.Data.LastRecruitReward = DateTimeOffset.MinValue;
+                    return "Command: skipped recruit reward waiting time";
+                case "check" or _:
+                    player.CheckRecruitReward();
+                    return $"Command: checked reward necessity. Recruit reward day: {player.Data.RecruitRewardDay}";
+            }
         }
 
         private static string Reload(Player player, string[] args)
