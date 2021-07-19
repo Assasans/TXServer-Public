@@ -168,7 +168,7 @@ namespace TXServer.Core
                 //new FractionGroupComponent(Fractions.GlobalItems.Frontier),
                 //new FractionUserScoreComponent(500),
 
-                new TutorialCompleteIdsComponent(Data.CompletedTutorialIds),
+                new TutorialCompleteIdsComponent(Data.CompletedTutorialIds, this),
 
                 new UserStatisticsComponent(),
                 new FavoriteEquipmentStatisticsComponent(),
