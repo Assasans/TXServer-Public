@@ -4,6 +4,9 @@ using System.Linq;
 using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.Core.ServerMapInformation;
+using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.EntityTemplates.Notification;
+using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
 using TXServer.ECSSystem.Types;
@@ -21,6 +24,7 @@ namespace TXServer.Core.ChatCommands
             { "goldrain", (null, ChatCommandConditions.ActiveBattle, GoldboxRain) },
             { "immune", (null, ChatCommandConditions.InBattle, Immune) },
             { "map", ("map [opt: map name]", ChatCommandConditions.InactiveBattle, ChangeMap) },
+            { "message", ("message [all/uid] [message]", ChatCommandConditions.None, Message) },
             { "modules", (null, ChatCommandConditions.InactiveBattle, ChangeModules) },
             { "open", (null, ChatCommandConditions.InBattle, Open) },
             { "pause", (null, ChatCommandConditions.InBattle, Pause) },
@@ -201,6 +205,27 @@ namespace TXServer.Core.ChatCommands
             return player.BattlePlayer.IsCheatImmune
                 ? "Congrats, you got vaccinated"
                 : "You got successfully unvaccinated";
+        }
+
+        private static string Message(Player player, string[] args)
+        {
+            List<Player> targets = new();
+            switch (args[0])
+            {
+                case "all":
+                    targets = player.Server.Connection.Pool;
+                    break;
+                default:
+                    Player target = player.Server.FindPlayerByUsername(args[0]);
+                    if (target is null) return $"Command error: couldn't find target '{args[0]}'";
+                    targets.Add(target);
+                    break;
+            }
+
+            Entity notification = SimpleTextNotificationTemplate.CreateEntity(string.Join(" ", args[1..]));
+            targets.ShareEntities(notification);
+
+            return $"Sent message to {targets.Count} target{(targets.Count > 1 ? "s" : "")}";
         }
 
         private static string Open(Player player, string[] args)
