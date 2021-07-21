@@ -18,12 +18,12 @@ using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 using TXServer.Core.Database;
 using TXDatabase.NetworkEvents.Communications;
-using TXServer.Core.Configuration;
+using TXServer.Core.ECSSystem.Events;
 using TXServer.ECSSystem.Components.DailyBonus;
 using TXServer.ECSSystem.Components.User.Tutorial;
 using TXServer.ECSSystem.EntityTemplates.Notification;
-using TXServer.ECSSystem.ServerComponents;
-using TXServer.ECSSystem.ServerComponents.Experience;
+using TXServer.ECSSystem.EntityTemplates.User;
+using TXServer.ECSSystem.Events.Fraction;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core
@@ -67,6 +67,7 @@ namespace TXServer.Core
         private readonly ConcurrentDictionary<Player, int> _SharedPlayers = new();
 
         public string UniqueId => Data?.Username;
+        public ServerData ServerData => Server.Instance.ServerData;
 
         public Server Server { get; }
         public PlayerConnection Connection { get; }
@@ -150,50 +151,7 @@ namespace TXServer.Core
 
             Logger.Log($"{this}: Logged in as {Data.Username}.");
 
-            Entity user = new(new TemplateAccessor(new UserTemplate(), ""),
-                new UserComponent(),
-                new UserOnlineComponent(),
-
-                new UserUidComponent(Data.Username),
-                new UserCountryComponent(Data.CountryCode),
-                new UserAvatarComponent("8b74e6a3-849d-4a8d-a20e-be3c142fd5e8"),
-                new RegistrationDateComponent(),
-
-                new UserMoneyComponent(Data.Crystals),
-                new UserXCrystalsComponent(Data.XCrystals),
-                new UserRankComponent(1),
-                new UserExperienceComponent(Data.Experience),
-                new UserReputationComponent(Data.Reputation),
-
-                //new FractionGroupComponent(Fractions.GlobalItems.Frontier),
-                //new FractionUserScoreComponent(500),
-
-                new TutorialCompleteIdsComponent(Data.CompletedTutorialIds, this),
-
-                new UserStatisticsComponent(),
-                new FavoriteEquipmentStatisticsComponent(),
-                new KillsEquipmentStatisticsComponent(),
-                new BattleLeaveCounterComponent(0, 0),
-
-                new PersonalChatOwnerComponent(),
-
-                new LeagueGroupComponent(Data.League),
-                new GameplayChestScoreComponent(0),
-
-                new BlackListComponent(),
-
-                new UserDailyBonusInitializedComponent(),
-				new UserDailyBonusCycleComponent(Data.DailyBonusCycle),
-				new UserDailyBonusReceivedRewardsComponent(),
-				new UserDailyBonusZoneComponent(Data.DailyBonusZone),
-				new UserDailyBonusNextReceivingDateComponent(Data.DailyBonusNextReceiveDate),
-
-                new QuestReadyComponent(),
-                new UserPublisherComponent(),
-                new ConfirmedUserEmailComponent(Data.Email, Data.Subscribed),
-                new UserSubscribeComponent());
-            user.Components.Add(new UserGroupComponent(user));
-
+            Entity user = UserTemplate.CreateEntity(this);
             User = user;
 
             // todo: in db
@@ -237,7 +195,6 @@ namespace TXServer.Core
                 item.AddComponent(new MountedItemComponent());
             }
 
-            //new SendEventCommand(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition),
             SendEvent(new PaymentSectionLoadedEvent(), user);
             SendEvent(new FriendsLoadedEvent(this), ClientSession);
 
@@ -261,6 +218,27 @@ namespace TXServer.Core
             ShareEntities(notification);
             SendEvent(new ShowNotificationGroupEvent(1), notification);
         }
+
+        public void CheckNotifications()
+        {
+            if (ServerData.FractionsCompetitionFinished && !Data.ReceivedFractionsCompetitionReward &&
+                Data.Fraction is not null)
+                ShareEntities(FractionsCompetitionRewardNotificationTemplate.CreateEntity(this));
+
+            if (ServerData.SpreadReleaseGift && !Data.ReceivedReleaseReward &&
+                Data.RegistrationDate <= ServerData.ReleaseGiftMaxRegistrationDate)
+                ShareEntities(ReleaseGiftsPersistentNotificationTemplate.CreateEntity(this));
+
+            if (ServerData.FractionsCompetitionActive && !ServerData.FractionsCompetitionFinished &&
+                !Data.ShowedFractionsCompetition)
+                ShareEntities(FractionsCompetitionStartNotificationTemplate.CreateEntity(this));
+
+            if (ServerData.FractionsCompetitionActive || ServerData.FractionsCompetitionFinished)
+                UpdateFractionScores();
+        }
+
+        public void UpdateFractionScores() =>
+            SendEvent(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition);
 
         public Entity GetUserItemByMarket(Entity marketItem) => ResourceManager.GetUserItem(this, marketItem);
         public int GetUserItemLevel(Entity userItem) => ResourceManager.GetUserItemLevel(this, userItem);

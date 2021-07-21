@@ -19,6 +19,7 @@ namespace TXServer.Core
 
         public ServerSettings Settings { get; init; }
         public IDatabase Database { get; init; }
+        public ServerData ServerData { get; set; }
         public Action UserErrorHandler { get; init; }
         public ModuleRegistry ModuleRegistry { get; }
         public List<PlayerData> StoredPlayerData { get; } = new();
@@ -44,6 +45,7 @@ namespace TXServer.Core
                 !DatabaseNetwork.Instance.IsReady)
                 new DatabaseNetwork().Connect(null);
 
+            ServerData = new ServerData();
             Connection = new ServerConnection(this);
             Connection.Start(Settings.IPAddress, Settings.Port, Settings.MaxPlayers);
             Database.Startup();

@@ -55,6 +55,14 @@ namespace TXServer.ECSSystem.Types
                 if (earnedContainerAmount > 0)
                     _player.SaveNewMarketItem(Container, earnedContainerAmount);
 
+                // rewards
+                Entity reward = Leveling.GetTankRankRewards(_player);
+                if (reward is not null)
+                {
+                    _player.ShareEntities(reward);
+                    Reward = reward;
+                }
+
                 _player.User.ChangeComponent<UserStatisticsComponent>(component =>
                 {
                     component.Statistics["ALL_BATTLES_PARTICIPATED"]++;

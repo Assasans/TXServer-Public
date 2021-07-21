@@ -12,7 +12,7 @@ namespace TXServer.Core.Battles.Effect {
 		public override void Activate()
         {
             // todo: fix module counter, SetGoldBoxes works only for garage
-            MatchPlayer.Player.Data.SetGoldBoxes(MatchPlayer.Player.Data.GoldBoxes - 1);
+            MatchPlayer.Player.Data.GoldBonus--;
 
             MatchPlayer.Battle.DropSpecificBonusType(BonusType.GOLD, MatchPlayer.Player);
             MatchPlayer.Battle.DroppedGoldBoxes++;
@@ -25,7 +25,7 @@ namespace TXServer.Core.Battles.Effect {
         }
 
         protected override void Tick() {
-            IsEnabled = MatchPlayer.Player.Data.GoldBoxes > 0 &&
+            IsEnabled = MatchPlayer.Player.Data.GoldBonus > 0 &&
                         MatchPlayer.Battle.BattleState is BattleState.Running &&
                         MatchPlayer.Battle.DroppedGoldBoxes < Battle.MaxDroppedGoldBoxes &&
                         !MatchPlayer.Battle.WaitingGoldBoxSenders.Contains(MatchPlayer.Player);

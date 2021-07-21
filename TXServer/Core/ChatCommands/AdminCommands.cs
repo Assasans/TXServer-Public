@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.EntityTemplates.Notification;
-using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
+using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.ChatCommands
@@ -20,6 +22,7 @@ namespace TXServer.Core.ChatCommands
             { "battlemode", ("battlemode [opt: shortcut]", ChatCommandConditions.InactiveBattle, ChangeBattleMode) },
             { "dailybonus", (null, ChatCommandConditions.None, DailyBonusRecharge)},
             { "finish", (null, ChatCommandConditions.ActiveBattle, Finish) },
+            { "competition", ("competition [start/finish/reset]", ChatCommandConditions.None, FractionsCompetitionEditor )},
             { "friendlyfire", (null, ChatCommandConditions.InactiveBattle, ChangeFriendlyFire) },
             { "goldrain", (null, ChatCommandConditions.ActiveBattle, GoldboxRain) },
             { "immune", (null, ChatCommandConditions.InBattle, Immune) },
@@ -36,12 +39,11 @@ namespace TXServer.Core.ChatCommands
             { "supplyrain", (null, ChatCommandConditions.ActiveBattle, SupplyRain) }
         };
 
-        public static bool CheckForCommand(string command, Player player, out string cmdReply)
+        public static void CheckForCommand(string command, Player player)
         {
-            cmdReply = "";
-            if (!player.Data.Admin) return false;
+            if (!player.Data.Admin) return;
             string[] args = command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (!Commands.ContainsKey(args[0].ToLower())) return false;
+            if (!Commands.ContainsKey(args[0].ToLower())) return;
 
             (string, ChatCommandConditions, Func<Player, string[], string>) desc = Commands[args[0].ToLower()];
             ChatCommandConditions playerConditions = ChatCommands.GetConditionsFor(player);
@@ -49,12 +51,11 @@ namespace TXServer.Core.ChatCommands
             foreach (ChatCommandConditions condition in Enum.GetValues<ChatCommandConditions>())
             {
                 if ((desc.Item2 & condition) != condition || (playerConditions & condition) == condition) continue;
-                cmdReply = ChatCommands.ConditionErrors[condition];
-                return true;
+                CommandReply(ChatCommands.ConditionErrors[condition], player);
+                return;
             }
 
-            cmdReply = desc.Item3(player, args[1..]);
-            return true;
+            CommandReply(desc.Item3(player, args[1..]), player);
         }
 
         private static string ChangeBattleMode(Player player, string[] args)
@@ -116,14 +117,18 @@ namespace TXServer.Core.ChatCommands
             return $"{(newParams.DisabledModules ? "Deactivated" : "Activated")} modules";
         }
 
+        private static void CommandReply(string message, Player player) =>
+            player.ShareEntities(SimpleTextNotificationTemplate.CreateEntity(
+                $"Command{(message.StartsWith("error") ? "" : ":")} {message}"));
+
         private static string DailyBonusRecharge(Player player, string[] args)
         {
             bool alreadyAvailable = player.Data.DailyBonusNextReceiveDate <= DateTime.UtcNow;
             player.Data.DailyBonusNextReceiveDate = DateTime.UtcNow;
 
             return alreadyAvailable
-                ? "Command: daily bonus is already available"
-                : "Command: recharged teleportation device";
+                ? "daily bonus is already available"
+                : "recharged teleportation device";
         }
 
 
@@ -169,6 +174,77 @@ namespace TXServer.Core.ChatCommands
             return $"Force finished {counter} battle{(counter is > 1 or 0 ? "s" : "")}";
         }
 
+        private static string FractionsCompetitionEditor(Player player, string[] args)
+        {
+            string message;
+
+            switch (args[0])
+            {
+                case "addScore":
+                    if (!player.ServerData.FractionsCompetitionActive)
+                        return "error: fraction competition needs to be active";
+                    if (args.Length < 3) return "Error: fraction name or additional score argument is missing";
+                    if (!long.TryParse(args[2], out long additionalScore))
+                        return $"error: unable to parse '{args[2]}' as score";
+
+                    switch (args[1].ToLower())
+                    {
+                        case "antaeus":
+                            player.ServerData.AntaeusScore += additionalScore;
+                            break;
+                        case "frontier":
+                            player.ServerData.FrontierScore += additionalScore;
+                            break;
+                        default:
+                            return $"error: couldn't find fraction '{args[1]}'";
+                    }
+
+                    foreach (Player p in Server.Instance.Connection.Pool.Where(p => p.User is not null).ToList())
+                        p.UpdateFractionScores();
+
+                    return $"Added {additionalScore} score points to the " +
+                           $"{new CultureInfo("en-US").TextInfo.ToTitleCase(args[1])} fraction";
+                case "finish":
+                    if (player.ServerData.FractionsCompetitionFinished)
+                        return "error: fractions competition is already finished";
+                    player.ServerData.FractionsCompetitionFinished = true;
+                    message = "fractions competition has been finished";
+                    break;
+                case "reset":
+                    // todo: reset user fraction score of every user in database
+                    player.ServerData.FractionsCompetitionActive = false;
+                    player.ServerData.FractionsCompetitionFinished = false;
+                    player.ServerData.AntaeusScore = 0;
+                    player.ServerData.AntaeusUserCount = 0;
+                    player.ServerData.FrontierScore = 0;
+                    player.ServerData.FrontierUserCount = 0;
+                    message = "all fractions competition values have been set to default";
+                    break;
+                case "start":
+                    if (player.ServerData.FractionsCompetitionActive)
+                        return "error: fractions competition is already active";
+                    player.ServerData.FractionsCompetitionActive = true;
+                    message = "fractions competition has been started";
+                    break;
+                default:
+                    return $"error: argument {args[0]} isn't valid";
+            }
+
+            PropertyInfo info = typeof(Fractions).GetProperty("GlobalItems");
+            Entity[] fractionItems = ((ItemList) info?.GetValue(null))?.GetAllItems();
+
+            foreach (Player p in Server.Instance.Connection.Pool.Where(p => p.User is not null))
+            {
+                p.UnshareEntities(p.EntityList.Where(e =>
+                    !string.IsNullOrEmpty(e.TemplateAccessor.ConfigPath) &&
+                    e.TemplateAccessor.ConfigPath.StartsWith("fractionscompetition")));
+                p.ShareEntities(fractionItems);
+                p.UpdateFractionScores();
+            }
+
+            return message;
+        }
+
         private static string GoldboxRain(Player player, string[] args)
         {
             Battle battle = player.BattlePlayer.Battle;
@@ -178,9 +254,9 @@ namespace TXServer.Core.ChatCommands
             if (args.Length != 0)
             {
                 bool successfullyParsed = int.TryParse(args[0], out int amount);
-                if (!successfullyParsed) return "Command error, unable to parse amount of goldboxes";
+                if (!successfullyParsed) return "error, unable to parse amount of goldboxes";
                 if (unusedGolds.Count() < amount)
-                    return $"Command error, too few goldboxes ({unusedGolds.Count()} are available)";
+                    return $"error, too few goldboxes ({unusedGolds.Count()} are available)";
                 Random random = new();
                 unusedGolds = unusedGolds.OrderBy(_ => random.Next()).Take(amount);
             }
@@ -196,7 +272,7 @@ namespace TXServer.Core.ChatCommands
 
             return counter > 0
                 ? $"Get an umbrella, {counter} goldboxes will be dropped soon"
-                : "Command error, no supplies are ready to drop";
+                : "error, no supplies are ready to drop";
         }
 
         private static string Immune(Player player, string[] args)
@@ -217,7 +293,7 @@ namespace TXServer.Core.ChatCommands
                     break;
                 default:
                     Player target = player.Server.FindPlayerByUsername(args[0]);
-                    if (target is null) return $"Command error: couldn't find target '{args[0]}'";
+                    if (target is null) return $"error: couldn't find target '{args[0]}'";
                     targets.Add(target);
                     break;
             }
@@ -272,13 +348,13 @@ namespace TXServer.Core.ChatCommands
             {
                 case "reset":
                     player.Data.RecruitRewardDay = 0;
-                    return "Command: recruit reward days counter has been reset";
+                    return "recruit reward days counter has been reset";
                 case "skip":
                     player.Data.LastRecruitReward = DateTimeOffset.MinValue;
-                    return "Command: skipped recruit reward waiting time";
+                    return "skipped recruit reward waiting time";
                 case "check" or _:
                     player.CheckRecruitReward();
-                    return $"Command: checked reward necessity. Recruit reward day: {player.Data.RecruitRewardDay}";
+                    return $"checked reward necessity. Recruit reward day: {player.Data.RecruitRewardDay}";
             }
         }
 
@@ -335,7 +411,7 @@ namespace TXServer.Core.ChatCommands
 
         private static string SupplyRain(Player player, string[] args)
         {
-            if (player.BattlePlayer.Battle.Params.DisabledModules) return "Command error, modules & supplies are disabled";
+            if (player.BattlePlayer.Battle.Params.DisabledModules) return "error, modules & supplies are disabled";
 
             int counter = 0;
             foreach (BattleBonus battleBonus in player.BattlePlayer.Battle.BattleBonuses)
@@ -346,7 +422,7 @@ namespace TXServer.Core.ChatCommands
 
             return counter > 0
                 ? $"Get an umbrella, {counter} supplies will be dropped soon"
-                : "Command error, no supplies are ready to drop";
+                : "error, no supplies are ready to drop";
         }
     }
 }

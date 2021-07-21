@@ -103,7 +103,36 @@ namespace TXServer.Core
 
         public int CurrentBattleSeries { get; set; }
         public long Experience { get; protected set; }
-        public int GoldBoxes { get; private set; } = 5;
+
+        public int GoldBonus
+        {
+            get => _goldBonus;
+            set
+            {
+                _goldBonus = value;
+                if (Player?.User is null) return;
+
+                // todo: database set
+                Player.EntityList.SingleOrDefault(e => e.TemplateAccessor.Template is GoldBonusUserItemTemplate)
+                    ?.ChangeComponent<UserItemCounterComponent>(component => component.Count = value);
+            }
+        }
+
+        public Entity Fraction { get; set; }
+
+        public long FractionUserScore
+        {
+            get => _fractionUserScore;
+            set
+            {
+                _fractionUserScore = value;
+                if (Player?.User is null) return;
+
+                Player.User.ChangeComponent<FractionUserScoreComponent>(
+                    component => component.TotalEarnedPoints = value);
+                // todo: database set
+            }
+        }
 
         public int DailyBonusCycle
         {
@@ -203,6 +232,10 @@ namespace TXServer.Core
         public Dictionary<long, long> Weapons { get; protected set; }
         public List<long> WeaponSkins { get; protected set; }
 
+        public bool ReceivedFractionsCompetitionReward { get; set; }
+        public bool ReceivedReleaseReward { get; set; }
+        public bool ShowedFractionsCompetition { get; set; }
+
 
         public PlayerData(string uid)
         {
@@ -295,14 +328,6 @@ namespace TXServer.Core
             Experience = value;
             Player.User.ChangeComponent(new UserExperienceComponent(value));
             if (rankUpCheck) Player.CheckRankUp();
-        }
-        public void SetGoldBoxes(int value)
-        {
-            GoldBoxes = value;
-
-            // todo: better solution for this
-            var goldBonus = Player.EntityList.Single(i => i.TemplateAccessor.Template is GoldBonusUserItemTemplate);
-            goldBonus.ChangeComponent<UserItemCounterComponent>(component => component.Count = value);
         }
 
         public void SetAutoLogin(bool value)
@@ -523,5 +548,7 @@ namespace TXServer.Core
         private int _dailyBonusCycle;
         private DateTime _dailyBonusNextReceiveDate;
         private int _dailyBonusZone;
+        private long _fractionUserScore;
+        private int _goldBonus;
     }
 }

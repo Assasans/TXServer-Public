@@ -27,7 +27,11 @@ namespace TXServer.Core.Data.Impl
                 Crystals = 1000000;
                 XCrystals = 50000;
                 Experience = 0;
+                GoldBonus = 5;
                 PremiumExpirationDate = DateTime.MinValue;
+
+                Fraction = null;
+                FractionUserScore = 0;
 
                 DailyBonusCycle = 0;
                 DailyBonusNextReceiveDate = DateTime.UtcNow;
@@ -65,6 +69,10 @@ namespace TXServer.Core.Data.Impl
                     530945311, -1408603862, 139800007, 366763244};
                 Weapons = new Dictionary<long, long> {{-2005747272, 0}};
                 WeaponSkins = new List<long> {2008385753};
+
+                ReceivedFractionsCompetitionReward = false;
+                ReceivedReleaseReward = false;
+                ShowedFractionsCompetition = false;
 
                 Original = (PlayerData) Clone();
             }

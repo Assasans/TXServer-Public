@@ -36,7 +36,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             typeof(MatchmakingModes),
 
             typeof(Leagues),
-            //typeof(Fractions),
+            typeof(Fractions),
 
             typeof(Hulls),
             typeof(Weapons),
@@ -152,6 +152,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
         public static void SaveNewMarketItem(Player player, Entity marketItem, int amount)
         {
+            bool updateItemCounter = true;
             Entity userItem = null;
             switch (marketItem.TemplateAccessor.Template)
             {
@@ -174,6 +175,10 @@ namespace TXServer.ECSSystem.GlobalEntities
                         player.Data.Shards[marketItem.EntityId] += amount;
                     else
                         player.Data.Shards[marketItem.EntityId] = amount;
+                    break;
+                case GoldBonusMarketItemTemplate:
+                    player.Data.GoldBonus += amount;
+                    updateItemCounter = false;
                     break;
                 case HullSkinMarketItemTemplate:
                     player.Data.HullSkins.Add(marketItem.EntityId);
@@ -217,7 +222,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             userItem ??= GetUserItem(player, marketItem);
             if (!userItem.HasComponent<UserGroupComponent>())
                 userItem.AddComponent(new UserGroupComponent(player.User));
-            if (userItem.HasComponent<UserItemCounterComponent>())
+            if (userItem.HasComponent<UserItemCounterComponent>() && updateItemCounter)
             {
                 userItem.ChangeComponent<UserItemCounterComponent>(component => component.Count += amount);
                 player.SendEvent(new ItemsCountChangedEvent(amount), userItem);
@@ -240,6 +245,8 @@ namespace TXServer.ECSSystem.GlobalEntities
             {typeof(DonutChestMarketItemTemplate), typeof(SimpleChestUserItemTemplate)},
 
             {typeof(DetailMarketItemTemplate), typeof(DetailUserItemTemplate)},
+
+            {typeof(GoldBonusMarketItemTemplate), typeof(GoldBonusUserItemTemplate)},
 
             {typeof(ModuleCardMarketItemTemplate), typeof(ModuleCardUserItemTemplate)},
 

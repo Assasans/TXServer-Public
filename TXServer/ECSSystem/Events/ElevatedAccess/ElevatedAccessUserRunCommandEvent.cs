@@ -13,8 +13,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
         {
             if (!player.Data.Admin) return;
 
-            if (AdminCommands.CheckForCommand(Command, player, out string cmdReply))
-                ChatMessageReceivedEvent.SystemMessageTarget(cmdReply, player);
+            AdminCommands.CheckForCommand(Command, player);
         }
 
         public string Command { get; set; }

@@ -3,7 +3,7 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
 
-namespace TXServer.ECSSystem.Components
+namespace TXServer.ECSSystem.Components.Notification
 {
     [SerialVersionUID(1464339267328L)]
     public class NotificationComponent : Component

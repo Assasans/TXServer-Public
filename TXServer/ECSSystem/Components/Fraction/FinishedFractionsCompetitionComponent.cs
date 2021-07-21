@@ -1,12 +1,16 @@
 ﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.GlobalEntities;
 
-namespace TXServer.ECSSystem.Components
+namespace TXServer.ECSSystem.Components.Fraction
 {
     [SerialVersionUID(1545394828752)]
     public class FinishedFractionsCompetitionComponent : Component
     {
-        public long Winner { get; } = -1650120701;
+        public FinishedFractionsCompetitionComponent(long winner)
+        {
+            Winner = winner;
+        }
+
+        public long Winner { get; set; }
     }
 }

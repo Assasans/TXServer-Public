@@ -243,6 +243,8 @@ namespace TXServer.Core.Battles
 
             ModeHandler.OnFinish();
 
+            (double antaeusScore, double frontierScore, double neutralScore) = (0, 0, 0);
+
             foreach (BattleTankPlayer battlePlayer in MatchTankPlayers)
             {
                 battlePlayer.MatchPlayer.KeepDisabled = true;
@@ -253,16 +255,28 @@ namespace TXServer.Core.Battles
                 BattleResultForClient battleResultForClient =
                     new(this, ModeHandler, battlePlayer.MatchPlayer.PersonalBattleResult);
 
-                // item rewards
-                Entity unlockBattleReward = Leveling.GetTankRankRewards(battlePlayer.Player);
-                if (unlockBattleReward.GetComponent<LevelUpUnlockPersonalRewardComponent>().Unlocked.Any())
-                {
-                    battlePlayer.Player.ShareEntities(unlockBattleReward);
-                    battleResultForClient.PersonalResult.Reward = unlockBattleReward;
-                }
-
                 // recruit reward check
                 if (IsMatchMaking) battlePlayer.Player.CheckRecruitReward();
+
+                // collect fraction score
+                if (IsMatchMaking)
+                {
+                    double fractionScore = battlePlayer.MatchPlayer.UserResult.ScoreWithoutPremium * 0.03;
+                    switch (battlePlayer.Player.Data.Fraction)
+                    {
+                        case { } e when e.EntityId == Fractions.GlobalItems.Antaeus.EntityId:
+                            antaeusScore += fractionScore;
+                            break;
+                        case { } e when e.EntityId == Fractions.GlobalItems.Frontier.EntityId:
+                            frontierScore += fractionScore;
+                            break;
+                        case null:
+                            neutralScore += fractionScore;
+                            break;
+                    }
+                    if (battlePlayer.Player.Data.Fraction is not null)
+                        battlePlayer.Player.Data.FractionUserScore += Convert.ToInt64(fractionScore);
+                }
 
                 battlePlayer.SendEvent(new BattleResultForClientEvent(battleResultForClient), battlePlayer.Player.User);
             }
@@ -271,7 +285,16 @@ namespace TXServer.Core.Battles
             foreach (Player player in WaitingGoldBoxSenders.ToList())
             {
                 WaitingGoldBoxSenders.Remove(player);
-                player.Data.SetGoldBoxes(player.Data.GoldBoxes + 1);
+                player.Data.GoldBonus++;
+            }
+
+            // fractions competition
+            if (ServerData.FractionsCompetitionActive && !ServerData.FractionsCompetitionFinished)
+            {
+                ServerData.AntaeusScore +=
+                    Convert.ToInt64(antaeusScore + (antaeusScore < frontierScore ? neutralScore : 0));
+                ServerData.FrontierScore +=
+                    Convert.ToInt64(frontierScore + (frontierScore < antaeusScore ? neutralScore : 0));
             }
 
             IsWarmUpCompleted = false;
@@ -687,5 +710,7 @@ namespace TXServer.Core.Battles
         public Entity BattleLobbyChatEntity { get; }
 
         public HeightMap HeightMap { get; private set; }
+
+        private ServerData ServerData => Server.Instance.ServerData;
     }
 }

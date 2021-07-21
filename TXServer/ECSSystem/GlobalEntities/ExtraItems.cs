@@ -22,7 +22,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 item.Components.Add(new UserGroupComponent(player.User));
 
                 if (item.TemplateAccessor.Template is GoldBonusUserItemTemplate)
-                    item.AddComponent(new UserItemCounterComponent(player.Data.GoldBoxes));
+                    item.AddComponent(new UserItemCounterComponent(player.Data.GoldBonus));
             }
 
             return items;

@@ -70,7 +70,7 @@ namespace TXServer.Core
 
         public static Entity GetTankRankRewards(Player player)
         {
-            Entity notification = LevelUpUnlockBattleRewardTemplate.CreateEntity(new List<Entity>());
+            Entity reward = LevelUpUnlockBattleRewardTemplate.CreateEntity(new List<Entity>());
             foreach (Entity childItem in player.EntityList.Where(e =>
                 e.TemplateAccessor.Template is ChildGraffitiMarketItemTemplate or HullSkinMarketItemTemplate or
                     WeaponSkinMarketItemTemplate))
@@ -87,12 +87,12 @@ namespace TXServer.Core
 
                 if (itemLevel < neededLevel || neededLevel == 0) continue;
 
-                notification.ChangeComponent<LevelUpUnlockPersonalRewardComponent>(component =>
+                reward.ChangeComponent<LevelUpUnlockPersonalRewardComponent>(component =>
                     component.Unlocked.Add(childItem));
                 ResourceManager.SaveNewMarketItem(player, childItem, 1);
             }
 
-            return notification;
+            return reward.GetComponent<LevelUpUnlockPersonalRewardComponent>().Unlocked.Any() ? reward : null;
         }
     }
 }
