@@ -72,6 +72,11 @@ namespace TXServerConsole
                             if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
                             settings.DisableHeightMaps = true;
                             break;
+                        case "nhb":
+                        case "-disable-hack-battle":
+                            if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
+                            settings.DisableHackBattle = true;
+                            break;
                         case "np":
                         case "-disable-ping":
                             if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;

@@ -48,9 +48,14 @@
 
                         <Label Content="Max players:" Grid.Row="2" Grid.Column="0"/>
                         <TextBox x:Name="MaxPlayersTextBox" Text="5" Margin="3" Grid.Row="2" Grid.Column="1"/>
-
-                        <CheckBox x:Name="DisableHeightMapsCheckBox" Content="Disable height maps" Margin="3" Grid.Row="3" Grid.ColumnSpan="2"/>
                     </Grid>
+                </GroupBox>
+                
+                <GroupBox x:Name="GameOptionsGroupBox" Header="Game options" Margin="3">
+                    <StackPanel>
+                        <CheckBox x:Name="DisableHeightMapsCheckBox" Content="Disable height maps" Margin="3" />
+                        <CheckBox x:Name="DisableHackBattleCheckBox" Content="Disable hack battle" Margin="3" />
+                    </StackPanel>
                 </GroupBox>
 
                 <GroupBox x:Name="DebugOptionsGroupBox" Header="Debug options" Margin="3">

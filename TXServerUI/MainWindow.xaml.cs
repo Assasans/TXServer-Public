@@ -69,7 +69,9 @@ namespace TXServerUI
                 IPAddress = (IPAddress)IPAddressComboBox.SelectedItem,
                 Port = short.Parse(PortTextBox.Text),
                 MaxPlayers = int.Parse(MaxPlayersTextBox.Text),
+
                 DisableHeightMaps = DisableHeightMapsCheckBox.IsChecked.GetValueOrDefault(),
+                DisableHackBattle = DisableHackBattleCheckBox.IsChecked.GetValueOrDefault(),
 
                 DisablePingMessages = DisablePingMessagesCheckBox.IsChecked.GetValueOrDefault(),
                 EnableTracing = EnableTracingCheckBox.IsChecked.GetValueOrDefault(),
