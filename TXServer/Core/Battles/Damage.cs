@@ -268,9 +268,6 @@ namespace TXServer.Core.Battles
         private static float GetHpWithEffects(float damage, MatchPlayer target, MatchPlayer shooter,
             bool isModule, Entity weaponMarketItem)
         {
-            if (target.TryGetModule(out AbsorbingArmorEffect armorModule) && armorModule.EffectIsActive)
-                damage *= armorModule.Factor();
-
             if (!isModule && shooter.TryGetModule(out AdrenalineModule adrenalineModule) && adrenalineModule.EffectIsActive)
                 damage *= adrenalineModule.DamageFactor;
 
@@ -281,6 +278,9 @@ namespace TXServer.Core.Battles
                 else
                     damage *= damageModule.Factor;
             }
+
+            if (target.TryGetModule(out AbsorbingArmorEffect armorModule) && armorModule.EffectIsActive)
+                damage *= armorModule.Factor();
 
             // todo: add common mine to mine boolean when added
             bool mine = isModule && weaponMarketItem == Modules.GlobalItems.Spidermine;
