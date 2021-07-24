@@ -18,18 +18,12 @@ namespace TXServer.Core
     {
         public static void CheckRankUp(Player player)
         {
-            List<int> experiencePerRank = new List<int> {0};
-            experiencePerRank.AddRange(Config.GetComponent<RanksExperiencesConfigComponent>("ranksconfig")
-                .RanksExperiences);
-
-            experiencePerRank.Sort((a, b) => a.CompareTo(b));
-
             long totalExperience = player.Data.Experience;
             if (player.IsInMatch)
                 totalExperience += player.BattlePlayer.MatchPlayer.UserResult.ScoreToExperience -
                                    player.BattlePlayer.MatchPlayer.AlreadyAddedExperience;
 
-            int correctRank = experiencePerRank.IndexOf(experiencePerRank.LastOrDefault(x => x <= totalExperience)) + 1;
+            int correctRank = GetRankByXp(totalExperience);
 
             while (player.User.GetComponent<UserRankComponent>().Rank < correctRank)
             {
@@ -40,7 +34,16 @@ namespace TXServer.Core
                 });
             }
         }
+        public static int GetRankByXp(long experience)
+        {
+            List<int> experiencePerRank = new List<int> {0};
+            experiencePerRank.AddRange(Config.GetComponent<RanksExperiencesConfigComponent>("ranksconfig")
+                .RanksExperiences);
 
+            experiencePerRank.Sort((a, b) => a.CompareTo(b));
+
+            return experiencePerRank.IndexOf(experiencePerRank.LastOrDefault(x => x <= experience)) + 1;
+        }
         private static void RankUpNotification(int rank, Player player)
         {
             int crystals = rank * 100 - 100;
@@ -68,7 +71,6 @@ namespace TXServer.Core
             item.RemoveComponent<UpgradeLevelItemComponent>();
             item.AddComponent(new UpgradeLevelItemComponent(experience));
         }
-
         public static Entity GetTankRankRewards(Player player)
         {
             Entity reward = LevelUpUnlockBattleRewardTemplate.CreateEntity(new List<Entity>());

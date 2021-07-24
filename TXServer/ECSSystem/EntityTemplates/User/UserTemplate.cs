@@ -24,7 +24,7 @@ namespace TXServer.ECSSystem.EntityTemplates.User
 
                 new UserMoneyComponent(player.Data.Crystals),
                 new UserXCrystalsComponent(player.Data.XCrystals),
-                new UserRankComponent(1),
+                new UserRankComponent(Leveling.GetRankByXp(player.Data.Experience)),
                 new UserExperienceComponent(player.Data.Experience),
                 new UserReputationComponent(player.Data.Reputation),
 
