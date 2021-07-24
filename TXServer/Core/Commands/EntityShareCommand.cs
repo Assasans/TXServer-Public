@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -14,15 +15,18 @@ namespace TXServer.Core.Commands
         [ProtocolFixed] [OptionalMapped] public TemplateAccessor TemplateAccessor { get; private set; }
         [ProtocolFixed] public IReadOnlyCollection<Component> Components { get; }
 
-        public EntityShareCommand(Entity entity)
+        public EntityShareCommand(Entity entity, Player player)
         {
             Entity = entity ?? throw new ArgumentNullException(nameof(entity));
 
             EntityId = entity.EntityId;
             TemplateAccessor = entity.TemplateAccessor;
 
-            Components = new Component[Entity.Components.Count];
-            Entity.Components.CopyTo((Component[])Components);
+            Component[] shareAbleComponents =
+                Entity.Components.Where(c => c.SelfOnlyPlayer is null || c.SelfOnlyPlayer == player).ToArray();
+
+            Components = new Component[shareAbleComponents.Length];
+            shareAbleComponents.CopyTo((Component[])Components, 0);
         }
 
         public void OnReceive(Player player)

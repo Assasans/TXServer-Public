@@ -305,7 +305,7 @@ namespace TXServer.Core
             {
                 EntityList.Add(entity);
                 entity.PlayerReferences.Add(this);
-                Connection.QueueCommands(new EntityShareCommand(entity));
+                Connection.QueueCommands(new EntityShareCommand(entity, this));
             }
         }
 

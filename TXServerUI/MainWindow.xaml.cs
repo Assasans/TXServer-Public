@@ -71,7 +71,7 @@ namespace TXServerUI
                 MaxPlayers = int.Parse(MaxPlayersTextBox.Text),
 
                 DisableHeightMaps = DisableHeightMapsCheckBox.IsChecked.GetValueOrDefault(),
-                DisableHackBattle = DisableHackBattleCheckBox.IsChecked.GetValueOrDefault(),
+                TestServer = TestServerCheckBox.IsChecked.GetValueOrDefault(),
 
                 DisablePingMessages = DisablePingMessagesCheckBox.IsChecked.GetValueOrDefault(),
                 EnableTracing = EnableTracingCheckBox.IsChecked.GetValueOrDefault(),

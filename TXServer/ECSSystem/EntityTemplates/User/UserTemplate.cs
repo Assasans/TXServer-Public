@@ -44,11 +44,11 @@ namespace TXServer.ECSSystem.EntityTemplates.User
 
                 new BlackListComponent(),
 
-                new UserDailyBonusInitializedComponent(),
-                new UserDailyBonusCycleComponent(player.Data.DailyBonusCycle),
-                new UserDailyBonusReceivedRewardsComponent(player.Data.DailyBonusReceivedRewards),
-                new UserDailyBonusZoneComponent(player.Data.DailyBonusZone),
-                new UserDailyBonusNextReceivingDateComponent(player.Data.DailyBonusNextReceiveDate),
+                new UserDailyBonusInitializedComponent(player),
+                new UserDailyBonusCycleComponent(player),
+                new UserDailyBonusReceivedRewardsComponent(player),
+                new UserDailyBonusZoneComponent(player),
+                new UserDailyBonusNextReceivingDateComponent(player),
 
                 new QuestReadyComponent(),
                 new UserPublisherComponent(),
