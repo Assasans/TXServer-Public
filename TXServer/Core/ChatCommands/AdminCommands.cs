@@ -7,6 +7,7 @@ using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates.Notification;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
@@ -34,9 +35,10 @@ namespace TXServer.Core.ChatCommands
             { "positioninfo", (null, ChatCommandConditions.InMatch, PositionInfo) },
             { "recruitreward", ("recruitReward [opt: check/reset]", ChatCommandConditions.None, RecruitReward) },
             { "reload", ("reload [opt: all]", ChatCommandConditions.None, Reload) },
+            { "season", ("season [finish]", ChatCommandConditions.None, SeasonEditor ) },
             { "start", (null, ChatCommandConditions.InBattle, Start) },
             { "shutdown", (null, ChatCommandConditions.Admin, Shutdown) },
-            { "supplyrain", (null, ChatCommandConditions.ActiveBattle, SupplyRain) }
+            { "supplyrain", (null, ChatCommandConditions.ActiveBattle, SupplyRain) },
         };
 
         public static void CheckForCommand(string command, Player player)
@@ -384,6 +386,74 @@ namespace TXServer.Core.ChatCommands
             }
 
             return $"Target{(targets.Count > 1 ? "s" : "")} rejoin{(targets.Count < 2 ? "s" : "")}";
+        }
+
+        private static string SeasonEditor(Player player, string[] args)
+        {
+            switch (args[0].ToLower())
+            {
+                case "battles":
+                    if (args.Length < 2) return "error: missing argument for battle amount";
+                    if (!int.TryParse(args[1], out int count)) return $"error: unable to parse '{args[1]} as number'";
+
+                    player.User.ChangeComponent<UserStatisticsComponent>(component =>
+                        component.Statistics["BATTLES_PARTICIPATED_IN_SEASON"] = count);
+
+                    return $"Your battles in current season counter has been set to {count}";
+                case "finish":
+                    player.ServerData.SpreadLastSeasonRewards = true;
+                    player.ServerData.SeasonNumber++;
+
+                    // todo: this loop for every player in the database
+                    List<Player> uneditedPlayers = Server.Instance.Connection.Pool;
+                    foreach (Player p in uneditedPlayers)
+                    {
+                        p.User.ChangeComponent<UserStatisticsComponent>(component =>
+                        {
+                            p.Data.LastSeasonBattles = component.Statistics["BATTLES_PARTICIPATED_IN_SEASON"];
+                            component.Statistics["BATTLES_PARTICIPATED_IN_SEASON"] = 0;
+                        });
+
+                        p.Data.LastSeasonLeagueId = p.Data.League.EntityId;
+                        p.Data.LastSeasonLeagueIndex = p.Data.LeagueIndex;
+                        p.Data.LastSeasonLeaguePlace = Leveling.GetLeaguePlace(p, uneditedPlayers);
+                        p.Data.LastSeasonPlace = Leveling.GetSeasonPlace(p, uneditedPlayers);
+
+                        // todo: subtract correct reputation amount (read wiki)
+                        p.Data.Reputation = 100;
+                    }
+
+                    return $"finished season {player.ServerData.SeasonNumber - 1} & " +
+                           $"started season {player.ServerData.SeasonNumber}";
+                case "leagueplace":
+                    if (args.Length < 2) return "error: missing argument for place";
+                    if (!int.TryParse(args[1], out int leaguePlace))
+                        return $"error: unable to parse '{args[1]} as number'";
+                    player.Data.LastSeasonLeaguePlace = leaguePlace;
+
+                    return $"changed your last season's league place to {leaguePlace}";
+                case "place":
+                    if (args.Length < 2) return "error: missing argument for place";
+                    if (!int.TryParse(args[1], out int place)) return $"error: unable to parse '{args[1]} as number'";
+                    player.Data.LastSeasonPlace = place;
+
+                    return $"changed your last season's place to {place}";
+                case "rewardStop":
+                    player.ServerData.SpreadLastSeasonRewards = false;
+
+                    // todo: this loop for every player in the database
+                    foreach (Player p in Server.Instance.Connection.Pool)
+                    {
+                        p.Data.LastSeasonLeagueId = Leagues.GlobalItems.Training.EntityId;
+                        p.Data.LastSeasonLeagueIndex = 0;
+                        p.Data.LastSeasonPlace = 1;
+                        p.Data.ReceivedLastSeasonReward = false;
+                    }
+
+                    return "the season rewards spreading has been stopped";
+                default:
+                    return $"error: '{args[0]}' isn't a valid argument";
+            }
         }
 
         private static string Shutdown(Player player, string[] args)

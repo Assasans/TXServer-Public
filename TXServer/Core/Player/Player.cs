@@ -22,6 +22,8 @@ using TXServer.Core.ECSSystem.Events;
 using TXServer.ECSSystem.Components.DailyBonus;
 using TXServer.ECSSystem.Components.User.Tutorial;
 using TXServer.ECSSystem.EntityTemplates.Notification;
+using TXServer.ECSSystem.EntityTemplates.Notification.FractionsCompetition;
+using TXServer.ECSSystem.EntityTemplates.Notification.League;
 using TXServer.ECSSystem.EntityTemplates.User;
 using TXServer.ECSSystem.Events.Fraction;
 using TXServer.ECSSystem.Types;
@@ -45,8 +47,13 @@ namespace TXServer.Core
         public bool IsBanned => Data.Punishments.Any(p => p.Type is PunishmentType.Ban && p.IsActive);
         public bool IsMuted => Data.Punishments.Any(p => p.Type is PunishmentType.Mute && p.IsActive);
 
-        //todo add those three in PlayerData
-        public Entity CurrentAvatar { get; set; }
+        public bool HasEntityWithId(long id, out Entity searchedEntity)
+        {
+            searchedEntity = GetEntityById(id);
+            return searchedEntity is not null;
+        }
+
+        // todo add that in PlayerData
         public ConcurrentDictionary<Type, ItemList> UserItems { get; } = new();
 
 
@@ -162,27 +169,15 @@ namespace TXServer.Core
                 Data.Mod = false;
             }
 
-            if (Data.PremiumExpirationDate > DateTime.UtcNow)
-                user.AddComponent(new PremiumAccountBoostComponent { EndDate = Data.PremiumExpirationDate });
-            if (Data.Admin)
-            {
-                user.Components.Add(new UserAdminComponent());
-                if (!Data.IsPremium)
-                    Data.RenewPremium(new TimeSpan(23999976, 0, 0));
-            }
-            if (Data.Beta) user.Components.Add(new ClosedBetaQuestAchievementComponent());
-
-
             ShareEntities(user);
-            clientSession.AddComponent(new UserGroupComponent(user));
+            clientSession.AddComponent(user.GetComponent<UserGroupComponent>());
 
             ShareEntities(ResourceManager.GetEntities(this, user));
-
-            CurrentAvatar = ((Avatars.Items)UserItems[typeof(Avatars)]).Tankist;
+            SetEquipment();
 
             foreach (Entity item in new[]
             {
-                CurrentAvatar,
+                GetUserItemByMarket(GetEntityById(Data.Avatar)),
                 CurrentPreset.WeaponItem,
                 CurrentPreset.HullItem,
                 CurrentPreset.WeaponPaint,
@@ -225,26 +220,29 @@ namespace TXServer.Core
                 Data.Fraction is not null)
                 ShareEntities(FractionsCompetitionRewardNotificationTemplate.CreateEntity(this));
 
+            // release gift notification
             if (ServerData.SpreadReleaseGift && !Data.ReceivedReleaseReward &&
                 Data.RegistrationDate <= ServerData.ReleaseGiftMaxRegistrationDate)
                 ShareEntities(ReleaseGiftsPersistentNotificationTemplate.CreateEntity(this));
 
-            if (ServerData.FractionsCompetitionActive && !ServerData.FractionsCompetitionFinished &&
-                !Data.ShowedFractionsCompetition)
-                ShareEntities(FractionsCompetitionStartNotificationTemplate.CreateEntity(this));
-
-            if (ServerData.FractionsCompetitionActive || ServerData.FractionsCompetitionFinished)
-                UpdateFractionScores();
+            Fractions.CheckForNotifications(this);
+            Leagues.CheckForNotifications(this);
         }
 
         public void UpdateFractionScores() =>
             SendEvent(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition);
 
+        public Entity GetMarketItemByUser(Entity userItem) => ResourceManager.GetMarketItem(this, userItem);
         public Entity GetUserItemByMarket(Entity marketItem) => ResourceManager.GetUserItem(this, marketItem);
         public int GetUserItemLevel(Entity userItem) => ResourceManager.GetUserItemLevel(this, userItem);
 
         public void SaveNewMarketItem(Entity marketItem, int amount = 1) =>
             ResourceManager.SaveNewMarketItem(this, marketItem, amount);
+
+        public void SetEquipment()
+        {
+            User.AddComponent(new UserAvatarComponent(Data.Avatar, this));
+        }
 
         /// <summary>
         /// Shares users of players.
@@ -321,6 +319,8 @@ namespace TXServer.Core
                 Connection.QueueCommands(new EntityUnshareCommand(entity));
             }
         }
+
+        public Entity GetEntityById(long id) => EntityList.SingleOrDefault(e => e.EntityId == id);
 
         public override string ToString() => $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : null)})" : null)}";
         private EndPoint _EndPoint;

@@ -30,9 +30,8 @@ namespace TXServer.ECSSystem.Events.Item
                     player.CurrentPreset.HullId = player.CurrentPreset.Hull.EntityId;
 					break;
 				case AvatarUserItemTemplate _:
-					prevItem = player.CurrentAvatar;
-					player.CurrentAvatar = item;
-                    player.Data.Avatar = item.EntityId;
+                    prevItem = player.GetUserItemByMarket(player.GetEntityById(player.Data.Avatar));
+                    player.Data.Avatar = player.GetMarketItemByUser(item).EntityId;
                     break;
 				case TankPaintUserItemTemplate _:
 					prevItem = player.CurrentPreset.TankPaint;

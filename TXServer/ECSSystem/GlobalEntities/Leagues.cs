@@ -1,8 +1,10 @@
-﻿using TXServer.ECSSystem.Base;
+﻿using TXServer.Core;
+using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.BattleRewards;
 using TXServer.ECSSystem.Components.League;
 using TXServer.ECSSystem.EntityTemplates;
+using TXServer.ECSSystem.EntityTemplates.Notification.League;
 
 namespace TXServer.ECSSystem.GlobalEntities
 {
@@ -37,6 +39,27 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new LeagueGroupComponent(1131431735),
                 new CurrentSeasonRewardForClientComponent(4),
                 new LeagueConfigComponent(4, 4500));
+        }
+
+        public static void CheckForNotifications(Player player)
+        {
+            // season first entrance reward
+            if (!player.Data.RewardedLeagues.Contains(player.Data.League.EntityId) &&
+                player.Data.League.EntityId != GlobalItems.Training.EntityId)
+                player.ShareEntities(LeagueFirstEntranceRewardPersistentNotificationTemplate.CreateEntity(player));
+
+            // finished season reward
+            if (player.ServerData.SpreadLastSeasonRewards && !player.Data.ReceivedLastSeasonReward &&
+                player.Data.LastSeasonBattles > 0 && player.Data.LastSeasonLeagueIndex > 0)
+                player.ShareEntities(LeagueSeasonEndRewardPersistentNotificationTemplate.CreateEntity(player));
+
+            // season normal graffiti
+            if (player.ServerData.SeasonGraffities.TryGetValue(player.ServerData.SeasonNumber,
+                    out (long normalId, long _) graffiti) &&
+                player.HasEntityWithId(graffiti.normalId, out Entity graffitiReward) &&
+                !player.Data.OwnsMarketItem(graffitiReward) &&
+                player.User.GetComponent<UserStatisticsComponent>().Statistics["BATTLES_PARTICIPATED_IN_SEASON"] > 9)
+                player.SaveNewMarketItem(graffitiReward);
         }
     }
 }

@@ -5,7 +5,7 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.GlobalEntities;
 
-namespace TXServer.ECSSystem.Components.Notification
+namespace TXServer.ECSSystem.Components.Notification.FractionsCompetition
 {
     [SerialVersionUID(1547017351411L)]
     public class FractionsCompetitionRewardNotificationComponent : Component

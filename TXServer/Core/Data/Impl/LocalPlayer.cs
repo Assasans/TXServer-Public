@@ -42,9 +42,17 @@ namespace TXServer.Core.Data.Impl
                 LastRecruitReward = null;
                 RecruitRewardDay = 0;
 
-                Reputation = 100;
+                LastSeasonBattles = 0;
+                LastSeasonLeagueId = Leagues.GlobalItems.Training.EntityId;
+                LastSeasonLeagueIndex = 0;
+                LastSeasonPlace = 1;
+                LastSeasonLeaguePlace = 1;
+                SeasonsReputation = new Dictionary<int, int> {{Server.Instance.ServerData.SeasonNumber, 100}};
+
                 League = Leagues.GlobalItems.Training;
                 LeagueChestScore = 0;
+                LeagueIndex = 0;
+                Reputation = 100;
 
                 AcceptedFriendIds = new List<long>();
                 IncomingFriendIds = new List<long>();
@@ -73,6 +81,7 @@ namespace TXServer.Core.Data.Impl
                 ReceivedFractionsCompetitionReward = false;
                 ReceivedReleaseReward = false;
                 ShowedFractionsCompetition = false;
+                RewardedLeagues = new List<long>();
 
                 Original = (PlayerData) Clone();
             }

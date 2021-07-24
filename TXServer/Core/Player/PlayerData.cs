@@ -16,7 +16,6 @@ using TXServer.ECSSystem.Components.Item.Tank;
 using TXServer.ECSSystem.Components.User;
 using TXServer.ECSSystem.Components.User.Tutorial;
 using TXServer.ECSSystem.EntityTemplates;
-using TXServer.ECSSystem.EntityTemplates.Item.Module;
 using TXServer.ECSSystem.Events.DailyBonus;
 using TXServer.ECSSystem.Events.Item;
 using TXServer.ECSSystem.GlobalEntities;
@@ -52,25 +51,10 @@ namespace TXServer.Core
 
         public string HashedPassword { get; set; }
         public string HardwareId { get; set; }
-        public string AutoLoginToken { get; protected set; }
+        protected string AutoLoginToken { get; set; }
         public bool RememberMe { get; set; }
 
         public string CountryCode { get; protected set; }
-
-        public long Avatar
-        {
-            get => _avatar;
-            set
-            {
-                _avatar = value;
-                if (Player?.User is null) return;
-
-                // todo: database set
-                string configPath = Player.EntityList.Single(e => e.EntityId == value).TemplateAccessor.ConfigPath;
-                string avatarId = Config.GetComponent<AvatarItemComponent>(configPath).Id;
-                Player.User.ChangeComponent<UserAvatarComponent>(component => component.Id = avatarId);
-            }
-        }
 
         public bool Admin { get; set; }
         public bool Beta { get; protected set; }
@@ -161,7 +145,7 @@ namespace TXServer.Core
                 });
             }
         }
-        protected List<long> DailyBonusReceivedRewards { get; set; }
+        public List<long> DailyBonusReceivedRewards { get; set; }
         public int DailyBonusZone
         {
             get => _dailyBonusZone;
@@ -180,12 +164,15 @@ namespace TXServer.Core
         public int RecruitRewardDay { get; set; }
 
         public Entity League { get; protected set; }
+        public int LeagueIndex { get; protected set; }
         public int Reputation
         {
             get => _reputation;
             set
             {
                 _reputation = value;
+                SeasonsReputation ??= new Dictionary<int, int>();
+                SeasonsReputation[Server.Instance.ServerData.SeasonNumber] = value;
 
                 if (Player?.User is null) return;
                 //todo: save in db
@@ -206,6 +193,13 @@ namespace TXServer.Core
             }
         }
 
+        public long LastSeasonBattles { get; set; }
+        public long LastSeasonLeagueId { get; set; }
+        public int LastSeasonLeagueIndex { get; set; }
+        public int LastSeasonPlace { get; set; }
+        public int LastSeasonLeaguePlace { get; set; }
+        protected Dictionary<int, int> SeasonsReputation { get; set; }
+
         public DateTime PremiumExpirationDate { get; protected set; }
 
         public List<Entity> Presets { get; } = new();
@@ -222,6 +216,20 @@ namespace TXServer.Core
         public List<long> Avatars { get; protected set; }
         public Dictionary<long, int> Containers { get; protected set; }
         public List<long> Covers { get; protected set; }
+        public long Avatar
+        {
+            get => _avatar;
+            set
+            {
+                _avatar = value;
+                if (Player?.User is null) return;
+
+                // todo: database set
+                string configPath = Player.GetEntityById(value).TemplateAccessor.ConfigPath;
+                string avatarId = Config.GetComponent<AvatarItemComponent>(configPath).Id;
+                Player.User.ChangeComponent<UserAvatarComponent>(component => component.Id = avatarId);
+            }
+        }
         public List<long> Graffities { get; protected set; }
         public Dictionary<long, long> Hulls { get; protected set; }
         public List<long> HullSkins { get; protected set; }
@@ -234,7 +242,9 @@ namespace TXServer.Core
 
         public bool ReceivedFractionsCompetitionReward { get; set; }
         public bool ReceivedReleaseReward { get; set; }
+        public bool ReceivedLastSeasonReward { get; set; }
         public bool ShowedFractionsCompetition { get; set; }
+        public List<long> RewardedLeagues { get; set; }
 
 
         public PlayerData(string uid)
@@ -252,13 +262,13 @@ namespace TXServer.Core
 
         private void SetLeague(int reputation)
         {
-            League = reputation switch
+            (League, LeagueIndex) = reputation switch
             {
-                <= 139 => Leagues.GlobalItems.Training,
-                >= 140 and <= 999 => Leagues.GlobalItems.Bronze,
-                >= 1000 and <= 2999 => Leagues.GlobalItems.Silver,
-                >= 3000 and <= 4499 => Leagues.GlobalItems.Gold,
-                >= 4500 => Leagues.GlobalItems.Master
+                <= 139 => (Leagues.GlobalItems.Training, 0),
+                >= 140 and <= 999 => (Leagues.GlobalItems.Bronze, 1),
+                >= 1000 and <= 2999 => (Leagues.GlobalItems.Silver, 2),
+                >= 3000 and <= 4499 => (Leagues.GlobalItems.Gold, 3),
+                >= 4500 => (Leagues.GlobalItems.Master, 4)
             };
             Player.User.TryRemoveComponent<LeagueGroupComponent>();
             Player.User.AddComponent(League.GetComponent<LeagueGroupComponent>());
@@ -340,15 +350,17 @@ namespace TXServer.Core
             if (IsPremium) PremiumExpirationDate += additionalPremiumTime;
             else PremiumExpirationDate = DateTime.UtcNow + additionalPremiumTime;
 
-            PremiumAccountBoostComponent component = new() { EndDate = PremiumExpirationDate };
-
-            if (Player.User.GetComponent<PremiumAccountBoostComponent>() == null)
-                Player.User.AddComponent(component);
-            else
-                Player.User.ChangeComponent(component);
-
             if (Server.DatabaseNetwork.IsReady)
                 Server.DatabaseNetwork.Socket.emit(new SetPremiumExpiration() { uid = UniqueId, expiration = PremiumExpirationDate.Ticks });
+
+            if (Player.User is not null)
+            {
+                PremiumAccountBoostComponent component = new(PremiumExpirationDate);
+                if (Player.User.HasComponent<PremiumAccountBoostComponent>())
+                    Player.User.AddComponent(component);
+                else
+                    Player.User.ChangeComponent(component);
+            }
         }
 
         public void AddDailyBonusReward(long code)

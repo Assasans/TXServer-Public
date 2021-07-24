@@ -1,4 +1,5 @@
-﻿using TXServer.Core;
+﻿using System;
+using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -19,7 +20,6 @@ namespace TXServer.ECSSystem.EntityTemplates.User
 
                 new UserUidComponent(player.Data.Username),
                 new UserCountryComponent(player.Data.CountryCode),
-                new UserAvatarComponent("8b74e6a3-849d-4a8d-a20e-be3c142fd5e8"),
                 new RegistrationDateComponent(),
 
                 new UserMoneyComponent(player.Data.Crystals),
@@ -46,7 +46,7 @@ namespace TXServer.ECSSystem.EntityTemplates.User
 
                 new UserDailyBonusInitializedComponent(),
                 new UserDailyBonusCycleComponent(player.Data.DailyBonusCycle),
-                new UserDailyBonusReceivedRewardsComponent(),
+                new UserDailyBonusReceivedRewardsComponent(player.Data.DailyBonusReceivedRewards),
                 new UserDailyBonusZoneComponent(player.Data.DailyBonusZone),
                 new UserDailyBonusNextReceivingDateComponent(player.Data.DailyBonusNextReceiveDate),
 
@@ -55,8 +55,20 @@ namespace TXServer.ECSSystem.EntityTemplates.User
                 new ConfirmedUserEmailComponent(player.Data.Email, player.Data.Subscribed),
                 new UserSubscribeComponent());
 
+            if (player.Data.Admin)
+            {
+                user.Components.Add(new UserAdminComponent());
+                if (!player.Data.IsPremium)
+                    player.Data.RenewPremium(new TimeSpan(23999976, 0, 0));
+            }
+            if (player.Data.Beta)
+                user.Components.Add(new ClosedBetaQuestAchievementComponent());
+
             if (player.Data.Fraction is not null)
                 user.AddComponent(new FractionGroupComponent(player.Data.Fraction));
+
+            if (player.Data.PremiumExpirationDate > DateTime.UtcNow)
+                user.AddComponent(new PremiumAccountBoostComponent(player.Data.PremiumExpirationDate));
 
             user.AddComponent(new UserGroupComponent(user));
 

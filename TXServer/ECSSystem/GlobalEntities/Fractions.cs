@@ -3,6 +3,7 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Fraction;
 using TXServer.ECSSystem.EntityTemplates;
+using TXServer.ECSSystem.EntityTemplates.Notification.FractionsCompetition;
 
 namespace TXServer.ECSSystem.GlobalEntities
 {
@@ -52,6 +53,18 @@ namespace TXServer.ECSSystem.GlobalEntities
                     return frontier;
                 }
             }
+        }
+
+        public static void CheckForNotifications(Player player)
+        {
+            // fractions competition start notification
+            if (ServerData.FractionsCompetitionActive && !ServerData.FractionsCompetitionFinished &&
+                !player.Data.ShowedFractionsCompetition)
+                player.ShareEntities(FractionsCompetitionStartNotificationTemplate.CreateEntity(player));
+
+            // update fraction scores
+            if (ServerData.FractionsCompetitionActive || ServerData.FractionsCompetitionFinished)
+                player.UpdateFractionScores();
         }
 
         private static Entity GetWinner() => ServerData.AntaeusScore > ServerData.FrontierScore

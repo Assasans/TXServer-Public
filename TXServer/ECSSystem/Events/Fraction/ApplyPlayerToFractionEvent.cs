@@ -17,10 +17,20 @@ namespace TXServer.ECSSystem.Events.Fraction
             if (!user.HasComponent<FractionGroupComponent>())
                 user.AddComponent(fraction.GetComponent<FractionGroupComponent>());
 
+            Entity graffiti;
             if (fraction.EntityId == Fractions.GlobalItems.Antaeus.EntityId)
+            {
                 Server.Instance.ServerData.AntaeusUserCount++;
+                graffiti = Graffiti.GlobalItems.Antaeus;
+            }
             else
+            {
                 Server.Instance.ServerData.FrontierUserCount++;
+                graffiti = Graffiti.GlobalItems.Frontier;
+            }
+
+            if (!player.Data.OwnsMarketItem(graffiti))
+                player.SaveNewMarketItem(graffiti);
         }
     }
 }

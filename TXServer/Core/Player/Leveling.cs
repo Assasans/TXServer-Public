@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.Configuration;
@@ -93,6 +94,21 @@ namespace TXServer.Core
             }
 
             return reward.GetComponent<LevelUpUnlockPersonalRewardComponent>().Unlocked.Any() ? reward : null;
+        }
+
+        public static int GetLeaguePlace(Player player, List<Player> players = null)
+        {
+            // todo: compare ALL players in database
+            players ??= Server.Instance.Connection.Pool;
+            return players.Where(p => p.Data.LeagueIndex == player.Data.LeagueIndex)
+                       .OrderByDescending(p => p.Data.Reputation).ToList().IndexOf(player) + 1;
+        }
+        public static int GetSeasonPlace(Player player, List<Player> players = null)
+        {
+            // todo: compare ALL players in database
+            players ??= Server.Instance.Connection.Pool;
+            return players.OrderByDescending(p => p.Data.Reputation).ToList().IndexOf(player) +
+                   1;
         }
     }
 }

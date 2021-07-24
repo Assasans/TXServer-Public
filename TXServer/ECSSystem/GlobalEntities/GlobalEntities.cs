@@ -119,6 +119,14 @@ namespace TXServer.ECSSystem.GlobalEntities
             return entities.ToArray();
         }
 
+        public static Entity GetMarketItem(Player player, Entity userItem)
+        {
+            Type templateType = MarketToUserTemplate.First(t => t.Value == userItem.TemplateAccessor.Template.GetType())
+                .Key;
+            return player.EntityList.Single(e =>
+                e.TemplateAccessor.Template.GetType() == templateType &&
+                e.EntityId == userItem.GetComponent<MarketItemGroupComponent>().Key);
+        }
         public static Entity GetModuleUserItem(Player player, long id)
         {
             return player.EntityList.Single(e => e.HasComponent<MarketItemGroupComponent>() &&

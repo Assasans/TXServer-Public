@@ -9,43 +9,48 @@ namespace TXServer.ECSSystem.Components.League
     [SerialVersionUID(1503654626834L)]
     public class CurrentSeasonRewardForClientComponent : Component
     {
-        public CurrentSeasonRewardForClientComponent(int leagueIndex)
+        public CurrentSeasonRewardForClientComponent(int leagueIndex) => Rewards = GetLeagueRewards(leagueIndex);
+
+        public static List<EndSeasonRewardItem> GetLeagueRewards(int leagueIndex)
         {
-            List<DroppedItem> items = new List<DroppedItem>();
-            switch (leagueIndex)
+            return leagueIndex switch
             {
-                case 0:
-                    Rewards.Add(new EndSeasonRewardItem(100, 139, items));
-                    break;
-                case 1:
-                    items.Add(new DroppedItem(Containers.GlobalItems.Cardsbronze, 20));
-                    items.Add(new DroppedItem(ExtraItems.GlobalItems.Crystal, 20000));
-                    items.Add(new DroppedItem(Paints.GlobalItems.League_bronze, 1));
-                    Rewards.Add(new EndSeasonRewardItem(140, 999, items));
-                    break;
-                case 2:
-                    items.Add(new DroppedItem(Containers.GlobalItems.Cardssilver, 20));
-                    items.Add(new DroppedItem(ExtraItems.GlobalItems.Crystal, 60000));
-                    items.Add(new DroppedItem(Paints.GlobalItems.League_silver, 1));
-                    Rewards.Add(new EndSeasonRewardItem(1000, 2999, items));
-                    break;
-                case 3:
-                    items.Add(new DroppedItem(Containers.GlobalItems.Cardsgold, 20));
-                    items.Add(new DroppedItem(ExtraItems.GlobalItems.Xcrystal, 500));
-                    items.Add(new DroppedItem(Paints.GlobalItems.League_gold, 1));
-                    Rewards.Add(new EndSeasonRewardItem(3000, 4499, items));
-                    break;
-                case 4:
-                    items.Add(new DroppedItem(Containers.GlobalItems.Cardsmaster, 20));
-                    items.Add(new DroppedItem(Containers.GlobalItems.Xt_zeus, 1));
-                    items.Add(new DroppedItem(ExtraItems.GlobalItems.Xcrystal, 9999));
-                    items.Add(new DroppedItem(Paints.GlobalItems.League_master, 1));
-                    items.Add(new DroppedItem(Paints.GlobalItems.Hero, 1));
-                    Rewards.Add(new EndSeasonRewardItem(4500, 99999, items));
-                    break;
-            }
+                0 => new List<EndSeasonRewardItem>{new(100, 139, new List<DroppedItem>())},
+                1 => new List<EndSeasonRewardItem>{new(140, 999, BronzeRewards)},
+                2 => new List<EndSeasonRewardItem>{new(1000, 2999, SilverRewards)},
+                3 => new List<EndSeasonRewardItem>{new(3000, 4499, GoldRewards)},
+                4 => new List<EndSeasonRewardItem>{new(4500, 99999, MasterRewards)},
+                _ => new List<EndSeasonRewardItem>()
+            };
         }
 
-        public List<EndSeasonRewardItem> Rewards { get; set; } = new();
+        private static readonly List<DroppedItem> BronzeRewards = new()
+        {
+            new DroppedItem(Containers.GlobalItems.Cardsbronze, 20),
+            new DroppedItem(ExtraItems.GlobalItems.Crystal, 20000),
+            new DroppedItem(Paints.GlobalItems.League_bronze, 1)
+        };
+        private static readonly List<DroppedItem> SilverRewards = new()
+        {
+            new DroppedItem(Containers.GlobalItems.Cardssilver, 20),
+            new DroppedItem(ExtraItems.GlobalItems.Crystal, 60000),
+            new DroppedItem(Paints.GlobalItems.League_silver, 1)
+        };
+        private static readonly List<DroppedItem> GoldRewards = new()
+        {
+            new DroppedItem(Containers.GlobalItems.Cardsgold, 20),
+            new DroppedItem(ExtraItems.GlobalItems.Xcrystal, 500),
+            new DroppedItem(Paints.GlobalItems.League_gold, 1)
+        };
+        private static readonly List<DroppedItem> MasterRewards = new()
+        {
+            new DroppedItem(Containers.GlobalItems.Cardsmaster, 20),
+            new DroppedItem(Containers.GlobalItems.Xt_zeus, 1),
+            new DroppedItem(ExtraItems.GlobalItems.Xcrystal, 9999),
+            new DroppedItem(Paints.GlobalItems.League_master, 1),
+            new DroppedItem(Paints.GlobalItems.Hero, 1)
+        };
+
+        public List<EndSeasonRewardItem> Rewards { get; set; }
     }
 }
