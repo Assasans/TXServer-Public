@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Protocol;
+﻿using TXServer.Core;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Components.DailyBonus
@@ -6,9 +7,10 @@ namespace TXServer.ECSSystem.Components.DailyBonus
     [SerialVersionUID(636459062089487176)]
     public class UserDailyBonusZoneComponent : Component
     {
-        public UserDailyBonusZoneComponent(long ZoneNumber)
+        public UserDailyBonusZoneComponent(Player player)
         {
-            this.ZoneNumber = ZoneNumber;
+            ZoneNumber = player.Data.DailyBonusZone;
+            SelfOnlyPlayer = player;
         }
 
         public long ZoneNumber { get; set; }

@@ -1,14 +1,16 @@
-﻿using TXServer.Core.Protocol;
+﻿using TXServer.Core;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Components
+namespace TXServer.ECSSystem.Components.DailyBonus
 {
     [SerialVersionUID(636459034861529826)]
     public class UserDailyBonusCycleComponent : Component
     {
-        public UserDailyBonusCycleComponent(long CycleNumber)
+        public UserDailyBonusCycleComponent(Player player)
         {
-            this.CycleNumber = CycleNumber;
+            CycleNumber = player.Data.DailyBonusCycle;
+            SelfOnlyPlayer = player;
         }
 
         public long CycleNumber { get; set; }

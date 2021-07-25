@@ -158,9 +158,6 @@ namespace TXServer.Core
 
             Logger.Log($"{this}: Logged in as {Data.Username}.");
 
-            Entity user = UserTemplate.CreateEntity(this);
-            User = user;
-
             // todo: in db
             List<string> admins = new() { "NoNick", "Tim203", "M8", "Kaveman", "Assasans" };
             if (!admins.Contains(Data.Username))
@@ -168,6 +165,9 @@ namespace TXServer.Core
                 Data.Admin = false;
                 Data.Mod = false;
             }
+
+            Entity user = UserTemplate.CreateEntity(this);
+            User = user;
 
             ShareEntities(user);
             clientSession.AddComponent(user.GetComponent<UserGroupComponent>());
@@ -305,7 +305,7 @@ namespace TXServer.Core
             {
                 EntityList.Add(entity);
                 entity.PlayerReferences.Add(this);
-                Connection.QueueCommands(new EntityShareCommand(entity));
+                Connection.QueueCommands(new EntityShareCommand(entity, this));
             }
         }
 

@@ -18,28 +18,40 @@ namespace TXServer.ECSSystem.Events.Item
 	{
 		public void Execute(Player player, Entity container)
         {
+            int containerAmount = player.Data.Containers[container.GetComponent<MarketItemGroupComponent>().Key];
+
             // remove opened container from user
-            player.Data.Containers[container.GetComponent<MarketItemGroupComponent>().Key]--;
-            container.ChangeComponent<UserItemCounterComponent>(component =>
-                component.Count = player.Data.Containers[container.GetComponent<MarketItemGroupComponent>().Key]);
+            player.Data.Containers[container.GetComponent<MarketItemGroupComponent>().Key] = 0;
+            container.ChangeComponent<UserItemCounterComponent>(component => component.Count = 0);
             player.SendEvent(new ItemsCountChangedEvent(1), container);
 
             List<Entity> notifications = new List<Entity>();
+            for (int i = 0; i < containerAmount; i++)
+                notifications.AddRange(OpenContainer(player, container));
 
-            // save reward(s) + create notification(s)
-            Entity containerMarketItem =
-                player.EntityList.Single(e => e.EntityId == container.GetComponent<MarketItemGroupComponent>().Key);
+            player.ShareEntities(notifications);
+			player.SendEvent(new ShowNotificationGroupEvent(1), notifications.First());
+        }
+
+        private List<Entity> OpenContainer(Player player, Entity container)
+        {
+            List<Entity> notifications = new List<Entity>();
+
+            Entity containerMarketItem = player.EntityList.Single(e =>
+                    e.EntityId == container.GetComponent<MarketItemGroupComponent>().Key);
+
             switch (containerMarketItem.TemplateAccessor.Template)
             {
-                case ContainerPackPriceMarketItemTemplate:
-                    Random random = new();
+                case ContainerPackPriceMarketItemTemplate: Random random = new();
                     ItemsContainerItemComponent configComponent =
                         Config.GetComponent<ItemsContainerItemComponent>(container.TemplateAccessor.ConfigPath);
                     List<ContainerItem> marketItemBundles = (configComponent.Items ?? new List<ContainerItem>())
                         .Concat(configComponent.RareItems ?? new List<ContainerItem>()).ToList();
                     ContainerItem containerItem = marketItemBundles[random.Next(marketItemBundles.Count)];
-                    MarketItemBundle marketItemBundle = containerItem.ItemBundles[random.Next(containerItem.ItemBundles.Count)];
-                    Entity rewardMarketItem = player.EntityList.Single(e => e.EntityId == marketItemBundle.MarketItem);
+                    MarketItemBundle marketItemBundle =
+                        containerItem.ItemBundles[random.Next(containerItem.ItemBundles.Count)];
+                    Entity rewardMarketItem =
+                        player.EntityList.Single(e => e.EntityId == marketItemBundle.MarketItem);
 
                     if (player.Data.OwnsMarketItem(rewardMarketItem))
                     {
@@ -51,8 +63,8 @@ namespace TXServer.ECSSystem.Events.Item
                         ResourceManager.SaveNewMarketItem(player, rewardMarketItem,
                             marketItemBundle.Max == 0 ? marketItemBundle.Amount : random.Next(1, marketItemBundle.Max));
 
-                    notifications.Add(
-                        NewItemNotificationTemplate.CreateEntity(container, rewardMarketItem, marketItemBundle.Amount));
+                    notifications.Add(NewItemNotificationTemplate.CreateEntity(container, rewardMarketItem,
+                        marketItemBundle.Amount));
 
                     break;
                 default:
@@ -63,12 +75,10 @@ namespace TXServer.ECSSystem.Events.Item
                         ResourceManager.SaveNewMarketItem(player, card, amount);
                         notifications.Add(NewItemNotificationTemplate.CreateCardNotification(container, card, amount));
                     }
-
                     break;
             }
 
-            player.ShareEntities(notifications);
-			player.SendEvent(new ShowNotificationGroupEvent(1), notifications.First());
+            return notifications;
         }
 
         private Dictionary<Entity, int> GetBlueprintsByContainer(Entity containerMarketItem, Player player)

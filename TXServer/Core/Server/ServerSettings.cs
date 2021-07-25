@@ -9,7 +9,7 @@ namespace TXServer.Core
         public int MaxPlayers { get; set; }
 
         public bool DisableHeightMaps { get; set; }
-        public bool DisableHackBattle { get; set; }
+        public bool TestServer { get; set; }
 
         public bool DisablePingMessages { get; set; }
 
