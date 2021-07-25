@@ -91,7 +91,7 @@ namespace TXServer.Core.Battles
             if (!Server.Instance.Settings.DisableHeightMaps)
             {
                 HeightMap map = Battle.HeightMap;
-                (HeightMapLayer layer, float y) = map.Layers
+                var tuple = map.Layers
                     .Select((layer) =>
                     {
                         // If layer is not loaded
@@ -115,25 +115,28 @@ namespace TXServer.Core.Battles
 
                         return (layer, y);
                     })
-                    .First((tuple) => tuple.y - Vector3.UnitY.Y < Carrier.MatchPlayer.TankPosition.Y);
+                    .FirstOrDefault((tuple) => tuple.y - Vector3.UnitY.Y < Carrier.MatchPlayer.TankPosition.Y);
 
-                if (layer == null)
+                if (tuple == default)
                 {
-                    ChatMessageReceivedEvent.SystemMessageTarget(
-                        $"[Flag] Dropped at {Carrier.MatchPlayer.TankPosition.X}, {Carrier.MatchPlayer.TankPosition.Z}, {Carrier.MatchPlayer.TankPosition.Y}\n" +
-                        "[Flag/Error] No layer found",
-                        Battle.GeneralBattleChatEntity, Carrier.Player
-                    );
+                    Carrier = null;
+
+                    if (!silent)
+                        Battle.PlayersInMap.SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
+                    FlagEntity.RemoveComponent<TankGroupComponent>();
+                    FlagEntity.AddComponent(new FlagGroundedStateComponent());
+
+                    Return(silent: true);
                     return;
                 }
 
+                (HeightMapLayer layer, float y) = tuple;
                 flagPosition = new Vector3(Carrier.MatchPlayer.TankPosition.X, y, Carrier.MatchPlayer.TankPosition.Z) - Vector3.UnitY;
             }
             else
             {
                 flagPosition = Carrier.MatchPlayer.TankPosition - Vector3.UnitY;
             }
-
 
             Carrier = null;
 
