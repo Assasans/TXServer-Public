@@ -1,13 +1,10 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using TXServer.Library;
 using TXServer.Core.HeightMaps;
-using TXServer.Core.Logging;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
@@ -16,8 +13,8 @@ using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Flag;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
-using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.Types;
+using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.Core.Battles
@@ -92,7 +89,7 @@ namespace TXServer.Core.Battles
             {
                 HeightMap map = Battle.HeightMap;
                 var tuple = map.Layers
-                    .Select((layer) =>
+                    .Select(layer =>
                     {
                         // If layer is not loaded
                         if (layer.Image == null) return (null, -9999);
@@ -115,28 +112,26 @@ namespace TXServer.Core.Battles
 
                         return (layer, y);
                     })
-                    .FirstOrDefault((tuple) => tuple.y - Vector3.UnitY.Y < Carrier.MatchPlayer.TankPosition.Y);
+                    .FirstOrDefault(tuple => tuple.y - Vector3.UnitY.Y < Carrier.MatchPlayer.TankPosition.Y);
 
                 if (tuple == default)
                 {
                     Carrier = null;
 
-                    if (!silent)
-                        Battle.PlayersInMap.SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
                     FlagEntity.RemoveComponent<TankGroupComponent>();
                     FlagEntity.AddComponent(new FlagGroundedStateComponent());
+                    if (!silent)
+                        Battle.PlayersInMap.SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
 
-                    Return(silent: true);
+                    Return();
                     return;
                 }
 
                 (HeightMapLayer layer, float y) = tuple;
-                flagPosition = new Vector3(Carrier.MatchPlayer.TankPosition.X, y, Carrier.MatchPlayer.TankPosition.Z) - Vector3.UnitY;
+                flagPosition = new Vector3(Carrier.MatchPlayer.TankPosition.X, y + 0.9f, Carrier.MatchPlayer.TankPosition.Z) - Vector3.UnitY;
             }
             else
-            {
                 flagPosition = Carrier.MatchPlayer.TankPosition - Vector3.UnitY;
-            }
 
             Carrier = null;
 

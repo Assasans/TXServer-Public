@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
@@ -19,6 +20,7 @@ using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
+using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 using TXServer.Library;
@@ -36,20 +38,14 @@ namespace TXServer.Core.Battles
             if (victim.TryGetModule(out InvulnerabilityModule module)) if (module.EffectIsActive) return;
             if (victim.TryGetModule(out EmergencyProtectionModule epModule)) if (epModule.EffectIsActive) return;
 
-            // var a1 = victim.Tank.GetComponent<TankMovementComponent>().Movement.Orientation;
-            // var a2 = victim.TankQuaternion;
-
             damager.UserResult.Damage += (int) damage;
-            double diff = hitTarget.HitDirection.Y - victim.TankQuaternion.Y;
 
-            //TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget($"[Damage] Rotation: {diff}",
-                //damager.Battle.GeneralBattleChatEntity, damager.Player);
-
-            /*// todo: set this correctly when back hits can be detected
-            bool backHit = diff is < -0.8 and > -1.2;
+            bool backHit = IsBackHit(hitTarget.LocalHitPoint, victim.Tank);
             if (backHit && victim.TryGetModule(out BackhitDefenceModule backhitDefModule) &&
                 backhitDefModule.EffectIsActive)
-                    damage = backhitDefModule.GetReducedDamage(damage);*/
+                damage = backhitDefModule.GetReducedDamage(damage);
+
+            ChatMessageReceivedEvent.SystemMessageTarget($"X:{hitTarget.LocalHitPoint.X}, Y:{hitTarget.LocalHitPoint.Y}, Z:{hitTarget.LocalHitPoint.Z}", damager.Player);
 
             DealTemperature(weaponMarketItem, victim:victim, damager:damager);
 
@@ -77,7 +73,7 @@ namespace TXServer.Core.Battles
                 }
 
                 if (!IsModule(weaponMarketItem) || IsModule(weaponMarketItem) && damage != 0)
-                    damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, false), victim.Tank);
+                    damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, backHit), victim.Tank);
                 victim.HealthChanged();
             });
         }
@@ -362,6 +358,18 @@ namespace TXServer.Core.Battles
             DealDamage(weaponMarketItem, target, shooter, hitTarget, damage);
         }
 
+        private static bool IsBackHit(Vector3 localHitPoint, Entity hull)
+        {
+            Console.WriteLine(hull.TemplateAccessor.ConfigPath);
+            double backHitLimit = hull.TemplateAccessor.ConfigPath.Split('/').Last() switch
+            {
+                "dictator" => -1.9,
+                "viking" => -1.6,
+                _ => -1.25
+            };
+
+            return localHitPoint.Z < backHitLimit;
+        }
 
         private static bool IsOnCooldown(Entity weapon, MatchPlayer target, MatchPlayer shooter)
         {

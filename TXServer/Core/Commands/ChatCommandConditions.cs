@@ -6,17 +6,19 @@ namespace TXServer.Core.Commands
     public enum ChatCommandConditions
     {
         None = 0,
-        Admin = 1,
-        Tester = 2,
-        InBattle = 4,
-        Premium = 8,
+
+        TestServer = 1,
+        Admin = 2,
+        Tester = 4,
+        InBattle = 8,
+        Premium = 16,
 
         // InBattle is implicit for these below
-        BattleOwner = 16,
-        HackBattle = 32,
-        InMatch = 64,
-        ActiveTank = 128,
-        InactiveBattle = 256,
-        ActiveBattle = 512
+        BattleOwner = 32,
+        HackBattle = 64,
+        InMatch = 128,
+        ActiveTank = 256,
+        InactiveBattle = 512,
+        ActiveBattle = 1024
     }
 }

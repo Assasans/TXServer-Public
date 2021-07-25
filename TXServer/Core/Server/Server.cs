@@ -6,7 +6,6 @@ using TXServer.Core.Battles.Effect;
 using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;
 using TXServer.Core.Database;
-using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core

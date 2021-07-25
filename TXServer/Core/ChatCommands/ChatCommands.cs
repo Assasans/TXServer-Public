@@ -32,7 +32,7 @@ namespace TXServer.Core.ChatCommands
             { "stats", (null, ChatCommandConditions.Tester, Stats) },
             { "spawnInfo", (null, ChatCommandConditions.Tester | ChatCommandConditions.InMatch, SpawnInfo) },
 
-            { "hackBattle", ("hackBattle [everyone/onlyme]", ChatCommandConditions.BattleOwner, HackBattle) },
+            { "hackBattle", ("hackBattle [everyone/onlyme]", ChatCommandConditions.TestServer | ChatCommandConditions.BattleOwner, HackBattle) },
             { "bulletSpeed", ("bulletSpeed [max/stuck/norm/number] [target]", ChatCommandConditions.HackBattle, BulletSpeed) },
             { "cases", ("cases (punishments)", ChatCommandConditions.None, ListPunishments) },
             { "cheat", ("cheat [supply] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.ActiveTank, Cheat) },
@@ -57,7 +57,8 @@ namespace TXServer.Core.ChatCommands
             { ChatCommandConditions.InBattle, "You are not in a battle" },
             { ChatCommandConditions.InMatch, "You are not in a match" },
             { ChatCommandConditions.Premium, "You don't have an active premium pass" },
-            { ChatCommandConditions.Tester, "You are not a tester" }
+            { ChatCommandConditions.Tester, "You are not a tester" },
+            { ChatCommandConditions.TestServer, "This command is only available on test server" }
         };
 
         /// <summary>
@@ -261,6 +262,9 @@ namespace TXServer.Core.ChatCommands
                     foreach (BattleTankPlayer target in targets)
                     foreach ((Type, Entity) desc in cheats.Select(bonusCheat => BonusToModule[bonusCheat]))
                     {
+                        if (target.MatchPlayer.TankState is not TankState.Active)
+                            return "error: tank of at least one target isn't active";
+
                         if (!target.MatchPlayer.TryGetModule(desc.Item1, out BattleModule module))
                         {
                             module =
@@ -845,6 +849,9 @@ namespace TXServer.Core.ChatCommands
         public static ChatCommandConditions GetConditionsFor(Player player)
         {
             ChatCommandConditions conditions = 0;
+
+            if (Server.Instance.Settings.TestServer || player.Data.Admin)
+                conditions |= ChatCommandConditions.TestServer;
 
             if (player.Data.Admin)
                 conditions |= ChatCommandConditions.Admin;

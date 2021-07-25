@@ -300,6 +300,13 @@ namespace TXServer.Core.ChatCommands
                     break;
             }
 
+            if (args.Length < 2) return "error: no argument for message content";
+
+            foreach (Player target in targets)
+            foreach (Entity entity in target.EntityList.Where(e =>
+                e.TemplateAccessor.Template.GetType() == typeof(SimpleTextNotificationTemplate)))
+                target.UnshareEntities(entity);
+
             Entity notification = SimpleTextNotificationTemplate.CreateEntity(string.Join(" ", args[1..]));
             targets.ShareEntities(notification);
 
