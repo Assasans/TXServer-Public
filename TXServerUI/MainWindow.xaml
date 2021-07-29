@@ -54,6 +54,8 @@
                 <GroupBox x:Name="GameOptionsGroupBox" Header="Game options" Margin="3">
                     <StackPanel>
                         <CheckBox x:Name="DisableHeightMapsCheckBox" Content="Disable height maps" Margin="3" />
+                        <CheckBox x:Name="DisableMapBoundsCheckbox" Content="Disable map bounds" Margin="3" />
+                        <CheckBox x:Name="SuperMegaCoolContainerCheckbox" Content="Super Mega Cool Container" Margin="3" />
                         <CheckBox x:Name="TestServerCheckBox" IsChecked="True" Content="Test server" Margin="3" />
                     </StackPanel>
                 </GroupBox>

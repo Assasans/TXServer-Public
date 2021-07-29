@@ -11,19 +11,14 @@ using TXServer.Core.Squads;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.User;
-using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 using TXServer.Core.Database;
 using TXDatabase.NetworkEvents.Communications;
-using TXServer.Core.ECSSystem.Events;
-using TXServer.ECSSystem.Components.DailyBonus;
-using TXServer.ECSSystem.Components.User.Tutorial;
 using TXServer.ECSSystem.EntityTemplates.Notification;
 using TXServer.ECSSystem.EntityTemplates.Notification.FractionsCompetition;
-using TXServer.ECSSystem.EntityTemplates.Notification.League;
 using TXServer.ECSSystem.EntityTemplates.User;
 using TXServer.ECSSystem.Events.Fraction;
 using TXServer.ECSSystem.Types;
@@ -235,6 +230,17 @@ namespace TXServer.Core
         public Entity GetMarketItemByUser(Entity userItem) => ResourceManager.GetMarketItem(this, userItem);
         public Entity GetUserItemByMarket(Entity marketItem) => ResourceManager.GetUserItem(this, marketItem);
         public int GetUserItemLevel(Entity userItem) => ResourceManager.GetUserItemLevel(this, userItem);
+
+        public void ScreenMessage(string message, bool clearOtherMessages = true)
+        {
+            if (clearOtherMessages)
+                foreach (Entity entity in EntityList.Where(e =>
+                    e.TemplateAccessor.Template.GetType() == typeof(SimpleTextNotificationTemplate)))
+                    UnshareEntities(entity);
+
+            Entity notification = SimpleTextNotificationTemplate.CreateEntity(message);
+            ShareEntities(notification);
+        }
 
         public void SaveNewMarketItem(Entity marketItem, int amount = 1) =>
             ResourceManager.SaveNewMarketItem(this, marketItem, amount);

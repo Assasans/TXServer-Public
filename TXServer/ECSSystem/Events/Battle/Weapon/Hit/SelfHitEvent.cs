@@ -22,28 +22,18 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
             if (battlePlayer.MatchPlayer.TankState == TankState.Dead)
                 return;
 
-            player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["SHOTS"]++);
-
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
             foreach (HitTarget hitTarget in Targets)
             {
                 MatchPlayer victim = battle.MatchTankPlayers
                     .Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity).MatchPlayer;
 
-                victim.Tank.ChangeComponent<TemperatureComponent>(component =>
-                {
-                    component.Temperature += weapon.TemplateAccessor.Template switch
-                    {
-                        FlamethrowerBattleItemTemplate => 2,
-                        FreezeBattleItemTemplate => -2,
-                        _ => 0
-                    };
-                });
-
                 Damage.HandleHit(weapon, victim, player.BattlePlayer.MatchPlayer, hitTarget);
             }
 
-            player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["HITS"] += Targets.Count);
+            player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["SHOTS"]++);
+            player.User.ChangeComponent<UserStatisticsComponent>(component =>
+                component.Statistics["HITS"] += Targets.Count);
         }
 
         public virtual IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteHitEvent>();

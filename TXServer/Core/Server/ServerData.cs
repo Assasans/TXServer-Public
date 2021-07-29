@@ -43,6 +43,10 @@ namespace TXServer.Core
         public bool SpreadReleaseGift { get; set; }
         public DateTimeOffset ReleaseGiftMaxRegistrationDate { get; set; } = DateTimeOffset.UtcNow;
 
+        public bool MapBoundsInactive { get; set; }
+        public bool SuperMegaCoolContainerActive { get; set; }
+        public bool TestServer { get; set; }
+
 
         private long _antaeusScore;
         private long _frontierScore;

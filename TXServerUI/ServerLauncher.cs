@@ -38,7 +38,7 @@ namespace TXServer.Core
         /// <param name="ip">IP address.</param>
         /// <param name="port">Port.</param>
         /// <param name="poolSize">Max players.</param>
-        public static void InitServer(ServerSettings settings)
+        public static Server InitServer(ServerSettings settings)
         {
             if (!Debugger.IsAttached)
             {
@@ -50,7 +50,6 @@ namespace TXServer.Core
 
             if (Server.Instance == null)
             {
-                // Server.Instance = new Server(settings, new SqLiteDatabase(@"URI=file:" + Directory.GetCurrentDirectory() + "/tankix.db"));
                 Server.Instance = new Server
                 {
                     Settings = settings,
@@ -59,12 +58,14 @@ namespace TXServer.Core
                 };
                 Server.Instance.Start();
             }
+
+            return Server.Instance;
         }
 
         public static void StopServer(bool disableConsole = true)
         {
             if (Server.Instance != null)
-            { 
+            {
                 Server.Instance.Stop();
                 Server.Instance = null;
             }

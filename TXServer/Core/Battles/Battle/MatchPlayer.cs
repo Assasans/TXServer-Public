@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using TXServer.Core.Battles.Effect;
+using TXServer.Core.Configuration;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -16,6 +17,7 @@ using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Score;
+using TXServer.ECSSystem.ServerComponents.Tank;
 using TXServer.ECSSystem.Types;
 using static TXServer.Core.Battles.Battle;
 
@@ -287,6 +289,10 @@ namespace TXServer.Core.Battles
                 Player.SendEvent(new KickFromBattleEvent(), BattleUser);
                 Player.BattlePlayer.WaitingForExit = true;
             }
+
+            if ((DateTimeOffset.UtcNow - LastTemperatureTact).TotalMilliseconds >=
+                TemperatureConfigComponent.TactPeriodInMs)
+                Damage.DealAutoTemperature(this);
         }
 
 
@@ -358,6 +364,15 @@ namespace TXServer.Core.Battles
         public Vector3 TankPosition { get; set; }
         public Vector3 PrevTankPosition { get; set; }
         public Quaternion TankQuaternion { get; set; }
+
+        public float Temperature
+        {
+            get => Tank.GetComponent<TemperatureComponent>().Temperature;
+            set => Tank.ChangeComponent<TemperatureComponent>(component => component.Temperature = value);
+        }
+        public TemperatureConfigComponent TemperatureConfigComponent =>
+            Config.GetComponent<TemperatureConfigComponent>(Tank.TemplateAccessor.ConfigPath);
+        public DateTimeOffset LastTemperatureTact { get; set; }
 
         public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new();
 

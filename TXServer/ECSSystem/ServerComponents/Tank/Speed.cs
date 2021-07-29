@@ -1,4 +1,4 @@
-﻿namespace TXServer.ECSSystem.ServerComponents
+﻿namespace TXServer.ECSSystem.ServerComponents.Tank
 {
     public static class Speed
     {

@@ -51,7 +51,7 @@ namespace TXServerUI
             ChangeServerState();
         }
 
-        public void ChangeServerState()
+        private void ChangeServerState()
         {
             Cursor = Cursors.Wait;
             if (!ServerLauncher.IsStarted())
@@ -71,14 +71,17 @@ namespace TXServerUI
                 MaxPlayers = int.Parse(MaxPlayersTextBox.Text),
 
                 DisableHeightMaps = DisableHeightMapsCheckBox.IsChecked.GetValueOrDefault(),
-                TestServer = TestServerCheckBox.IsChecked.GetValueOrDefault(),
 
                 DisablePingMessages = DisablePingMessagesCheckBox.IsChecked.GetValueOrDefault(),
                 EnableTracing = EnableTracingCheckBox.IsChecked.GetValueOrDefault(),
                 EnableCommandStackTrace = EnableCommandStackTraceCheckBox.IsChecked.GetValueOrDefault(),
             };
 
-            ServerLauncher.InitServer(settings);
+            Server server = ServerLauncher.InitServer(settings);
+
+            server.ServerData.MapBoundsInactive = DisableMapBoundsCheckbox.IsChecked.GetValueOrDefault();
+            server.ServerData.SuperMegaCoolContainerActive = SuperMegaCoolContainerCheckbox.IsChecked.GetValueOrDefault();
+            server.ServerData.TestServer = TestServerCheckBox.IsChecked.GetValueOrDefault();
 
             SettingsStackPanel.IsEnabled = false;
             StartButton.Content = "Stop";

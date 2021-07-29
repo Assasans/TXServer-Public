@@ -1,7 +1,10 @@
+using System;
 using TXServer.Core;
+using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.GlobalEntities;
+using TXServer.ECSSystem.ServerComponents;
 
 namespace TXServer.ECSSystem.Events.Item
 {
@@ -10,6 +13,8 @@ namespace TXServer.ECSSystem.Events.Item
     {
         public void Execute(Player player, Entity user, Entity item)
         {
+            if (!PurchaseIsValid(Amount, Price, item, player)) return;
+
             player.Data.Crystals -= Price;
             HandleNewItem(player, item, Amount);
         }
@@ -20,6 +25,31 @@ namespace TXServer.ECSSystem.Events.Item
             ResourceManager.SaveNewMarketItem(player, marketItem, amount);
 
             new MountItemEvent().Execute(player, userItem);
+        }
+
+        public static bool PurchaseIsValid(int amount, int price, Entity item, Player player)
+        {
+            if (!player.ServerData.SuperMegaCoolContainerActive && item.TemplateAccessor.ConfigPath is not null &&
+                item.TemplateAccessor.ConfigPath.EndsWith("everything"))
+            {
+                player.ScreenMessage("Sorry, this container is currently unavailable");
+                return false;
+            }
+
+            Console.WriteLine(Config.GetComponent<PriceComponent.XPriceItemComponent>(item.TemplateAccessor.ConfigPath).Price);
+
+            if (amount == 1 &&
+                Config.GetComponent<PriceComponent.PriceItemComponent>(item.TemplateAccessor.ConfigPath).Price != price
+                && Config.GetComponent<PriceComponent.XPriceItemComponent>(item.TemplateAccessor.ConfigPath).Price
+                != price)
+            {
+                player.Data.CheatSusActions++;
+                player.ScreenMessage("Error: something seems to be wrong here. Contact us if you think that the  " +
+                                     "problem is on our side.");
+                return false;
+            }
+
+            return true;
         }
 
         public int Price { get; set; }

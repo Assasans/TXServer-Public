@@ -54,6 +54,8 @@ namespace TXServer.Core
         protected string AutoLoginToken { get; set; }
         public bool RememberMe { get; set; }
 
+        public int CheatSusActions { get; set; }
+
         public string CountryCode { get; protected set; }
 
         public bool Admin { get; set; }

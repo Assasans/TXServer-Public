@@ -1,6 +1,6 @@
 ﻿using TXServer.ECSSystem.Components.Battle.Weapon;
 
-namespace TXServer.ECSSystem.ServerComponents
+namespace TXServer.ECSSystem.ServerComponents.Hit
 {
     public static class StreamHitConfig
     {

@@ -1,7 +1,7 @@
 ﻿using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 
-namespace TXServer.ECSSystem.ServerComponents
+namespace TXServer.ECSSystem.ServerComponents.Weapon
 {
     public class ReloadTimePropertyComponent : RangedComponent, IConvertibleComponent<WeaponCooldownComponent>, IConvertibleComponent<DiscreteWeaponEnergyComponent>
     {

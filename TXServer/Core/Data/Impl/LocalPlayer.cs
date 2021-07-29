@@ -24,6 +24,8 @@ namespace TXServer.Core.Data.Impl
                 Beta = true;
                 Mod = true;
 
+                CheatSusActions = 0;
+
                 Crystals = 1000000;
                 XCrystals = 50000;
                 Experience = 0;
