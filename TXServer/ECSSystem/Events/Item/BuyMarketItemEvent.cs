@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
@@ -28,7 +30,8 @@ namespace TXServer.ECSSystem.Events.Item
             new MountItemEvent().Execute(player, userItem);
         }
 
-        public static bool PurchaseIsValid(int amount, int price, Entity item, Player player, bool xCrystal = false)
+        public static bool PurchaseIsValid(int requestedAmount, int requestedPrice, Entity item, Player player,
+            bool xCrystal = false)
         {
             if (!player.ServerData.SuperMegaCoolContainerActive && item.TemplateAccessor.ConfigPath is not null &&
                 item.TemplateAccessor.ConfigPath.EndsWith("everything"))
@@ -37,22 +40,46 @@ namespace TXServer.ECSSystem.Events.Item
                 return false;
             }
 
-            if (amount == 1 &&
-                Config.GetComponent<PriceComponent.PriceItemComponent>(item.TemplateAccessor.ConfigPath).Price != price
-                && Config.GetComponent<PriceComponent.XPriceItemComponent>(item.TemplateAccessor.ConfigPath).Price
-                != price)
+            int realPrice = 99999;
+            switch (requestedAmount)
+            {
+                case 1:
+                    realPrice = xCrystal switch
+                    {
+                        false => Config
+                            .GetComponent<PriceComponent.PriceItemComponent>(item.TemplateAccessor.ConfigPath).Price,
+                        true => Config
+                            .GetComponent<PriceComponent.XPriceItemComponent>(item.TemplateAccessor.ConfigPath).Price
+                    };
+                    break;
+                default:
+                    PackPriceComponent packPriceComponent =
+                        Config.GetComponent<PackPriceComponent>(item.TemplateAccessor.ConfigPath, false);
+                    if (packPriceComponent is null) break;
+
+                    Dictionary<int, int> packPrice = xCrystal switch
+                    {
+                        false => packPriceComponent.PackPrice,
+                        true => packPriceComponent.PackXPrice
+                    };
+                    if (!packPrice.Any() || !packPrice.ContainsKey(requestedAmount)) break;
+
+                    realPrice = packPrice[requestedAmount];
+                    break;
+            }
+
+            if (realPrice != requestedPrice)
             {
                 player.Data.CheatSusActions++;
                 player.ScreenMessage("Error: something seems to be wrong here. Contact us if you think that the  " +
                                      "problem is on our side.");
-                return false;
             }
 
             CrystalsPurchaseUserRankRestrictionComponent rankRestrictionComponent =
                 Config.GetComponent<CrystalsPurchaseUserRankRestrictionComponent>(item.TemplateAccessor.ConfigPath,
                     false);
 
-            if (xCrystal && Leveling.GetRankByXp(player.Data.Experience) < rankRestrictionComponent?.RestrictionValue)
+            if (!xCrystal && Leveling.GetRankByXp(player.Data.Experience) < rankRestrictionComponent?.RestrictionValue)
             {
                 player.Data.CheatSusActions++;
                 player.ScreenMessage("Error: you are not allowed to buy this item with your current rank. Contact us " +
