@@ -1,6 +1,6 @@
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.ServerComponents
+namespace TXServer.ECSSystem.ServerComponents.Item
 {
     public static class PriceComponent
     {

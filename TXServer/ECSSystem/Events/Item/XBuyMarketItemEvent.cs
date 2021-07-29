@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events.Item
 	{
 		public void Execute(Player player, Entity user, Entity item)
         {
-            if (!BuyMarketItemEvent.PurchaseIsValid(Amount, Price, item, player)) return;
+            if (!BuyMarketItemEvent.PurchaseIsValid(Amount, Price, item, player, true)) return;
 
             player.Data.XCrystals -= Price;
             BuyMarketItemEvent.HandleNewItem(player, item, Amount);
