@@ -358,7 +358,7 @@ namespace TXServer.Core
             if (Player.User is not null)
             {
                 PremiumAccountBoostComponent component = new(PremiumExpirationDate);
-                if (Player.User.HasComponent<PremiumAccountBoostComponent>())
+                if (!Player.User.HasComponent<PremiumAccountBoostComponent>())
                     Player.User.AddComponent(component);
                 else
                     Player.User.ChangeComponent(component);

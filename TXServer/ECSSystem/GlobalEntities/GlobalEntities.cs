@@ -204,6 +204,9 @@ namespace TXServer.ECSSystem.GlobalEntities
                 case PremiumBoostMarketItemTemplate:
                     player.Data.RenewPremium(new TimeSpan(days: amount, 0, 0, 0));
                     break;
+                case PremiumQuestUserItemTemplate:
+                    //todo
+                    return;
                 case ShellMarketItemTemplate:
                     player.Data.Shells.Add(marketItem.EntityId);
                     break;
@@ -259,6 +262,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             {typeof(ModuleCardMarketItemTemplate), typeof(ModuleCardUserItemTemplate)},
 
             {typeof(PremiumBoostMarketItemTemplate), typeof(PremiumBoostUserItemTemplate)},
+            {typeof(PremiumQuestMarketItemTemplate), typeof(PremiumQuestUserItemTemplate)},
 
             {typeof(HullSkinMarketItemTemplate), typeof(HullSkinUserItemTemplate)},
             {typeof(ShellMarketItemTemplate), typeof(ShellUserItemTemplate)},
