@@ -8,6 +8,7 @@ using TXServer.Core.Configuration;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.Components.Battle.Round;
@@ -15,6 +16,7 @@ using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
+using TXServer.ECSSystem.EntityTemplates.Battle.Tank;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.ServerComponents.Tank;
@@ -27,12 +29,15 @@ namespace TXServer.Core.Battles
     {
         public MatchPlayer(BattleTankPlayer battlePlayer, Entity battleEntity, IEnumerable<UserResult> userResults)
         {
+            OriginalSpeedComponent = Config.GetComponent<SpeedComponent>(
+                battlePlayer.Player.CurrentPreset.HullItem.TemplateAccessor.ConfigPath);
+
             Battle = battlePlayer.Battle;
             Player = battlePlayer.Player;
 
             BattleUser = BattleUserTemplate.CreateEntity(battlePlayer.Player, battleEntity, battlePlayer.Team);
 
-            Tank = TankTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullItem, BattleUser, battlePlayer);
+            Tank = TankTemplate.CreateEntity(this, battlePlayer.Player.CurrentPreset.HullItem, BattleUser, battlePlayer);
             Weapon = WeaponTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponItem, Tank, battlePlayer);
             HullSkin = HullSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullSkins[battlePlayer.Player.CurrentPreset.HullItem], Tank);
             WeaponSkin = WeaponSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponSkins[battlePlayer.Player.CurrentPreset.WeaponItem], Tank);
@@ -205,13 +210,17 @@ namespace TXServer.Core.Battles
                 if (deactivateModuleCooldown && module.IsOnCooldown) module.DeactivateCooldown();
             }
 
-            if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
-            Weapon.TryRemoveComponent<ShootableComponent>();
+            Tank.ChangeComponent(OriginalSpeedComponent);
+
+            TemperatureHits.Clear();
 
             // trigger: Drone Module (stay after tank disable)
             if (TryGetModule(out TurretDroneModule turretDroneModule))
                 foreach (var droneTuple in turretDroneModule.Drones)
                     TurretDroneModule.Stay(droneTuple.Item1);
+
+            if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
+            Weapon.TryRemoveComponent<ShootableComponent>();
         }
 
         public void Tick()
@@ -368,7 +377,6 @@ namespace TXServer.Core.Battles
 
         public float TemperatureFromAllHits() =>
             TemperatureHits.Sum(temperatureHit => temperatureHit.CurrentTemperature);
-
         public float Temperature
         {
             get => Tank.GetComponent<TemperatureComponent>().Temperature;
@@ -405,6 +413,8 @@ namespace TXServer.Core.Battles
         public int AlreadyAddedExperience { get; set; }
 
         public Dictionary<MatchPlayer, float> DamageAssistants { get; } = new();
+
+        public SpeedComponent OriginalSpeedComponent { get; }
 
         public SpawnPoint LastSpawnPoint { get; private set; }
         public TeleportPoint LastTeleportPoint { get; private set; }

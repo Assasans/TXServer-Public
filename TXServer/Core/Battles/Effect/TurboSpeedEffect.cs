@@ -29,7 +29,6 @@ namespace TXServer.Core.Battles.Effect
 
             MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component =>
             {
-                _prevSpeedComponent = (SpeedComponent)component.Clone();
                 component.Speed *= Factor();
             });
 
@@ -38,7 +37,7 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Deactivate()
         {
-            if (EffectEntity == null ) return;
+            if (EffectEntity == null) return;
             if (IsCheat && !DeactivateCheat)
             {
                 ChangeDuration(30000);
@@ -46,7 +45,7 @@ namespace TXServer.Core.Battles.Effect
             }
 
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
-            MatchPlayer.Tank.ChangeComponent(_prevSpeedComponent);
+            MatchPlayer.Tank.ChangeComponent(MatchPlayer.OriginalSpeedComponent);
 
             EffectEntity = null;
             IsCheat = false;
@@ -66,6 +65,5 @@ namespace TXServer.Core.Battles.Effect
             return IsSupply ? 1.5f : ModuleFactor;
         }
         private float ModuleFactor { get; set; }
-        private SpeedComponent _prevSpeedComponent;
     }
 }

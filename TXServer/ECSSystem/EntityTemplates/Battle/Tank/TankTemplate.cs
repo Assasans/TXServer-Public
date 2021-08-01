@@ -9,12 +9,12 @@ using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Team;
 
-namespace TXServer.ECSSystem.EntityTemplates.Battle
+namespace TXServer.ECSSystem.EntityTemplates.Battle.Tank
 {
     [SerialVersionUID(2012489519776979402)]
     public class TankTemplate : IEntityTemplate
     {
-        public static Entity CreateEntity(Entity hullUserItem, Entity battleUser, BattleTankPlayer battlePlayer)
+        public static Entity CreateEntity(MatchPlayer selfMatchPlayer, Entity hullUserItem, Entity battleUser, BattleTankPlayer battlePlayer)
         {
             string configPath = hullUserItem.TemplateAccessor.ConfigPath;
 
@@ -26,7 +26,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 Config.GetComponent<HealthComponent>(configPath),
                 Config.GetComponent<HealthConfigComponent>(configPath),
                 Config.GetComponent<DampingComponent>(configPath),
-                Config.GetComponent<SpeedComponent>(configPath),
+                (SpeedComponent)selfMatchPlayer.OriginalSpeedComponent.Clone(),
                 Config.GetComponent<SpeedConfigComponent>(configPath),
                 Config.GetComponent<WeightComponent>(configPath),
                 new TemperatureComponent(0),

@@ -56,7 +56,7 @@ namespace TXServer.Core.Battles.Effect
         {
             base.Tick();
 
-            if (EffectIsActive && DifferenceToLastHeal.TotalMilliseconds > 250)
+            if (EffectIsActive && DifferenceToLastHeal.TotalMilliseconds >= 250)
             {
                 LastTickTime = DateTimeOffset.UtcNow;
 
