@@ -109,7 +109,7 @@ namespace TXServer.Core
         {
             // todo: compare ALL players in database
             players ??= Server.Instance.Connection.Pool;
-            return players.OrderByDescending(p => p.Data.Reputation).ToList().IndexOf(player) +
+            return players.OrderByDescending(p => p?.Data.Reputation).ToList().IndexOf(player) +
                    1;
         }
     }

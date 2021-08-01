@@ -25,6 +25,7 @@ using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents.Hit;
 using TXServer.ECSSystem.ServerComponents.Tank;
+using TXServer.ECSSystem.ServerComponents.Weapon;
 using TXServer.ECSSystem.Types;
 using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
@@ -35,7 +36,7 @@ namespace TXServer.Core.Battles
     public static class Damage
     {
         private static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
-            HitTarget hitTarget, float damage)
+            float damage, bool backHit = false, Vector3 localHitPoint = new())
         {
             // triggers for Invulnerability & Emergency Protection modules
             if (victim.TryGetModule(out InvulnerabilityModule module)) if (module.EffectIsActive) return;
@@ -43,9 +44,6 @@ namespace TXServer.Core.Battles
 
             damager.UserResult.Damage += (int) damage;
 
-            ChatMessageReceivedEvent.SystemMessageTarget($"Z: {hitTarget.LocalHitPoint.Z}", damager.Player);
-
-            bool backHit = IsBackHit(hitTarget.LocalHitPoint, victim.Tank);
             if (backHit) damage *= 1.20f;
             if (backHit && victim.TryGetModule(out BackhitDefenceModule backhitDefModule) &&
                 backhitDefModule.EffectIsActive)
@@ -53,7 +51,6 @@ namespace TXServer.Core.Battles
 
             damage = GetHpWithEffects(damage, victim, damager, IsModule(weaponMarketItem), weaponMarketItem);
 
-            DealNewTemperature(weaponMarketItem, victim, damager);
             victim.Tank.ChangeComponent<HealthComponent>(component =>
             {
                 component.CurrentHealth -= damage;
@@ -64,7 +61,7 @@ namespace TXServer.Core.Battles
                         !ep.IsOnCooldown)
                         ep.Activate();
                     else
-                        ProcessKill(weaponMarketItem, victim, damager, hitTarget);
+                        ProcessKill(weaponMarketItem, victim, damager);
                 }
                 else
                 {
@@ -75,7 +72,7 @@ namespace TXServer.Core.Battles
                 }
 
                 if (!IsModule(weaponMarketItem) || IsModule(weaponMarketItem) && damage != 0)
-                    damager.SendEvent(new DamageInfoEvent(damage, hitTarget.LocalHitPoint, backHit), victim.Tank);
+                    damager.SendEvent(new DamageInfoEvent(damage, localHitPoint, backHit), victim.Tank);
                 victim.HealthChanged();
             });
         }
@@ -127,52 +124,97 @@ namespace TXServer.Core.Battles
             healer.UpdateStatistics(additiveScore: 4, 0, 0, 0, null);
         }
 
-        private static void DealNewTemperature(Entity weaponMarketItem, MatchPlayer target, MatchPlayer shooter)
+        private static void DealNewTemperature(Entity weapon, Entity weaponMarketItem, MatchPlayer target,
+            MatchPlayer shooter)
         {
+            float temperatureChange;
             if (IsModule(weaponMarketItem))
             {
                 BattleModule module = shooter.Modules.Single(m => m.MarketItem == weaponMarketItem);
                 if (module.MarketItem != Modules.GlobalItems.Firering) return;
 
-                target.Tank.ChangeComponent<TemperatureComponent>(component =>
+                switch (module.MarketItem.EntityId)
                 {
-                    component.Temperature += Config
-                        .GetComponent<ModuleIcetrapEffectTemperatureDeltaPropertyComponent>(module.ConfigPath)
-                        .UpgradeLevel2Values[module.Level - 1];
-                });
+                    case 1896579342:
+                        temperatureChange = Config
+                            .GetComponent<ModuleIcetrapEffectTemperatureDeltaPropertyComponent>(module.ConfigPath)
+                            .UpgradeLevel2Values[module.Level - 1];
+                        break;
+                    default:
+                        return;
+                }
             }
             else
+                temperatureChange = GetTemperatureChange(weaponMarketItem);
+
+            temperatureChange =
+                NormalizeTemperature(target.Temperature + temperatureChange, target) - target.Temperature;
+            target.Temperature += temperatureChange;
+
+            float maxTemperatureDamage = 250;
+            TemperatureHit temperatureHit =
+                target.TemperatureHits.SingleOrDefault(t => t.Shooter == shooter && t.WeaponMarketItem == weaponMarketItem);
+
+            if (temperatureHit != default)
             {
-                float temperatureChange = GetTemperatureChange(weaponMarketItem, target);
-                target.Temperature += temperatureChange;
+                temperatureHit.CurrentTemperature += temperatureChange;
+                target.TemperatureHits[target.TemperatureHits.FindIndex(
+                    t => t.Shooter == shooter && t.WeaponMarketItem == weaponMarketItem)] = temperatureHit;
             }
+            else
+                target.TemperatureHits.Add(new TemperatureHit(temperatureChange, maxTemperatureDamage, shooter, weapon,
+                    weaponMarketItem));
+        }
 
+        private static float NormalizeTemperature(float temperature, MatchPlayer target)
+        {
             TemperatureConfigComponent temperatureConfig = target.TemperatureConfigComponent;
-
-            if (target.Temperature > temperatureConfig.MaxTemperature)
-                target.Temperature = temperatureConfig.MaxTemperature;
-            else if (target.Temperature < temperatureConfig.MinTemperature)
-                target.Temperature = temperatureConfig.MinTemperature;
+            if (temperature > temperatureConfig.MaxTemperature)
+                return temperatureConfig.MaxTemperature;
+            return temperature < temperatureConfig.MinTemperature ? temperatureConfig.MinTemperature : temperature;
         }
 
         public static void DealAutoTemperature(MatchPlayer matchPlayer)
         {
-            matchPlayer.LastTemperatureTact = DateTimeOffset.UtcNow;
-            float oldTemperature = matchPlayer.Temperature;
+            if (matchPlayer.Battle.BattleState == BattleState.Ended) return;
+            TemperatureConfigComponent temperatureConfig = matchPlayer.TemperatureConfigComponent;
 
-            if (oldTemperature == 0) return;
-
-            float newTemperature = oldTemperature switch
+            foreach (TemperatureHit temperatureHit in matchPlayer.TemperatureHits.ToList())
             {
-                > 0 => oldTemperature - matchPlayer.TemperatureConfigComponent.AutoDecrementInMs * 1000,
-                < 0 => oldTemperature + matchPlayer.TemperatureConfigComponent.AutoIncrementInMs * 1000,
-                _ => 0
-            };
+                if ((DateTimeOffset.UtcNow - temperatureHit.LastTact).TotalMilliseconds <
+                    matchPlayer.TemperatureConfigComponent.TactPeriodInMs) continue;
 
-            if (oldTemperature > 0 && newTemperature < 0 || oldTemperature < 0 && newTemperature > 0)
-                newTemperature = 0;
+                temperatureHit.LastTact = DateTimeOffset.UtcNow;
 
-            matchPlayer.Temperature = newTemperature;
+                float temperatureDelta = temperatureHit.CurrentTemperature switch
+                {
+                    > 0 => -temperatureConfig.AutoDecrementInMs * temperatureConfig.TactPeriodInMs,
+                    < 0 => temperatureConfig.AutoIncrementInMs * temperatureConfig.TactPeriodInMs,
+                    _ => 0
+                };
+
+                if (temperatureHit.CurrentTemperature > 0)
+                {
+                    float heatDamage = MathUtils.Map(temperatureHit.CurrentTemperature,
+                        0, temperatureConfig.MaxTemperature, 0,
+                        temperatureHit.MaxDamage);
+                    if (heatDamage >= 1)
+                        DealDamage(temperatureHit.WeaponMarketItem, matchPlayer, temperatureHit.Shooter, heatDamage);
+                }
+
+                bool wasPositive = temperatureHit.CurrentTemperature > 0;
+                temperatureHit.CurrentTemperature += temperatureDelta;
+                bool isPositive = temperatureHit.CurrentTemperature > 0;
+
+                if (wasPositive != isPositive)
+                {
+                    matchPlayer.TemperatureHits.Remove(temperatureHit);
+                    matchPlayer.Temperature = matchPlayer.TemperatureFromAllHits();
+                    return;
+                }
+
+                matchPlayer.Temperature += temperatureDelta;
+            }
         }
 
         private static float GetBaseDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer target, MatchPlayer shooter)
@@ -290,7 +332,7 @@ namespace TXServer.Core.Battles
             }
         }
 
-        private static float GetTemperatureChange(Entity weaponMarketItem, MatchPlayer victim)
+        private static float GetTemperatureChange(Entity weaponMarketItem)
         {
             string path = weaponMarketItem.TemplateAccessor.ConfigPath;
             switch (weaponMarketItem.TemplateAccessor.Template)
@@ -353,10 +395,11 @@ namespace TXServer.Core.Battles
             switch (weapon.TemplateAccessor.Template)
             {
                 case FireRingEffectTemplate:
-                    DealNewTemperature(weaponMarketItem, target, shooter);
+                    DealNewTemperature(weapon, weaponMarketItem, target, shooter);
                     damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
                     break;
                 case FlamethrowerBattleItemTemplate or FreezeBattleItemTemplate:
+                    DealNewTemperature(weapon, weaponMarketItem, target, shooter);
                     damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
                     float modifier = GetDamageDistanceMultiplier(weapon, weaponMarketItem, hitTarget.HitDistance);
                     damage = (int) Math.Round(damage * modifier);
@@ -403,7 +446,9 @@ namespace TXServer.Core.Battles
                     break;
             }
 
-            DealDamage(weaponMarketItem, target, shooter, hitTarget, damage);
+            bool backHit = IsBackHit(hitTarget.LocalHitPoint, target.Tank);
+
+            DealDamage(weaponMarketItem, target, shooter, damage, backHit, hitTarget.LocalHitPoint);
         }
 
         private static bool IsBackHit(Vector3 localHitPoint, Entity hull)
@@ -463,19 +508,20 @@ namespace TXServer.Core.Battles
             Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem) ||
             weaponMarketItem.HasComponent<EffectComponent>();
 
-        private static void ProcessKill(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer killer, HitTarget hitTarget)
+        private static void ProcessKill(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer killer)
         {
             // module trigger: Kamikadze
             if (victim.TryGetModule(out KamikadzeModule kamikadzeModule) && !kamikadzeModule.IsOnCooldown)
                 kamikadzeModule.Activate();
+
+            victim.TemperatureHits.Clear();
 
             victim.TankState = TankState.Dead;
             Battle battle = victim.Battle;
 
             if (killer.Player != victim.Player)
             {
-                battle.PlayersInMap.SendEvent(
-                    new KillEvent(weaponMarketItem, hitTarget.Entity), killer.BattleUser);
+                battle.PlayersInMap.SendEvent(new KillEvent(weaponMarketItem, victim.Tank), killer.BattleUser);
                 killer.SendEvent(
                     new VisualScoreKillEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid,
                         victim.Player.User.GetComponent<UserRankComponent>().Rank,
@@ -546,5 +592,26 @@ namespace TXServer.Core.Battles
 
         private static readonly Dictionary<int, int> KillStreakScores = new()
             {{2, 0}, {3, 5}, {4, 7}, {5, 10}, {10, 10}, {15, 10}, {20, 20}, {25, 30}, {30, 40}, {35, 50}, {40, 60}};
+    }
+
+    public class TemperatureHit
+    {
+        public TemperatureHit(float currentTemperature, float maxDamage, MatchPlayer shooter, Entity weapon,
+            Entity weaponMarketItem)
+        {
+            CurrentTemperature = currentTemperature;
+            LastTact = DateTimeOffset.UtcNow;
+            MaxDamage = maxDamage;
+            Shooter = shooter;
+            Weapon = weapon;
+            WeaponMarketItem = weaponMarketItem;
+        }
+
+        public float CurrentTemperature { get; set; }
+        public DateTimeOffset LastTact { get; set; }
+        public float MaxDamage { get; }
+        public MatchPlayer Shooter { get; }
+        public Entity Weapon { get; }
+        public Entity WeaponMarketItem { get; }
     }
 }

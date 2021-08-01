@@ -47,6 +47,9 @@ namespace TXServer.Core.Battles
             PersonalBattleResult = new PersonalBattleResultForClient(Player);
             UserResult = new UserResult(battlePlayer, userResults);
 
+            TemperatureConfigComponent =
+                Config.GetComponent<TemperatureConfigComponent>(Tank.TemplateAccessor.ConfigPath);
+
             if (Battle.ModeHandler is TeamBattleHandler handler)
                 _spawnCoordinates = handler.BattleViewFor(Player.BattlePlayer).SpawnPoints;
             else
@@ -290,9 +293,7 @@ namespace TXServer.Core.Battles
                 Player.BattlePlayer.WaitingForExit = true;
             }
 
-            if ((DateTimeOffset.UtcNow - LastTemperatureTact).TotalMilliseconds >=
-                TemperatureConfigComponent.TactPeriodInMs)
-                Damage.DealAutoTemperature(this);
+            if (Temperature != 0) Damage.DealAutoTemperature(this);
         }
 
 
@@ -365,14 +366,15 @@ namespace TXServer.Core.Battles
         public Vector3 PrevTankPosition { get; set; }
         public Quaternion TankQuaternion { get; set; }
 
+        public float TemperatureFromAllHits() =>
+            TemperatureHits.Sum(temperatureHit => temperatureHit.CurrentTemperature);
+
         public float Temperature
         {
             get => Tank.GetComponent<TemperatureComponent>().Temperature;
             set => Tank.ChangeComponent<TemperatureComponent>(component => component.Temperature = value);
         }
-        public TemperatureConfigComponent TemperatureConfigComponent =>
-            Config.GetComponent<TemperatureConfigComponent>(Tank.TemplateAccessor.ConfigPath);
-        public DateTimeOffset LastTemperatureTact { get; set; }
+        public TemperatureConfigComponent TemperatureConfigComponent { get; set; }
 
         public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new();
 
@@ -395,6 +397,7 @@ namespace TXServer.Core.Battles
 
         public Dictionary<MatchPlayer, DateTimeOffset> HitCooldownTimers { get; } = new();
         public Dictionary<MatchPlayer, (double, DateTimeOffset)> StreamHitLengths { get; } = new();
+        public List<TemperatureHit> TemperatureHits { get; } = new();
 
         public bool Paused { get; set; }
         public DateTime? IdleKickTime { get; set; }
