@@ -150,7 +150,9 @@ namespace TXServer.Core.Battles
                 NormalizeTemperature(target.Temperature + temperatureChange, target) - target.Temperature;
             target.Temperature += temperatureChange;
 
-            float maxTemperatureDamage = 250;
+            float maxTemperatureDamage =
+                Config.GetComponent<ServerComponents.Damage.HeatDamagePropertyComponent>(weaponMarketItem.TemplateAccessor.ConfigPath)
+                .FinalValue;
             TemperatureHit temperatureHit =
                 target.TemperatureHits.SingleOrDefault(t => t.Shooter == shooter && t.WeaponMarketItem == weaponMarketItem);
 

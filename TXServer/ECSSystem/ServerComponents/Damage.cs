@@ -23,6 +23,10 @@ namespace TXServer.ECSSystem.ServerComponents
         {
         }
 
+        public class HeatDamagePropertyComponent : RangedComponent
+        {
+        }
+
         public class MinDamagePropertyComponent : RangedComponent
         {
         }
