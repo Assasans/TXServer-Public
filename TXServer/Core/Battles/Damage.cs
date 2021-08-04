@@ -66,10 +66,13 @@ namespace TXServer.Core.Battles
                 }
                 else
                 {
-                    if (victim.DamageAssistants.ContainsKey(damager))
-                        victim.DamageAssistants[damager] += damage;
-                    else
-                        victim.DamageAssistants.Add(damager, damage);
+                    if (victim.Battle.ModeHandler is not TeamBattleHandler)
+                    {
+                        if (victim.DamageAssistants.ContainsKey(damager))
+                            victim.DamageAssistants[damager] += damage;
+                        else
+                            victim.DamageAssistants.Add(damager, damage);
+                    }
                 }
 
                 if (!IsModule(weaponMarketItem) || IsModule(weaponMarketItem) && damage != 0)
@@ -459,7 +462,8 @@ namespace TXServer.Core.Battles
                     damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
                     break;
                 case ShaftBattleItemTemplate:
-                    turretHit = IsTurretHit(hitTarget.LocalHitPoint, target.Tank);
+                    turretHit = shooter.ShaftAimingBeginTime != null &&
+                                IsTurretHit(hitTarget.LocalHitPoint, target.Tank);
 
                     float maxDamage = Config
                         .GetComponent<ServerComponents.Damage.AimingMaxDamagePropertyComponent>(path).FinalValue;
