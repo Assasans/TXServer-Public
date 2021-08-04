@@ -472,12 +472,9 @@ namespace TXServer.Core.Battles
                     double aimingTime = shooter.ShaftLastAimingDurationMs ?? 0;
                     damage = (float) MathUtils.Map(aimingTime, 0, 5000, minDamage, maxDamage);
 
-                    weapon.ChangeComponent<WeaponEnergyComponent>(component => component.Energy += (float) 0.4);
-
                     if (damage > maxDamage) damage = maxDamage;
                     if (turretHit) damage *= 2;
 
-                    Console.WriteLine($"{turretHit}: {hitTarget.LocalHitPoint.Y}");
                     break;
                 default:
                     damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);

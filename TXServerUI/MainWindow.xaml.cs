@@ -75,13 +75,13 @@ namespace TXServerUI
                 DisablePingMessages = DisablePingMessagesCheckBox.IsChecked.GetValueOrDefault(),
                 EnableTracing = EnableTracingCheckBox.IsChecked.GetValueOrDefault(),
                 EnableCommandStackTrace = EnableCommandStackTraceCheckBox.IsChecked.GetValueOrDefault(),
+
+                MapBoundsInactive = DisableMapBoundsCheckbox.IsChecked.GetValueOrDefault(),
+                SuperMegaCoolContainerActive = SuperMegaCoolContainerCheckbox.IsChecked.GetValueOrDefault(),
+                TestServer = TestServerCheckBox.IsChecked.GetValueOrDefault()
             };
 
             Server server = ServerLauncher.InitServer(settings);
-
-            server.ServerData.MapBoundsInactive = DisableMapBoundsCheckbox.IsChecked.GetValueOrDefault();
-            server.ServerData.SuperMegaCoolContainerActive = SuperMegaCoolContainerCheckbox.IsChecked.GetValueOrDefault();
-            server.ServerData.TestServer = TestServerCheckBox.IsChecked.GetValueOrDefault();
 
             SettingsStackPanel.IsEnabled = false;
             StartButton.Content = "Stop";
