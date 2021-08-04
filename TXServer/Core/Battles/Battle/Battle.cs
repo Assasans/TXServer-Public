@@ -14,7 +14,6 @@ using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Time;
-using TXServer.ECSSystem.Components.BattleRewards;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Chat;
 using TXServer.ECSSystem.Events.Battle;
@@ -592,6 +591,7 @@ namespace TXServer.Core.Battles
         public ClientBattleParams Params { get; private set; }
         public bool IsMatchMaking { get; }
         public Entity MapEntity { get; private set; }
+        public bool SuppressInactivityKick { get; set; }
 
         public bool ForceStart { get; set; }
         public bool ForcePause { get; set; }
@@ -711,6 +711,6 @@ namespace TXServer.Core.Battles
 
         public HeightMap HeightMap { get; private set; }
 
-        private ServerData ServerData => Server.Instance.ServerData;
+        private static ServerData ServerData => Server.Instance.ServerData;
     }
 }

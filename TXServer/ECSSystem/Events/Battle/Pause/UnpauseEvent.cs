@@ -8,15 +8,13 @@ namespace TXServer.ECSSystem.Events.Battle.Pause
 	[SerialVersionUID(-3944419188146485646L)]
 	public class UnpauseEvent : ECSEvent
 	{
-		public void Execute(Player player, Entity entity)
+		public void Execute(Player player, Entity user)
 		{
-			if (!player.BattlePlayer.MatchPlayer.Paused) return;
-
-			player.BattlePlayer.MatchPlayer.Paused = false;
+            player.BattlePlayer.MatchPlayer.Paused = false;
 			player.BattlePlayer.MatchPlayer.IdleKickTime = null;
 
-			entity.RemoveComponent<PauseComponent>();
-			entity.RemoveComponent<IdleCounterComponent>();
+			user.TryRemoveComponent<PauseComponent>();
+			user.TryRemoveComponent<IdleCounterComponent>();
 		}
 	}
 }

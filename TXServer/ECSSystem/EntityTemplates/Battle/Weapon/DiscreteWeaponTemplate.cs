@@ -4,6 +4,7 @@ using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Weapon;
+using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 
 namespace TXServer.ECSSystem.EntityTemplates.Battle
 {
@@ -21,10 +22,13 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 battlePlayer.TurretKickback == null
                     ? Config.GetComponent<KickbackComponent>(configPath)
                     : new KickbackComponent((float)battlePlayer.TurretKickback),
-                battlePlayer.TurretUnloadEnergyPerShot == null
-                    ? Config.GetComponent<DiscreteWeaponEnergyComponent>(configPath)
-                    : new DiscreteWeaponEnergyComponent(1f, (float)battlePlayer.TurretUnloadEnergyPerShot)
             }.Where(x => x != null));
+
+            if (template.GetType() != typeof(ShaftBattleItemTemplate))
+                entity.AddComponent(battlePlayer.TurretUnloadEnergyPerShot == null
+                    ? Config.GetComponent<DiscreteWeaponEnergyComponent>(configPath)
+                    : new DiscreteWeaponEnergyComponent(1f, (float) battlePlayer.TurretUnloadEnergyPerShot));
+
 
             return entity;
         }

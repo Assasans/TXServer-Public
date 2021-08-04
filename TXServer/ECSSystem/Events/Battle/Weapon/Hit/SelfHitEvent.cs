@@ -4,8 +4,6 @@ using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle.Tank;
-using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
@@ -34,6 +32,9 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
             player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["SHOTS"]++);
             player.User.ChangeComponent<UserStatisticsComponent>(component =>
                 component.Statistics["HITS"] += Targets.Count);
+
+            battlePlayer.MatchPlayer.ShaftAimingBeginTime = null;
+            battlePlayer.MatchPlayer.ShaftLastAimingDurationMs = null;
         }
 
         public virtual IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteHitEvent>();

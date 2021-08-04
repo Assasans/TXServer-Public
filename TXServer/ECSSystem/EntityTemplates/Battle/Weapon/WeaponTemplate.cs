@@ -60,13 +60,14 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
             {
                 if (battlePlayer.TurretUnloadEnergyPerShot != null)
                     component = new WeaponCooldownComponent((float)battlePlayer.TurretUnloadEnergyPerShot);
+                else if (template.GetType() == typeof(ShaftBattleItemTemplate))
+                    ((WeaponCooldownComponent) component).CooldownIntervalSec = 2;
                 weapon.Components.Add(component);
             }
 
             if (battlePlayer.TurretRotationSpeed == null)
-            {
-                weapon.AddComponent(Config.GetComponent<WeaponRotationComponent>(tank.TemplateAccessor.ConfigPath.Replace("battle", "garage")));
-            }
+                weapon.AddComponent(Config.GetComponent<WeaponRotationComponent>(
+                        tank.TemplateAccessor.ConfigPath.Replace("battle", "garage")));
             else
             {
                 float turretRotation = (float)battlePlayer.TurretRotationSpeed;

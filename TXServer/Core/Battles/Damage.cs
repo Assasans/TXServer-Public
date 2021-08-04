@@ -9,6 +9,7 @@ using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Effect;
+using TXServer.ECSSystem.Components.Battle.Energy;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Module.Icetrap;
@@ -22,6 +23,7 @@ using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
+using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents.Hit;
 using TXServer.ECSSystem.ServerComponents.Tank;
@@ -406,7 +408,10 @@ namespace TXServer.Core.Battles
             Entity weaponMarketItem = GetWeaponMarketItem(weapon, shooter);
             if (!IsModule(weaponMarketItem) && IsOnCooldown(weapon, target, shooter)) return;
 
+            bool turretHit = false;
             float damage;
+            string path = weaponMarketItem.TemplateAccessor.ConfigPath;
+
             switch (weapon.TemplateAccessor.Template)
             {
                 case FireRingEffectTemplate:
@@ -454,14 +459,28 @@ namespace TXServer.Core.Battles
                     damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
                     break;
                 case ShaftBattleItemTemplate:
-                    damage = 1;
+                    turretHit = IsTurretHit(hitTarget.LocalHitPoint, target.Tank);
+
+                    float maxDamage = Config
+                        .GetComponent<ServerComponents.Damage.AimingMaxDamagePropertyComponent>(path).FinalValue;
+                    float minDamage = Config
+                        .GetComponent<ServerComponents.Damage.AimingMinDamagePropertyComponent>(path).FinalValue;
+                    double aimingTime = shooter.ShaftLastAimingDurationMs ?? 0;
+                    damage = (float) MathUtils.Map(aimingTime, 0, 5000, minDamage, maxDamage);
+
+                    weapon.ChangeComponent<WeaponEnergyComponent>(component => component.Energy += (float) 0.4);
+
+                    if (damage > maxDamage) damage = maxDamage;
+                    if (turretHit) damage *= 2;
+
+                    Console.WriteLine($"{turretHit}: {hitTarget.LocalHitPoint.Y}");
                     break;
                 default:
                     damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
                     break;
             }
 
-            bool backHit = IsBackHit(hitTarget.LocalHitPoint, target.Tank);
+            bool backHit = !turretHit && IsBackHit(hitTarget.LocalHitPoint, target.Tank);
 
             DealDamage(weaponMarketItem, target, shooter, damage, backHit, hitTarget.LocalHitPoint);
         }
@@ -475,6 +494,18 @@ namespace TXServer.Core.Battles
                 "viking" => -1.6,
                 _ => -1.25
             } > localHitPoint.Z;
+        }
+        private static bool IsTurretHit(Vector3 localHitPoint, Entity hull)
+        {
+            return hull.TemplateAccessor.ConfigPath.Split('/').Last() switch
+            {
+                "dictator" => 2.015,
+                "hornet" => 1.37,
+                "mammoth" => 1.74,
+                "titan" => 1.6265,
+                "viking" => 1.2955,
+                _ => 1.51
+            } < localHitPoint.Y;
         }
 
         private static bool IsOnCooldown(Entity weapon, MatchPlayer target, MatchPlayer shooter)

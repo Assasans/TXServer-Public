@@ -9,9 +9,10 @@ namespace TXServer.ECSSystem.Events.Battle.Pause
 	[SerialVersionUID(-1316093147997460626L)]
 	public class PauseEvent : ECSEvent
 	{
-		public void Execute(Player player, Entity entity)
+		public void Execute(Player player, Entity user)
 		{
-			if (player.BattlePlayer.MatchPlayer.Paused) return;
+			if (player.BattlePlayer.MatchPlayer.Paused ||
+                player.IsInMatch && player.BattlePlayer.Battle.SuppressInactivityKick) return;
 
 			player.BattlePlayer.MatchPlayer.Paused = true;
 			player.BattlePlayer.MatchPlayer.IdleKickTime = DateTime.UtcNow.AddMinutes(2);

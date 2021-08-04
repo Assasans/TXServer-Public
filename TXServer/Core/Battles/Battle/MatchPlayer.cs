@@ -18,6 +18,7 @@ using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle.Tank;
 using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.Events.Battle.Pause;
 using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.ServerComponents.Tank;
 using TXServer.ECSSystem.Types;
@@ -294,12 +295,17 @@ namespace TXServer.Core.Battles
                 module.ModuleTick();
             }
 
-            if (Paused && DateTime.UtcNow > IdleKickTime)
+            if (Paused && DateTime.UtcNow >= IdleKickTime)
             {
-                Paused = false;
-                IdleKickTime = null;
-                Player.SendEvent(new KickFromBattleEvent(), BattleUser);
-                Player.BattlePlayer.WaitingForExit = true;
+                if (Battle.SuppressInactivityKick)
+                    new UnpauseEvent().Execute(Player, Player.User);
+                else
+                {
+                    Paused = false;
+                    IdleKickTime = null;
+                    Player.SendEvent(new KickFromBattleEvent(), BattleUser);
+                    Player.BattlePlayer.WaitingForExit = true;
+                }
             }
 
             if (Temperature != 0) Damage.DealAutoTemperature(this);
@@ -415,6 +421,9 @@ namespace TXServer.Core.Battles
         public Dictionary<MatchPlayer, float> DamageAssistants { get; } = new();
 
         public SpeedComponent OriginalSpeedComponent { get; }
+
+        public DateTimeOffset? ShaftAimingBeginTime { get; set; }
+        public double? ShaftLastAimingDurationMs { get; set; }
 
         public SpawnPoint LastSpawnPoint { get; private set; }
         public TeleportPoint LastTeleportPoint { get; private set; }

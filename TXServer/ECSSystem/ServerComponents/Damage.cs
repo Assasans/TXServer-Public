@@ -16,10 +16,10 @@ namespace TXServer.ECSSystem.ServerComponents
         {
         }
 
-        public class AimingMaxDamageProperty : RangedComponent
+        public class AimingMaxDamagePropertyComponent : RangedComponent
         {
         }
-        public class AimingMinDamageProperty : RangedComponent
+        public class AimingMinDamagePropertyComponent : RangedComponent
         {
         }
 
@@ -32,11 +32,6 @@ namespace TXServer.ECSSystem.ServerComponents
         }
         public class MaxDamagePropertyComponent : RangedComponent
         {
-        }
-
-        public class WeaponCooldown : RangedComponent, IConvertibleComponent<WeaponCooldownComponent>
-        {
-            public void Convert(WeaponCooldownComponent component) => component.CooldownIntervalSec = FinalValue;
         }
     }
 }

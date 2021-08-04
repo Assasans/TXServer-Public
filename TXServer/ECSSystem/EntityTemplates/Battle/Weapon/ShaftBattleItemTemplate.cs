@@ -17,10 +17,9 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Weapon
             entity.Components.UnionWith(new Component[]
             {
                 new ShaftComponent(),
-
                 Config.GetComponent<ShaftAimingImpactComponent>(GarageWeaponConfig),
                 Config.GetComponent<ShaftAimingSpeedComponent>(GarageWeaponConfig),
-                new ShaftEnergyComponent(1, 1, 1, 1),
+                new ShaftEnergyComponent(0.2857f, 1, 0.2f, 0.143f),
                 Config.GetComponent<ShaftStateConfigComponent>("battle/weapon/shaft")
             });
 

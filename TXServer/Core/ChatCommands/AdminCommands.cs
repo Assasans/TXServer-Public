@@ -30,6 +30,7 @@ namespace TXServer.Core.ChatCommands
             { "map", ("map [opt: map name]", ChatCommandConditions.InactiveBattle, ChangeMap) },
             { "message", ("message [all/uid] [message]", ChatCommandConditions.None, Message) },
             { "modules", (null, ChatCommandConditions.InactiveBattle, ChangeModules) },
+            { "nopause", ("noPause [opt: active/inactive]", ChatCommandConditions.InBattle, NoPause)},
             { "open", (null, ChatCommandConditions.InBattle, Open) },
             { "pause", (null, ChatCommandConditions.InBattle, Pause) },
             { "positioninfo", (null, ChatCommandConditions.InMatch, PositionInfo) },
@@ -311,6 +312,33 @@ namespace TXServer.Core.ChatCommands
             targets.ShareEntities(notification);
 
             return $"Sent message to {targets.Count} target{(targets.Count > 1 ? "s" : "")}";
+        }
+
+        private static string NoPause(Player player, string[] args)
+        {
+            bool blockPause;
+            if (args.Length == 0)
+                blockPause = !player.BattlePlayer.Battle.SuppressInactivityKick;
+            else
+            {
+                switch (args[0])
+                {
+                    case "activate":
+                        blockPause = true;
+                        break;
+                    case "inactive":
+                        blockPause = false;
+                        break;
+                    default:
+                        return $"error: '{args[0]}' ain't a valid argument";
+                }
+
+                if (blockPause == player.BattlePlayer.Battle.SuppressInactivityKick)
+                    return "the noPause command is already configured to do this";
+            }
+
+            player.BattlePlayer.Battle.SuppressInactivityKick = blockPause;
+            return $"inactive players will {(blockPause ? "no longer " : 0)}be kicked";
         }
 
         private static string Open(Player player, string[] args)

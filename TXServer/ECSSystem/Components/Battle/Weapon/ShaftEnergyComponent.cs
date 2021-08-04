@@ -6,7 +6,8 @@ namespace TXServer.ECSSystem.Components.Battle.Weapon
     [SerialVersionUID(1826384779893027508L)]
     public class ShaftEnergyComponent : Component
     {
-        public ShaftEnergyComponent(float unloadEnergyPerQuickShot, float possibleUnloadEnergyPerAimingShot, float unloadAimingEnergyPerSec, float reloadEnergyPerSec)
+        public ShaftEnergyComponent(float unloadEnergyPerQuickShot, float possibleUnloadEnergyPerAimingShot,
+            float unloadAimingEnergyPerSec, float reloadEnergyPerSec)
         {
             UnloadEnergyPerQuickShot = unloadEnergyPerQuickShot;
             PossibleUnloadEnergyPerAimingShot = possibleUnloadEnergyPerAimingShot;
