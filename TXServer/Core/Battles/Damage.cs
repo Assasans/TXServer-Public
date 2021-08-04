@@ -66,7 +66,7 @@ namespace TXServer.Core.Battles
                 }
                 else
                 {
-                    if (victim.Battle.ModeHandler is not TeamBattleHandler)
+                    if (victim.Battle.ModeHandler is TeamBattleHandler)
                     {
                         if (victim.DamageAssistants.ContainsKey(damager))
                             victim.DamageAssistants[damager] += damage;
