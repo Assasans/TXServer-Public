@@ -88,6 +88,18 @@ namespace TXServerConsole
                             if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
                             settings.EnableCommandStackTrace = true;
                             break;
+                        case "-disable-map-bounds":
+                            if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
+                            settings.MapBoundsInactive = true;
+                            break;
+                        case "-super-cool-container-active":
+                            if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
+                            settings.SuperMegaCoolContainerActive = true;
+                            break;
+                        case "-test-server":
+                            if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
+                            settings.TestServer = true;
+                            break;
                         case "h":
                         case "-help":
                             Help();
@@ -116,31 +128,6 @@ namespace TXServerConsole
                 Database = new LocalDatabase()
             };
             Server.Instance.Start();
-
-            foreach (var pair in additionalArgs)
-            {
-                if (!uniqueArgs.Add(pair.Key))
-                {
-                    Console.WriteLine($"Duplicate parameter: {pair.Key}");
-                    return;
-                }
-
-                switch (pair.Key)
-                {
-                    case "-disable-map-bounds":
-                        if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
-                        Server.Instance.ServerData.MapBoundsInactive = true;
-                        break;
-                    case "-super-cool-container-active":
-                        if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
-                        Server.Instance.ServerData.SuperMegaCoolContainerActive = true;
-                        break;
-                    case "-test-server":
-                        if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
-                        Server.Instance.ServerData.TestServer = true;
-                        break;
-                }
-            }
         }
     }
 }

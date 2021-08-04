@@ -50,7 +50,7 @@ namespace TXServer.ECSSystem.Events.Battle.Movement
             if (MoveCommand.Movement != null)
                 matchPlayer.TankQuaternion = (Quaternion) MoveCommand.Movement?.Orientation;
 
-            if (!player.ServerData.MapBoundsInactive && CheckOverflow(position.Value + velocity))
+            if (!player.Server.Settings.MapBoundsInactive && CheckOverflow(position.Value + velocity))
                 matchPlayer.SelfDestructionTime = DateTime.UtcNow;
 
             if (player.BattlePlayer.Battle.Params.KillZoneEnabled)

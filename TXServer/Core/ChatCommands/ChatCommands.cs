@@ -850,7 +850,7 @@ namespace TXServer.Core.ChatCommands
         {
             ChatCommandConditions conditions = 0;
 
-            if (player.ServerData.TestServer || player.Data.Admin)
+            if (player.Server.Settings.TestServer || player.Data.Admin)
                 conditions |= ChatCommandConditions.TestServer;
 
             if (player.Data.Admin)

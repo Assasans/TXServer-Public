@@ -14,5 +14,9 @@ namespace TXServer.Core
 
         public bool EnableTracing { get; set; }
         public bool EnableCommandStackTrace { get; set; }
+        
+        public bool MapBoundsInactive { get; set; }
+        public bool SuperMegaCoolContainerActive { get; set; }
+        public bool TestServer { get; set; }
     }
 }

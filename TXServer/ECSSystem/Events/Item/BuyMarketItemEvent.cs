@@ -33,7 +33,7 @@ namespace TXServer.ECSSystem.Events.Item
         public static bool PurchaseIsValid(int requestedAmount, int requestedPrice, Entity item, Player player,
             bool xCrystal = false)
         {
-            if (!player.ServerData.SuperMegaCoolContainerActive && item.TemplateAccessor.ConfigPath is not null &&
+            if (!player.Server.Settings.SuperMegaCoolContainerActive && item.TemplateAccessor.ConfigPath is not null &&
                 item.TemplateAccessor.ConfigPath.EndsWith("everything"))
             {
                 player.ScreenMessage("Sorry, this container is currently unavailable");
