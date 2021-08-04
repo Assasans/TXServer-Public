@@ -19,8 +19,9 @@ namespace TXServer.ECSSystem.Components.Battle.Weapon
                 player.BattlePlayer.MatchPlayer.ShaftAimingBeginTime ?? DateTimeOffset.UtcNow)).TotalMilliseconds;
             player.BattlePlayer.MatchPlayer.ShaftAimingBeginTime = null;
 
-            double energy = (double) (player.BattlePlayer.MatchPlayer.ShaftLastAimingDurationMs * 0.0002);
-            weapon.ChangeComponent<WeaponEnergyComponent>(component => component.Energy = (float) (0.9 - energy));
+            double newEnergy = 0.9 - (double) (player.BattlePlayer.MatchPlayer.ShaftLastAimingDurationMs * 0.0002);
+            newEnergy = Math.Clamp(newEnergy, 0, 1);
+            weapon.ChangeComponent<WeaponEnergyComponent>(component => component.Energy = (float) newEnergy);
         }
 
 
