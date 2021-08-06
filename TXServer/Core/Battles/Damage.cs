@@ -3,27 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using TXServer.Core.Battles.Effect;
+using TXServer.Core.BattleWeapons;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Effect;
-using TXServer.ECSSystem.Components.Battle.Energy;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Module.Icetrap;
 using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
-using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
-using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents.Hit;
 using TXServer.ECSSystem.ServerComponents.Tank;
@@ -128,7 +126,7 @@ namespace TXServer.Core.Battles
             healer.UpdateStatistics(additiveScore: 4, 0, 0, 0, null);
         }
 
-        private static void DealNewTemperature(Entity weapon, Entity weaponMarketItem, MatchPlayer target,
+        public static void DealNewTemperature(Entity weapon, Entity weaponMarketItem, MatchPlayer target,
             MatchPlayer shooter)
         {
             float temperatureChange;
@@ -155,9 +153,8 @@ namespace TXServer.Core.Battles
                 NormalizeTemperature(target.Temperature + temperatureChange, target) - target.Temperature;
             target.Temperature += temperatureChange;
 
-            float maxTemperatureDamage =
-                Config.GetComponent<ServerComponents.Damage.HeatDamagePropertyComponent>(weaponMarketItem.TemplateAccessor.ConfigPath)
-                .FinalValue;
+            float maxTemperatureDamage = Config.GetComponent<ServerComponents.Damage.HeatDamagePropertyComponent>(
+                weaponMarketItem.TemplateAccessor.ConfigPath, false)?.FinalValue ?? 0;
             TemperatureHit temperatureHit =
                 target.TemperatureHits.SingleOrDefault(t => t.Shooter == shooter && t.WeaponMarketItem == weaponMarketItem);
 
@@ -185,8 +182,8 @@ namespace TXServer.Core.Battles
 
                 float temperatureDelta = temperatureHit.CurrentTemperature switch
                 {
-                    > 0 => -temperatureConfig.AutoDecrementInMs * temperatureConfig.TactPeriodInMs,
-                    < 0 => temperatureConfig.AutoIncrementInMs * temperatureConfig.TactPeriodInMs,
+                    > 0 => -temperatureConfig.AutoDecrementInMs * temperatureConfig.TactPeriodInMs / 2,
+                    < 0 => temperatureConfig.AutoIncrementInMs * temperatureConfig.TactPeriodInMs / 1.5f,
                     _ => 0
                 };
 
@@ -199,20 +196,6 @@ namespace TXServer.Core.Battles
                     if (heatDamage >= 1)
                         DealDamage(temperatureHit.WeaponMarketItem, matchPlayer, temperatureHit.Shooter, heatDamage);
                 }
-                else
-                {
-                    // cold: speed reducing
-                    bool hasSpeedCheat = matchPlayer.TryGetModule(typeof(TurboSpeedModule),
-                        out BattleModule turboSpeedModule) && turboSpeedModule.IsCheat;
-                    float originalSpeed = hasSpeedCheat ? float.MaxValue : matchPlayer.OriginalSpeedComponent.Speed;
-
-                    float speed = MathUtils.Map(temperatureHit.CurrentTemperature, 0, temperatureConfig.MinTemperature,
-                        originalSpeed, 0);
-                    float twentyPercent = originalSpeed / 100 * 20;
-                    if (speed < twentyPercent) speed = twentyPercent;
-
-                    matchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.Speed = speed);
-                }
 
                 bool wasPositive = temperatureHit.CurrentTemperature > 0;
                 temperatureHit.CurrentTemperature += temperatureDelta;
@@ -223,6 +206,8 @@ namespace TXServer.Core.Battles
                 {
                     matchPlayer.TemperatureHits.Remove(temperatureHit);
                     matchPlayer.Temperature = matchPlayer.TemperatureFromAllHits();
+                    matchPlayer.Tank.ChangeComponent<SpeedComponent>(component =>
+                        component.Speed = matchPlayer.TemperatureSpeed());
                     return;
                 }
 
@@ -234,122 +219,23 @@ namespace TXServer.Core.Battles
                     tempHit.CurrentTemperature += temperatureChangePerHit;
 
                 matchPlayer.Temperature = matchPlayer.TemperatureFromAllHits();
+                matchPlayer.Tank.ChangeComponent<SpeedComponent>(component =>
+                    component.Speed = matchPlayer.TemperatureSpeed());
             }
         }
+
 
         private static float GetBaseDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer target, MatchPlayer shooter)
         {
-            string path = weaponMarketItem.TemplateAccessor.ConfigPath;
+            BattleModule module = shooter.Modules.Single(m => m.MarketItem == weaponMarketItem);
 
-            if (IsModule(weaponMarketItem))
-            {
-                BattleModule module = shooter.Modules.Single(m => m.MarketItem == weaponMarketItem);
+            var minDamageComponent = Config.GetComponent<ModuleEffectMinDamagePropertyComponent>(module.ConfigPath);
+            var maxDamageComponent = Config.GetComponent<ModuleEffectMaxDamagePropertyComponent>(module.ConfigPath);
 
-                var minDamageComponent = Config.GetComponent<ModuleEffectMinDamagePropertyComponent>(module.ConfigPath);
-                var maxDamageComponent = Config.GetComponent<ModuleEffectMaxDamagePropertyComponent>(module.ConfigPath);
+            float minDamage = minDamageComponent.UpgradeLevel2Values[module.Level - 1];
+            float maxDamage = maxDamageComponent.UpgradeLevel2Values[module.Level - 1];
 
-                float minDamage = minDamageComponent.UpgradeLevel2Values[module.Level - 1];
-                float maxDamage = maxDamageComponent.UpgradeLevel2Values[module.Level - 1];
-
-                return (int) Math.Round(new Random().NextGaussianRange(minDamage, maxDamage));
-            }
-
-            switch (weapon.TemplateAccessor.Template)
-            {
-                case FreezeBattleItemTemplate or FlamethrowerBattleItemTemplate or VulcanBattleItemTemplate:
-                    var damageComponent =
-                        Config.GetComponent<ServerComponents.Damage.DamagePerSecondPropertyComponent>(path);
-                    WeaponCooldownComponent cooldownComponent = Config
-                        .GetComponent<WeaponCooldownComponent>("battle/weapon/" + path.Split('/').Last());
-
-                    return (int) damageComponent.FinalValue * cooldownComponent.CooldownIntervalSec;
-                case HammerBattleItemTemplate:
-                    return Config.GetComponent<ServerComponents.Damage.DamagePerPelletPropertyComponent>(path
-                    ).FinalValue;
-                case IsisBattleItemTemplate:
-                    float dps;
-                    if (shooter.IsEnemyOf(target))
-                        dps = Config.GetComponent<ServerComponents.Damage.DamagePerSecondPropertyComponent>(path)
-                            .FinalValue;
-                    else
-                        dps = Config.GetComponent<ServerComponents.Damage.HealingPropertyComponent>(path)
-                            .FinalValue;
-
-                    float cooldown = Config
-                        .GetComponent<WeaponCooldownComponent>("battle/weapon/" + path.Split('/').Last())
-                        .CooldownIntervalSec;
-
-                    return (int) dps * cooldown;
-                case RicochetBattleItemTemplate:
-                    var minAimingDamageComponent =
-                        Config.GetComponent<ServerComponents.Damage.MinDamagePropertyComponent>(path);
-                    var maxAimingDamageComponent =
-                        Config.GetComponent<ServerComponents.Damage.MaxDamagePropertyComponent>(path);
-
-                    return (int) Math.Round(new Random().NextGaussianRange(minAimingDamageComponent.FinalValue,
-                        maxAimingDamageComponent.FinalValue));
-                default:
-                    var minDamageComponent =
-                        Config.GetComponent<ServerComponents.Damage.MinDamagePropertyComponent>(path);
-                    var maxDamageComponent =
-                        Config.GetComponent<ServerComponents.Damage.MaxDamagePropertyComponent>(path);
-
-                    return (int) Math.Round(new Random().NextGaussianRange(minDamageComponent.FinalValue,
-                        maxDamageComponent.FinalValue));
-            }
-        }
-
-        private static float GetDamageDistanceMultiplier(Entity weapon, Entity weaponMarketItem, float distance)
-        {
-            if (IsModule(weapon)) return 1;
-
-            string path = weaponMarketItem.TemplateAccessor.ConfigPath;
-
-            switch (weapon.TemplateAccessor.Template)
-            {
-                default:
-                    var minDamageDistance =
-                        Config.GetComponent<ServerComponents.DamageWeakeningByDistance.MinDamageDistancePropertyComponent>(path);
-                    var maxDamageDistance =
-                        Config.GetComponent<ServerComponents.DamageWeakeningByDistance.MaxDamageDistancePropertyComponent>(path);
-
-                    var minDamagePercent =
-                        Config.GetComponent<ServerComponents.DamageWeakeningByDistance.MinDamagePercentPropertyComponent>(path);
-
-                    float distanceModifier;
-
-                    if (distance < maxDamageDistance.FinalValue)
-                        distanceModifier = 1;
-                    else
-                        distanceModifier = MathUtils.Map(distance, minDamageDistance.FinalValue, maxDamageDistance.FinalValue, minDamagePercent.FinalValue / 100, 1);
-
-                    return distanceModifier;
-            }
-        }
-
-        private static float GetSplashDamageDistanceMultiplier(Entity weapon, float distance, MatchPlayer damager)
-        {
-            if (IsModule(weapon)) return 1;
-
-            switch (weapon.TemplateAccessor.Template)
-            {
-                case SmokyBattleItemTemplate or VulcanBattleItemTemplate:
-                    return 1;
-                default:
-                    SplashWeaponComponent damageComponent = damager.Weapon.GetComponent<SplashWeaponComponent>();
-
-                    float radiusOfMaxSplashDamage = damageComponent.RadiusOfMaxSplashDamage;
-                    float radiusOfMinSplashDamage = damageComponent.RadiusOfMinSplashDamage;
-                    float minSplashDamagePercent = damageComponent.MinSplashDamagePercent;
-
-                    if (distance < radiusOfMaxSplashDamage)
-                        return 1;
-
-                    if (distance > radiusOfMinSplashDamage)
-                        return 0;
-
-                    return 1 - (1 / (radiusOfMinSplashDamage / distance));
-            }
+            return (int) Math.Round(new Random().NextGaussianRange(minDamage, maxDamage));
         }
 
         private static float GetTemperatureChange(Entity weaponMarketItem)
@@ -357,12 +243,14 @@ namespace TXServer.Core.Battles
             string path = weaponMarketItem.TemplateAccessor.ConfigPath;
             switch (weaponMarketItem.TemplateAccessor.Template)
             {
-                case FlamethrowerMarketItemTemplate or FreezeMarketItemTemplate:
+                case FlamethrowerMarketItemTemplate:
                     WeaponCooldownComponent cooldownComponent = Config
                         .GetComponent<WeaponCooldownComponent>("battle/weapon/" + path.Split('/').Last());
                     float temperaturePerSecond =
                         Config.GetComponent<DeltaTemperaturePerSecondPropertyComponent>(path).FinalValue;
                     return temperaturePerSecond * cooldownComponent.CooldownIntervalSec;
+                case FreezeMarketItemTemplate:
+                    return -0.4f;
                 case IsisMarketItemTemplate:
                     return 0;
                 default:
@@ -395,96 +283,65 @@ namespace TXServer.Core.Battles
             return damage;
         }
 
-
         private static Entity GetWeaponMarketItem(Entity weapon, MatchPlayer shooter)
         {
             if (weapon.TemplateAccessor.Template is DroneWeaponTemplate) return Modules.GlobalItems.Drone;
 
-             return shooter.Modules.SingleOrDefault(m => m.EffectEntity == weapon)?.MarketItem ??
-                shooter.Player.CurrentPreset.Weapon;
+            return shooter.Modules.SingleOrDefault(m => m.EffectEntity == weapon)?.MarketItem ??
+                   shooter.Player.CurrentPreset.Weapon;
         }
 
 
         public static void HandleHit(Entity weapon, MatchPlayer target, MatchPlayer shooter,
-            HitTarget hitTarget, bool splash = false)
+            HitTarget hitTarget, bool isSplashHit = false)
         {
             Entity weaponMarketItem = GetWeaponMarketItem(weapon, shooter);
             if (!IsModule(weaponMarketItem) && IsOnCooldown(weapon, target, shooter)) return;
 
-            bool turretHit = false;
-            float damage;
-            string path = weaponMarketItem.TemplateAccessor.ConfigPath;
-
-            switch (weapon.TemplateAccessor.Template)
-            {
-                case FireRingEffectTemplate:
-                    DealNewTemperature(weapon, weaponMarketItem, target, shooter);
-                    damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
-                    break;
-                case FlamethrowerBattleItemTemplate or FreezeBattleItemTemplate:
-                    DealNewTemperature(weapon, weaponMarketItem, target, shooter);
-                    damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
-                    float modifier = GetDamageDistanceMultiplier(weapon, weaponMarketItem, hitTarget.HitDistance);
-                    damage = (int) Math.Round(damage * modifier);
-                    break;
-                case HammerBattleItemTemplate or RicochetBattleItemTemplate or SmokyBattleItemTemplate or
-                    ThunderBattleItemTemplate or TwinsBattleItemTemplate or VulcanBattleItemTemplate:
-                    damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
-                    float distanceModifier = splash
-                        ? GetSplashDamageDistanceMultiplier(weapon, hitTarget.HitDistance, shooter)
-                        : GetDamageDistanceMultiplier(weapon, weaponMarketItem, hitTarget.HitDistance);
-
-                    /*TXServer.ECSSystem.Events.Chat.ChatMessageReceivedEvent.SystemMessageTarget(
-                    $"[Damage] Random damage: {damage} | Distance multiplier: {distanceModifier} | Calculated damage: {Math.Round(damage * distanceModifier)}",
-                    target.Battle.GeneralBattleChatEntity, shooter.Player);*/
-
-                    damage = (int) Math.Round(damage * distanceModifier);
-                    break;
-                case IsisBattleItemTemplate:
-                    damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
-                    if (!shooter.IsEnemyOf(target))
-                    {
-                        DealIsisHeal(damage, shooter, target, hitTarget);
-                        return;
-                    }
-                    break;
-                case KamikadzeEffectTemplate:
-                    shooter.TryGetModule(out KamikadzeModule kamikadzeModule);
-                    if (!kamikadzeModule.EffectIsActive) return;
-                    kamikadzeModule.Deactivate();
-
-                    damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
-                    break;
-                case MineEffectTemplate:
-                    shooter.TryGetModule(out MineModule mineModule);
-                    mineModule.Explode(weapon);
-
-                    damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
-                    break;
-                case ShaftBattleItemTemplate:
-                    turretHit = shooter.ShaftAimingBeginTime != null &&
-                                IsTurretHit(hitTarget.LocalHitPoint, target.Tank);
-
-                    float maxDamage = Config
-                        .GetComponent<ServerComponents.Damage.AimingMaxDamagePropertyComponent>(path).FinalValue;
-                    float minDamage = Config
-                        .GetComponent<ServerComponents.Damage.AimingMinDamagePropertyComponent>(path).FinalValue;
-                    double aimingTime = shooter.ShaftLastAimingDurationMs ?? 0;
-                    damage = (float) MathUtils.Map(aimingTime, 0, 5000, minDamage, maxDamage);
-
-                    if (damage > maxDamage) damage = maxDamage;
-                    if (turretHit) damage *= 2;
-
-                    break;
-                default:
-                    damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
-                    break;
-            }
-
+            bool turretHit = (shooter.BattleWeapon as Shaft)?.ShaftAimingBeginTime != null &&
+                             IsTurretHit(hitTarget.LocalHitPoint, target.Tank);
             bool backHit = !turretHit && IsBackHit(hitTarget.LocalHitPoint, target.Tank);
+            float damage;
 
+            if (IsModule(weaponMarketItem))
+            {
+                switch (weapon.TemplateAccessor.Template)
+                {
+                    case FireRingEffectTemplate:
+                        DealNewTemperature(weapon, weaponMarketItem, target, shooter);
+                        damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
+                        break;
+                    case KamikadzeEffectTemplate:
+                        shooter.TryGetModule(out KamikadzeModule kamikadzeModule);
+                        if (!kamikadzeModule.EffectIsActive) return;
+                        kamikadzeModule.Deactivate();
+
+                        damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
+                        break;
+                    case MineEffectTemplate:
+                        shooter.TryGetModule(out MineModule mineModule);
+                        mineModule.Explode(weapon);
+
+                        damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
+                        break;
+                    default:
+                        damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
+                        break;
+                }
+            }
+            else
+                damage = shooter.BattleWeapon.BaseDamage(hitTarget.HitDistance, target, isSplashHit);
+
+            if (turretHit) damage *= 2;
+
+            if (shooter.BattleWeapon.GetType() == typeof(Isis) && !shooter.IsEnemyOf(target))
+            {
+                DealIsisHeal(damage, shooter, target, hitTarget);
+                return;
+            }
             DealDamage(weaponMarketItem, target, shooter, damage, backHit, hitTarget.LocalHitPoint);
         }
+
 
         private static bool IsBackHit(Vector3 localHitPoint, Entity hull)
         {
@@ -554,6 +411,7 @@ namespace TXServer.Core.Battles
         private static bool IsModule(Entity weaponMarketItem) =>
             Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem) ||
             weaponMarketItem.HasComponent<EffectComponent>();
+
 
         private static float NormalizeTemperature(float temperature, MatchPlayer target)
         {

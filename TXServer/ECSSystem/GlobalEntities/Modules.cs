@@ -302,7 +302,5 @@ namespace TXServer.ECSSystem.GlobalEntities
             [GlobalItems.Spidermine] = typeof(SpiderMineModule),
             [GlobalItems.Turbospeed] = typeof(TurboSpeedModule)
         };
-
-
     }
 }

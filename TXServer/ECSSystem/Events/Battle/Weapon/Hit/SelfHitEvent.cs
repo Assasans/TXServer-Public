@@ -33,8 +33,7 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
             player.User.ChangeComponent<UserStatisticsComponent>(component =>
                 component.Statistics["HITS"] += Targets.Count);
 
-            battlePlayer.MatchPlayer.ShaftAimingBeginTime = null;
-            battlePlayer.MatchPlayer.ShaftLastAimingDurationMs = null;
+            (battlePlayer.MatchPlayer.BattleWeapon as Core.BattleWeapons.Shaft)?.ResetAiming();
         }
 
         public virtual IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteHitEvent>();

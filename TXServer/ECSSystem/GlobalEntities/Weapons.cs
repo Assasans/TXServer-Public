@@ -1,5 +1,8 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using TXServer.Core;
+using TXServer.Core.BattleWeapons;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Item.Tank;
@@ -89,5 +92,20 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ParentGroupComponent(-1955445362),
                 new MarketItemGroupComponent(-1955445362));
         }
+
+        public static readonly Dictionary<Entity, Type> WeaponToType = new()
+        {
+            [GlobalItems.Hammer] = typeof(Hammer),
+            [GlobalItems.Flamethrower] = typeof(Flamethrower),
+            [GlobalItems.Freeze] = typeof(Freeze),
+            [GlobalItems.Isis] = typeof(Isis),
+            [GlobalItems.Railgun] = typeof(Railgun),
+            [GlobalItems.Ricochet] = typeof(Ricochet),
+            [GlobalItems.Shaft] = typeof(Shaft),
+            [GlobalItems.Smoky] = typeof(Smoky),
+            [GlobalItems.Thunder] = typeof(Thunder),
+            [GlobalItems.Twins] = typeof(Twins),
+            [GlobalItems.Vulcan] = typeof(Vulcan)
+        };
     }
 }

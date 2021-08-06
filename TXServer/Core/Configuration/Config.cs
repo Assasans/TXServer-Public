@@ -122,7 +122,8 @@ namespace TXServer.Core.Configuration
         {
             var currentNode = _rootNode;
             foreach (string part in path.Split('/'))
-                currentNode = currentNode.ChildNodes[part];
+                if (currentNode.ChildNodes.ContainsKey(part))
+                    currentNode = currentNode.ChildNodes[part];
 
             return currentNode;
         }

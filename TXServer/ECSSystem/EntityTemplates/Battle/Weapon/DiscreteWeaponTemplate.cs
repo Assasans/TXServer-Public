@@ -3,6 +3,7 @@ using TXServer.Core.Battles;
 using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 
@@ -25,10 +26,11 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
             }.Where(x => x != null));
 
             if (template.GetType() != typeof(ShaftBattleItemTemplate))
+            {
                 entity.AddComponent(battlePlayer.TurretUnloadEnergyPerShot == null
                     ? Config.GetComponent<DiscreteWeaponEnergyComponent>(configPath)
-                    : new DiscreteWeaponEnergyComponent(1f, (float) battlePlayer.TurretUnloadEnergyPerShot));
-
+                    : new DiscreteWeaponEnergyComponent(1, (float) battlePlayer.TurretUnloadEnergyPerShot));
+            }
 
             return entity;
         }

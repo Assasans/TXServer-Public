@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using TXServer.Core;
+using TXServer.Core.BattleWeapons;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Energy;
@@ -11,19 +12,20 @@ namespace TXServer.ECSSystem.Components.Battle.Weapon
 	public class ShaftAimingWorkingStateComponent : Component
     {
         public void OnAttached(Player player, Entity weapon) =>
-            player.BattlePlayer.MatchPlayer.ShaftAimingBeginTime = DateTimeOffset.UtcNow;
+            ((Shaft) player.BattlePlayer.MatchPlayer.BattleWeapon).ShaftAimingBeginTime = DateTimeOffset.UtcNow;
 
         public void OnRemove(Player player, Entity weapon)
         {
-            player.BattlePlayer.MatchPlayer.ShaftLastAimingDurationMs = (DateTimeOffset.UtcNow - (
-                player.BattlePlayer.MatchPlayer.ShaftAimingBeginTime ?? DateTimeOffset.UtcNow)).TotalMilliseconds;
-            player.BattlePlayer.MatchPlayer.ShaftAimingBeginTime = null;
+            Shaft shaft = (Shaft) player.BattlePlayer.MatchPlayer.BattleWeapon;
 
-            double newEnergy = 0.9 - (double) (player.BattlePlayer.MatchPlayer.ShaftLastAimingDurationMs * 0.0002);
+            ((Shaft) player.BattlePlayer.MatchPlayer.BattleWeapon).ShaftLastAimingDurationMs =
+                (DateTimeOffset.UtcNow - (shaft.ShaftAimingBeginTime ?? DateTimeOffset.UtcNow)).TotalMilliseconds;
+            ((Shaft) player.BattlePlayer.MatchPlayer.BattleWeapon).ShaftAimingBeginTime = null;
+
+            double newEnergy = 0.9 - (shaft.ShaftLastAimingDurationMs ?? 0) * 0.0002;
             newEnergy = Math.Clamp(newEnergy, 0, 1);
             weapon.ChangeComponent<WeaponEnergyComponent>(component => component.Energy = (float) newEnergy);
         }
-
 
         public float InitialEnergy { get; set; }
         public float ExhaustedEnergy { get; set; }
@@ -32,5 +34,6 @@ namespace TXServer.ECSSystem.Components.Battle.Weapon
         public float VerticalSpeed { get; set; }
         public int VerticalElevationDir { get; set; }
         public bool IsActive { get; set; }
+        public int ClientTime { get; set; }
 	}
 }

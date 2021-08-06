@@ -26,7 +26,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Tank
                 Config.GetComponent<HealthComponent>(configPath),
                 Config.GetComponent<HealthConfigComponent>(configPath),
                 Config.GetComponent<DampingComponent>(configPath),
-                (SpeedComponent)selfMatchPlayer.OriginalSpeedComponent.Clone(),
+                Config.GetComponent<SpeedComponent>(configPath),
                 Config.GetComponent<SpeedConfigComponent>(configPath),
                 Config.GetComponent<WeightComponent>(configPath),
                 new TemperatureComponent(0),

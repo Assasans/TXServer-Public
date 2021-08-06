@@ -62,6 +62,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                     component = new WeaponCooldownComponent((float)battlePlayer.TurretUnloadEnergyPerShot);
                 else if (template.GetType() == typeof(ShaftBattleItemTemplate))
                     ((WeaponCooldownComponent) component).CooldownIntervalSec = 2;
+
                 weapon.Components.Add(component);
             }
 

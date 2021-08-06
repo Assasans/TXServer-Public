@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using TXServer.Core.Battles.Effect;
+using TXServer.Core.BattleWeapons;
 using TXServer.Core.Configuration;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
@@ -20,8 +21,10 @@ using TXServer.ECSSystem.EntityTemplates.Battle.Tank;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Pause;
 using TXServer.ECSSystem.Events.Battle.Score;
+using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents.Tank;
 using TXServer.ECSSystem.Types;
+using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.Core.Battles
@@ -30,8 +33,8 @@ namespace TXServer.Core.Battles
     {
         public MatchPlayer(BattleTankPlayer battlePlayer, Entity battleEntity, IEnumerable<UserResult> userResults)
         {
-            OriginalSpeedComponent = Config.GetComponent<SpeedComponent>(
-                battlePlayer.Player.CurrentPreset.HullItem.TemplateAccessor.ConfigPath);
+            OriginalTankSpeed = Config.GetComponent<SpeedComponent>(
+                battlePlayer.Player.CurrentPreset.HullItem.TemplateAccessor.ConfigPath).Speed;
 
             Battle = battlePlayer.Battle;
             Player = battlePlayer.Player;
@@ -49,6 +52,17 @@ namespace TXServer.Core.Battles
             Modules = new List<BattleModule>();
             Incarnation = TankIncarnationTemplate.CreateEntity(Tank);
             RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, Tank);
+
+            BattleWeapon =
+                (BattleWeapon) Activator.CreateInstance(Weapons.WeaponToType[Player.CurrentPreset.Weapon], this);
+            if (BattleWeapon?.CustomComponents is not null)
+            {
+                foreach (Component component in BattleWeapon.CustomComponents)
+                {
+                    Weapon.TryRemoveComponent(component.GetType());
+                    Weapon.AddComponent(component);
+                }
+            }
 
             PersonalBattleResult = new PersonalBattleResultForClient(Player);
             UserResult = new UserResult(battlePlayer, userResults);
@@ -188,7 +202,6 @@ namespace TXServer.Core.Battles
             foreach (BattleModule module in Modules.Where(m => m.ActivateOnTankSpawn && !m.IsOnCooldown))
                 module.Activate();
         }
-
         public void DisableTank(bool deactivateModuleCooldown = false)
         {
             if (KeepDisabled)
@@ -211,8 +224,9 @@ namespace TXServer.Core.Battles
                 if (deactivateModuleCooldown && module.IsOnCooldown) module.DeactivateCooldown();
             }
 
-            Tank.ChangeComponent(OriginalSpeedComponent);
+            Tank.ChangeComponent<SpeedComponent>(component => component.Speed = OriginalTankSpeed);
 
+            if (BattleWeapon.GetType() == typeof(Vulcan)) ((Vulcan) BattleWeapon).ResetOverheat();
             TemperatureHits.Clear();
 
             // trigger: Drone Module (stay after tank disable)
@@ -222,6 +236,17 @@ namespace TXServer.Core.Battles
 
             if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
             Weapon.TryRemoveComponent<ShootableComponent>();
+        }
+
+        public float TemperatureSpeed()
+        {
+            bool hasSpeedCheat = TryGetModule(typeof(TurboSpeedModule),
+                out BattleModule turboSpeedModule) && turboSpeedModule.IsCheat;
+            float originalSpeed = hasSpeedCheat ? float.MaxValue : OriginalTankSpeed;
+
+            float speed = MathUtils.Map(Temperature, 0, TemperatureConfigComponent.MinTemperature,
+                                    originalSpeed, 0);
+            return Math.Clamp(speed, originalSpeed / 100 * 20, originalSpeed);
         }
 
         public void Tick()
@@ -308,12 +333,14 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            if (Temperature != 0) Damage.DealAutoTemperature(this);
+            BattleWeapon.Tick();
+            Damage.DealAutoTemperature(this);
         }
 
 
         public readonly Battle Battle;
         public Player Player { get; }
+        public BattleWeapon BattleWeapon { get; }
         public Entity BattleUser { get; }
         public Entity RoundUser { get; }
 
@@ -420,10 +447,7 @@ namespace TXServer.Core.Battles
 
         public Dictionary<MatchPlayer, float> DamageAssistants { get; } = new();
 
-        public SpeedComponent OriginalSpeedComponent { get; }
-
-        public DateTimeOffset? ShaftAimingBeginTime { get; set; }
-        public double? ShaftLastAimingDurationMs { get; set; }
+        public float OriginalTankSpeed { get; }
 
         public SpawnPoint LastSpawnPoint { get; private set; }
         public TeleportPoint LastTeleportPoint { get; private set; }
