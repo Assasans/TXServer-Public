@@ -288,7 +288,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             {typeof(VulcanMarketItemTemplate), typeof(VulcanUserItemTemplate)}
         };
 
-        public static readonly List<Type> WeaponTemplates = new()
+        private static readonly List<Type> WeaponTemplates = new()
         {
             typeof(FlamethrowerMarketItemTemplate),
             typeof(FreezeMarketItemTemplate),

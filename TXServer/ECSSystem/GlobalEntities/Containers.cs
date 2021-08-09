@@ -1,5 +1,8 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using TXServer.Core;
+using TXServer.Core.ShopContainers;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
@@ -193,6 +196,20 @@ namespace TXServer.ECSSystem.GlobalEntities
             public Entity Xt_zeus { get; } = new Entity(598090230, new TemplateAccessor(new ContainerPackPriceMarketItemTemplate(), "garage/container/xt_zeus"),
                 new RestrictionByUserFractionComponent(),
                 new MarketItemGroupComponent(598090230));
+        }
+
+        private static readonly Dictionary<Entity, Type> ContainerToType = new()
+        {
+            { GlobalItems.Everything, typeof(EverythingContainer) },
+            { GlobalItems.Cardsscout, typeof(ScoutContainer) }
+        };
+
+        public static ShopContainer GetShopContainer(Entity containerMarketItem, Player player)
+        {
+            if (ContainerToType.ContainsKey(containerMarketItem))
+                return (ShopContainer) Activator.CreateInstance(ContainerToType[containerMarketItem],
+                    containerMarketItem, player);
+            return new StandardItemContainer(containerMarketItem, player);
         }
     }
 }

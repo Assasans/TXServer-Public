@@ -57,6 +57,15 @@ namespace TXServer.Core.Battles.BattleWeapons
             return distanceModifier;
         }
 
+        public virtual void OnSpawn()
+        {
+            Weapon.AddComponent(new ShootableComponent());
+        }
+        public virtual void OnDespawn()
+        {
+            Weapon.TryRemoveComponent<ShootableComponent>();
+        }
+
         public virtual void Tick() {}
 
 

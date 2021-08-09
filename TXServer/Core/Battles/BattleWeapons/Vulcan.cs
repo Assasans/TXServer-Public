@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using TXServer.Core.Configuration;
+using TXServer.ECSSystem.ServerComponents.Hit;
 
 namespace TXServer.Core.Battles.BattleWeapons
 {
@@ -7,6 +9,8 @@ namespace TXServer.Core.Battles.BattleWeapons
     {
         public Vulcan(MatchPlayer matchPlayer) : base(matchPlayer)
         {
+            DeltaTemperaturePerSecond = Config
+                .GetComponent<DeltaTemperaturePerSecondPropertyComponent>(MarketItemPath).FinalValue;
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)
@@ -49,17 +53,22 @@ namespace TXServer.Core.Battles.BattleWeapons
 
             if (temperatureHit != default)
             {
-                temperatureHit.CurrentTemperature += 0.150f;
+                temperatureHit.CurrentTemperature += DeltaTemperaturePerSecond;
                 temperatureHit.CurrentTemperature = Math.Clamp(temperatureHit.CurrentTemperature, 0, 1);
                 MatchPlayer.TemperatureHits[MatchPlayer.TemperatureHits.FindIndex(
                     t => t.Shooter == MatchPlayer && t.WeaponMarketItem == MarketItem)] = temperatureHit;
             }
             else
-                MatchPlayer.TemperatureHits.Add(new TemperatureHit(0.150f, 150, MatchPlayer, Weapon,
-                    MarketItem));
+                MatchPlayer.TemperatureHits.Add(new TemperatureHit(DeltaTemperaturePerSecond, MaxTemperatureDamage,
+                    MinTemperatureDamage, MatchPlayer, Weapon, MarketItem));
         }
 
         public DateTimeOffset? LastVulcanHeatTactTime { get; set; }
         public DateTimeOffset? VulcanShootingStartTime { get; set; }
+
+        private float DeltaTemperaturePerSecond { get; }
+
+        private const float MaxTemperatureDamage = 150;
+        private const float MinTemperatureDamage = 50;
     }
 }

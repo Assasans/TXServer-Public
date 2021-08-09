@@ -22,7 +22,6 @@ using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
-using TXServer.ECSSystem.Events.Battle.Weapon.Smoky;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents.Hit;
 using TXServer.ECSSystem.ServerComponents.Tank;
@@ -36,7 +35,7 @@ namespace TXServer.Core.Battles
     public static class Damage
     {
         public static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
-            float damage, bool backHit = false, Vector3 localHitPoint = new())
+            float damage, bool backHit = false, Vector3 localHitPoint = new(), bool isHeatDamage = false)
         {
             // triggers for Invulnerability & Emergency Protection modules
             if (victim.TryGetModule(out InvulnerabilityModule module)) if (module.EffectIsActive) return;
@@ -49,11 +48,13 @@ namespace TXServer.Core.Battles
                 backhitDefModule.EffectIsActive)
                 damage = backhitDefModule.GetReducedDamage(damage);
 
+            bool criticalHit = false;
             if (damager.Weapon.TemplateAccessor.Template.GetType() == typeof(SmokyBattleItemTemplate))
-                (damage, backHit) = ((Smoky) damager.BattleWeapon).GetPossibleCriticalDamage(
+                (damage, criticalHit) = ((Smoky) damager.BattleWeapon).GetPossibleCriticalDamage(
                     backHit, damage, victim, localHitPoint);
 
-            damage = GetHpWithEffects(damage, victim, damager, IsModule(weaponMarketItem), weaponMarketItem);
+            damage = GetHpWithEffects(damage, victim, damager, IsModule(weaponMarketItem), isHeatDamage,
+                weaponMarketItem);
 
             victim.Tank.ChangeComponent<HealthComponent>(component =>
             {
@@ -79,7 +80,7 @@ namespace TXServer.Core.Battles
                 }
 
                 if (!IsModule(weaponMarketItem) || IsModule(weaponMarketItem) && damage != 0)
-                    damager.SendEvent(new DamageInfoEvent(damage, localHitPoint, backHit), victim.Tank);
+                    damager.SendEvent(new DamageInfoEvent(damage, localHitPoint, backHit || criticalHit), victim.Tank);
                 victim.HealthChanged();
             });
         }
@@ -170,8 +171,8 @@ namespace TXServer.Core.Battles
                     t => t.Shooter == shooter && t.WeaponMarketItem == weaponMarketItem)] = temperatureHit;
             }
             else
-                target.TemperatureHits.Add(new TemperatureHit(temperatureChange, maxTemperatureDamage, shooter, weapon,
-                    weaponMarketItem));
+                target.TemperatureHits.Add(new TemperatureHit(temperatureChange, maxTemperatureDamage, 0, shooter,
+                    weapon, weaponMarketItem));
         }
 
         public static void DealAutoTemperature(MatchPlayer matchPlayer)
@@ -196,10 +197,11 @@ namespace TXServer.Core.Battles
                 {
                     // heat: damage
                     float heatDamage = MathUtils.Map(temperatureHit.CurrentTemperature,
-                        0, temperatureConfig.MaxTemperature, 0,
+                        0, temperatureConfig.MaxTemperature, temperatureHit.MinDamage,
                         temperatureHit.MaxDamage);
                     if (heatDamage >= 1)
-                        DealDamage(temperatureHit.WeaponMarketItem, matchPlayer, temperatureHit.Shooter, heatDamage);
+                        DealDamage(temperatureHit.WeaponMarketItem, matchPlayer, temperatureHit.Shooter, heatDamage,
+                            isHeatDamage: true);
                 }
 
                 bool wasPositive = temperatureHit.CurrentTemperature > 0;
@@ -267,12 +269,12 @@ namespace TXServer.Core.Battles
         }
 
         private static float GetHpWithEffects(float damage, MatchPlayer target, MatchPlayer shooter,
-            bool isModule, Entity weaponMarketItem)
+            bool isModule, bool isHeatDamage, Entity weaponMarketItem)
         {
             if (!isModule && shooter.TryGetModule(out AdrenalineModule adrenalineModule) && adrenalineModule.EffectIsActive)
                 damage *= adrenalineModule.DamageFactor;
 
-            if (!isModule && shooter.TryGetModule(out IncreasedDamageModule damageModule) && damageModule.EffectIsActive)
+            if (!isModule && !isHeatDamage && shooter.TryGetModule(out IncreasedDamageModule damageModule) && damageModule.EffectIsActive)
             {
                 if (damageModule.IsCheat)
                     damage = target.Tank.GetComponent<HealthComponent>().CurrentHealth;
@@ -459,6 +461,8 @@ namespace TXServer.Core.Battles
             // module triggers: LifeSteal + Rage
             if (killer.TryGetModule(out LifeStealModule module)) module.Activate();
             if (killer.TryGetModule(out RageModule rageModule)) rageModule.Activate();
+
+            killer.Battle.TriggerRandomGoldbox();
         }
 
         private static void ProcessKillAssists(MatchPlayer victim, MatchPlayer damager)
@@ -515,12 +519,13 @@ namespace TXServer.Core.Battles
 
     public class TemperatureHit
     {
-        public TemperatureHit(float currentTemperature, float maxDamage, MatchPlayer shooter, Entity weapon,
+        public TemperatureHit(float currentTemperature, float maxDamage, float minDamage, MatchPlayer shooter, Entity weapon,
             Entity weaponMarketItem)
         {
             CurrentTemperature = currentTemperature;
             LastTact = DateTimeOffset.UtcNow;
             MaxDamage = maxDamage;
+            MinDamage = minDamage;
             Shooter = shooter;
             Weapon = weapon;
             WeaponMarketItem = weaponMarketItem;
@@ -528,8 +533,12 @@ namespace TXServer.Core.Battles
 
         public float CurrentTemperature { get; set; }
         public DateTimeOffset LastTact { get; set; }
+
         public float MaxDamage { get; }
+        public float MinDamage { get; }
+
         public MatchPlayer Shooter { get; }
+
         public Entity Weapon { get; }
         public Entity WeaponMarketItem { get; }
     }

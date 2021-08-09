@@ -1,7 +1,8 @@
 using System;
 using System.Numerics;
-using TXServer.ECSSystem.Base;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Events.Battle.Weapon.Smoky;
+using TXServer.ECSSystem.ServerComponents.Hit;
 using TXServer.Library;
 
 namespace TXServer.Core.Battles.BattleWeapons
@@ -10,6 +11,14 @@ namespace TXServer.Core.Battles.BattleWeapons
     {
         public Smoky(MatchPlayer matchPlayer) : base(matchPlayer)
         {
+            AfterCriticalProbability = Config
+                .GetComponent<CriticalHit.AfterCriticalHitProbabilityPropertyComponent>(MarketItemPath).FinalValue;
+            CriticalProbabilityDelta = Config
+                .GetComponent<CriticalHit.CriticalProbabilityDeltaPropertyComponent>(MarketItemPath).FinalValue;
+            MaxCriticalProbability = Config
+                .GetComponent<CriticalHit.MaxCriticalProbabilityPropertyComponent>(MarketItemPath).FinalValue;
+            CurrentCriticalProbability = StartCriticalProbability = Config
+                .GetComponent<CriticalHit.StartCriticalProbabilityPropertyComponent>(MarketItemPath).FinalValue;
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)
@@ -23,14 +32,32 @@ namespace TXServer.Core.Battles.BattleWeapons
         public (float, bool) GetPossibleCriticalDamage(bool backHit, float damage, MatchPlayer victim,
             Vector3 localPosition)
         {
-            if (new Random().Next(0, 100) <= 30)
+            if (new Random().Next(0, 100) <= CurrentCriticalProbability * 100)
             {
+                CurrentCriticalProbability = AfterCriticalProbability;
+
                 MatchPlayer.Battle.PlayersInMap.SendEvent(new CriticalDamageEvent(victim.Tank, localPosition),
                     MatchPlayer.Weapon);
-                return ((float) (backHit ? damage * 1.2 : damage * 1.87), true);
+                return ((float) (backHit ? damage * 2.07f : damage * 1.87), true);
             }
+
+            CurrentCriticalProbability = Math.Clamp(CurrentCriticalProbability + CriticalProbabilityDelta,
+                AfterCriticalProbability, MaxCriticalProbability);
 
             return (damage, false);
         }
+
+        public override void OnSpawn()
+        {
+            base.OnSpawn();
+            CurrentCriticalProbability = StartCriticalProbability;
+        }
+
+        private float CurrentCriticalProbability { get; set; }
+
+        private float AfterCriticalProbability { get; }
+        private float CriticalProbabilityDelta { get; }
+        private float MaxCriticalProbability { get; }
+        private float StartCriticalProbability { get; }
     }
 }

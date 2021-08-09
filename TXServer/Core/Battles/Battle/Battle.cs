@@ -513,6 +513,13 @@ namespace TXServer.Core.Battles
             }
         }
 
+        public void TriggerRandomGoldbox()
+        {
+            if (!IsMatchMaking) return;
+            if (new Random().Next(0, 300) <= 1)
+                DropSpecificBonusType(BonusType.GOLD);
+        }
+
         public void UpdateScore(Entity team, int additiveScore = 1)
         {
             if (BattleState != BattleState.Running) return;

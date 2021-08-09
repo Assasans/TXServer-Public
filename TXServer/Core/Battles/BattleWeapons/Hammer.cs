@@ -58,6 +58,12 @@ namespace TXServer.Core.Battles.BattleWeapons
             }
         }
 
+        public override void OnDespawn()
+        {
+            base.OnDespawn();
+            ResetMagazine();
+        }
+
         public void ProcessHits(List<HitTarget> targets)
         {
             CombineHitInfo(targets, out Dictionary<MatchPlayer, (bool, float, Vector3)> hits);

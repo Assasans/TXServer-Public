@@ -12,10 +12,6 @@ namespace TXServer.ECSSystem.ServerComponents.Weapon
         {
             public void Convert(VulcanWeaponComponent component) => component.SlowDownTime = FinalValue;
         }
-        public class DeltaTemperaturePerSecondPropertyComponent : RangedComponent, IConvertibleComponent<VulcanWeaponComponent>
-        {
-            public void Convert(VulcanWeaponComponent component) => component.TemperatureIncreasePerSec = FinalValue;
-        }
         public class TemperatureLimitPropertyComponent : RangedComponent, IConvertibleComponent<VulcanWeaponComponent>
         {
             public void Convert(VulcanWeaponComponent component) => component.TemperatureLimit = FinalValue;

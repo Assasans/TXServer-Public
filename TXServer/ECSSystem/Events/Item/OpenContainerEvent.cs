@@ -26,47 +26,22 @@ namespace TXServer.ECSSystem.Events.Item
             player.SendEvent(new ItemsCountChangedEvent(1), container);
 
             List<Entity> notifications = new List<Entity>();
-            for (int i = 0; i < containerAmount; i++)
-                notifications.AddRange(OpenContainer(player, container));
+            notifications.AddRange(OpenContainer(player, container, containerAmount));
 
             player.ShareEntities(notifications);
 			player.SendEvent(new ShowNotificationGroupEvent(1), notifications.First());
         }
 
-        private List<Entity> OpenContainer(Player player, Entity container)
+        private List<Entity> OpenContainer(Player player, Entity container, int containerAmount)
         {
             List<Entity> notifications = new List<Entity>();
-
             Entity containerMarketItem = player.EntityList.Single(e =>
-                    e.EntityId == container.GetComponent<MarketItemGroupComponent>().Key);
+                e.EntityId == container.GetComponent<MarketItemGroupComponent>().Key);
+
+            return Containers.GetShopContainer(containerMarketItem, player).GetRewards(new Random(), containerAmount);
 
             switch (containerMarketItem.TemplateAccessor.Template)
             {
-                case ContainerPackPriceMarketItemTemplate: Random random = new();
-                    ItemsContainerItemComponent configComponent =
-                        Config.GetComponent<ItemsContainerItemComponent>(container.TemplateAccessor.ConfigPath);
-                    List<ContainerItem> marketItemBundles = (configComponent.Items ?? new List<ContainerItem>())
-                        .Concat(configComponent.RareItems ?? new List<ContainerItem>()).ToList();
-                    ContainerItem containerItem = marketItemBundles[random.Next(marketItemBundles.Count)];
-                    MarketItemBundle marketItemBundle =
-                        containerItem.ItemBundles[random.Next(containerItem.ItemBundles.Count)];
-                    Entity rewardMarketItem =
-                        player.EntityList.Single(e => e.EntityId == marketItemBundle.MarketItem);
-
-                    if (player.Data.OwnsMarketItem(rewardMarketItem))
-                    {
-                        marketItemBundle.Amount = (int) containerItem.Compensation;
-                        rewardMarketItem = ExtraItems.GlobalItems.Crystal;
-                        player.Data.Crystals += marketItemBundle.Amount;
-                    }
-                    else
-                        ResourceManager.SaveNewMarketItem(player, rewardMarketItem,
-                            marketItemBundle.Max == 0 ? marketItemBundle.Amount : random.Next(1, marketItemBundle.Max));
-
-                    notifications.Add(NewItemNotificationTemplate.CreateEntity(container, rewardMarketItem,
-                        marketItemBundle.Amount));
-
-                    break;
                 default:
                     Dictionary<Entity, int> blueprints = GetBlueprintsByContainer(containerMarketItem, player);
 

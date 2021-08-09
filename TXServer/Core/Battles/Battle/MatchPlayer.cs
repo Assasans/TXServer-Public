@@ -197,8 +197,10 @@ namespace TXServer.Core.Battles
         private void EnableTank()
         {
             if (KeepDisabled) return;
+
+            BattleWeapon.OnSpawn();
+
             Tank.AddComponent(new TankMovableComponent());
-            Weapon.AddComponent(new ShootableComponent());
 
             foreach (BattleModule module in Modules.Where(m => m.ActivateOnTankSpawn && !m.IsOnCooldown))
                 module.Activate();
@@ -235,10 +237,8 @@ namespace TXServer.Core.Battles
                 foreach (var droneTuple in turretDroneModule.Drones)
                     TurretDroneModule.Stay(droneTuple.Item1);
 
-            if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
-            Weapon.TryRemoveComponent<ShootableComponent>();
-
-            (BattleWeapon as Hammer)?.ResetMagazine();
+            Tank.TryRemoveComponent<TankMovableComponent>();
+            BattleWeapon.OnDespawn();
         }
 
         public float TemperatureSpeed()

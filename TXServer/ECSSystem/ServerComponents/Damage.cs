@@ -1,6 +1,4 @@
-﻿using TXServer.ECSSystem.Components.Battle;
-
-namespace TXServer.ECSSystem.ServerComponents
+﻿namespace TXServer.ECSSystem.ServerComponents
 {
     public static class Damage
     {

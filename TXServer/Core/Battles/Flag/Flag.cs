@@ -193,9 +193,11 @@ namespace TXServer.Core.Battles
 
             LastCarrier = null;
 
-            return (carrier, getAndClearAssistResults());
+            Battle.TriggerRandomGoldbox();
 
-            IEnumerable<UserResult> getAndClearAssistResults()
+            return (carrier, GetAndClearAssistResults());
+
+            IEnumerable<UserResult> GetAndClearAssistResults()
             {
                 foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(carrier).AllyTeamResults)
                 {
