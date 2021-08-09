@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -63,5 +64,16 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ParentGroupComponent(1913834436),
                 new MarketItemGroupComponent(1913834436));
         }
+
+        public static readonly Dictionary<Entity, Entity> DefaultSkins = new()
+        {
+            { GlobalItems.Dictator, HullSkins.GlobalItems.DictatorM0 },
+            { GlobalItems.Hornet, HullSkins.GlobalItems.HornetM0 },
+            { GlobalItems.Hunter, HullSkins.GlobalItems.HunterM0 },
+            { GlobalItems.Mammoth, HullSkins.GlobalItems.MammothM0 },
+            { GlobalItems.Titan, HullSkins.GlobalItems.TitanM0 },
+            { GlobalItems.Viking, HullSkins.GlobalItems.VikingM0 },
+            { GlobalItems.Wasp, HullSkins.GlobalItems.WaspM0 },
+        };
     }
 }

@@ -215,9 +215,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                     break;
                 case TankMarketItemTemplate:
                     player.Data.Hulls.Add(marketItem.EntityId, 0);
+                    if (!player.Data.OwnsMarketItem(Hulls.DefaultSkins[marketItem]))
+                        player.SaveNewMarketItem(Hulls.DefaultSkins[marketItem]);
                     break;
                 case { } n when WeaponTemplates.Contains(n.GetType()):
                     player.Data.Weapons.Add(marketItem.EntityId, 0);
+                    if (!player.Data.OwnsMarketItem(Weapons.DefaultSkins[marketItem]))
+                        player.SaveNewMarketItem(Weapons.DefaultSkins[marketItem]);
                     break;
                 case WeaponSkinMarketItemTemplate:
                     player.Data.WeaponSkins.Add(marketItem.EntityId);

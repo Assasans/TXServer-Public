@@ -93,6 +93,21 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new MarketItemGroupComponent(-1955445362));
         }
 
+        public static readonly Dictionary<Entity, Entity> DefaultSkins = new()
+        {
+            { GlobalItems.Flamethrower, WeaponSkins.GlobalItems.FlamethrowerM0 },
+            { GlobalItems.Freeze, WeaponSkins.GlobalItems.FreezeM0 },
+            { GlobalItems.Hammer, WeaponSkins.GlobalItems.HammerM0 },
+            { GlobalItems.Isis, WeaponSkins.GlobalItems.IsisM0 },
+            { GlobalItems.Railgun, WeaponSkins.GlobalItems.RailgunM0 },
+            { GlobalItems.Ricochet, WeaponSkins.GlobalItems.RicochetM0 },
+            { GlobalItems.Shaft, WeaponSkins.GlobalItems.ShaftM0 },
+            { GlobalItems.Smoky, WeaponSkins.GlobalItems.SmokyM0 },
+            { GlobalItems.Thunder, WeaponSkins.GlobalItems.ThunderM0 },
+            { GlobalItems.Twins, WeaponSkins.GlobalItems.TwinsM0 },
+            { GlobalItems.Vulcan, WeaponSkins.GlobalItems.VulcanM0 }
+        };
+
         public static readonly Dictionary<Entity, Type> WeaponToType = new()
         {
             [GlobalItems.Hammer] = typeof(Hammer),
