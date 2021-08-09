@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
@@ -6,7 +5,6 @@ using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.GlobalEntities;
-using TXServer.ECSSystem.ServerComponents;
 using TXServer.ECSSystem.ServerComponents.Item;
 
 namespace TXServer.ECSSystem.Events.Item

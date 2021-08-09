@@ -22,6 +22,7 @@ using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
+using TXServer.ECSSystem.Events.Battle.Weapon.Smoky;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents.Hit;
 using TXServer.ECSSystem.ServerComponents.Tank;
@@ -47,6 +48,10 @@ namespace TXServer.Core.Battles
             if (backHit && victim.TryGetModule(out BackhitDefenceModule backhitDefModule) &&
                 backhitDefModule.EffectIsActive)
                 damage = backhitDefModule.GetReducedDamage(damage);
+
+            if (damager.Weapon.TemplateAccessor.Template.GetType() == typeof(SmokyBattleItemTemplate))
+                (damage, backHit) = ((Smoky) damager.BattleWeapon).GetPossibleCriticalDamage(
+                    backHit, damage, victim, localHitPoint);
 
             damage = GetHpWithEffects(damage, victim, damager, IsModule(weaponMarketItem), weaponMarketItem);
 

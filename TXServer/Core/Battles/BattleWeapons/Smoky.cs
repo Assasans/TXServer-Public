@@ -1,4 +1,7 @@
 using System;
+using System.Numerics;
+using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Events.Battle.Weapon.Smoky;
 using TXServer.Library;
 
 namespace TXServer.Core.Battles.BattleWeapons
@@ -15,6 +18,19 @@ namespace TXServer.Core.Battles.BattleWeapons
             float distanceModifier = DamageDistanceMultiplier(hitDistance);
 
             return (int) Math.Round(damage * distanceModifier);
+        }
+
+        public (float, bool) GetPossibleCriticalDamage(bool backHit, float damage, MatchPlayer victim,
+            Vector3 localPosition)
+        {
+            if (new Random().Next(0, 100) <= 30)
+            {
+                MatchPlayer.Battle.PlayersInMap.SendEvent(new CriticalDamageEvent(victim.Tank, localPosition),
+                    MatchPlayer.Weapon);
+                return ((float) (backHit ? damage * 1.2 : damage * 1.87), true);
+            }
+
+            return (damage, false);
         }
     }
 }

@@ -3,7 +3,7 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Tank;
 
-namespace TXServer.ECSSystem.EntityTemplates.Battle
+namespace TXServer.ECSSystem.EntityTemplates.Battle.Tank
 {
     [SerialVersionUID(1478091203635)]
     public class TankIncarnationTemplate : IEntityTemplate
