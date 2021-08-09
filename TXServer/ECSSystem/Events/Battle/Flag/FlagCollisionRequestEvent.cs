@@ -24,7 +24,8 @@ namespace TXServer.ECSSystem.Events.Battle.Flag
 
             BattleView view = handler.BattleViewFor(player.BattlePlayer);
 
-            if (battle.BattleState == BattleState.WarmUp)
+            if (battle.BattleState == BattleState.WarmUp ||
+                player.BattlePlayer.MatchPlayer.TankState is not TankState.Active)
                 return;
 
             switch (flag.State)

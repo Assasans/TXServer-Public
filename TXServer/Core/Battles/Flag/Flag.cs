@@ -6,7 +6,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using TXServer.Core.HeightMaps;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle;
@@ -24,9 +23,8 @@ namespace TXServer.Core.Battles
         public Flag(Vector3 position, Entity team, Battle battle)
         {
             Team = team;
-            TeamColor = team.GetComponent<TeamColorComponent>().TeamColor;
-            BasePosition = position;
-            Battle = battle;
+            _basePosition = position;
+            _battle = battle;
 
             PedestalEntity = PedestalTemplate.CreateEntity(position, team, battle.BattleEntity);
             FlagEntity = FlagTemplate.CreateEntity(position, team, battle.BattleEntity);
@@ -49,29 +47,10 @@ namespace TXServer.Core.Battles
 
             FlagEntity.AddComponent(new TankGroupComponent(tank));
 
-            Battle.PlayersInMap.SendEvent(new FlagPickupEvent(), FlagEntity);
+            _battle.PlayersInMap.SendEvent(new FlagPickupEvent(), FlagEntity);
             CurrentAssists.Add(battlePlayer);
 
             FlagEntity.RemoveComponent<FlagHomeStateComponent>();
-
-            battlePlayer.MatchPlayer.TryDeactivateInvisibility();
-        }
-
-        public void Pickup(BattleTankPlayer battlePlayer)
-        {
-            if (battlePlayer == LastCarrier && LastCarrierMinTime > DateTime.UtcNow) return;
-
-            State = FlagState.Captured;
-            Carrier = battlePlayer;
-            Entity tank = Carrier.MatchPlayer.Tank;
-
-            FlagEntity.AddComponent(new TankGroupComponent(tank));
-
-            Battle.PlayersInMap.SendEvent(new FlagPickupEvent(), FlagEntity);
-            if (!CurrentAssists.Contains(battlePlayer))
-                CurrentAssists.Add(battlePlayer);
-
-            FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
 
             battlePlayer.MatchPlayer.TryDeactivateInvisibility();
         }
@@ -87,8 +66,8 @@ namespace TXServer.Core.Battles
             Vector3 flagPosition;
             if (!Server.Instance.Settings.DisableHeightMaps)
             {
-                HeightMap map = Battle.HeightMap;
-                var tuple = map.Layers
+                HeightMap map = _battle.HeightMap;
+                (HeightMapLayer layer, float newHeight) tuple = map.Layers
                     .Select(layer =>
                     {
                         // If layer is not loaded
@@ -105,14 +84,14 @@ namespace TXServer.Core.Battles
                         Rgb24 pixel = image[(int) Math.Round(x), (int) Math.Round(z)];
 
                         // Map pixel color to height
-                        float y = MathUtils.Map(pixel.R, byte.MinValue, byte.MaxValue, layer.MinY, layer.MaxY);
+                        float newHeight = MathUtils.Map(pixel.R, byte.MinValue, byte.MaxValue, layer.MinY, layer.MaxY);
 
                         //Logger.Log(
                             //$"{Carrier.MatchPlayer.TankPosition.X} {Carrier.MatchPlayer.TankPosition.Z} {Carrier.MatchPlayer.TankPosition.Y} | {Path.GetFileName(layer.Path)} | {Math.Round(x)} {Math.Round(z)} | {pixel.R} {pixel.G} {pixel.B} | {y}");
 
-                        return (layer, y);
+                        return (layer, newHeight);
                     })
-                    .FirstOrDefault(tuple => tuple.y - Vector3.UnitY.Y < Carrier.MatchPlayer.TankPosition.Y);
+                    .FirstOrDefault(t => t.newHeight - Vector3.UnitY.Y < Carrier.MatchPlayer.TankPosition.Y);
 
                 if (tuple == default)
                 {
@@ -121,13 +100,13 @@ namespace TXServer.Core.Battles
                     FlagEntity.RemoveComponent<TankGroupComponent>();
                     FlagEntity.AddComponent(new FlagGroundedStateComponent());
                     if (!silent)
-                        Battle.PlayersInMap.SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
+                        _battle.PlayersInMap.SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
 
                     Return();
                     return;
                 }
 
-                (HeightMapLayer layer, float y) = tuple;
+                (HeightMapLayer _, float y) = tuple;
                 flagPosition = new Vector3(Carrier.MatchPlayer.TankPosition.X, y + 0.9f, Carrier.MatchPlayer.TankPosition.Z) - Vector3.UnitY;
             }
             else
@@ -136,11 +115,45 @@ namespace TXServer.Core.Battles
             Carrier = null;
 
             if (!silent)
-                Battle.PlayersInMap.SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
+                _battle.PlayersInMap.SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
             FlagEntity.RemoveComponent<TankGroupComponent>();
 
             FlagEntity.ChangeComponent(new FlagPositionComponent(flagPosition));
             FlagEntity.AddComponent(new FlagGroundedStateComponent());
+        }
+
+        public void KillDrop(BattleTankPlayer battlePlayer)
+        {
+            bool inKillzone = _battle.Params.KillZoneEnabled && _battle.CurrentMapInfo.PuntativeGeoms.Any(geometry =>
+                PositionFormulas.IsInsideBox(Carrier.MatchPlayer.TankPosition, geometry.Position, geometry.Size));
+            bool outOfBounds = !battlePlayer.Player.Server.Settings.MapBoundsInactive &&
+                               PositionFormulas.CheckOverflow(battlePlayer.MatchPlayer.TankPosition);
+
+            if (inKillzone || outOfBounds)
+            {
+                Drop(false, true);
+                Return();
+            }
+            else Drop(false);
+        }
+
+        public void Pickup(BattleTankPlayer battlePlayer)
+        {
+            if (battlePlayer == LastCarrier && LastCarrierMinTime > DateTime.UtcNow) return;
+
+            State = FlagState.Captured;
+            Carrier = battlePlayer;
+            Entity tank = Carrier.MatchPlayer.Tank;
+
+            FlagEntity.AddComponent(new TankGroupComponent(tank));
+
+            _battle.PlayersInMap.SendEvent(new FlagPickupEvent(), FlagEntity);
+            if (!CurrentAssists.Contains(battlePlayer))
+                CurrentAssists.Add(battlePlayer);
+
+            FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
+
+            battlePlayer.MatchPlayer.TryDeactivateInvisibility();
         }
 
         public void Return(BattleTankPlayer battlePlayer = null, bool silent = false)
@@ -154,7 +167,7 @@ namespace TXServer.Core.Battles
             }
 
             if (!silent)
-                Battle.PlayersInMap.SendEvent(new FlagReturnEvent(), FlagEntity);
+                _battle.PlayersInMap.SendEvent(new FlagReturnEvent(), FlagEntity);
 
             if (battlePlayer != null)
             {
@@ -162,7 +175,7 @@ namespace TXServer.Core.Battles
                 FlagEntity.RemoveComponent<TankGroupComponent>();
             }
 
-            FlagEntity.ChangeComponent(new FlagPositionComponent(BasePosition));
+            FlagEntity.ChangeComponent(new FlagPositionComponent(_basePosition));
             FlagEntity.RemoveComponent<FlagGroundedStateComponent>();
             FlagEntity.AddComponent(new FlagHomeStateComponent());
             ReShare();
@@ -175,13 +188,13 @@ namespace TXServer.Core.Battles
             State = FlagState.Home;
 
             FlagEntity.AddComponent(new FlagHomeStateComponent());
-            Battle.PlayersInMap.SendEvent(new FlagDeliveryEvent(), FlagEntity);
+            _battle.PlayersInMap.SendEvent(new FlagDeliveryEvent(), FlagEntity);
             FlagEntity.RemoveComponent<TankGroupComponent>();
 
-            FlagEntity.ChangeComponent(new FlagPositionComponent(BasePosition));
+            FlagEntity.ChangeComponent(new FlagPositionComponent(_basePosition));
             ReShare();
 
-            foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(Carrier).AllyTeamResults)
+            foreach (UserResult assistResult in ((CTFHandler)_battle.ModeHandler).BattleViewFor(Carrier).AllyTeamResults)
             {
                 if (assistResult.UserId != Carrier.User.EntityId) continue;
                 if (CurrentAssists.Select(p => p.User.EntityId).Contains(assistResult.UserId))
@@ -193,13 +206,13 @@ namespace TXServer.Core.Battles
 
             LastCarrier = null;
 
-            Battle.TriggerRandomGoldbox();
+            _battle.TriggerRandomGoldbox();
 
             return (carrier, GetAndClearAssistResults());
 
             IEnumerable<UserResult> GetAndClearAssistResults()
             {
-                foreach (UserResult assistResult in ((CTFHandler)Battle.ModeHandler).BattleViewFor(carrier).AllyTeamResults)
+                foreach (UserResult assistResult in ((CTFHandler)_battle.ModeHandler).BattleViewFor(carrier).AllyTeamResults)
                 {
                     if (assistResult.UserId != carrier.User.EntityId) continue;
                     if (CurrentAssists.Select(p => p.User.EntityId).Contains(assistResult.UserId))
@@ -209,22 +222,20 @@ namespace TXServer.Core.Battles
             }
         }
 
-        private readonly Battle Battle;
+        private readonly Battle _battle;
         public Entity PedestalEntity { get; }
         public Entity FlagEntity { get; }
-        private readonly Vector3 BasePosition;
+        private readonly Vector3 _basePosition;
 
         public Entity Team { get; }
-        public TeamColor TeamColor { get; }
 
         public FlagState State { get; private set; }
-        public DateTime ReturnStartTime { get; set; }
+        public DateTime ReturnStartTime { get; private set; }
 
 
         public BattleTankPlayer Carrier;
-        private readonly List<BattleTankPlayer> CurrentAssists = new();
-
-        private BattleTankPlayer LastCarrier;
-        private DateTime LastCarrierMinTime;
+        private List<BattleTankPlayer> CurrentAssists { get; } = new();
+        private BattleTankPlayer LastCarrier { get; set; }
+        private DateTime LastCarrierMinTime { get; set; }
     }
 }

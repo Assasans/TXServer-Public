@@ -14,7 +14,6 @@ using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
-using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle.Tank;
@@ -381,16 +380,15 @@ namespace TXServer.Core.Battles
                         Tank.AddComponent(new TankVisibleStateComponent());
                         break;
                     case TankState.Dead:
-
                         Player.SendEvent(new SelfTankExplosionEvent(), Tank);
                         DisableTank();
                         if (Battle.ModeHandler is CTFHandler handler)
                         {
                             foreach (Flag flag in handler.Flags.Values.Where(flag =>
                                 flag is {State: FlagState.Captured} &&
-                                flag.FlagEntity.GetComponent<TankGroupComponent>().Key == Tank.EntityId))
+                                flag.Carrier == Player.BattlePlayer))
                             {
-                                flag.Drop(false);
+                                flag.KillDrop(Player.BattlePlayer);
                             }
                         }
                         break;

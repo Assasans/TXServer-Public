@@ -11,24 +11,6 @@ namespace TXServer.ECSSystem.Events.Battle.Movement
     [SerialVersionUID(6959116100408127452)]
     public class MoveCommandEvent : ECSEvent, ISelfEvent
     {
-        private static bool CheckOverflow(Vector3 vec)
-        {
-            const float maxValue = 655.36f;
-            return Math.Abs(vec.X) > maxValue ||
-                Math.Abs(vec.Y) > maxValue ||
-                Math.Abs(vec.Z) > maxValue;
-        }
-
-        private static bool IsInsideBox(Vector3 point, Vector3 center, Vector3 size)
-        {
-            return point.X > center.X - size.X / 2 &&
-                point.Y > center.Y - size.Y / 2 &&
-                point.Z > center.Z - size.Z / 2 &&
-                point.X < center.X + size.X / 2 &&
-                point.Y < center.Y + size.Y / 2 &&
-                point.Z < center.Z + size.Z / 2;
-        }
-
         public void Execute(Player player, Entity tank)
         {
             SelfEvent.Execute(this, player, tank);
@@ -50,14 +32,14 @@ namespace TXServer.ECSSystem.Events.Battle.Movement
             if (MoveCommand.Movement != null)
                 matchPlayer.TankQuaternion = (Quaternion) MoveCommand.Movement?.Orientation;
 
-            if (!player.Server.Settings.MapBoundsInactive && CheckOverflow(position.Value + velocity))
+            if (!player.Server.Settings.MapBoundsInactive && PositionFormulas.CheckOverflow(position.Value + velocity))
                 matchPlayer.SelfDestructionTime = DateTime.UtcNow;
 
             if (player.BattlePlayer.Battle.Params.KillZoneEnabled)
             {
                 foreach (PuntativeGeometry geometry in player.BattlePlayer.Battle.CurrentMapInfo.PuntativeGeoms)
                 {
-                    if (IsInsideBox(position.Value, geometry.Position, geometry.Size))
+                    if (PositionFormulas.IsInsideBox(position.Value, geometry.Position, geometry.Size))
                         matchPlayer.SelfDestructionTime = DateTime.UtcNow;
                 }
             }
