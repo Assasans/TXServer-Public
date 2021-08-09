@@ -1,12 +1,11 @@
 using System;
-using TXServer.Core.Battles;
 using TXServer.Library;
 
-namespace TXServer.Core.BattleWeapons
+namespace TXServer.Core.Battles.BattleWeapons
 {
-    public class Twins : BattleWeapon
+    public class Smoky : BattleWeapon
     {
-        public Twins(MatchPlayer matchPlayer) : base(matchPlayer)
+        public Smoky(MatchPlayer matchPlayer) : base(matchPlayer)
         {
         }
 

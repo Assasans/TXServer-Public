@@ -2,6 +2,7 @@
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Weapon;
+using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 
 namespace TXServer.ECSSystem.EntityTemplates.Battle
 {

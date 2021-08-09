@@ -3,11 +3,9 @@ using TXServer.Core.Battles;
 using TXServer.Core.Configuration;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Weapon;
-using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 
-namespace TXServer.ECSSystem.EntityTemplates.Battle
+namespace TXServer.ECSSystem.EntityTemplates.Battle.Weapon
 {
     [SerialVersionUID(-1716200834009238305L)]
     public class DiscreteWeaponTemplate : WeaponTemplate

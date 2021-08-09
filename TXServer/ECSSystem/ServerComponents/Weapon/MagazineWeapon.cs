@@ -1,4 +1,4 @@
-﻿using TXServer.ECSSystem.Components.Battle.Weapon;
+﻿using TXServer.ECSSystem.Components.Battle.Weapon.Hammer;
 
 namespace TXServer.ECSSystem.ServerComponents.Weapon
 {
@@ -6,7 +6,7 @@ namespace TXServer.ECSSystem.ServerComponents.Weapon
     {
         public class ReloadMagazineTimePropertyComponent : RangedComponent, IConvertibleComponent<MagazineWeaponComponent>
         {
-            public void Convert(MagazineWeaponComponent component) => component.ReloadMagazineTimePerSec = 1 / FinalValue;
+            public void Convert(MagazineWeaponComponent component) => component.ReloadMagazineTimePerSec = FinalValue;
         }
 
         public class MagazineSizePropertyComponent : RangedComponent, IConvertibleComponent<MagazineWeaponComponent>, IConvertibleComponent<MagazineStorageComponent>

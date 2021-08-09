@@ -1,8 +1,7 @@
 using System;
 using System.Linq;
-using TXServer.Core.Battles;
 
-namespace TXServer.Core.BattleWeapons
+namespace TXServer.Core.Battles.BattleWeapons
 {
     public class Vulcan : BattleWeapon
     {

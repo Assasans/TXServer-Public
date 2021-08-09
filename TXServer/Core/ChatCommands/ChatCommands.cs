@@ -40,7 +40,7 @@ namespace TXServer.Core.ChatCommands
             { "gravity", ("gravity [number]", ChatCommandConditions.BattleOwner | ChatCommandConditions.HackBattle, Gravity) },
             { "kickback", ("kickback [number] [target]", ChatCommandConditions.HackBattle, Kickback) },
             { "kill", ("kill [target]", ChatCommandConditions.InMatch | ChatCommandConditions.Admin, KillPlayer) },
-            { "tp", ("teleport [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.Premium, Teleport) },
+            { "tp", ("teleport [target]", ChatCommandConditions.Premium | ChatCommandConditions.InMatch | ChatCommandConditions.HackBattle, Teleport) },
             { "turretReload", ("turretReload [instant/never] [target]", ChatCommandConditions.HackBattle, ReloadTime) },
             { "turretRotation", ("turretRotation [instant/stuck/norm/number]", ChatCommandConditions.HackBattle, TurretRotation) },
             { "jump", ("jump [multiplier]", ChatCommandConditions.HackBattle | ChatCommandConditions.InMatch, Jump) }
@@ -48,16 +48,16 @@ namespace TXServer.Core.ChatCommands
 
         public static readonly Dictionary<ChatCommandConditions, string> ConditionErrors = new()
         {
-            { ChatCommandConditions.ActiveTank, "Your tank is not active" },
+            { ChatCommandConditions.ActiveTank, "Your tank needs to be active" },
             { ChatCommandConditions.Admin, "You are not an admin" },
-            { ChatCommandConditions.BattleOwner, "You do not own this battle" },
+            { ChatCommandConditions.BattleOwner, "You need to be the battle owner" },
             { ChatCommandConditions.HackBattle, "HackBattle is not enabled or you don't have permission to it" },
             { ChatCommandConditions.InactiveBattle, "You need to be in a battle lobby with no active players in-battle" },
             { ChatCommandConditions.ActiveBattle, "You need to be in a battle with active players in-battle" },
-            { ChatCommandConditions.InBattle, "You are not in a battle" },
-            { ChatCommandConditions.InMatch, "You are not in a match" },
-            { ChatCommandConditions.Premium, "You don't have an active premium pass" },
-            { ChatCommandConditions.Tester, "You are not a tester" },
+            { ChatCommandConditions.InBattle, "You need to be in a battle" },
+            { ChatCommandConditions.InMatch, "You need to be in a match" },
+            { ChatCommandConditions.Premium, "You need an active premium pass" },
+            { ChatCommandConditions.Tester, "You need to be a tester" },
             { ChatCommandConditions.TestServer, "This command is only available on test server" }
         };
 
@@ -267,12 +267,12 @@ namespace TXServer.Core.ChatCommands
 
                         if (!target.MatchPlayer.TryGetModule(desc.Item1, out BattleModule module))
                         {
-                            module =
-                                (BattleModule) Activator.CreateInstance(desc.Item1, target.MatchPlayer,
+                            module = (BattleModule) Activator.CreateInstance(desc.Item1, target.MatchPlayer,
                                     desc.Item2);
                             target.MatchPlayer.Modules.Add(module);
                         }
 
+                        Debug.Assert(module != null, nameof(module) + " != null");
                         module.IsCheat = true;
                         module.Activate();
                     }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using TXServer.Core;
-using TXServer.Core.BattleWeapons;
+using TXServer.Core.Battles.BattleWeapons;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Item.Tank;

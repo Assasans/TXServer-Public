@@ -1,8 +1,7 @@
 using System;
-using TXServer.Core.Battles;
 using TXServer.Library;
 
-namespace TXServer.Core.BattleWeapons
+namespace TXServer.Core.Battles.BattleWeapons
 {
     public class Shaft : BattleWeapon
     {

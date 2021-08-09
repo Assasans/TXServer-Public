@@ -20,7 +20,7 @@ namespace TXServer.ECSSystem.Base
 
             PopulateEntity(null, components);
         }
-        
+
         /// <summary>
         /// Create Entity with unused id.
         /// </summary>
@@ -91,6 +91,14 @@ namespace TXServer.ECSSystem.Base
 
             foreach (Player player in PlayerReferences.Where(x => x != excludedFromSending))
                 player.Connection.QueueCommands(new ComponentAddCommand(this, component));
+        }
+
+        public void AddOrChangeComponent(Component component, Player excludedFromSending = null)
+        {
+            if (Components.Contains(component))
+                ChangeComponent(component, excludedFromSending);
+            else
+                AddComponent(component, excludedFromSending);
         }
 
         public void ChangeComponent(Component component, Player excludedFromSending = null)

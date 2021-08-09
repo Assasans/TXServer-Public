@@ -1,5 +1,4 @@
 using System;
-using TXServer.Core.Battles;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
@@ -7,7 +6,7 @@ using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.ServerComponents.Weapon;
 using TXServer.Library;
 
-namespace TXServer.Core.BattleWeapons
+namespace TXServer.Core.Battles.BattleWeapons
 {
     public class Ricochet : BattleWeapon
     {

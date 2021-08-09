@@ -3,8 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using TXServer.Core.Battles.BattleWeapons;
 using TXServer.Core.Battles.Effect;
-using TXServer.Core.BattleWeapons;
 using TXServer.Core.Configuration;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
@@ -18,9 +18,11 @@ using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle.Tank;
+using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Pause;
 using TXServer.ECSSystem.Events.Battle.Score;
+using TXServer.ECSSystem.Events.Battle.Weapon.Hammer;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents.Tank;
 using TXServer.ECSSystem.Types;
@@ -53,8 +55,7 @@ namespace TXServer.Core.Battles
             Incarnation = TankIncarnationTemplate.CreateEntity(Tank);
             RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, Tank);
 
-            BattleWeapon =
-                (BattleWeapon) Activator.CreateInstance(Weapons.WeaponToType[Player.CurrentPreset.Weapon], this);
+            BattleWeapon = (BattleWeapon) Activator.CreateInstance(Weapons.WeaponToType[Player.CurrentPreset.Weapon], this);
             if (BattleWeapon?.CustomComponents is not null)
             {
                 foreach (Component component in BattleWeapon.CustomComponents)
@@ -236,6 +237,8 @@ namespace TXServer.Core.Battles
 
             if (!Tank.TryRemoveComponent<TankMovableComponent>()) return;
             Weapon.TryRemoveComponent<ShootableComponent>();
+
+            (BattleWeapon as Hammer)?.ResetMagazine();
         }
 
         public float TemperatureSpeed()
@@ -397,6 +400,10 @@ namespace TXServer.Core.Battles
                 Tank.AddComponent((Component)Activator.CreateInstance(TankStates[value].Item1));
                 _tankState = value;
 
+                if (value == TankState.Active &&
+                    Weapon.TemplateAccessor.Template.GetType() == typeof(HammerBattleItemTemplate))
+                    Player.SendEvent(new SetMagazineReadyEvent(), Weapon);
+
                 TankStateChangeTime = DateTime.UtcNow.AddSeconds(TankStates[value].Item2);
             }
         }
@@ -415,7 +422,7 @@ namespace TXServer.Core.Battles
             get => Tank.GetComponent<TemperatureComponent>().Temperature;
             set => Tank.ChangeComponent<TemperatureComponent>(component => component.Temperature = value);
         }
-        public TemperatureConfigComponent TemperatureConfigComponent { get; set; }
+        public TemperatureConfigComponent TemperatureConfigComponent { get; }
 
         public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new();
 
@@ -443,11 +450,11 @@ namespace TXServer.Core.Battles
         public bool Paused { get; set; }
         public DateTime? IdleKickTime { get; set; }
 
-        public int AlreadyAddedExperience { get; set; }
+        public int AlreadyAddedExperience { get; private set; }
 
         public Dictionary<MatchPlayer, float> DamageAssistants { get; } = new();
 
-        public float OriginalTankSpeed { get; }
+        private float OriginalTankSpeed { get; }
 
         public SpawnPoint LastSpawnPoint { get; private set; }
         public TeleportPoint LastTeleportPoint { get; private set; }

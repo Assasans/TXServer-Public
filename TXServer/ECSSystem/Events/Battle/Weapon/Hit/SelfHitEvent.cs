@@ -1,9 +1,9 @@
-﻿using System.Linq;
-using TXServer.Core;
+﻿using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
@@ -15,25 +15,25 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
         {
             SelfEvent.Execute(this, player, weapon);
 
-            BattleTankPlayer battlePlayer = player.BattlePlayer;
+            MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
 
-            if (battlePlayer.MatchPlayer.TankState == TankState.Dead)
+            if (matchPlayer.TankState == TankState.Dead)
                 return;
 
-            Core.Battles.Battle battle = player.BattlePlayer.Battle;
-            foreach (HitTarget hitTarget in Targets)
+            if (weapon.TemplateAccessor.Template.GetType() == typeof(HammerBattleItemTemplate))
             {
-                MatchPlayer victim = battle.MatchTankPlayers
-                    .Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity).MatchPlayer;
-
-                Damage.HandleHit(weapon, victim, player.BattlePlayer.MatchPlayer, hitTarget);
+                ((Core.Battles.BattleWeapons.Hammer) matchPlayer.BattleWeapon).ProcessHits(Targets);
+                return;
             }
+
+            foreach (HitTarget hitTarget in Targets)
+                Damage.HandleHit(weapon, matchPlayer, hitTarget);
 
             player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["SHOTS"]++);
             player.User.ChangeComponent<UserStatisticsComponent>(component =>
                 component.Statistics["HITS"] += Targets.Count);
 
-            (battlePlayer.MatchPlayer.BattleWeapon as Core.BattleWeapons.Shaft)?.ResetAiming();
+            (matchPlayer.BattleWeapon as Core.Battles.BattleWeapons.Shaft)?.ResetAiming();
         }
 
         public virtual IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteHitEvent>();

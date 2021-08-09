@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using TXServer.Core.Battles.BattleWeapons;
 using TXServer.Core.Battles.Effect;
-using TXServer.Core.BattleWeapons;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -34,7 +34,7 @@ namespace TXServer.Core.Battles
 {
     public static class Damage
     {
-        private static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
+        public static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             float damage, bool backHit = false, Vector3 localHitPoint = new())
         {
             // triggers for Invulnerability & Emergency Protection modules
@@ -225,7 +225,7 @@ namespace TXServer.Core.Battles
         }
 
 
-        private static float GetBaseDamage(Entity weapon, Entity weaponMarketItem, MatchPlayer target, MatchPlayer shooter)
+        private static float GetBaseDamage(Entity weaponMarketItem, MatchPlayer shooter)
         {
             BattleModule module = shooter.Modules.Single(m => m.MarketItem == weaponMarketItem);
 
@@ -237,6 +237,9 @@ namespace TXServer.Core.Battles
 
             return (int) Math.Round(new Random().NextGaussianRange(minDamage, maxDamage));
         }
+
+        public static MatchPlayer GetTargetByHit(MatchPlayer shooter, HitTarget hitTarget) => shooter.Battle
+            .MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity).MatchPlayer;
 
         private static float GetTemperatureChange(Entity weaponMarketItem)
         {
@@ -292,9 +295,9 @@ namespace TXServer.Core.Battles
         }
 
 
-        public static void HandleHit(Entity weapon, MatchPlayer target, MatchPlayer shooter,
-            HitTarget hitTarget, bool isSplashHit = false)
+        public static void HandleHit(Entity weapon, MatchPlayer shooter, HitTarget hitTarget, bool isSplashHit = false)
         {
+            MatchPlayer target = GetTargetByHit(shooter, hitTarget);
             Entity weaponMarketItem = GetWeaponMarketItem(weapon, shooter);
             if (!IsModule(weaponMarketItem) && IsOnCooldown(weapon, target, shooter)) return;
 
@@ -309,23 +312,23 @@ namespace TXServer.Core.Battles
                 {
                     case FireRingEffectTemplate:
                         DealNewTemperature(weapon, weaponMarketItem, target, shooter);
-                        damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
+                        damage = GetBaseDamage(weaponMarketItem, shooter);
                         break;
                     case KamikadzeEffectTemplate:
                         shooter.TryGetModule(out KamikadzeModule kamikadzeModule);
                         if (!kamikadzeModule.EffectIsActive) return;
                         kamikadzeModule.Deactivate();
 
-                        damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
+                        damage = GetBaseDamage(weaponMarketItem, shooter);
                         break;
                     case MineEffectTemplate:
                         shooter.TryGetModule(out MineModule mineModule);
                         mineModule.Explode(weapon);
 
-                        damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
+                        damage = GetBaseDamage(weaponMarketItem, shooter);
                         break;
                     default:
-                        damage = GetBaseDamage(weapon, weaponMarketItem, target, shooter);
+                        damage = GetBaseDamage(weaponMarketItem, shooter);
                         break;
                 }
             }
@@ -343,7 +346,7 @@ namespace TXServer.Core.Battles
         }
 
 
-        private static bool IsBackHit(Vector3 localHitPoint, Entity hull)
+        public static bool IsBackHit(Vector3 localHitPoint, Entity hull)
         {
             return hull.TemplateAccessor.ConfigPath.Split('/').Last() switch
             {

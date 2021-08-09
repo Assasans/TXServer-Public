@@ -1,5 +1,5 @@
 ﻿using TXServer.Core;
-using TXServer.Core.BattleWeapons;
+using TXServer.Core.Battles.BattleWeapons;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 

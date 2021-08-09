@@ -47,11 +47,13 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
             Entity weapon = new(new TemplateAccessor(template, configPath.Replace("garage", "battle")),
                 tank.GetComponent<TankPartComponent>(),
                 new WeaponComponent(),
-                new WeaponEnergyComponent(1),
                 tank.GetComponent<UserGroupComponent>(),
                 tank.GetComponent<TankGroupComponent>(),
                 tank.GetComponent<BattleGroupComponent>(),
                 battlePlayer.Player.CurrentPreset.Weapon.GetComponent<MarketItemGroupComponent>());
+
+            if (template.GetType() != typeof(HammerBattleItemTemplate))
+                weapon.AddComponent(new WeaponEnergyComponent(1));
 
             if (battlePlayer.Team != null)
                 weapon.AddComponent(battlePlayer.Team.GetComponent<TeamGroupComponent>());

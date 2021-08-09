@@ -1,14 +1,12 @@
 using System.Linq;
-using TXServer.Core.Battles;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.ServerComponents;
 using TXServer.Library;
-using Damage = TXServer.ECSSystem.ServerComponents.Damage;
 
-namespace TXServer.Core.BattleWeapons
+namespace TXServer.Core.Battles.BattleWeapons
 {
     public abstract class BattleWeapon
     {
@@ -17,17 +15,17 @@ namespace TXServer.Core.BattleWeapons
             MatchPlayer = matchPlayer;
 
             CooldownIntervalSec = Config.GetComponent<WeaponCooldownComponent>(BattleItemPath, false)?.CooldownIntervalSec ?? 0;
-            DamagePerSecond = Config.GetComponent<Damage.DamagePerSecondPropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
+            DamagePerSecond = Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.DamagePerSecondPropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
 
-            MaxDamage = Config.GetComponent<Damage.MaxDamagePropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
-            MinDamage = Config.GetComponent<Damage.MinDamagePropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
+            MaxDamage = Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.MaxDamagePropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
+            MinDamage = Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.MinDamagePropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
 
             if (MaxDamage == 0)
             {
                 MaxDamage = Config
-                    .GetComponent<Damage.AimingMaxDamagePropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
+                    .GetComponent<TXServer.ECSSystem.ServerComponents.Damage.AimingMaxDamagePropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
                 MinDamage = Config
-                    .GetComponent<Damage.AimingMinDamagePropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
+                    .GetComponent<TXServer.ECSSystem.ServerComponents.Damage.AimingMinDamagePropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
             }
 
             MaxDamageDistance = Config.GetComponent<

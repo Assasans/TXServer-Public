@@ -1,12 +1,12 @@
 using System;
-using TXServer.Core.Battles;
 
-namespace TXServer.Core.BattleWeapons
+namespace TXServer.Core.Battles.BattleWeapons
 {
-    public class Freeze : BattleWeapon
+    public class Flamethrower : BattleWeapon
     {
-        public Freeze(MatchPlayer matchPlayer) : base(matchPlayer)
+        public Flamethrower(MatchPlayer matchPlayer) : base(matchPlayer)
         {
+
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)
