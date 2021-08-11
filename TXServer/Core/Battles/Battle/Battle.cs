@@ -251,8 +251,7 @@ namespace TXServer.Core.Battles
 
                 // battle results
                 battlePlayer.MatchPlayer.PersonalBattleResult.FinalizeResult();
-                BattleResultForClient battleResultForClient =
-                    new(this, ModeHandler, battlePlayer.MatchPlayer.PersonalBattleResult);
+                BattleResultForClient battleResultForClient = new(battlePlayer);
 
                 // recruit reward check
                 if (IsMatchMaking) battlePlayer.Player.CheckRecruitReward();
@@ -278,6 +277,12 @@ namespace TXServer.Core.Battles
                 }
 
                 battlePlayer.SendEvent(new BattleResultForClientEvent(battleResultForClient), battlePlayer.Player.User);
+            }
+
+            foreach (Spectator spectator in Spectators)
+            {
+                BattleResultForClient spectatorResult = new(spectator);
+                spectator.SendEvent(new BattleResultForClientEvent(spectatorResult), spectator.Player.User);
             }
 
             // process waiting goldboxes queue

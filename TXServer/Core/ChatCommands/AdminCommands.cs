@@ -381,6 +381,8 @@ namespace TXServer.Core.ChatCommands
 
         private static string RecruitReward(Player player, string[] args)
         {
+            if (!args.Any())
+                return "error: missing argument";
             switch (args[0])
             {
                 case "reset":

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Components.Battle.Team;
@@ -8,29 +9,29 @@ namespace TXServer.ECSSystem.Types
 {
 	public class BattleResultForClient
 	{
-        public BattleResultForClient(Battle battle, Battle.IBattleModeHandler modeHandler, PersonalBattleResultForClient personalResult)
+        public BattleResultForClient(BaseBattlePlayer battlePlayer)
         {
+            Battle battle = battlePlayer.Battle;
             BattleId = battle.BattleEntity.EntityId;
-			MapId = battle.MapEntity.EntityId;
-			BattleMode = battle.Params.BattleMode;
-			MatchMakingModeType = BattleType.RATING;
-			Custom = !battle.IsMatchMaking;
-			Spectator = false;
-			PersonalResult = personalResult;
+            MapId = battle.MapEntity.EntityId;
+            BattleMode = battle.Params.BattleMode;
+            MatchMakingModeType = BattleType.RATING;
+            Custom = !battle.IsMatchMaking;
+            Spectator = battlePlayer.GetType() == typeof(Spectator);
+            PersonalResult = (battlePlayer as BattleTankPlayer)?.MatchPlayer.PersonalBattleResult;
 
-			if (modeHandler is Battle.TeamBattleHandler)
-			{
-				var handler = modeHandler as Battle.TeamBattleHandler;
-				RedTeamScore = handler.RedTeamEntity.GetComponent<TeamScoreComponent>().Score;
-				BlueTeamScore = handler.BlueTeamEntity.GetComponent<TeamScoreComponent>().Score;
-
-				RedUsers = handler.RedTeamResults.ToList();
-				BlueUsers = handler.BlueTeamResults.ToList();
-			}
-			else
+            if (battle.ModeHandler is Battle.TeamBattleHandler handler)
             {
-				DmUsers = ((Battle.DMHandler)modeHandler).Results.ToList();
-				DmScore = DmUsers.Sum(user => user.Kills);
+                RedTeamScore = handler.RedTeamEntity.GetComponent<TeamScoreComponent>().Score;
+                BlueTeamScore = handler.BlueTeamEntity.GetComponent<TeamScoreComponent>().Score;
+
+                RedUsers = handler.RedTeamResults.ToList();
+                BlueUsers = handler.BlueTeamResults.ToList();
+            }
+            else
+            {
+                DmUsers = ((Battle.DMHandler)battle.ModeHandler).Results.ToList();
+                DmScore = DmUsers.Sum(user => user.Kills);
             }
         }
 
