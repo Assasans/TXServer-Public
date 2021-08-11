@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Logging;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.GlobalEntities;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Settings
 {
@@ -41,6 +44,15 @@ namespace TXServer.ECSSystem.Events.Settings
                             Logger.Debug($"{player}: Changed experience to {player.Data.Experience}");
                         }
                         break;
+                    default:
+                        if (long.TryParse(Code, out long code))
+                        {
+                            Entity marketItem = player.EntityList.SingleOrDefault(e =>
+                                e.EntityId == code && e.GetComponent<MarketItemGroupComponent>()?.Key == code);
+                            if (marketItem is null) break;
+                            rewards.Add(marketItem, 1);
+                        }
+                        break;
                 }
             }
 
@@ -63,6 +75,8 @@ namespace TXServer.ECSSystem.Events.Settings
 		            player.Data.XCrystals += item.Value;
 	            else if (item.Key == ExtraItems.GlobalItems.Premiumboost)
 					player.Data.RenewPremium(new TimeSpan(item.Value, 0, 0, 0));
+                else
+                    player.SaveNewMarketItem(item.Key, item.Value);
             }
 
 			if (rewards.Count > 0)

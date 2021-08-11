@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core.ShopContainers
 {
-    public class ScoutContainer : ShopContainer
+    public class ScoutContainer : BlueprintContainer
     {
-        public ScoutContainer(Entity containerEntity, Player player) : base(containerEntity, player)
+        public ScoutContainer(Entity entity, Player player, ContainerInfo.ContainerInfo containerInfo) : base(entity,
+            player, containerInfo)
         {
         }
 
@@ -18,21 +18,11 @@ namespace TXServer.Core.ShopContainers
 
             for (int i = 0; i < blueprintAmount; i++)
             {
-                Entity blueprint = _possibleBlueprints[random.Next(_possibleBlueprints.Count)];
+                Entity blueprint = ItemListBlueprints[random.Next(ItemListBlueprints.Count)];
                 blueprints = AddBlueprint(blueprint, blueprints);
             }
 
             return CreateNewCardsNotifications(blueprints);
         }
-
-        private readonly List<Entity> _possibleBlueprints = new()
-        {
-            ModuleCards.GlobalItems.Explosivemass,
-            ModuleCards.GlobalItems.Externalimpact,
-            ModuleCards.GlobalItems.Firering,
-            ModuleCards.GlobalItems.Jumpimpact,
-            ModuleCards.GlobalItems.Kamikadze,
-            ModuleCards.GlobalItems.Sapper
-        };
     }
 }

@@ -1,6 +1,8 @@
-﻿using TXServer.Core;
+﻿using System.Linq;
+using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Settings
@@ -33,6 +35,17 @@ namespace TXServer.ECSSystem.Events.Settings
                         if (int.TryParse(Code.Substring(2, Code.Length - 2), out int i))
                             if (player.Data.Experience + i >= 0)
                                 result = PromoCodeCheckResult.VALID;
+                        break;
+                    default:
+                        if (long.TryParse(Code, out long code))
+                        {
+                            Entity marketItem = player.EntityList.SingleOrDefault(e =>
+                                e.EntityId == code && e.GetComponent<MarketItemGroupComponent>()?.Key == code);
+                            if (marketItem is null) break;
+                            result = player.Data.OwnsMarketItem(marketItem)
+                                ? PromoCodeCheckResult.OWNED
+                                : PromoCodeCheckResult.VALID;
+                        }
                         break;
                 }
 

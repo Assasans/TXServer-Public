@@ -190,8 +190,10 @@ namespace TXServer.Core.Battles.Effect {
         {
             if (IsModule)
             {
-                IsEnabled = ModuleType is not ModuleBehaviourType.PASSIVE &&
-                            MatchPlayer.Battle.BattleState is BattleState.Running or BattleState.WarmUp &&
+                bool battleStateAllowsModule = MatchPlayer.Battle.BattleState is BattleState.Running ||
+                                               ((Battle.MatchMakingBattleHandler) MatchPlayer.Battle.TypeHandler)
+                                               ?.WarmUpState is WarmUpState.WarmingUp;
+                IsEnabled = battleStateAllowsModule && ModuleType is not ModuleBehaviourType.PASSIVE &&
                             MatchPlayer.TankState == TankState.Active;
             }
         }

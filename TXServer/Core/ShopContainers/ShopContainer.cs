@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components.Item.Module;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.ServerComponents;
 
@@ -10,11 +10,9 @@ namespace TXServer.Core.ShopContainers
 {
     public abstract class ShopContainer
     {
-        protected ShopContainer(Entity containerEntity, Player player)
+        protected ShopContainer(Entity entity, Player player)
         {
-            ContainerEntity = containerEntity;
-            ItemsConfigComponent =
-                Config.GetComponent<ItemsContainerItemComponent>(ContainerEntity.TemplateAccessor.ConfigPath, false);
+            Entity = entity;
             Player = player;
         }
 
@@ -34,7 +32,7 @@ namespace TXServer.Core.ShopContainers
             {
                 Player.SaveNewMarketItem(blueprint.Key, blueprint.Value);
                 notifications.Add(
-                    NewItemNotificationTemplate.CreateCardNotification(ContainerEntity, blueprint.Key,
+                    NewItemNotificationTemplate.CreateCardNotification(Entity, blueprint.Key,
                         blueprint.Value));
             }
 
@@ -43,12 +41,13 @@ namespace TXServer.Core.ShopContainers
 
         public abstract List<Entity> GetRewards(Random random, int containerAmount);
 
-        protected Entity ContainerEntity { get; }
+        protected Entity Entity { get; }
+        protected string MarketItemPath => Entity.TemplateAccessor.ConfigPath;
         protected Player Player { get; }
 
-        private ItemsContainerItemComponent ItemsConfigComponent { get; }
+        protected ItemsContainerItemComponent ItemsConfigComponent { get; set; }
+        protected TargetTierComponent TargetTierComponent { get; set; }
 
-        protected List<ContainerItem> ContainerItems => (ItemsConfigComponent.Items ?? new List<ContainerItem>())
-            .Concat(ItemsConfigComponent.RareItems ?? new List<ContainerItem>()).ToList();
+        protected List<ContainerItem> Items { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -116,5 +117,44 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ParentGroupComponent(Modules.GlobalItems.Turbospeed),
                 new MarketItemGroupComponent(1378523021));
         }
+
+        public static readonly List<Entity> Tier1Modules = new()
+        {
+            GlobalItems.Absorbingarmor,
+            //GlobalItem.RepairKit,
+            GlobalItems.Turbospeed,
+            GlobalItems.Backhitdefence,
+            //GlobalItems.Tempblock,
+            GlobalItems.Emp,
+            GlobalItems.Mine,
+            GlobalItems.Sonar,
+            GlobalItems.Engineer,
+            GlobalItems.Rage,
+        };
+        public static readonly List<Entity> Tier2Modules = new()
+        {
+            GlobalItems.Forcefield,
+            GlobalItems.Invisibility,
+            GlobalItems.Jumpimpact,
+            GlobalItems.Acceleratedgears,
+            GlobalItems.Sapper,
+            GlobalItems.Externalimpact,
+            GlobalItems.Increaseddamage,
+            GlobalItems.Spidermine,
+            GlobalItems.Adrenaline,
+            GlobalItems.Kamikadze,
+            GlobalItems.Increaseddamage
+        };
+        public static readonly List<Entity> Tier3Modules = new()
+        {
+            GlobalItems.Firering,
+            //GlobalItems.Icetrap,
+            GlobalItems.Invulnerability,
+            GlobalItems.Emergencyprotection,
+            GlobalItems.Drone,
+            GlobalItems.Energyinjection,
+            GlobalItems.Explosivemass,
+            GlobalItems.Lifesteal
+        };
     }
 }

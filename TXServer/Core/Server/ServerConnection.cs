@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -35,7 +36,14 @@ namespace TXServer.Core
             if (IsStarted) return;
             IsStarted = true;
 
-            ServerMapInfo = JsonSerializer.Deserialize<Dictionary<string, MapInfo>>(File.ReadAllText(ServerMapInfoLocation), new JsonSerializerOptions
+            ServerMapInfo = JsonSerializer.Deserialize<Dictionary<string, MapInfo>>(
+                File.ReadAllText(ServerMapInfoLocation), new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                IncludeFields = true
+            });
+            ContainerInfos = JsonSerializer.Deserialize<Dictionary<string, ContainerInfo.ContainerInfo>>(
+                File.ReadAllText(ContainerInfoLocation), new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 IncludeFields = true
@@ -44,7 +52,8 @@ namespace TXServer.Core
             if (!Server.Instance.Settings.DisableHeightMaps)
             {
                 Logger.Log("Loading height maps...");
-                HeightMaps = JsonSerializer.Deserialize<Dictionary<string, HeightMap>>(File.ReadAllText(HeightMapInfoLocation), new JsonSerializerOptions
+                HeightMaps = JsonSerializer.Deserialize<Dictionary<string, HeightMap>>(
+                    File.ReadAllText(HeightMapInfoLocation), new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     IncludeFields = true
@@ -319,9 +328,11 @@ namespace TXServer.Core
 
         public int PlayerCount = 0;
 
-        private static string ServerMapInfoLocation { get; } = "Library/ServerMapInfo.json";
-        private static string HeightMapInfoLocation { get; } = "Library/HeightMaps.json";
+        private static string ServerMapInfoLocation => "Library/ServerMapInfo.json";
+        private static string ContainerInfoLocation => "Library/BlueprintContainers.json";
+        private static string HeightMapInfoLocation => "Library/HeightMaps.json";
         public static Dictionary<string, MapInfo> ServerMapInfo { get; private set; }
+        public static Dictionary<string, ContainerInfo.ContainerInfo> ContainerInfos { get; private set; }
         public static Dictionary<string, HeightMap> HeightMaps { get; private set; }
     }
 }

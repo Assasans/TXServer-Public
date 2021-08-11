@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TXServer.Core.Battles.Effect;
 using TXServer.Core.Battles.Matchmaking;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Components;
@@ -24,7 +23,7 @@ namespace TXServer.Core.Battles
 
             private readonly List<BattleTankPlayer> WaitingToJoinPlayers = new();
 
-            private WarmUpState WarmUpState;
+            public WarmUpState WarmUpState;
 
             private TeamColor LastLosingTeam;
             private DateTime DominationStartTime;

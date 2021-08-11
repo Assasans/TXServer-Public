@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using TXServer.Core;
+using TXServer.Core.ContainerInfo;
 using TXServer.Core.ShopContainers;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -208,8 +210,15 @@ namespace TXServer.ECSSystem.GlobalEntities
         {
             if (ContainerToType.ContainsKey(containerMarketItem))
                 return (ShopContainer) Activator.CreateInstance(ContainerToType[containerMarketItem],
-                    containerMarketItem, player);
-            return new StandardItemContainer(containerMarketItem, player);
+                    containerMarketItem, player, new ContainerInfo());
+
+            ContainerInfo containerInfo = ServerConnection.ContainerInfos
+                .SingleOrDefault(i => i.Key == containerMarketItem.TemplateAccessor.ConfigPath.Split("/").Last()).Value;
+
+            if (containerInfo is not null)
+                return new BlueprintContainer(containerMarketItem, player, containerInfo);
+
+            return new StandardItemContainer(containerMarketItem, player, new ContainerInfo());
         }
     }
 }

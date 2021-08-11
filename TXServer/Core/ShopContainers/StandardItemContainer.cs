@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.GlobalEntities;
@@ -10,8 +11,12 @@ namespace TXServer.Core.ShopContainers
 {
     public class StandardItemContainer : ShopContainer
     {
-        public StandardItemContainer(Entity containerEntity, Player player) : base(containerEntity, player)
+        public StandardItemContainer(Entity entity, Player player, ContainerInfo.ContainerInfo containerInfo) : base(
+            entity, player)
         {
+            ItemsConfigComponent = Config.GetComponent<ItemsContainerItemComponent>(MarketItemPath, false);
+            Items = (ItemsConfigComponent?.Items ?? new List<ContainerItem>())
+                .Concat(ItemsConfigComponent?.RareItems ?? new List<ContainerItem>()).ToList();
         }
 
         public override List<Entity> GetRewards(Random random, int containerAmount)
@@ -21,7 +26,7 @@ namespace TXServer.Core.ShopContainers
 
             for (int i = 0; i < containerAmount; i++)
             {
-                ContainerItem containerItem = ContainerItems[random.Next(ContainerItems.Count)];
+                ContainerItem containerItem = Items[random.Next(Items.Count)];
                 MarketItemBundle marketItemBundle =
                     containerItem.ItemBundles[random.Next(containerItem.ItemBundles.Count)];
                 Entity rewardMarketItem =
@@ -38,7 +43,7 @@ namespace TXServer.Core.ShopContainers
                     ResourceManager.SaveNewMarketItem(Player, rewardMarketItem,
                         marketItemBundle.Max == 0 ? marketItemBundle.Amount : random.Next(1, marketItemBundle.Max));
 
-                notifications.Add(NewItemNotificationTemplate.CreateEntity(ContainerEntity, rewardMarketItem,
+                notifications.Add(NewItemNotificationTemplate.CreateEntity(Entity, rewardMarketItem,
                     marketItemBundle.Amount));
             }
 

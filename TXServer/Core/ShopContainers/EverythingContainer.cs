@@ -8,7 +8,8 @@ namespace TXServer.Core.ShopContainers
 {
     public class EverythingContainer : StandardItemContainer
     {
-        public EverythingContainer(Entity containerEntity, Player player) : base(containerEntity, player)
+        public EverythingContainer(Entity entity, Player player, ContainerInfo.ContainerInfo containerInfo) : base(
+            entity, player, containerInfo)
         {
         }
 
@@ -16,7 +17,7 @@ namespace TXServer.Core.ShopContainers
         {
             List<Entity> notifications = base.GetRewards(random, containerAmount);
             if (new Random().Next(0, 100) <= 5 * containerAmount)
-                notifications.Add(NewItemNotificationTemplate.CreateEntity(ContainerEntity,
+                notifications.Add(NewItemNotificationTemplate.CreateEntity(Entity,
                     ExtraItems.GlobalItems.Goldbonus, new Random().Next(1 * containerAmount, 3 * containerAmount)));
 
             return notifications;
