@@ -13,9 +13,9 @@ namespace TXServer.Core.Battles.BattleWeapons
         public Ricochet(MatchPlayer matchPlayer) : base(matchPlayer)
         {
             float energyChargePerShot =
-                Config.GetComponent<EnergyChargePerShotPropertyComponent>(MarketItemPath).FinalValue;
+                Config.GetComponent<EnergyConfig.EnergyChargePerShotPropertyComponent>(MarketItemPath).FinalValue;
             float energyRechargeSpeed =
-                Config.GetComponent<EnergyRechargeSpeedPropertyComponent>(MarketItemPath).FinalValue;
+                Config.GetComponent<EnergyConfig.EnergyRechargeSpeedPropertyComponent>(MarketItemPath).FinalValue;
 
             CustomComponents = new Component[]
             {
