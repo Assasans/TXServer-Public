@@ -32,7 +32,7 @@ namespace TXServer.Core.Battles.Effect
             Activate();
         }
 
-        public long SupplyDuration(long normalDuration) =>
+        public long LongerDuration(long normalDuration) =>
             IsEmpLocked ? normalDuration : (long) (normalDuration * Factor);
 
         private float Factor { get; set; }

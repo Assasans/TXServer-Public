@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Configuration;
+﻿using TXServer.Core.Battles.BattleWeapons;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Effect.EnergyInjection;
 using TXServer.ECSSystem.Components.Battle.Module.EnergyInjection;
@@ -15,7 +16,11 @@ namespace TXServer.Core.Battles.Effect
             ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
         ) { }
 
-        public override void Activate() => MatchPlayer.SendEvent(new ExecuteEnergyInjectionEvent(), MatchPlayer.Weapon);
+        public override void Activate()
+        {
+            (MatchPlayer.BattleWeapon as Hammer)?.RefillMagazine();
+            MatchPlayer.SendEvent(new ExecuteEnergyInjectionEvent(), MatchPlayer.Weapon);
+        }
 
         public override void Init()
         {

@@ -21,7 +21,7 @@ namespace TXServer.Core.Battles.Effect
         {
             LastTickTime = DateTimeOffset.UtcNow.AddMilliseconds(-TickPeriod);
 
-            float duration = IsSupply || IsCheat ? 3000 : Duration;
+            float duration = IsSupply || IsCheat ? SupplyDuration(3000) : Duration;
             if (EffectIsActive)
             {
                 ChangeDuration(duration);
@@ -42,7 +42,7 @@ namespace TXServer.Core.Battles.Effect
             if (EffectEntity == null) return;
             if (IsCheat && !DeactivateCheat)
             {
-                ChangeDuration(3000);
+                ChangeDuration(SupplyDuration(3000));
                 return;
             }
 

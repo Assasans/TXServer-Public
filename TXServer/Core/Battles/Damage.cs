@@ -54,7 +54,7 @@ namespace TXServer.Core.Battles
 
             victim.Tank.ChangeComponent<HealthComponent>(component =>
             {
-                component.CurrentHealth -= damage;
+                component.CurrentHealth = Math.Clamp(component.CurrentHealth - damage, 0, float.MaxValue);
 
                 if (component.CurrentHealth <= 0)
                 {
@@ -250,10 +250,12 @@ namespace TXServer.Core.Battles
         private static float GetHpWithEffects(float damage, MatchPlayer target, MatchPlayer shooter,
             bool isModule, bool isHeatDamage, Entity weaponMarketItem)
         {
-            if (!isModule && shooter.TryGetModule(out AdrenalineModule adrenalineModule) && adrenalineModule.EffectIsActive)
+            if (!isModule && shooter.TryGetModule(out AdrenalineModule adrenalineModule) &&
+                adrenalineModule.EffectIsActive)
                 damage *= adrenalineModule.DamageFactor;
 
-            if (!isModule && !isHeatDamage && shooter.TryGetModule(out IncreasedDamageModule damageModule) && damageModule.EffectIsActive)
+            if (!isModule && !isHeatDamage && shooter.TryGetModule(out IncreasedDamageModule damageModule) &&
+                damageModule.EffectIsActive)
             {
                 if (damageModule.IsCheat)
                     damage = target.Tank.GetComponent<HealthComponent>().CurrentHealth;

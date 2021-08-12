@@ -17,7 +17,7 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Activate()
         {
-            float duration = IsSupply || IsCheat ? 30000 : Duration;
+            float duration = IsSupply || IsCheat ? SupplyDuration(30000) : Duration;
             if (EffectIsActive)
             {
                 ChangeDuration(duration);
@@ -37,7 +37,7 @@ namespace TXServer.Core.Battles.Effect
             if (EffectEntity == null) return;
             if (IsCheat && !DeactivateCheat)
             {
-                ChangeDuration(30000);
+                ChangeDuration(SupplyDuration(30000));
                 return;
             }
 

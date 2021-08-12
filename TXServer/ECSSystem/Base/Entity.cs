@@ -101,6 +101,11 @@ namespace TXServer.ECSSystem.Base
                 AddComponent(component, excludedFromSending);
         }
 
+        public void TryAddComponent(Component component, Player excludedFromSending = null)
+        {
+            if (!Components.Contains(component)) AddComponent(component);
+        }
+
         public void ChangeComponent(Component component, Player excludedFromSending = null)
         {
             if (!Components.Remove(component))

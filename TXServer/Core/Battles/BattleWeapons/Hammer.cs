@@ -6,6 +6,7 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.Components.Battle.Weapon.Hammer;
+using TXServer.ECSSystem.Events.Battle.Weapon.Hammer;
 using TXServer.ECSSystem.ServerComponents.Weapon;
 using TXServer.ECSSystem.Types;
 
@@ -42,11 +43,11 @@ namespace TXServer.Core.Battles.BattleWeapons
 
             foreach (HitTarget hitTarget in hitTargets)
             {
-                MatchPlayer target = Core.Battles.Damage.GetTargetByHit(MatchPlayer, hitTarget);
+                MatchPlayer target = Damage.GetTargetByHit(MatchPlayer, hitTarget);
                 (bool backHit, float damage, Vector3 hitPoint) hitInfo =
                     hits.ContainsKey(target) ? hits[target] : (false, 0, hitTarget.LocalHitPoint);
 
-                if (hitInfo.backHit is false && Core.Battles.Damage.IsBackHit(hitTarget.LocalHitPoint, target.Tank))
+                if (hitInfo.backHit is false && Damage.IsBackHit(hitTarget.LocalHitPoint, target.Tank))
                 {
                     hitInfo.backHit = true;
                     hitInfo.hitPoint = hitTarget.LocalHitPoint;
@@ -56,6 +57,14 @@ namespace TXServer.Core.Battles.BattleWeapons
 
                 hits[target] = hitInfo;
             }
+        }
+
+        public void RefillMagazine()
+        {
+            ResetReload();
+            CurrentCartridgeCount = MaxCartridgeCount;
+            Weapon.TryAddComponent(new ShootableComponent());
+            MatchPlayer.SendEvent(new SetMagazineReadyEvent(), Weapon);
         }
 
         public override void OnDespawn()
@@ -68,7 +77,7 @@ namespace TXServer.Core.Battles.BattleWeapons
         {
             CombineHitInfo(targets, out Dictionary<MatchPlayer, (bool, float, Vector3)> hits);
             foreach (KeyValuePair<MatchPlayer, (bool, float, Vector3)> hit in hits)
-                Core.Battles.Damage.DealDamage(MatchPlayer.Player.CurrentPreset.Weapon, hit.Key,
+                Damage.DealDamage(MatchPlayer.Player.CurrentPreset.Weapon, hit.Key,
                     MatchPlayer, hit.Value.Item2, hit.Value.Item1, hit.Value.Item3);
         }
 
@@ -80,13 +89,12 @@ namespace TXServer.Core.Battles.BattleWeapons
                   ReloadMagazineDurationSec * 1000)) return;
 
             ResetReload();
-            CurrentCartridgeCount = MaxCartridgeCount;
-            Weapon.AddComponent(new ShootableComponent());
+            RefillMagazine();
         }
 
         public void ProcessShot() => CurrentCartridgeCount--;
 
-        public void ResetMagazine()
+        private void ResetMagazine()
         {
             CurrentCartridgeCount = MaxCartridgeCount;
             ResetReload();
@@ -101,7 +109,7 @@ namespace TXServer.Core.Battles.BattleWeapons
         private void StartReloading()
         {
             Weapon.TryRemoveComponent<ShootableComponent>();
-            Weapon.AddComponent(new MagazineReloadStateComponent());
+            Weapon.TryAddComponent(new MagazineReloadStateComponent());
             ReloadStartTime = DateTimeOffset.UtcNow;
         }
 

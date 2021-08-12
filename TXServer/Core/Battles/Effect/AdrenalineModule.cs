@@ -68,7 +68,7 @@ namespace TXServer.Core.Battles.Effect
         }
 
 
-        public float DamageFactor { get; set; }
+        public float DamageFactor { get; private set; }
         private float MaxHpPercentWorking { get; set; }
         private float ModuleCooldownSpeedCoeff { get; set; }
     }

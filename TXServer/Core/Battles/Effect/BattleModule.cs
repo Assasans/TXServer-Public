@@ -176,6 +176,9 @@ namespace TXServer.Core.Battles.Effect {
             Schedule(TimeSpan.FromMilliseconds(duration), Deactivate);
         }
 
+        protected float SupplyDuration(long duration) =>
+            MatchPlayer.TryGetModule(out EngineerModule engineer) ? engineer.LongerDuration(duration) : duration;
+
         private void CheckCheatWaitingForTank()
         {
             if (!IsWaitingForTank || MatchPlayer.TankState != TankState.Active) return;
@@ -191,6 +194,7 @@ namespace TXServer.Core.Battles.Effect {
             if (IsModule)
             {
                 bool battleStateAllowsModule = MatchPlayer.Battle.BattleState is BattleState.Running ||
+                                               MatchPlayer.Battle.IsMatchMaking &&
                                                ((Battle.MatchMakingBattleHandler) MatchPlayer.Battle.TypeHandler)
                                                ?.WarmUpState is WarmUpState.WarmingUp;
                 IsEnabled = battleStateAllowsModule && ModuleType is not ModuleBehaviourType.PASSIVE &&
