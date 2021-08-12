@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
@@ -15,10 +16,13 @@ namespace TXServer.Core.Battles.BattleWeapons
             MatchPlayer = matchPlayer;
 
             CooldownIntervalSec = Config.GetComponent<WeaponCooldownComponent>(BattleItemPath, false)?.CooldownIntervalSec ?? 0;
-            DamagePerSecond = Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.DamagePerSecondPropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
+            DamagePerSecond = Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.
+                DamagePerSecondPropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
 
-            MaxDamage = Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.MaxDamagePropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
-            MinDamage = Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.MinDamagePropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
+            MaxDamage = Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.
+                MaxDamagePropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
+            MinDamage = Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.
+                MinDamagePropertyComponent>(MarketItemPath, false)?.FinalValue ?? 0;
 
             if (MaxDamage == 0)
             {
@@ -45,6 +49,8 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         public abstract float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false);
 
+        public virtual float TemperatureDeltaPerHit() => 0;
+
         protected float DamageDistanceMultiplier(float distance)
         {
             float distanceModifier;
@@ -55,6 +61,28 @@ namespace TXServer.Core.Battles.BattleWeapons
                     MaxDamageDistance, MinDamagePercent / 100, 1);
 
             return distanceModifier;
+        }
+
+        public virtual bool IsOnCooldown(MatchPlayer target) => false;
+
+        protected virtual bool IsStreamOnCooldown(MatchPlayer target)
+        {
+            if (!MatchPlayer.StreamHitLengths.ContainsKey(target))
+            {
+                MatchPlayer.StreamHitLengths[target] = (0, DateTimeOffset.UtcNow);
+                return true;
+            }
+
+            (double, DateTimeOffset) streamLength = MatchPlayer.StreamHitLengths[target];
+            streamLength.Item1 += (DateTimeOffset.UtcNow - streamLength.Item2).TotalMilliseconds;
+            streamLength.Item2 = DateTimeOffset.UtcNow;
+            MatchPlayer.StreamHitLengths[target] = streamLength;
+
+            if (MatchPlayer.StreamHitLengths[target].Item1 / 1000 < CooldownIntervalSec)
+                return true;
+
+            MatchPlayer.StreamHitLengths.Remove(target);
+            return false;
         }
 
         public virtual void OnSpawn()
@@ -74,13 +102,16 @@ namespace TXServer.Core.Battles.BattleWeapons
         protected Entity MarketItem => MatchPlayer.Player.CurrentPreset.Weapon;
         protected string MarketItemPath => MarketItem.TemplateAccessor.ConfigPath;
         private string BattleItemPath => "battle/weapon/" + MarketItemPath.Split('/').Last();
-        public Component[] CustomComponents { get; set; }
+        public Component[] CustomComponents { get; protected init; }
 
         protected float CooldownIntervalSec { get; }
         protected float DamagePerSecond { get; }
 
         protected float MaxDamage { get; }
         protected float MinDamage { get; }
+
+        public float MaxHeatDamage { get; set; }
+        public float MinHeatDamage { get; protected init; }
 
         private float MaxDamageDistance { get; }
         private float MinDamageDistance { get; }

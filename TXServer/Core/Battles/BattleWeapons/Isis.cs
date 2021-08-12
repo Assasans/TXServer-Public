@@ -13,6 +13,8 @@ namespace TXServer.Core.Battles.BattleWeapons
             return (int) dps * CooldownIntervalSec;
         }
 
-        private float HealPerSecond { get; set; }
+        public override bool IsOnCooldown(MatchPlayer target) => IsStreamOnCooldown(target);
+
+        private float HealPerSecond { get; }
     }
 }

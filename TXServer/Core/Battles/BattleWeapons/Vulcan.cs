@@ -11,15 +11,40 @@ namespace TXServer.Core.Battles.BattleWeapons
         {
             DeltaTemperaturePerSecond = Config
                 .GetComponent<DeltaTemperaturePerSecondPropertyComponent>(MarketItemPath).FinalValue;
+
+            MaxHeatDamage = 100;
+            MinHeatDamage = 50;
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)
         {
+            if (IsOverheating)
+                Damage.DealNewTemperature(Weapon, MarketItem, target, MatchPlayer);
+
             float damage = (int) DamagePerSecond * CooldownIntervalSec;
             float distanceModifier = DamageDistanceMultiplier(hitDistance);
 
             return (int) Math.Round(damage * distanceModifier);
         }
+
+        public override float TemperatureDeltaPerHit() => DeltaTemperaturePerSecond * CooldownIntervalSec / 0.5f;
+
+        public override bool IsOnCooldown(MatchPlayer target)
+        {
+            if (!MatchPlayer.HitCooldownTimers.ContainsKey(target))
+            {
+                MatchPlayer.HitCooldownTimers.Add(target, DateTimeOffset.UtcNow);
+                return true;
+            }
+
+            if ((DateTimeOffset.UtcNow - MatchPlayer.HitCooldownTimers[target]).TotalMilliseconds <= 100)
+                return true;
+
+            MatchPlayer.HitCooldownTimers.Remove(target);
+            return false;
+        }
+
+        public void ResetOverheat() => LastVulcanHeatTactTime = VulcanShootingStartTime = null;
 
         public override void Tick()
         {
@@ -27,14 +52,11 @@ namespace TXServer.Core.Battles.BattleWeapons
             HandleVulcanOverheating();
         }
 
-        public void ResetOverheat() => LastVulcanHeatTactTime = VulcanShootingStartTime = null;
-
         public void TrySaveShootingStartTime() => VulcanShootingStartTime ??= DateTimeOffset.UtcNow;
 
         private void HandleVulcanOverheating()
         {
-            if ((DateTimeOffset.UtcNow - (VulcanShootingStartTime ?? DateTimeOffset.UtcNow)).TotalMilliseconds < 5000)
-                return;
+            if (!IsOverheating) return;
             if (LastVulcanHeatTactTime != null &&
                 (DateTimeOffset.UtcNow - LastVulcanHeatTactTime).Value.TotalMilliseconds < 1000)
                 return;
@@ -59,8 +81,8 @@ namespace TXServer.Core.Battles.BattleWeapons
                     t => t.Shooter == MatchPlayer && t.WeaponMarketItem == MarketItem)] = temperatureHit;
             }
             else
-                MatchPlayer.TemperatureHits.Add(new TemperatureHit(DeltaTemperaturePerSecond, MaxTemperatureDamage,
-                    MinTemperatureDamage, MatchPlayer, Weapon, MarketItem));
+                MatchPlayer.TemperatureHits.Add(new TemperatureHit(DeltaTemperaturePerSecond, MaxOverheatTemperatureDamage,
+                    MinOverheatTemperatureDamage, MatchPlayer, Weapon, MarketItem));
         }
 
         public DateTimeOffset? LastVulcanHeatTactTime { get; set; }
@@ -68,7 +90,10 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         private float DeltaTemperaturePerSecond { get; }
 
-        private const float MaxTemperatureDamage = 150;
-        private const float MinTemperatureDamage = 50;
+        private bool IsOverheating => VulcanShootingStartTime != null &&
+                                      (DateTimeOffset.UtcNow - VulcanShootingStartTime).Value.TotalMilliseconds >= 5000;
+
+        private const float MaxOverheatTemperatureDamage = 150;
+        private const float MinOverheatTemperatureDamage = 50;
     }
 }

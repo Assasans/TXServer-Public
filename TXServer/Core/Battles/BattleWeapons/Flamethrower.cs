@@ -1,4 +1,6 @@
 using System;
+using TXServer.Core.Configuration;
+using TXServer.ECSSystem.ServerComponents.Hit;
 
 namespace TXServer.Core.Battles.BattleWeapons
 {
@@ -6,7 +8,8 @@ namespace TXServer.Core.Battles.BattleWeapons
     {
         public Flamethrower(MatchPlayer matchPlayer) : base(matchPlayer)
         {
-
+            TemperaturePerSecond = Config.GetComponent<DeltaTemperaturePerSecondPropertyComponent>(MarketItemPath)
+                .FinalValue;
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)
@@ -17,5 +20,11 @@ namespace TXServer.Core.Battles.BattleWeapons
 
             return (int) Math.Round(damage * modifier);
         }
+
+        public override float TemperatureDeltaPerHit() => TemperaturePerSecond * CooldownIntervalSec;
+
+        public override bool IsOnCooldown(MatchPlayer target) => IsStreamOnCooldown(target);
+
+        private float TemperaturePerSecond { get; set; }
     }
 }

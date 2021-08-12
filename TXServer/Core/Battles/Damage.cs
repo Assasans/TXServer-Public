@@ -7,7 +7,6 @@ using TXServer.Core.Battles.Effect;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Effect;
 using TXServer.ECSSystem.Components.Battle.Health;
@@ -16,19 +15,16 @@ using TXServer.ECSSystem.Components.Battle.Module.Icetrap;
 using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
-using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Battle.Weapon;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
 using TXServer.ECSSystem.GlobalEntities;
-using TXServer.ECSSystem.ServerComponents.Hit;
 using TXServer.ECSSystem.ServerComponents.Tank;
 using TXServer.ECSSystem.Types;
 using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
-using ServerComponents = TXServer.ECSSystem.ServerComponents;
 
 namespace TXServer.Core.Battles
 {
@@ -135,8 +131,9 @@ namespace TXServer.Core.Battles
         public static void DealNewTemperature(Entity weapon, Entity weaponMarketItem, MatchPlayer target,
             MatchPlayer shooter)
         {
+            bool isModule = IsModule(weaponMarketItem);
             float temperatureChange;
-            if (IsModule(weaponMarketItem))
+            if (isModule)
             {
                 BattleModule module = shooter.Modules.Single(m => m.MarketItem == weaponMarketItem);
                 if (module.MarketItem != Modules.GlobalItems.Firering) return;
@@ -153,14 +150,12 @@ namespace TXServer.Core.Battles
                 }
             }
             else
-                temperatureChange = GetTemperatureChange(weaponMarketItem);
+                temperatureChange = shooter.BattleWeapon.TemperatureDeltaPerHit();
 
             temperatureChange =
                 NormalizeTemperature(target.Temperature + temperatureChange, target) - target.Temperature;
             target.Temperature += temperatureChange;
 
-            float maxTemperatureDamage = Config.GetComponent<ServerComponents.Damage.HeatDamagePropertyComponent>(
-                weaponMarketItem.TemplateAccessor.ConfigPath, false)?.FinalValue ?? 0;
             TemperatureHit temperatureHit =
                 target.TemperatureHits.SingleOrDefault(t => t.Shooter == shooter && t.WeaponMarketItem == weaponMarketItem);
 
@@ -171,7 +166,8 @@ namespace TXServer.Core.Battles
                     t => t.Shooter == shooter && t.WeaponMarketItem == weaponMarketItem)] = temperatureHit;
             }
             else
-                target.TemperatureHits.Add(new TemperatureHit(temperatureChange, maxTemperatureDamage, 0, shooter,
+                target.TemperatureHits.Add(new TemperatureHit(temperatureChange, shooter.BattleWeapon.MaxHeatDamage,
+                    isModule ? 0 : shooter.BattleWeapon.MinHeatDamage, shooter,
                     weapon, weaponMarketItem));
         }
 
@@ -192,6 +188,9 @@ namespace TXServer.Core.Battles
                     < 0 => temperatureConfig.AutoIncrementInMs * temperatureConfig.TactPeriodInMs / 1.5f,
                     _ => 0
                 };
+                if (temperatureHit.Shooter == matchPlayer &&
+                    (temperatureHit.Shooter.BattleWeapon as Vulcan)?.VulcanShootingStartTime == null)
+                    temperatureDelta *= 1.5f;
 
                 if (temperatureHit.CurrentTemperature > 0)
                 {
@@ -248,26 +247,6 @@ namespace TXServer.Core.Battles
         public static MatchPlayer GetTargetByHit(MatchPlayer shooter, HitTarget hitTarget) => shooter.Battle
             .MatchTankPlayers.Single(p => p.MatchPlayer.Incarnation == hitTarget.IncarnationEntity).MatchPlayer;
 
-        private static float GetTemperatureChange(Entity weaponMarketItem)
-        {
-            string path = weaponMarketItem.TemplateAccessor.ConfigPath;
-            switch (weaponMarketItem.TemplateAccessor.Template)
-            {
-                case FlamethrowerMarketItemTemplate:
-                    WeaponCooldownComponent cooldownComponent = Config
-                        .GetComponent<WeaponCooldownComponent>("battle/weapon/" + path.Split('/').Last());
-                    float temperaturePerSecond =
-                        Config.GetComponent<DeltaTemperaturePerSecondPropertyComponent>(path).FinalValue;
-                    return temperaturePerSecond * cooldownComponent.CooldownIntervalSec;
-                case FreezeMarketItemTemplate:
-                    return -0.4f;
-                case IsisMarketItemTemplate:
-                    return 0;
-                default:
-                    return 0;
-            }
-        }
-
         private static float GetHpWithEffects(float damage, MatchPlayer target, MatchPlayer shooter,
             bool isModule, bool isHeatDamage, Entity weaponMarketItem)
         {
@@ -306,7 +285,7 @@ namespace TXServer.Core.Battles
         {
             MatchPlayer target = GetTargetByHit(shooter, hitTarget);
             Entity weaponMarketItem = GetWeaponMarketItem(weapon, shooter);
-            if (!IsModule(weaponMarketItem) && IsOnCooldown(weapon, target, shooter)) return;
+            if (!IsModule(weaponMarketItem) && shooter.BattleWeapon.IsOnCooldown(target)) return;
 
             bool turretHit = (shooter.BattleWeapon as Shaft)?.ShaftAimingBeginTime != null &&
                              IsTurretHit(hitTarget.LocalHitPoint, target.Tank);
@@ -352,7 +331,6 @@ namespace TXServer.Core.Battles
             DealDamage(weaponMarketItem, target, shooter, damage, backHit, hitTarget.LocalHitPoint);
         }
 
-
         public static bool IsBackHit(Vector3 localHitPoint, Entity hull)
         {
             return hull.TemplateAccessor.ConfigPath.Split('/').Last() switch
@@ -374,48 +352,6 @@ namespace TXServer.Core.Battles
                 "viking" => 1.2955,
                 _ => 1.51
             } < localHitPoint.Y;
-        }
-
-        private static bool IsOnCooldown(Entity weapon, MatchPlayer target, MatchPlayer shooter)
-        {
-            switch (weapon.TemplateAccessor.Template)
-            {
-                case FlamethrowerBattleItemTemplate or FreezeBattleItemTemplate or IsisBattleItemTemplate:
-                    WeaponCooldownComponent cooldownComponent =
-                        Config.GetComponent<WeaponCooldownComponent>(
-                            "battle/weapon/" + weapon.TemplateAccessor.ConfigPath.Split('/').Last(), false);
-
-                    if (!shooter.StreamHitLengths.ContainsKey(target))
-                    {
-                        shooter.StreamHitLengths[target] = (0, DateTimeOffset.UtcNow);
-                        return true;
-                    }
-
-                    (double, DateTimeOffset) streamLength = shooter.StreamHitLengths[target];
-                    streamLength.Item1 += (DateTimeOffset.UtcNow - streamLength.Item2).TotalMilliseconds;
-                    streamLength.Item2 = DateTimeOffset.UtcNow;
-                    shooter.StreamHitLengths[target] = streamLength;
-
-                    if (shooter.StreamHitLengths[target].Item1 / 1000 < cooldownComponent.CooldownIntervalSec)
-                        return true;
-
-                    shooter.StreamHitLengths.Remove(target);
-                    return false;
-                case VulcanBattleItemTemplate:
-                    if (!shooter.HitCooldownTimers.ContainsKey(target))
-                    {
-                        shooter.HitCooldownTimers.Add(target, DateTimeOffset.UtcNow);
-                        return true;
-                    }
-
-                    if ((DateTimeOffset.UtcNow - shooter.HitCooldownTimers[target]).TotalMilliseconds <= 100)
-                        return true;
-
-                    shooter.HitCooldownTimers.Remove(target);
-                    return false;
-            }
-
-            return false;
         }
 
         private static bool IsModule(Entity weaponMarketItem) =>

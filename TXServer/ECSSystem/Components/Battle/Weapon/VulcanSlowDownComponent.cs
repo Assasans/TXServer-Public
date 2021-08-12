@@ -8,10 +8,9 @@ namespace TXServer.ECSSystem.Components.Battle.Weapon
 	[SerialVersionUID(-6843896944033144903L)]
 	public class VulcanSlowDownComponent : Component
 	{
-        public void OnRemove(Player player, Entity weapon)
+        public void OnAttached(Player player, Entity weapon)
         {
             if (!IsAfterShooting) return;
-
             ((Vulcan) player.BattlePlayer.MatchPlayer.BattleWeapon).LastVulcanHeatTactTime = null;
             ((Vulcan) player.BattlePlayer.MatchPlayer.BattleWeapon).VulcanShootingStartTime = null;
         }
