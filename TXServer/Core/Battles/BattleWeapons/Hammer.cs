@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using TXServer.Core.Configuration;
-using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.Components.Battle.Weapon.Hammer;
@@ -25,10 +24,7 @@ namespace TXServer.Core.Battles.BattleWeapons
             ReloadMagazineDurationSec = Config
                 .GetComponent<MagazineWeapon.ReloadMagazineTimePropertyComponent>(MarketItemPath).FinalValue;
 
-            CustomComponents = new Component[]
-            {
-                new WeaponCooldownComponent(1.9f)
-            };
+            CustomComponents.Add(new WeaponCooldownComponent(1.9f));
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)

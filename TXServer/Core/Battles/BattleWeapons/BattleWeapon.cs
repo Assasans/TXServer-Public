@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using TXServer.Core.Configuration;
@@ -46,13 +47,25 @@ namespace TXServer.Core.Battles.BattleWeapons
                 RadiusOfMaxSplashDamage = damageComponent.RadiusOfMaxSplashDamage;
                 RadiusOfMinSplashDamage = damageComponent.RadiusOfMinSplashDamage;
             }
+
+            WeaponRotationComponent weaponRotationComponent = BattlePlayer.TurretRotationSpeed is null
+                ? Config.GetComponent<WeaponRotationComponent>(
+                    MatchPlayer.Tank.TemplateAccessor.ConfigPath.Replace("battle", "garage"))
+                : new WeaponRotationComponent((float) BattlePlayer.TurretRotationSpeed);
+            OriginalWeaponRotationComponent = (WeaponRotationComponent) weaponRotationComponent.Clone();
+            CustomComponents.Add(weaponRotationComponent);
         }
 
         public abstract float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false);
 
-        public virtual float DamageWithCritical(bool backHit, float damage) => damage;
+        protected void ChangeRotationSpeed(float multiplier) => Weapon.ChangeComponent<WeaponRotationComponent>(
+            component =>
+            {
+                component.BaseSpeed *= multiplier;
+                component.Speed *= multiplier;
+            });
 
-        public virtual float TemperatureDeltaPerHit() => 0;
+        public virtual float DamageWithCritical(bool backHit, float damage) => damage;
 
         protected float DamageDistanceMultiplier(float distance)
         {
@@ -99,15 +112,21 @@ namespace TXServer.Core.Battles.BattleWeapons
             Weapon.TryRemoveComponent<ShootableComponent>();
         }
 
+        protected void RestoreRotation() => Weapon.ChangeComponent((Component) OriginalWeaponRotationComponent.Clone());
+
+        public virtual float TemperatureDeltaPerHit() => 0;
+
         public virtual void Tick() {}
 
 
         protected readonly MatchPlayer MatchPlayer;
+        private BattleTankPlayer BattlePlayer => MatchPlayer.Player.BattlePlayer;
+
         protected Entity Weapon => MatchPlayer.Weapon;
         protected Entity MarketItem => MatchPlayer.Player.CurrentPreset.Weapon;
         protected string MarketItemPath => MarketItem.TemplateAccessor.ConfigPath;
         private string BattleItemPath => "battle/weapon/" + MarketItemPath.Split('/').Last();
-        public Component[] CustomComponents { get; protected init; }
+        public List<Component> CustomComponents { get; } = new();
 
         protected float CooldownIntervalSec { get; }
         protected float DamagePerSecond { get; }
@@ -115,7 +134,7 @@ namespace TXServer.Core.Battles.BattleWeapons
         protected float MaxDamage { get; }
         protected float MinDamage { get; }
 
-        public float MaxHeatDamage { get; protected set; }
+        public float MaxHeatDamage { get; protected init; }
         public float MinHeatDamage { get; protected init; }
 
         private float MaxDamageDistance { get; }
@@ -124,5 +143,7 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         protected float RadiusOfMaxSplashDamage { get; }
         protected float RadiusOfMinSplashDamage { get; }
+
+        private WeaponRotationComponent OriginalWeaponRotationComponent { get; }
     }
 }

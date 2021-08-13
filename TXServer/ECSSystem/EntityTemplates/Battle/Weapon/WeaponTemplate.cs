@@ -68,15 +68,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 weapon.Components.Add(component);
             }
 
-            if (battlePlayer.TurretRotationSpeed == null)
-                weapon.AddComponent(Config.GetComponent<WeaponRotationComponent>(
-                        tank.TemplateAccessor.ConfigPath.Replace("battle", "garage")));
-            else
-            {
-                float turretRotation = (float)battlePlayer.TurretRotationSpeed;
-                weapon.AddComponent(new WeaponRotationComponent(turretRotation, turretRotation, turretRotation));
-            }
-
             return weapon;
         }
     }

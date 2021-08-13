@@ -25,7 +25,7 @@ namespace TXServer.Core.Battles
     public static class Damage
     {
         public static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
-            float damage, bool backHit = false, Vector3 localHitPoint = new(), bool isHeatDamage = false)
+            float damage, bool isBackHit = false, Vector3 localHitPoint = new(), bool isHeatDamage = false)
         {
             // triggers for Invulnerability & Emergency Protection modules
             if (victim.TryGetModule(out InvulnerabilityModule module)) if (module.EffectIsActive) return;
@@ -33,13 +33,20 @@ namespace TXServer.Core.Battles
 
             damager.UserResult.Damage += (int) damage;
 
-            if (backHit) damage *= 1.20f;
-            if (backHit && victim.TryGetModule(out BackhitDefenceModule backhitDefModule) &&
+            bool isTurretHit = (damager.BattleWeapon as Shaft)?.ShaftAimingBeginTime != null &&
+                             IsTurretHit(localHitPoint, victim.Tank);
+            if (isBackHit == false)
+                isBackHit = !isTurretHit && IsBackHit(localHitPoint, victim.Tank);
+
+            if (isBackHit) damage *= 1.20f;
+            if (isTurretHit) damage *= 2;
+
+            if (isBackHit && victim.TryGetModule(out BackhitDefenceModule backhitDefModule) &&
                 backhitDefModule.EffectIsActive)
                 damage = backhitDefModule.GetReducedDamage(damage);
 
             bool isCritical = !IsModule(weaponMarketItem) && damager.BattleWeapon.IsCritical(victim, localHitPoint);
-            if (isCritical) damage = damager.BattleWeapon.DamageWithCritical(backHit, damage);
+            if (isCritical) damage = damager.BattleWeapon.DamageWithCritical(isBackHit, damage);
 
             damage = GetHpWithEffects(damage, victim, damager, IsModule(weaponMarketItem), isHeatDamage,
                 weaponMarketItem);
@@ -68,7 +75,8 @@ namespace TXServer.Core.Battles
                 }
 
                 if (!IsModule(weaponMarketItem) || IsModule(weaponMarketItem) && damage != 0)
-                    damager.SendEvent(new DamageInfoEvent(damage, localHitPoint, backHit || isCritical), victim.Tank);
+                    damager.SendEvent(new DamageInfoEvent(damage, localHitPoint, isBackHit || isCritical || isTurretHit),
+                        victim.Tank);
                 victim.HealthChanged();
             });
         }
@@ -161,6 +169,12 @@ namespace TXServer.Core.Battles
         {
             if (matchPlayer.Battle.BattleState == BattleState.Ended) return;
             TemperatureConfigComponent temperatureConfig = matchPlayer.TemperatureConfigComponent;
+
+            if (matchPlayer.TankState is TankState.Dead)
+            {
+                matchPlayer.TemperatureHits.Clear();
+                return;
+            }
 
             foreach (TemperatureHit temperatureHit in matchPlayer.TemperatureHits.ToList())
             {
@@ -257,11 +271,9 @@ namespace TXServer.Core.Battles
             (Entity marketItem, BattleModule battleModule) = GetWeaponItems(weapon, shooter);
             bool isModule = battleModule is not null;
 
-            if (!isModule && shooter.BattleWeapon.IsOnCooldown(target)) return;
+            if (target.TankState is not TankState.Active) return;
 
-            bool turretHit = (shooter.BattleWeapon as Shaft)?.ShaftAimingBeginTime != null &&
-                             IsTurretHit(hitTarget.LocalHitPoint, target.Tank);
-            bool backHit = !turretHit && IsBackHit(hitTarget.LocalHitPoint, target.Tank);
+            if (!isModule && shooter.BattleWeapon.IsOnCooldown(target)) return;
 
             float damage;
             if (isModule)
@@ -272,14 +284,12 @@ namespace TXServer.Core.Battles
             else
                 damage = shooter.BattleWeapon.BaseDamage(hitTarget.HitDistance, target, isSplashHit);
 
-            if (turretHit) damage *= 2;
-
             if (shooter.BattleWeapon.GetType() == typeof(Isis) && !shooter.IsEnemyOf(target))
             {
                 DealIsisHeal(damage, shooter, target, hitTarget);
                 return;
             }
-            DealDamage(marketItem, target, shooter, damage, backHit, hitTarget.LocalHitPoint);
+            DealDamage(marketItem, target, shooter, damage, localHitPoint:hitTarget.LocalHitPoint);
         }
 
         public static bool IsBackHit(Vector3 localHitPoint, Entity hull)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
@@ -17,11 +18,11 @@ namespace TXServer.Core.Battles.BattleWeapons
             float energyRechargeSpeed =
                 Config.GetComponent<EnergyConfig.EnergyRechargeSpeedPropertyComponent>(MarketItemPath).FinalValue;
 
-            CustomComponents = new Component[]
+            CustomComponents.AddRange(new List<Component>
             {
                 new WeaponCooldownComponent(0.7f),
                 new DiscreteWeaponEnergyComponent(energyRechargeSpeed, energyChargePerShot)
-            };
+            });
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)

@@ -37,7 +37,7 @@ namespace TXServer.Core.Battles.Effect {
             Duration = Config.GetComponent<ModuleEffectDurationPropertyComponent>(ConfigPath, false)
                 ?.UpgradeLevel2Values[Level] ?? 0;
             MaxAmmunition = (int) Config.GetComponent<ModuleAmmunitionPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level];
+                .UpgradeLevel2Values.First();
 
             MinDamage = Config.GetComponent<ModuleEffectMinDamagePropertyComponent>(ConfigPath, false)
                 ?.UpgradeLevel2Values[Level] ?? 0;
@@ -307,7 +307,7 @@ namespace TXServer.Core.Battles.Effect {
 
         public int CurrentAmmunition
         {
-            get => ModuleEntity.GetComponent<InventoryAmmunitionComponent>().CurrentCount;
+            get => ModuleEntity?.GetComponent<InventoryAmmunitionComponent>().CurrentCount ?? 1;
             set
             {
                 if (CurrentAmmunition > value) ActivateCooldown();
