@@ -45,7 +45,9 @@ namespace TXServer.Core.Battles.Effect
                     Single(p => p.MatchPlayer.Tank == tank).MatchPlayer;
 
                 if (target.TryGetModule(out InvulnerabilityModule shieldModule))
-                    if (shieldModule.EffectIsActive) return;
+                    if (shieldModule.EffectIsActive) continue;
+
+                target.SendEvent(new EMPEffectReadyEvent(), tank);
 
                 foreach (BattleModule module in target.Modules.ToList()
                     .Where(module => module.GetType() != typeof(GoldModule)))
