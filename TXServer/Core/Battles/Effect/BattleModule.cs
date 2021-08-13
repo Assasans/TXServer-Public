@@ -11,6 +11,7 @@ using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.EntityTemplates.Item.Slot;
 using TXServer.ECSSystem.Events.Battle.Effect;
 using TXServer.ECSSystem.Types;
+using TXServer.Library;
 
 namespace TXServer.Core.Battles.Effect {
     public abstract class BattleModule
@@ -20,24 +21,28 @@ namespace TXServer.Core.Battles.Effect {
 			MatchPlayer = matchPlayer;
 
             if (moduleEntity != null)
-			    SlotEntity = SlotUserItemTemplate.CreateEntity(moduleEntity, matchPlayer.Player.BattlePlayer);
+                SlotEntity = SlotUserItemTemplate.CreateEntity(moduleEntity, matchPlayer.Player.BattlePlayer);
 			ModuleEntity = moduleEntity;
 
-			TickHandlers = new List<TickHandler>();
+            TickHandlers = new List<TickHandler>();
 			_nextTickHandlers = new List<Action>();
-		}
+        }
 
         public abstract void Activate();
 		public virtual void Deactivate() { }
         public virtual void Init()
         {
-            var ammunitionComponent = Config.GetComponent<ModuleAmmunitionPropertyComponent>(ConfigPath);
-            var cooldownComponent = Config.GetComponent<ModuleCooldownPropertyComponent>(ConfigPath);
-            var durationComponent = Config.GetComponent<ModuleEffectDurationPropertyComponent>(ConfigPath, false);
+            CooldownDuration = Config.GetComponent<ModuleCooldownPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level];
+            Duration = Config.GetComponent<ModuleEffectDurationPropertyComponent>(ConfigPath, false)
+                ?.UpgradeLevel2Values[Level] ?? 0;
+            MaxAmmunition = (int) Config.GetComponent<ModuleAmmunitionPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level];
 
-            CooldownDuration = cooldownComponent.UpgradeLevel2Values[Level - 1];
-            Duration = durationComponent?.UpgradeLevel2Values[Level - 1] ?? 0;
-            MaxAmmunition = (int) ammunitionComponent.UpgradeLevel2Values[Level - 1];
+            MinDamage = Config.GetComponent<ModuleEffectMinDamagePropertyComponent>(ConfigPath, false)
+                ?.UpgradeLevel2Values[Level] ?? 0;
+            MaxDamage = Config.GetComponent<ModuleEffectMaxDamagePropertyComponent>(ConfigPath, false)
+                ?.UpgradeLevel2Values[Level] ?? 0;
         }
 
         private void ActivateCooldown()
@@ -150,6 +155,9 @@ namespace TXServer.Core.Battles.Effect {
                 leavingPlayer.UnshareEntities(effectEntity);
         }
 
+        public virtual float BaseDamage(Entity weapon, MatchPlayer target) =>
+            (int) Math.Round(new Random().NextGaussianRange(MinDamage, MaxDamage));
+
         protected void ChangeDuration(float duration)
         {
             TickHandlers.Clear();
@@ -259,7 +267,7 @@ namespace TXServer.Core.Battles.Effect {
         public Entity SlotEntity { get; }
         public Entity ModuleEntity { get; }
         public Entity EffectEntity { get; protected set; }
-        protected List<Entity> EffectEntities { get; } = new();
+        public List<Entity> EffectEntities { get; } = new();
         public ModuleBehaviourType ModuleType { get; set; }
 
         public bool IsCheat { get; set; }
@@ -331,6 +339,13 @@ namespace TXServer.Core.Battles.Effect {
 
         public string ConfigPath { get; set; }
         public int Level { get; set; }
+
+        private float MinDamage { get; set; }
+        private float MaxDamage { get; set; }
+        public float MaxHeatDamage { get; protected set; }
+
+        public float TemperatureChange { get; protected set; }
+
 
         public readonly List<TickHandler> TickHandlers;
         private readonly List<Action> _nextTickHandlers;

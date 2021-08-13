@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Module.Mine;
@@ -13,8 +13,7 @@ namespace TXServer.Core.Battles.Effect
     public class SpiderMineModule : BattleModule
     {
         public SpiderMineModule(MatchPlayer matchPlayer, Entity garageModule) : base(
-            matchPlayer,
-            ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
+            matchPlayer, ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
         ) { }
 
         public override void Activate()
@@ -34,6 +33,9 @@ namespace TXServer.Core.Battles.Effect
         public override void Deactivate()
         {
             if (EffectEntity == null) return;
+
+            MatchPlayer.Battle.PlayersInMap.SendEvent(new MineExplosionEvent(), EffectEntity);
+
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
             EffectEntity = null;
             TimeOfDeath = null;
@@ -45,42 +47,42 @@ namespace TXServer.Core.Battles.Effect
             IsAffectedByEmp = false;
 
             Acceleration = Config.GetComponent<ModuleEffectAccelerationPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             ActivationTime = (long) Config.GetComponent<ModuleEffectActivationTimePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             BeginHideDistance = Config.GetComponent<ModuleMineEffectBeginHideDistancePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             HideRange = Config.GetComponent<ModuleMineEffectHideRangePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             Impact = Config.GetComponent<ModuleMineEffectImpactPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             DamageMaxRadius = Config
                 .GetComponent<ModuleMineEffectSplashDamageMaxRadiusPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             DamageMinRadius = Config
                 .GetComponent<ModuleMineEffectSplashDamageMinRadiusPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             DamageMinPercent = Config
                 .GetComponent<ModuleMineEffectSplashDamageMinPercentPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             Speed = Config.GetComponent<ModuleEffectSpeedPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             TargetingDistance = Config.GetComponent<ModuleEffectTargetingDistancePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             TargetingPeriod = Config.GetComponent<ModuleEffectTargetingPeriodPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
+        }
+
+        public override float BaseDamage(Entity weapon, MatchPlayer target)
+        {
+            Deactivate();
+            return base.BaseDamage(weapon, target);
         }
 
 
         private void CheckLifeTime()
         {
-            if (DateTimeOffset.UtcNow > TimeOfDeath) Explode();
-        }
-
-        public void Explode()
-        {
-            MatchPlayer.Battle.PlayersInMap.SendEvent(new MineExplosionEvent(), EffectEntity);
-            Deactivate();
+            if (DateTimeOffset.UtcNow > TimeOfDeath) Deactivate();
         }
 
         private void ReplaceMine()

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Effect;
@@ -40,9 +40,9 @@ namespace TXServer.Core.Battles.Effect {
             base.Init();
 
             Radius = Config.GetComponent<ModuleEffectTargetingDistancePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             Delay = Config.GetComponent<ModuleEffectActivationTimePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
         }
 
         private float Delay { get; set; }

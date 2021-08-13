@@ -1,4 +1,4 @@
-﻿using TXServer.Core.Configuration;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Module.AcceleratedGears;
@@ -54,11 +54,11 @@ namespace TXServer.Core.Battles.Effect
             DeactivateOnTankDisable = false;
 
             HullRotation = Config.GetComponent<ModuleAcceleratedGearsEffectHullRotationSpeedPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             TurretAcceleration = Config.GetComponent<ModuleAcceleratedGearsEffectTurretAccelerationPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             TurretSpeed = Config.GetComponent<ModuleAcceleratedGearsEffectTurretSpeedPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
         }
 
         private float HullRotation { get; set; }

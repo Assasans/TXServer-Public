@@ -180,7 +180,9 @@ namespace TXServer.Core.Battles
                 if (battlePlayer.Player.IsInSquad)
                     battlePlayer.Player.SquadPlayer.Squad.ProcessBattleLeave(battlePlayer.Player, this);
 
-                JoinedTankPlayers.Where(p => p != battlePlayer).UnsharePlayers(battlePlayer.Player);
+                JoinedTankPlayers
+                    .Where(p => p != battlePlayer && battlePlayer.Player.EntityList.Contains(p.Player.User))
+                    .UnsharePlayers(battlePlayer.Player);
                 Spectators.UnsharePlayers(battlePlayer.Player);
 
                 Logger.Log($"{battlePlayer.Player}: Left battle {BattleEntity.EntityId}");

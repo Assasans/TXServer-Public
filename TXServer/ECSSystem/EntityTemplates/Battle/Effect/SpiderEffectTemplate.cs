@@ -1,4 +1,3 @@
-using System;
 using System.Numerics;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;

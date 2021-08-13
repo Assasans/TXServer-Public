@@ -10,6 +10,8 @@ namespace TXServer.Core.Battles.BattleWeapons
         {
             TemperaturePerSecond = Config.GetComponent<DeltaTemperaturePerSecondPropertyComponent>(MarketItemPath)
                 .FinalValue;
+
+            MaxHeatDamage = 250;
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)
@@ -25,6 +27,6 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         public override bool IsOnCooldown(MatchPlayer target) => IsStreamOnCooldown(target);
 
-        private float TemperaturePerSecond { get; set; }
+        private float TemperaturePerSecond { get; }
     }
 }

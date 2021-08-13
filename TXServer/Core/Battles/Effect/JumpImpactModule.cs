@@ -1,4 +1,4 @@
-﻿using TXServer.Core.Configuration;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Module.JumpImpact;
 using TXServer.ECSSystem.Components.Battle.Tank;
@@ -36,9 +36,9 @@ namespace TXServer.Core.Battles.Effect
             IsAffectedByEmp = false;
 
             ForceMultiplier = Config.GetComponent<JumpImpactForceMultPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             WorkingTemperature = Config.GetComponent<JumpImpactWorkingTemperaturePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
         }
 
         private float ForceMultiplier { get; set; }

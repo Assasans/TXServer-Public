@@ -42,11 +42,18 @@ namespace TXServer.Core.Battles.Effect
             DeactivateOnTankDisable = false;
 
             DamageMinPercent = Config.GetComponent<ModuleEffectSplashDamageMinPercentPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             Impact = Config.GetComponent<ModuleEffectImpactPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             SplashRadius = Config.GetComponent<ModuleEffectSplashRadiusPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
+        }
+
+        public override float BaseDamage(Entity weapon, MatchPlayer target)
+        {
+            if (!EffectIsActive) return 0;
+            Deactivate();
+            return base.BaseDamage(weapon, target);
         }
 
         private float DamageMinPercent { get; set; }

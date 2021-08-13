@@ -12,13 +12,13 @@ namespace TXServer.Core.Battles.BattleWeapons
             DeltaTemperaturePerSecond = Config
                 .GetComponent<DeltaTemperaturePerSecondPropertyComponent>(MarketItemPath).FinalValue;
 
-            MaxHeatDamage = 100;
+            MaxHeatDamage = 105;
             MinHeatDamage = 50;
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)
         {
-            if (IsOverheating)
+            if (IsOverheating(5500))
                 Damage.DealNewTemperature(Weapon, MarketItem, target, MatchPlayer);
 
             float damage = (int) DamagePerSecond * CooldownIntervalSec;
@@ -27,7 +27,7 @@ namespace TXServer.Core.Battles.BattleWeapons
             return (int) Math.Round(damage * distanceModifier);
         }
 
-        public override float TemperatureDeltaPerHit() => DeltaTemperaturePerSecond * CooldownIntervalSec / 0.5f;
+        public override float TemperatureDeltaPerHit() => DeltaTemperaturePerSecond * CooldownIntervalSec / 0.75f;
 
         public override bool IsOnCooldown(MatchPlayer target)
         {
@@ -56,7 +56,7 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         private void HandleVulcanOverheating()
         {
-            if (!IsOverheating) return;
+            if (!IsOverheating()) return;
             if (LastVulcanHeatTactTime != null &&
                 (DateTimeOffset.UtcNow - LastVulcanHeatTactTime).Value.TotalMilliseconds < 1000)
                 return;
@@ -90,8 +90,9 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         private float DeltaTemperaturePerSecond { get; }
 
-        private bool IsOverheating => VulcanShootingStartTime != null &&
-                                      (DateTimeOffset.UtcNow - VulcanShootingStartTime).Value.TotalMilliseconds >= 5000;
+        private bool IsOverheating(float minMs = 5000) => VulcanShootingStartTime != null &&
+                                                          (DateTimeOffset.UtcNow - VulcanShootingStartTime).Value
+                                                          .TotalMilliseconds >= minMs;
 
         private const float MaxOverheatTemperatureDamage = 150;
         private const float MinOverheatTemperatureDamage = 50;

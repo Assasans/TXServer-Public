@@ -29,8 +29,10 @@ namespace TXServer.Core.Battles.BattleWeapons
             return (int) Math.Round(damage * distanceModifier);
         }
 
-        public (float, bool) GetPossibleCriticalDamage(bool backHit, float damage, MatchPlayer victim,
-            Vector3 localPosition)
+        public override float DamageWithCritical(bool backHit, float damage) =>
+            (float) (backHit ? damage * 2.07f : damage * 1.87);
+
+        public override bool IsCritical(MatchPlayer victim, Vector3 localPosition)
         {
             if (new Random().Next(0, 100) <= CurrentCriticalProbability * 100)
             {
@@ -38,13 +40,13 @@ namespace TXServer.Core.Battles.BattleWeapons
 
                 MatchPlayer.Battle.PlayersInMap.SendEvent(new CriticalDamageEvent(victim.Tank, localPosition),
                     MatchPlayer.Weapon);
-                return ((float) (backHit ? damage * 2.07f : damage * 1.87), true);
+                return true;
             }
 
             CurrentCriticalProbability = Math.Clamp(CurrentCriticalProbability + CriticalProbabilityDelta,
                 AfterCriticalProbability, MaxCriticalProbability);
 
-            return (damage, false);
+            return false;
         }
 
         public override void OnSpawn()

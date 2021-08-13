@@ -19,11 +19,17 @@ namespace TXServer.ECSSystem.Events.Item
             (int level, int cards) infos = player.Data.Modules[id];
             Entity moduleItem = ResourceManager.GetModuleUserItem(player, id);
 
-            ModulePrice modulePrice =
-                moduleItem.GetComponent<ModuleCardsCompositionComponent>().AllPrices[infos.level + 1];
+            // check if already max level
+            ModuleCardsCompositionComponent compositionComponent =
+                moduleItem.GetComponent<ModuleCardsCompositionComponent>();
+            if (compositionComponent.AllPrices.Count < infos.level + 2) return;
+
+            ModulePrice modulePrice = compositionComponent.AllPrices[infos.level + 1];
             int price = xCrystals ? modulePrice.XCrystals : modulePrice.Crystals;
 
-            // todo: check if enough blueprints
+            // check if player has enough blueprints to upgrade
+            if (player.Data.Modules.TryGetValue(id, out (int _, int amount) blueprint) &&
+                blueprint.amount < modulePrice.Cards) return;
 
             if (xCrystals && player.Data.XCrystals >= price)
                 player.Data.XCrystals -= price;

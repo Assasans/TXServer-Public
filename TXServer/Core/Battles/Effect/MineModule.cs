@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Numerics;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
@@ -43,26 +43,32 @@ namespace TXServer.Core.Battles.Effect
             IsAffectedByEmp = false;
 
             ActivationTime = (long) Config.GetComponent<ModuleEffectActivationTimePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             BeginHideDistance = Config.GetComponent<ModuleMineEffectBeginHideDistancePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             DamageMaxRadius = Config
                 .GetComponent<ModuleMineEffectSplashDamageMaxRadiusPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             DamageMinRadius = Config
                 .GetComponent<ModuleMineEffectSplashDamageMinRadiusPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             DamageMinPercent = Config
                 .GetComponent<ModuleMineEffectSplashDamageMinPercentPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             ExplosionDelayMs = Config.GetComponent<ModuleMineEffectExplosionDelayMSPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             HideRange = Config.GetComponent<ModuleMineEffectHideRangePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             Impact = Config.GetComponent<ModuleMineEffectImpactPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             TriggeringArea = Config.GetComponent<ModuleMineEffectTriggeringAreaPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
+        }
+
+        public override float BaseDamage(Entity weapon, MatchPlayer target)
+        {
+            Explode(weapon);
+            return base.BaseDamage(weapon, target);
         }
 
 

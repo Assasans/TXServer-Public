@@ -1,4 +1,4 @@
-﻿using TXServer.Core.Battles.BattleWeapons;
+using TXServer.Core.Battles.BattleWeapons;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Effect.EnergyInjection;
@@ -28,7 +28,7 @@ namespace TXServer.Core.Battles.Effect
 
             ReloadEnergyPercent = Config
                 .GetComponent<ModuleEnergyInjectionEffectReloadPercentPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
 
             EffectEntity = EnergyInjectionEffectTemplate.CreateEntity(MatchPlayer);
             MatchPlayer.ShareEntities(EffectEntity);

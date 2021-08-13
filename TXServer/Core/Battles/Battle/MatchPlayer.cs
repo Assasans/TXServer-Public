@@ -204,13 +204,15 @@ namespace TXServer.Core.Battles
             foreach (BattleModule module in Modules.Where(m => m.ActivateOnTankSpawn && !m.IsOnCooldown))
                 module.Activate();
         }
-        public void DisableTank(bool deactivateModuleCooldown = false)
+        public void DisableTank(bool resetModuleCooldown = false)
         {
             if (KeepDisabled)
                 Tank.TryRemoveComponent(TankStates[_tankState].Item1);
             Tank.TryRemoveComponent<SelfDestructionComponent>();
 
-            foreach (BattleModule module in Modules.ToArray().Where(m => m.DeactivateOnTankDisable))
+            List<BattleModule> battleModules =
+                resetModuleCooldown ? Modules : Modules.Where(m => m.DeactivateOnTankDisable).ToList();
+            foreach (BattleModule module in battleModules)
             {
                 module.TickHandlers.Clear();
                 if (module.IsCheat)
@@ -223,7 +225,7 @@ namespace TXServer.Core.Battles
                 }
                 module.Deactivate();
 
-                if (deactivateModuleCooldown && module.IsOnCooldown) module.DeactivateCooldown();
+                if (resetModuleCooldown && module.IsOnCooldown) module.DeactivateCooldown();
             }
 
             Tank.ChangeComponent<SpeedComponent>(component => component.Speed = OriginalTankSpeed);

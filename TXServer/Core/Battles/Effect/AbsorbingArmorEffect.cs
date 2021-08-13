@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Module.Armor;
@@ -49,7 +49,7 @@ namespace TXServer.Core.Battles.Effect
             base.Init();
 
             ModuleFactor = Config.GetComponent<ModuleArmorEffectPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
         }
 
 

@@ -1,4 +1,4 @@
-﻿using TXServer.Core.Configuration;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
@@ -27,7 +27,7 @@ namespace TXServer.Core.Battles.Effect
             DeactivateOnTankDisable = false;
 
             Factor = Config.GetComponent<ModuleEngineerEffectDurationFactorPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
 
             Activate();
         }

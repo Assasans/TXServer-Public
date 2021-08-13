@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.Configuration;
@@ -43,6 +43,8 @@ namespace TXServer.Core.Battles.Effect
         {
             if (!EffectIsActive) return;
 
+            foreach (var droneTuple in Drones) DeactivateSingleDrone(droneTuple.Item1);
+
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntities);
             EffectEntities.Clear();
         }
@@ -69,9 +71,9 @@ namespace TXServer.Core.Battles.Effect
             IsAffectedByEmp = false;
 
             TargetingDistance = Config.GetComponent<ModuleEffectTargetingDistancePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             TargetingPeriod = Config.GetComponent<ModuleEffectTargetingPeriodPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
         }
 
 

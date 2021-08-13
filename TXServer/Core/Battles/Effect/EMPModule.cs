@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
@@ -34,7 +34,7 @@ namespace TXServer.Core.Battles.Effect
 
             Radius = Config
                 .GetComponent<ModuleEMPEffectRadiusPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
         }
 
         public void ApplyEmpOnTargets(Entity[] targets)

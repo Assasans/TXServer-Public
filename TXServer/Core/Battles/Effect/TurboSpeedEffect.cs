@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Chassis;
@@ -53,7 +53,7 @@ namespace TXServer.Core.Battles.Effect
             base.Init();
 
             ModuleFactor = Config.GetComponent<ModuleTurbospeedEffectPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
         }
 
         private float Factor()

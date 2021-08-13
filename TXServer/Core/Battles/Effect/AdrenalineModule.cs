@@ -40,13 +40,13 @@ namespace TXServer.Core.Battles.Effect
             base.Init();
 
             DamageFactor = Config.GetComponent<ModuleDamageEffectMaxFactorPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             ModuleCooldownSpeedCoeff = Config
                 .GetComponent<ModuleAdrenalineEffectCooldownSpeedCoeffPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             MaxHpPercentWorking =
                 Config.GetComponent<ModuleAdrenalineEffectMaxHPPercentWorkingPropertyComponent>(ConfigPath)
-                    .UpgradeLevel2Values[Level - 1];
+                    .UpgradeLevel2Values[Level];
         }
 
         public void CheckActivationNecessity()

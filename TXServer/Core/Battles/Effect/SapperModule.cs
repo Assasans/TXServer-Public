@@ -39,7 +39,7 @@ namespace TXServer.Core.Battles.Effect
             base.Init();
 
             DamageResistanceEffect  = Config.GetComponent<DamageResistanceEffectPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
         }
 
         public float ReduceDamage(float damage)

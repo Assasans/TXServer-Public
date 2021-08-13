@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Numerics;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
@@ -49,6 +50,8 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         public abstract float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false);
 
+        public virtual float DamageWithCritical(bool backHit, float damage) => damage;
+
         public virtual float TemperatureDeltaPerHit() => 0;
 
         protected float DamageDistanceMultiplier(float distance)
@@ -63,9 +66,11 @@ namespace TXServer.Core.Battles.BattleWeapons
             return distanceModifier;
         }
 
+        public virtual bool IsCritical(MatchPlayer victim, Vector3 localPosition) => false;
+
         public virtual bool IsOnCooldown(MatchPlayer target) => false;
 
-        protected virtual bool IsStreamOnCooldown(MatchPlayer target)
+        protected bool IsStreamOnCooldown(MatchPlayer target)
         {
             if (!MatchPlayer.StreamHitLengths.ContainsKey(target))
             {
@@ -110,7 +115,7 @@ namespace TXServer.Core.Battles.BattleWeapons
         protected float MaxDamage { get; }
         protected float MinDamage { get; }
 
-        public float MaxHeatDamage { get; set; }
+        public float MaxHeatDamage { get; protected set; }
         public float MinHeatDamage { get; protected init; }
 
         private float MaxDamageDistance { get; }

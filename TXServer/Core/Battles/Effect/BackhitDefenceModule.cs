@@ -35,7 +35,7 @@ namespace TXServer.Core.Battles.Effect
             AlwaysActiveExceptEmp = true;
 
             Factor = Config.GetComponent<ModuleBackhitModificatorEffectPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
         }
 
 

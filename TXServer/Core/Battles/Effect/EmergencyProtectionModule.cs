@@ -6,6 +6,7 @@ using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 using TXServer.ECSSystem.Events.Battle.Effect;
+using TXServer.Library;
 using HealthComponent = TXServer.ECSSystem.Components.Battle.Health.HealthComponent;
 
 namespace TXServer.Core.Battles.Effect
@@ -32,7 +33,7 @@ namespace TXServer.Core.Battles.Effect
             MatchPlayer.Battle.PlayersInMap.SendEvent(new TriggerEffectExecuteEvent(), EffectEntity);
             MatchPlayer.Weapon.RemoveComponent<ShootableComponent>();
 
-            // todo: add freeze effect
+            Damage.DealNewTemperature(EffectEntity, MarketItem, MatchPlayer, MatchPlayer);
 
             Schedule(TimeSpan.FromMilliseconds(HolyshieldDuration), Deactivate);
         }
@@ -59,12 +60,14 @@ namespace TXServer.Core.Battles.Effect
 
             AdditiveHpFactor = Config
                 .GetComponent<ModuleEmergencyProtectionEffectAdditiveHPFactorPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             FixedHp = Config.GetComponent<ModuleEmergencyProtectionEffectFixedHPPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             HolyshieldDuration = Config
                 .GetComponent<ModuleEmergencyProtectionEffectHolyshieldDurationPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
+
+            TemperatureChange = (float) MathUtils.Map(Level, 0, 9, -0.8, -1);
         }
 
         private DateTimeOffset ImmunityEndTime { get; set; }

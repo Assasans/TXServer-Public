@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Module.IncreasedDamage;
@@ -50,7 +50,7 @@ namespace TXServer.Core.Battles.Effect
             base.Init();
             // min & max factor are the same for this module
             ModuleFactor = Config.GetComponent<ModuleDamageEffectMaxFactorPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
         }
 
         public float Factor => IsSupply ? 1.5f : ModuleFactor;

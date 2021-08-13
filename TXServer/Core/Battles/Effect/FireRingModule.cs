@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Module.Icetrap;
 using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
+using TXServer.Library;
 
 namespace TXServer.Core.Battles.Effect
 {
@@ -40,21 +41,29 @@ namespace TXServer.Core.Battles.Effect
             base.Init();
 
             DamageMinPercent = Config.GetComponent<ModuleEffectSplashDamageMinPercentPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             Impact = Config.GetComponent<ModuleEffectImpactPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             SplashRadius = Config.GetComponent<ModuleEffectSplashRadiusPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
             TemperatureDuration = Config.GetComponent<ModuleIcetrapEffectTemperatureDurationPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
-            TemperatureLimit = Config.GetComponent<ModuleIcetrapEffectTemperatureLimitPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level - 1];
+                .UpgradeLevel2Values[Level];
+            TemperatureChange = Config.GetComponent<ModuleIcetrapEffectTemperatureLimitPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level];
+
+            Console.WriteLine(Level);
+            MaxHeatDamage = MathUtils.Map(Level, 0, 9, 150, 225);
+        }
+
+        public override float BaseDamage(Entity weapon, MatchPlayer target)
+        {
+            Damage.DealNewTemperature(EffectEntity, MarketItem, target, MatchPlayer);
+            return base.BaseDamage(weapon, target);
         }
 
         private float DamageMinPercent { get; set; }
         private float Impact { get; set; }
         private float SplashRadius { get; set; }
         private float TemperatureDuration { get; set; }
-        private float TemperatureLimit { get; set; }
     }
 }
