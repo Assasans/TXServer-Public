@@ -39,42 +39,6 @@ namespace TXServer.ECSSystem.Events.Item
                 e.EntityId == container.GetComponent<MarketItemGroupComponent>().Key);
 
             return Containers.GetShopContainer(containerMarketItem, player).GetRewards(new Random(), containerAmount);
-
-            switch (containerMarketItem.TemplateAccessor.Template)
-            {
-                default:
-                    Dictionary<Entity, int> blueprints = GetBlueprintsByContainer(containerMarketItem, player);
-
-                    foreach ((Entity card, int amount) in blueprints)
-                    {
-                        ResourceManager.SaveNewMarketItem(player, card, amount);
-                        notifications.Add(NewItemNotificationTemplate.CreateCardNotification(container, card, amount));
-                    }
-                    break;
-            }
-
-            return notifications;
-        }
-
-        private Dictionary<Entity, int> GetBlueprintsByContainer(Entity containerMarketItem, Player player)
-        {
-            Dictionary<Entity, int> blueprints = new Dictionary<Entity, int>();
-            TargetTierComponent targetTierComponent =
-                Config.GetComponent<TargetTierComponent>(containerMarketItem.TemplateAccessor.ConfigPath, false);
-
-            return blueprints;
-        }
-
-        private List<Entity> TierBlueprints(int tier, Player player)
-        {
-            IEnumerable<Entity> modules = player.EntityList.Where(e =>
-                !ResourceManager.MarketToUserTemplate.ContainsValue(e.TemplateAccessor.Template.GetType()) &&
-                e.HasComponent<ModuleTierComponent>() && e.GetComponent<ModuleTierComponent>().TierNumber == tier &&
-                e.GetComponent<MarketItemGroupComponent>().Key == e.EntityId);
-
-            return modules.Select(module => player.EntityList.SingleOrDefault(e =>
-                e.TemplateAccessor.Template is ModuleCardMarketItemTemplate &&
-                e.GetComponent<ParentGroupComponent>().Key == module.EntityId)).Where(card => card != null).ToList();
         }
 
         public long Amount { get; set; }

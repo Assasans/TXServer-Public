@@ -32,18 +32,21 @@ namespace TXServer.Core.Battles.Effect {
 		public virtual void Deactivate() { }
         public virtual void Init()
         {
-            CooldownDuration = Config.GetComponent<ModuleCooldownPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level];
+            CooldownDuration = GetConfigByLevel(Config.GetComponent<ModuleCooldownPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values);
             Duration = Config.GetComponent<ModuleEffectDurationPropertyComponent>(ConfigPath, false)
                 ?.UpgradeLevel2Values[Level] ?? 0;
-            MaxAmmunition = (int) Config.GetComponent<ModuleAmmunitionPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values.First();
+            MaxAmmunition = (int) GetConfigByLevel(Config.GetComponent<ModuleAmmunitionPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values);
 
             MinDamage = Config.GetComponent<ModuleEffectMinDamagePropertyComponent>(ConfigPath, false)
                 ?.UpgradeLevel2Values[Level] ?? 0;
             MaxDamage = Config.GetComponent<ModuleEffectMaxDamagePropertyComponent>(ConfigPath, false)
                 ?.UpgradeLevel2Values[Level] ?? 0;
         }
+
+        private float GetConfigByLevel(List<float> statsPerLevel) =>
+            statsPerLevel.Count - 1 < Level ? statsPerLevel.Last() : statsPerLevel[Level];
 
         private void ActivateCooldown()
         {

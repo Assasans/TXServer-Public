@@ -20,11 +20,7 @@ namespace TXServer.Core.Battles.Effect
             if (EffectEntity != null) return;
 
             MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.TurnSpeed *= HullRotation);
-            MatchPlayer.Weapon.ChangeComponent<WeaponRotationComponent>(component =>
-            {
-                component.Acceleration *= TurretAcceleration;
-                component.Speed *= TurretSpeed;
-            });
+            MatchPlayer.BattleWeapon.ChangeRotationSpeed(TurretAcceleration, TurretSpeed, true);
 
             EffectEntity = AcceleratedGearsEffectTemplate.CreateEntity(MatchPlayer);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
@@ -35,11 +31,7 @@ namespace TXServer.Core.Battles.Effect
             if (EffectEntity == null) return;
 
             MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.TurnSpeed /= HullRotation);
-            MatchPlayer.Weapon.ChangeComponent<WeaponRotationComponent>(component =>
-            {
-                component.Acceleration /= TurretAcceleration;
-                component.Speed /= TurretSpeed;
-            });
+            MatchPlayer.BattleWeapon.ChangeRotationSpeed(TurretAcceleration - 1, TurretSpeed -1, true);
 
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
             EffectEntity = null;

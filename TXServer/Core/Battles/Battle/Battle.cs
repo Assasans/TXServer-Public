@@ -126,6 +126,8 @@ namespace TXServer.Core.Battles
 
         public void AddPlayer(Player player, bool isSpectator)
         {
+            if (player.IsInBattle) return;
+
             Logger.Log($"{player}: Joined battle {BattleEntity.EntityId}{(isSpectator ? " as spectator" : null)}");
 
             player.SharePlayers(JoinedTankPlayers.Select(x => x.Player));

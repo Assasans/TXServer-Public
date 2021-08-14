@@ -24,7 +24,7 @@ namespace TXServer.Core.Battles.BattleWeapons
         public void StartAiming()
         {
             ((Shaft) MatchPlayer.BattleWeapon).ShaftAimingBeginTime = DateTimeOffset.UtcNow;
-            ChangeRotationSpeed(RotationAimingStateMultiplier);
+            ChangeRotationSpeed(speedMultiplier:RotationAimingStateMultiplier);
         }
 
         public void StopAiming()
