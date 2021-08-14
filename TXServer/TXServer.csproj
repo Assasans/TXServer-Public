@@ -45,17 +45,14 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="Library\Config.json">
+    <None Update="Library/HeightMaps/**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Library/Config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>Config.json</Link>
     </None>
-    <None Update="Library\ServerMapInfo.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Library/HeightMaps.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Library/HeightMaps/**">
+    <None Update="Library/*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
