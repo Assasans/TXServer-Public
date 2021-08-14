@@ -14,6 +14,7 @@ using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
+using TXServer.ECSSystem.Components.Battle.Weapon;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle.Tank;
@@ -34,8 +35,8 @@ namespace TXServer.Core.Battles
     {
         public MatchPlayer(BattleTankPlayer battlePlayer, Entity battleEntity, IEnumerable<UserResult> userResults)
         {
-            OriginalTankSpeed = Config.GetComponent<SpeedComponent>(
-                battlePlayer.Player.CurrentPreset.HullItem.TemplateAccessor.ConfigPath).Speed;
+            OriginalSpeedComponent = Config.GetComponent<SpeedComponent>(
+                battlePlayer.Player.CurrentPreset.HullItem.TemplateAccessor.ConfigPath);
 
             Battle = battlePlayer.Battle;
             Player = battlePlayer.Player;
@@ -173,6 +174,34 @@ namespace TXServer.Core.Battles
             Player.Data.SetExperience(Player.Data.Experience + AlreadyAddedExperience, false);
         }
 
+        public void SpeedByTemperature()
+        {
+            bool hasSpeedCheat = TryGetModule(typeof(TurboSpeedModule),
+                out BattleModule turboSpeedModule) && turboSpeedModule.IsCheat;
+            float originalSpeed = hasSpeedCheat ? float.MaxValue : OriginalSpeedComponent.Speed;
+
+            float speed = MathUtils.Map(Temperature, 0, TemperatureConfigComponent.MinTemperature,
+                originalSpeed, 0);
+            speed = Math.Clamp(speed, originalSpeed / 100 * 20, originalSpeed);
+
+            float turnSpeed = MathUtils.Map(Temperature, 0, TemperatureConfigComponent.MinTemperature,
+                OriginalSpeedComponent.TurnSpeed, 0);
+            turnSpeed = Math.Clamp(turnSpeed, OriginalSpeedComponent.TurnSpeed / 100 * 20,
+                OriginalSpeedComponent.TurnSpeed);
+
+            float turretRotationMultiplier =
+                MathUtils.Map(Temperature, 0, TemperatureConfigComponent.MinTemperature, 1, 0);
+            turretRotationMultiplier = Math.Clamp(turretRotationMultiplier, 0.2f, 1);
+
+            Tank.ChangeComponent<SpeedComponent>(component =>
+            {
+                component.Speed = speed;
+                component.TurnSpeed = turnSpeed;
+            });
+            Weapon.ChangeComponent<WeaponRotationComponent>(component =>
+                component.ChangeByTemperature(BattleWeapon, turretRotationMultiplier));
+        }
+
         public bool TryGetModule(Type moduleType, out BattleModule module)
         {
             module = Modules.SingleOrDefault(m => m.GetType() == moduleType);
@@ -228,7 +257,7 @@ namespace TXServer.Core.Battles
                 if (resetModuleCooldown && module.IsOnCooldown) module.DeactivateCooldown();
             }
 
-            Tank.ChangeComponent<SpeedComponent>(component => component.Speed = OriginalTankSpeed);
+            Tank.ChangeComponent((Component) OriginalSpeedComponent.Clone());
 
             if (BattleWeapon.GetType() == typeof(Vulcan)) ((Vulcan) BattleWeapon).ResetOverheat();
             TemperatureHits.Clear();
@@ -240,17 +269,6 @@ namespace TXServer.Core.Battles
 
             Tank.TryRemoveComponent<TankMovableComponent>();
             BattleWeapon.OnDespawn();
-        }
-
-        public float TemperatureSpeed()
-        {
-            bool hasSpeedCheat = TryGetModule(typeof(TurboSpeedModule),
-                out BattleModule turboSpeedModule) && turboSpeedModule.IsCheat;
-            float originalSpeed = hasSpeedCheat ? float.MaxValue : OriginalTankSpeed;
-
-            float speed = MathUtils.Map(Temperature, 0, TemperatureConfigComponent.MinTemperature,
-                                    originalSpeed, 0);
-            return Math.Clamp(speed, originalSpeed / 100 * 20, originalSpeed);
         }
 
         public void Tick()
@@ -454,7 +472,7 @@ namespace TXServer.Core.Battles
 
         public Dictionary<MatchPlayer, float> DamageAssistants { get; } = new();
 
-        private float OriginalTankSpeed { get; }
+        private SpeedComponent OriginalSpeedComponent { get; }
 
         public SpawnPoint LastSpawnPoint { get; private set; }
         public TeleportPoint LastTeleportPoint { get; private set; }

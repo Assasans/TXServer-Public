@@ -6,7 +6,6 @@ using TXServer.Core.Battles.BattleWeapons;
 using TXServer.Core.Battles.Effect;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
-using TXServer.ECSSystem.Components.Battle.Chassis;
 using TXServer.ECSSystem.Components.Battle.Effect;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
@@ -157,12 +156,34 @@ namespace TXServer.Core.Battles
                     t => t.Shooter == shooter && t.WeaponMarketItem == weaponMarketItem)] = temperatureHit;
             }
             else
+            {
+                if (target.Temperature - temperatureChange > 0 != temperatureChange > 0)
+                {
+                    foreach (TemperatureHit tempHit in target.TemperatureHits.ToList())
+                    {
+                        if (tempHit.CurrentTemperature > 0 == temperatureChange > 0) continue;
+
+                        if (tempHit.CurrentTemperature - temperatureChange > 0 != (tempHit.CurrentTemperature > 0))
+                        {
+                            target.TemperatureHits.Remove(tempHit);
+                            temperatureChange -= tempHit.CurrentTemperature;
+                            continue;
+                        }
+
+                        tempHit.CurrentTemperature += temperatureChange;
+                        target.Temperature = target.TemperatureFromAllHits();
+                        return;
+                    }
+                }
+
+                Console.WriteLine("added");
+
                 target.TemperatureHits.Add(new TemperatureHit(temperatureChange, maxHeatDamage,
                     isModule ? 0 : shooter.BattleWeapon.MinHeatDamage, shooter,
                     weapon, weaponMarketItem));
+            }
 
-            target.Tank.ChangeComponent<SpeedComponent>(component =>
-                component.Speed = target.TemperatureSpeed());
+            target.SpeedByTemperature();
         }
 
         public static void DealAutoTemperature(MatchPlayer matchPlayer)
@@ -185,7 +206,7 @@ namespace TXServer.Core.Battles
                 float temperatureDelta = temperatureHit.CurrentTemperature switch
                 {
                     > 0 => -temperatureConfig.AutoDecrementInMs * temperatureConfig.TactPeriodInMs / 2,
-                    < 0 => temperatureConfig.AutoIncrementInMs * temperatureConfig.TactPeriodInMs / 1.5f,
+                    < 0 => temperatureConfig.AutoIncrementInMs * temperatureConfig.TactPeriodInMs / 2,
                     _ => 0
                 };
                 if (temperatureHit.CurrentTemperature > 0)
@@ -208,8 +229,7 @@ namespace TXServer.Core.Battles
                 {
                     matchPlayer.TemperatureHits.Remove(temperatureHit);
                     matchPlayer.Temperature = matchPlayer.TemperatureFromAllHits();
-                    matchPlayer.Tank.ChangeComponent<SpeedComponent>(component =>
-                        component.Speed = matchPlayer.TemperatureSpeed());
+                    matchPlayer.SpeedByTemperature();
                     return;
                 }
 
@@ -221,8 +241,7 @@ namespace TXServer.Core.Battles
                     tempHit.CurrentTemperature += temperatureChangePerHit;
 
                 matchPlayer.Temperature = matchPlayer.TemperatureFromAllHits();
-                matchPlayer.Tank.ChangeComponent<SpeedComponent>(component =>
-                    component.Speed = matchPlayer.TemperatureSpeed());
+                matchPlayer.SpeedByTemperature();
             }
         }
 

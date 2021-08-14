@@ -33,6 +33,7 @@ namespace TXServer.Core.Battles.Effect
             MatchPlayer.Battle.PlayersInMap.SendEvent(new TriggerEffectExecuteEvent(), EffectEntity);
             MatchPlayer.Weapon.RemoveComponent<ShootableComponent>();
 
+            MatchPlayer.TemperatureHits.Clear();
             Damage.DealNewTemperature(EffectEntity, MarketItem, MatchPlayer, MatchPlayer);
 
             Schedule(TimeSpan.FromMilliseconds(HolyshieldDuration), Deactivate);

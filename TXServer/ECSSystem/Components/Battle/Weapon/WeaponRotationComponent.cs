@@ -1,4 +1,5 @@
-﻿using TXServer.Core.Protocol;
+﻿using TXServer.Core.Battles.BattleWeapons;
+using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Components.Battle.Weapon
@@ -8,6 +9,9 @@ namespace TXServer.ECSSystem.Components.Battle.Weapon
     {
         public WeaponRotationComponent(float simplifiedTurretRotation) =>
             Speed = Acceleration = BaseSpeed = simplifiedTurretRotation;
+
+        public void ChangeByTemperature(BattleWeapon battleWeapon, float multiplier) =>
+            Speed = battleWeapon.OriginalWeaponRotationComponent.Speed * multiplier;
 
         public float Speed { get; set; }
         public float Acceleration { get; set; }

@@ -58,7 +58,8 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         public abstract float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false);
 
-        public void ChangeRotationSpeed(float accelerationMultiplier = 1, float speedMultiplier = 1, bool setAsOriginal = false)
+        public void ChangeRotationSpeed(float accelerationMultiplier = 1,
+            float speedMultiplier = 1)
         {
             Weapon.ChangeComponent<WeaponRotationComponent>(
                 component =>
@@ -66,9 +67,6 @@ namespace TXServer.Core.Battles.BattleWeapons
                     component.Acceleration *= accelerationMultiplier;
                     component.Speed *= speedMultiplier;
                 });
-            if (setAsOriginal)
-                OriginalWeaponRotationComponent =
-                    (WeaponRotationComponent) Weapon.GetComponent<WeaponRotationComponent>().Clone();
         }
 
         public virtual float DamageWithCritical(bool backHit, float damage) => damage;
@@ -150,6 +148,6 @@ namespace TXServer.Core.Battles.BattleWeapons
         protected float RadiusOfMaxSplashDamage { get; }
         protected float RadiusOfMinSplashDamage { get; }
 
-        private WeaponRotationComponent OriginalWeaponRotationComponent { get; set; }
+        public WeaponRotationComponent OriginalWeaponRotationComponent { get; set; }
     }
 }
