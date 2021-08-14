@@ -176,8 +176,6 @@ namespace TXServer.Core.Battles
                     }
                 }
 
-                Console.WriteLine("added");
-
                 target.TemperatureHits.Add(new TemperatureHit(temperatureChange, maxHeatDamage,
                     isModule ? 0 : shooter.BattleWeapon.MinHeatDamage, shooter,
                     weapon, weaponMarketItem));
