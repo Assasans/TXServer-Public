@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.Configuration;
@@ -109,8 +108,7 @@ namespace TXServer.Core
         {
             // todo: compare ALL players in database
             players ??= Server.Instance.Connection.Pool;
-            return players.OrderByDescending(p => p?.Data.Reputation).ToList().IndexOf(player) +
-                   1;
+            return players.OrderByDescending(p => p?.Data.Reputation ?? 0).ToList().IndexOf(player) + 1;
         }
     }
 }

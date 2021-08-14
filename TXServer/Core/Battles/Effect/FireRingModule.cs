@@ -51,7 +51,6 @@ namespace TXServer.Core.Battles.Effect
             TemperatureChange = Config.GetComponent<ModuleIcetrapEffectTemperatureLimitPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
 
-            Console.WriteLine(Level);
             MaxHeatDamage = MathUtils.Map(Level, 0, 9, 150, 225);
         }
 

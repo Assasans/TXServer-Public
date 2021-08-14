@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
@@ -17,7 +17,6 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
 		{
             SelfEvent.Execute(this, player, weapon);
 
-            Console.WriteLine(SplashTargets.Concat(Targets).Count());
 
             foreach (HitTarget hitTarget in Targets)
                 Damage.HandleHit(weapon, player.BattlePlayer.MatchPlayer, hitTarget);
