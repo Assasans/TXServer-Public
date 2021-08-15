@@ -185,13 +185,10 @@ namespace TXServer.Core.Battles
             speed = Math.Clamp(speed, originalSpeed / 100 * 20, originalSpeed);
 
             float turnSpeed = MathUtils.Map(Temperature, 0, TemperatureConfigComponent.MinTemperature,
-                OriginalSpeedComponent.TurnSpeed, 0);
-            turnSpeed = Math.Clamp(turnSpeed, OriginalSpeedComponent.TurnSpeed / 100 * 20,
-                OriginalSpeedComponent.TurnSpeed);
+                OriginalSpeedComponent.TurnSpeed, OriginalSpeedComponent.TurnSpeed / 100 * 50);
 
             float turretRotationMultiplier =
-                MathUtils.Map(Temperature, 0, TemperatureConfigComponent.MinTemperature, 1, 0);
-            turretRotationMultiplier = Math.Clamp(turretRotationMultiplier, 0.2f, 1);
+                MathUtils.Map(Temperature, 0, TemperatureConfigComponent.MinTemperature, 1, 0.5f);
 
             Tank.ChangeComponent<SpeedComponent>(component =>
             {
@@ -235,6 +232,10 @@ namespace TXServer.Core.Battles
         }
         public void DisableTank(bool resetModuleCooldown = false)
         {
+            TemperatureHits.Clear();
+            Temperature = TemperatureFromAllHits();
+            SpeedByTemperature();
+
             if (KeepDisabled)
                 Tank.TryRemoveComponent(TankStates[_tankState].Item1);
             Tank.TryRemoveComponent<SelfDestructionComponent>();
@@ -260,7 +261,6 @@ namespace TXServer.Core.Battles
             Tank.ChangeComponent((Component) OriginalSpeedComponent.Clone());
 
             if (BattleWeapon.GetType() == typeof(Vulcan)) ((Vulcan) BattleWeapon).ResetOverheat();
-            TemperatureHits.Clear();
 
             // trigger: Drone Module (stay after tank disable)
             if (TryGetModule(out TurretDroneModule turretDroneModule))

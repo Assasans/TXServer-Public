@@ -58,7 +58,7 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         public abstract float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false);
 
-        public void ChangeRotationSpeed(float accelerationMultiplier = 1,
+        protected void ChangeRotationSpeed(float accelerationMultiplier = 1,
             float speedMultiplier = 1)
         {
             Weapon.ChangeComponent<WeaponRotationComponent>(
@@ -118,7 +118,7 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         protected void RestoreRotation() => Weapon.ChangeComponent((Component) OriginalWeaponRotationComponent.Clone());
 
-        public virtual float TemperatureDeltaPerHit() => 0;
+        public virtual float TemperatureDeltaPerHit(float targetTemperature) => 0;
 
         public virtual void Tick() {}
 

@@ -26,11 +26,14 @@ namespace TXServer.Core
 
             while (player.User.GetComponent<UserRankComponent>().Rank < correctRank)
             {
+                int rank = 0;
                 player.User.ChangeComponent<UserRankComponent>(component =>
                 {
                     component.Rank++;
-                    RankUpNotification(component.Rank, player);
+                    rank = component.Rank;
                 });
+
+                RankUpNotification(rank, player);
             }
         }
         public static int GetRankByXp(long experience)

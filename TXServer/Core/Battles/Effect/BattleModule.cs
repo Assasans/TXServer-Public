@@ -65,7 +65,7 @@ namespace TXServer.Core.Battles.Effect {
         }
         private void CheckForCooldownEnd()
         {
-            if (CooldownEndTime is not null && DateTimeOffset.UtcNow >= CooldownEndTime)
+            if (CooldownEndTime is not null && DateTimeOffset.UtcNow >= CooldownEndTime && ModuleEntity is not null)
                 DeactivateCooldown();
         }
         public void UpdateCooldownSpeedCoeff(float speedCoeff, bool normalize = false)

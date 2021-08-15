@@ -27,7 +27,13 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
             }
 
             foreach (HitTarget hitTarget in Targets)
-                Damage.HandleHit(weapon, matchPlayer, hitTarget);
+            {
+                if (matchPlayer.IsEnemyOf(Damage.GetTargetByHit(matchPlayer, hitTarget)) ||
+                    matchPlayer.Battle.Params.FriendlyFire)
+                    Damage.HandleHit(weapon, matchPlayer, hitTarget);
+                else
+                    Damage.HandleMateHit(weapon, matchPlayer, hitTarget);
+            }
 
             player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["SHOTS"]++);
             player.User.ChangeComponent<UserStatisticsComponent>(component =>

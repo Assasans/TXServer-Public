@@ -10,7 +10,6 @@ using TXServer.ECSSystem.Components.Battle.Effect;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Round;
-using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
 using TXServer.ECSSystem.GlobalEntities;
@@ -91,10 +90,7 @@ namespace TXServer.Core.Battles
                     return;
                 }
 
-                if (component.CurrentHealth + healHp > component.MaxHealth)
-                    component.CurrentHealth = component.MaxHealth;
-                else
-                    component.CurrentHealth += healHp;
+                component.CurrentHealth = Math.Clamp(component.CurrentHealth + healHp, 0, component.MaxHealth);
             });
             if (!healed) return healed;
 
@@ -105,34 +101,14 @@ namespace TXServer.Core.Battles
             return healed;
         }
 
-        private static void DealIsisHeal(float hp, MatchPlayer healer, MatchPlayer target, HitTarget hitTarget)
-        {
-            target.Tank.ChangeComponent<TemperatureComponent>(component =>
-            {
-                if (component.Temperature.CompareTo(0) < 0)
-                    component.Temperature = 0;
-                else if (component.Temperature > 0)
-                    component.Temperature -= 2;
-                else if (component.Temperature < 0)
-                    component.Temperature += 2;
-            });
-
-            if (!DealHeal(hp, target)) return;
-
-            target.Player.BattlePlayer.MatchPlayer.HealthChanged();
-            healer.Battle.Spectators.Concat(new[] {(IPlayerPart) healer})
-                .SendEvent(new DamageInfoEvent(hp, hitTarget.LocalHitPoint, false, true), target.Tank);
-            healer.SendEvent(new VisualScoreHealEvent(healer.GetScoreWithBonus(4)), healer.BattleUser);
-
-            healer.UpdateStatistics(additiveScore: 4, 0, 0, 0, null);
-        }
-
         public static void DealNewTemperature(Entity weapon, Entity weaponMarketItem, MatchPlayer target,
-            MatchPlayer shooter)
+            MatchPlayer shooter, bool onlyNormalize = false)
         {
             bool isModule = IsModule(weaponMarketItem);
             float maxHeatDamage = shooter.BattleWeapon.MaxHeatDamage;
             float temperatureChange;
+            float totalTemperature = target.TemperatureFromAllHits();
+
             if (isModule)
             {
                 (Entity _, BattleModule module) = GetWeaponItems(weapon, shooter);
@@ -140,11 +116,40 @@ namespace TXServer.Core.Battles
                 temperatureChange = module.TemperatureChange;
             }
             else
-                temperatureChange = shooter.BattleWeapon.TemperatureDeltaPerHit();
+                temperatureChange = shooter.BattleWeapon.TemperatureDeltaPerHit(totalTemperature);
+
+            if (Math.Abs(temperatureChange) <= 0) return;
 
             temperatureChange =
-                NormalizeTemperature(target.Temperature + temperatureChange, target) - target.Temperature;
-            target.Temperature += temperatureChange;
+                NormalizeTemperature(totalTemperature + temperatureChange, target) - target.Temperature;
+
+            // removes existing opposite of to deal temperature
+            if (totalTemperature - temperatureChange > 0 != temperatureChange > 0)
+            {
+                foreach (TemperatureHit tempHit in target.TemperatureHits.ToList())
+                {
+                    if (Math.Abs(temperatureChange) <= 0) return;
+
+                    if (tempHit.CurrentTemperature > 0 == temperatureChange > 0) continue;
+
+                    if (tempHit.CurrentTemperature + temperatureChange > 0 != tempHit.CurrentTemperature > 0)
+                    {
+                        target.TemperatureHits.Remove(tempHit);
+
+                        if (temperatureChange > 0) temperatureChange -= tempHit.CurrentTemperature;
+                        else temperatureChange += tempHit.CurrentTemperature;
+
+                        target.Temperature = target.TemperatureFromAllHits();
+
+                        continue;
+                    }
+
+                    tempHit.CurrentTemperature += temperatureChange;
+                    target.Temperature = target.TemperatureFromAllHits();
+                }
+            }
+
+            if (onlyNormalize) return;
 
             TemperatureHit temperatureHit =
                 target.TemperatureHits.SingleOrDefault(t => t.Shooter == shooter && t.WeaponMarketItem == weaponMarketItem);
@@ -157,31 +162,13 @@ namespace TXServer.Core.Battles
             }
             else
             {
-                if (target.Temperature - temperatureChange > 0 != temperatureChange > 0)
-                {
-                    foreach (TemperatureHit tempHit in target.TemperatureHits.ToList())
-                    {
-                        if (tempHit.CurrentTemperature > 0 == temperatureChange > 0) continue;
-
-                        if (tempHit.CurrentTemperature - temperatureChange > 0 != (tempHit.CurrentTemperature > 0))
-                        {
-                            target.TemperatureHits.Remove(tempHit);
-                            temperatureChange -= tempHit.CurrentTemperature;
-                            continue;
-                        }
-
-                        tempHit.CurrentTemperature += temperatureChange;
-                        target.Temperature = target.TemperatureFromAllHits();
-                        return;
-                    }
-                }
-
                 target.TemperatureHits.Add(new TemperatureHit(temperatureChange, maxHeatDamage,
                     isModule ? 0 : shooter.BattleWeapon.MinHeatDamage, shooter,
                     weapon, weaponMarketItem));
             }
 
-            target.SpeedByTemperature();
+            float temperature = target.Temperature = target.TemperatureFromAllHits();
+            if (temperature < 0) target.SpeedByTemperature();
         }
 
         public static void DealAutoTemperature(MatchPlayer matchPlayer)
@@ -204,7 +191,7 @@ namespace TXServer.Core.Battles
                 float temperatureDelta = temperatureHit.CurrentTemperature switch
                 {
                     > 0 => -temperatureConfig.AutoDecrementInMs * temperatureConfig.TactPeriodInMs / 2,
-                    < 0 => temperatureConfig.AutoIncrementInMs * temperatureConfig.TactPeriodInMs / 2,
+                    < 0 => temperatureConfig.AutoIncrementInMs * temperatureConfig.TactPeriodInMs / 1.75f,
                     _ => 0
                 };
                 if (temperatureHit.CurrentTemperature > 0)
@@ -220,26 +207,18 @@ namespace TXServer.Core.Battles
 
                 bool wasPositive = temperatureHit.CurrentTemperature > 0;
                 temperatureHit.CurrentTemperature += temperatureDelta;
-                bool isPositive = temperatureHit.CurrentTemperature > 0;
 
                 // remove temperatureHit if its temperature is 0
-                if (wasPositive != isPositive)
+                if (wasPositive != temperatureHit.CurrentTemperature > 0)
                 {
                     matchPlayer.TemperatureHits.Remove(temperatureHit);
-                    matchPlayer.Temperature = matchPlayer.TemperatureFromAllHits();
-                    matchPlayer.SpeedByTemperature();
+                    float tmp = matchPlayer.Temperature = matchPlayer.TemperatureFromAllHits();
+                    if (tmp < 0) matchPlayer.SpeedByTemperature();
                     return;
                 }
 
-                // apply temperature change on other temperature hits
-                float temperatureChangePerHit = temperatureDelta / matchPlayer.TemperatureHits.Count(
-                    h => h.CurrentTemperature > 0 == wasPositive);
-                foreach (TemperatureHit tempHit in matchPlayer.TemperatureHits.Where(tempHit =>
-                    tempHit.CurrentTemperature > 0 == wasPositive))
-                    tempHit.CurrentTemperature += temperatureChangePerHit;
-
-                matchPlayer.Temperature = matchPlayer.TemperatureFromAllHits();
-                matchPlayer.SpeedByTemperature();
+                float temperature = matchPlayer.Temperature = matchPlayer.TemperatureFromAllHits();
+                if (temperature < 0) matchPlayer.SpeedByTemperature();
             }
         }
 
@@ -289,7 +268,6 @@ namespace TXServer.Core.Battles
             bool isModule = battleModule is not null;
 
             if (target.TankState is not TankState.Active) return;
-
             if (!isModule && shooter.BattleWeapon.IsOnCooldown(target)) return;
 
             float damage;
@@ -301,13 +279,22 @@ namespace TXServer.Core.Battles
             else
                 damage = shooter.BattleWeapon.BaseDamage(hitTarget.HitDistance, target, isSplashHit);
 
-            if (shooter.BattleWeapon.GetType() == typeof(Isis) && !shooter.IsEnemyOf(target))
-            {
-                DealIsisHeal(damage, shooter, target, hitTarget);
-                return;
-            }
             DealDamage(marketItem, target, shooter, damage, localHitPoint:hitTarget.LocalHitPoint);
         }
+
+        public static void HandleMateHit(Entity weapon, MatchPlayer shooter, HitTarget hitTarget)
+        {
+            MatchPlayer target = GetTargetByHit(shooter, hitTarget);
+            (Entity weaponMarketItem, _) = GetWeaponItems(weapon, shooter);
+
+            if (shooter.BattleWeapon.IsOnCooldown(target) || target.TemperatureFromAllHits() == 0) return;
+
+            if (shooter.BattleWeapon.GetType() == typeof(Isis))
+                ((Isis) shooter.BattleWeapon).HealMate(target, hitTarget);
+
+            DealNewTemperature(weapon, weaponMarketItem, target, shooter, onlyNormalize:true);
+        }
+
 
         public static bool IsBackHit(Vector3 localHitPoint, Entity hull)
         {

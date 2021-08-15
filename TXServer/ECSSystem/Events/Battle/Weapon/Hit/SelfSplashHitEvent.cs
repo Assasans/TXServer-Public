@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Battles;
@@ -13,20 +12,25 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
     [SerialVersionUID(196833391289212110L)]
 	public class SelfSplashHitEvent : SelfHitEvent, ISelfEvent
 	{
-        public void Execute(Player player, Entity weapon)
+        public new void Execute(Player player, Entity weapon)
 		{
             SelfEvent.Execute(this, player, weapon);
 
+            MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
 
-            foreach (HitTarget hitTarget in Targets)
+            foreach (HitTarget hitTarget in Targets.Where(hitTarget =>
+                matchPlayer.Battle.Params.FriendlyFire ||
+                matchPlayer.IsEnemyOf(Damage.GetTargetByHit(matchPlayer, hitTarget))))
                 Damage.HandleHit(weapon, player.BattlePlayer.MatchPlayer, hitTarget);
 
-            foreach (HitTarget splashTarget in SplashTargets)
+            foreach (HitTarget splashTarget in SplashTargets.Where(hitTarget =>
+                matchPlayer.Battle.Params.FriendlyFire ||
+                matchPlayer.IsEnemyOf(Damage.GetTargetByHit(matchPlayer, hitTarget))))
                 Damage.HandleHit(weapon, player.BattlePlayer.MatchPlayer, splashTarget, true);
 
             player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["SHOTS"]++);
             player.User.ChangeComponent<UserStatisticsComponent>(component =>
-                component.Statistics["HITS"] += Targets.Count + SplashTargets.Count);
+                component.Statistics["HITS"] += Targets.Concat(SplashTargets).Distinct().Count());
         }
 
 		public override IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteSplashHitEvent>();

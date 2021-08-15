@@ -23,7 +23,8 @@ namespace TXServer.Core.Battles.BattleWeapons
             return (int) Math.Round(damage * modifier);
         }
 
-        public override float TemperatureDeltaPerHit() => TemperaturePerSecond * CooldownIntervalSec;
+        public override float TemperatureDeltaPerHit(float targetTemperature) =>
+            TemperaturePerSecond * CooldownIntervalSec;
 
         public override bool IsOnCooldown(MatchPlayer target) => IsStreamOnCooldown(target);
 

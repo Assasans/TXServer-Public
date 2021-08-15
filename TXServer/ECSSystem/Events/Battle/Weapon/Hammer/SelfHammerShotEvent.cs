@@ -8,7 +8,7 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hammer
     [SerialVersionUID(-1937089974629265090L)]
 	public class SelfHammerShotEvent : SelfShotEvent
 	{
-        public static void Execute(Player player, Entity tank)
+        public new static void Execute(Player player, Entity tank)
         {
             new SelfShotEvent().Execute(player, tank);
             ((Core.Battles.BattleWeapons.Hammer) player.BattlePlayer.MatchPlayer.BattleWeapon).ProcessShot();

@@ -17,7 +17,7 @@ namespace TXServer.Core.Battles.BattleWeapons
             return (int) Math.Round(damage * modifier);
         }
 
-        public override float TemperatureDeltaPerHit() => -0.3f;
+        public override float TemperatureDeltaPerHit(float targetTemperature) => -0.3f;
 
         public override bool IsOnCooldown(MatchPlayer target) => IsStreamOnCooldown(target);
     }

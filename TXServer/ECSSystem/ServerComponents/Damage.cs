@@ -13,6 +13,9 @@
         public class HealingPropertyComponent : RangedComponent
         {
         }
+        public class SelfHealingPropertyComponent : RangedComponent
+        {
+        }
 
         public class AimingMaxDamagePropertyComponent : RangedComponent
         {
@@ -29,6 +32,13 @@
         {
         }
         public class MaxDamagePropertyComponent : RangedComponent
+        {
+        }
+
+        public class DecreaseFriendTemperaturePropertyComponent : RangedComponent
+        {
+        }
+        public class IncreaseFriendTemperaturePropertyComponent : RangedComponent
         {
         }
     }
