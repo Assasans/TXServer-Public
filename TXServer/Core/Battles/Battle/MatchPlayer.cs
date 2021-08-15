@@ -477,6 +477,6 @@ namespace TXServer.Core.Battles
         public SpawnPoint LastSpawnPoint { get; private set; }
         public TeleportPoint LastTeleportPoint { get; private set; }
         public TeleportPoint NextTeleportPoint { get; set; }
-        private readonly IList<SpawnPoint> _spawnCoordinates;
+        public readonly IList<SpawnPoint> _spawnCoordinates;
     }
 }

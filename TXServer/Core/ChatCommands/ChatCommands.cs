@@ -735,6 +735,7 @@ namespace TXServer.Core.ChatCommands
             {
                 TeleportPoint teleportPoint = null;
 
+                // CTF specific teleport points
                 if (player.BattlePlayer.Battle.Params.BattleMode is BattleMode.CTF)
                 {
                     TeamBattleHandler teamHandler = player.BattlePlayer.Battle.ModeHandler as TeamBattleHandler;
@@ -762,9 +763,11 @@ namespace TXServer.Core.ChatCommands
                             teleportPoint.Position.Z);
                 }
 
+                // map specific points of interest
                 teleportPoint ??=
                     player.BattlePlayer.Battle.CurrentMapInfo.TeleportPoints.SingleOrDefault(tp => tp.Name == args[0]);
 
+                // other players
                 if (teleportPoint == null)
                 {
                     List<BattleTankPlayer> targets = FindTargets(args[0], player);
@@ -773,12 +776,26 @@ namespace TXServer.Core.ChatCommands
                         if (!targets[0].Player.IsInMatch)
                             return "Command error, target is in the battle lobby";
                         if (targets[0].MatchPlayer.TankState is TankState.Dead or TankState.Spawn)
-                            return "Command error, targeted is currently spawning";
+                            return "Command error, target is currently spawning";
                         if (targets[0] == player.BattlePlayer)
                             return "Nope";
 
                         teleportPoint = new TeleportPoint($"Player {targets[0].Player.Data.Username}",
                             targets[0].MatchPlayer.TankPosition, targets[0].MatchPlayer.TankQuaternion);
+                    }
+                }
+
+                // specific spawn point
+                if (player.Data.Admin && teleportPoint is null)
+                {
+                    if (Int32.TryParse(args[0], out int number))
+                    {
+                        SpawnPoint spawnPoint = player.BattlePlayer.MatchPlayer._spawnCoordinates.SingleOrDefault(s =>
+                            s.Number == number);
+
+                        if (spawnPoint is not null)
+                            teleportPoint = new TeleportPoint($"spawnPoint {spawnPoint.Number.ToString()}",
+                                spawnPoint.Position, spawnPoint.Rotation);
                     }
                 }
 

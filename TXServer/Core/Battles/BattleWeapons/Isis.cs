@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Configuration;
