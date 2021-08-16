@@ -28,7 +28,7 @@ namespace TXServer.ECSSystem.Events.Lobby
                         break;
                     // brute join specific lobby at index
                     default:
-                        if (LobbyId < ServerConnection.BattlePool.Count)
+                        if (LobbyId < ServerConnection.BattlePool.Count && LobbyId >= 0)
                             battle = ServerConnection.BattlePool[(int)LobbyId];
                         break;
                 }

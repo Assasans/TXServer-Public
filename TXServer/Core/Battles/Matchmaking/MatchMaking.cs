@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.Squads;
 using TXServer.ECSSystem.Components.Battle.Time;
@@ -9,23 +10,13 @@ namespace TXServer.Core.Battles.Matchmaking
 {
     public static class MatchMaking
     {
-        public static void FindBattle(Player player)
+        private static void FindOrCreateBattle(Player player)
         {
-            Battle battle = ServerConnection.BattlePool.OrderBy(b => b.JoinedTankPlayers).LastOrDefault(IsValidToEnter) ??
-                            CreateMatchMakingBattle();
+            Battle battle = ServerConnection.BattlePool.OrderBy(b => b.JoinedTankPlayers).
+                FirstOrDefault(IsValidToEnter) ?? CreateMatchMakingBattle();
 
             battle.AddPlayer(player, false);
         }
-
-        public static void FindSquadBattle(Squad squad)
-        {
-            Battle battle = ServerConnection.BattlePool.OrderBy(b => b.JoinedTankPlayers).LastOrDefault(b => IsValidForSquad(b, squad)) ??
-                            CreateMatchMakingBattle();
-
-            foreach (SquadPlayer participant in squad.Participants)
-                battle.AddPlayer(participant.Player, false);
-        }
-
 
         private static Battle CreateMatchMakingBattle()
         {
@@ -34,6 +25,16 @@ namespace TXServer.Core.Battles.Matchmaking
             return battle;
         }
 
+        public static void FindSquadBattle(Squad squad)
+        {
+            Battle battle = ServerConnection.BattlePool.OrderBy(b => b.JoinedTankPlayers).
+                FirstOrDefault(b => IsValidForSquad(b, squad)) ?? CreateMatchMakingBattle();
+
+            foreach (SquadPlayer participant in squad.Participants)
+                battle.AddPlayer(participant.Player, false);
+        }
+
+        public static void EnterMatchMaking(Player player) => WaitingPlayers.Add(player, DateTimeOffset.UtcNow);
 
         private static bool IsValidToEnter(Battle battle)
         {
@@ -68,7 +69,6 @@ namespace TXServer.Core.Battles.Matchmaking
             }
             return false;
         }
-
 
         public static void ProcessDeserterState(Player player, Battle battle)
         {
@@ -107,6 +107,22 @@ namespace TXServer.Core.Battles.Matchmaking
             });
         }
 
+        public static void Tick()
+        {
+            foreach ((Player player, DateTimeOffset joinTime) in WaitingPlayers.ToList())
+            {
+                if (!player.IsActive)
+                {
+                    WaitingPlayers.Remove(player);
+                    continue;
+                }
+                if (DateTimeOffset.UtcNow <= joinTime.AddSeconds(2)) continue;
+
+                FindOrCreateBattle(player);
+                WaitingPlayers.Remove(player);
+            }
+        }
+
         public static BattleMode BattleModePicker()
         {
             int percent = new Random().Next(0, 100);
@@ -117,5 +133,7 @@ namespace TXServer.Core.Battles.Matchmaking
                 _ => BattleMode.DM
             };
         }
+
+        private static Dictionary<Player, DateTimeOffset> WaitingPlayers = new();
     }
 }

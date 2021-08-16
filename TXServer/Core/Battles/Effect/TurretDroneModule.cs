@@ -43,7 +43,7 @@ namespace TXServer.Core.Battles.Effect
         {
             if (!EffectIsActive) return;
 
-            foreach (var droneTuple in Drones) DeactivateSingleDrone(droneTuple.Item1);
+            foreach (var droneTuple in Drones.ToList()) DeactivateSingleDrone(droneTuple.Item1);
 
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntities);
             EffectEntities.Clear();

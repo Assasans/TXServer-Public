@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -14,6 +13,7 @@ using System.Threading.Tasks;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using TXServer.Core.Battles;
+using TXServer.Core.Battles.Matchmaking;
 using TXServer.Core.Configuration;
 using TXServer.Core.Logging;
 using TXServer.Core.HeightMaps;
@@ -75,6 +75,8 @@ namespace TXServer.Core
             new Thread(() => StateServer(ip)) { Name = "State Server" }.Start();
 
             new Thread(BattleLoop) { Name = "Battle Thread" }.Start();
+            new Thread(PlayerLoop) { Name = "Player Thread" }.Start();
+
 #if DEBUG
             if (!Server.Instance.Settings.DisablePingMessages)
 #endif
@@ -280,10 +282,11 @@ namespace TXServer.Core
                     if (!IsStarted) return;
 
                     stopwatch.Restart();
+
                     foreach (Battle battle in BattlePool.ToArray())
-                    {
-                        battle.Tick(LastTickDuration);
-                    }
+                        battle.Tick(LastBattleTickDuration);
+                    MatchMaking.Tick();
+
                     stopwatch.Stop();
 
                     TimeSpan spentOnBattles = stopwatch.Elapsed;
@@ -293,7 +296,42 @@ namespace TXServer.Core
                         Thread.Sleep(TimeSpan.FromSeconds(BattleTickDuration) - spentOnBattles);
 
                     stopwatch.Stop();
-                    LastTickDuration = stopwatch.Elapsed.TotalSeconds;
+                    LastBattleTickDuration = stopwatch.Elapsed.TotalSeconds;
+                }
+            }
+            catch (Exception e)
+            {
+#if DEBUG
+                Debugger.Launch();
+#endif
+                HandleError(e);
+            }
+        }
+
+        private void PlayerLoop()
+        {
+            Stopwatch stopwatch = new();
+
+            try
+            {
+                while (true)
+                {
+                    if (!IsStarted) return;
+
+                    stopwatch.Restart();
+                    foreach (Player player in Pool.ToArray())
+                        player.Tick();
+
+                    stopwatch.Stop();
+
+                    TimeSpan spentOnPlayers = stopwatch.Elapsed;
+
+                    stopwatch.Start();
+                    if (spentOnPlayers.TotalSeconds < PlayerTickDuration)
+                        Thread.Sleep(TimeSpan.FromSeconds(PlayerTickDuration) - spentOnPlayers);
+
+                    stopwatch.Stop();
+                    LastPlayerTickDuration = stopwatch.Elapsed.TotalSeconds;
                 }
             }
             catch (Exception e)
@@ -319,9 +357,13 @@ namespace TXServer.Core
 
         public static List<Battle> BattlePool { get; } = new List<Battle>();
 
-        public static double LastTickDuration { get; private set; }
+        public static double LastBattleTickDuration { get; private set; }
         private const int BattleTickRate = 100;
         private const double BattleTickDuration = 1.0 / BattleTickRate;
+
+        public static double LastPlayerTickDuration { get; set; }
+        private const int PlayerTickRate = 1000;
+        private const double PlayerTickDuration = 1.0 / PlayerTickRate;
 
         // Server state.
         public bool IsStarted { get; private set; }

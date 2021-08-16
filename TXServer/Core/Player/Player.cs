@@ -328,7 +328,19 @@ namespace TXServer.Core
 
         public Entity GetEntityById(long id) => EntityList.SingleOrDefault(e => e.EntityId == id);
 
+        public void Tick()
+        {
+            foreach ((Entity notification, DateTimeOffset timeLimit) in Notifications.ToList())
+            {
+                if (DateTimeOffset.UtcNow <= timeLimit) continue;
+                Notifications.Remove(notification);
+                UnshareEntities(notification);
+            }
+        }
+
         public override string ToString() => $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : null)})" : null)}";
         private EndPoint _EndPoint;
+
+        public readonly Dictionary<Entity, DateTimeOffset> Notifications = new();
     }
 }

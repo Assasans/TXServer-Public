@@ -117,7 +117,8 @@ namespace TXServerUI
             {
                 ServerStateText.Text = $"Connected players: {ServerLauncher.GetPlayerCount()}\n" +
                     $"Active battles: {ServerConnection.BattlePool.Count}\n" +
-                    $"Last tick duration: {ServerConnection.LastTickDuration}\n";
+                    $"Last battle tick duration: {ServerConnection.LastBattleTickDuration}\n" +
+                    $"Last player tick duration: {ServerConnection.LastPlayerTickDuration}\n";
                 if (Server.Instance.StoredPlayerData.Count > 0)
                     ServerStateText.Text += $"Stored player data: {Server.Instance.StoredPlayerData.Count}\n";
                 await Task.Delay(1000);

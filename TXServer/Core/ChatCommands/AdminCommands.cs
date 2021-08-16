@@ -120,9 +120,14 @@ namespace TXServer.Core.ChatCommands
             return $"{(newParams.DisabledModules ? "Deactivated" : "Activated")} modules";
         }
 
-        private static void CommandReply(string message, Player player) =>
-            player.ShareEntities(SimpleTextNotificationTemplate.CreateEntity(
-                $"Command{(message.StartsWith("error") ? "" : ":")} {message}"));
+        private static void CommandReply(string message, Player player)
+        {
+            Entity notification = SimpleTextNotificationTemplate.CreateEntity(
+                $"Command{(message.StartsWith("error") ? "" : ":")} {message}");
+
+            player.ShareEntities(notification);
+            player.Notifications.Add(notification, DateTimeOffset.UtcNow.AddSeconds(10));
+        }
 
         private static string DailyBonusRecharge(Player player, string[] args)
         {

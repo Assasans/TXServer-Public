@@ -353,14 +353,4 @@ namespace TXServer.Core.Battles.Effect {
         public readonly List<TickHandler> TickHandlers;
         private readonly List<Action> _nextTickHandlers;
     }
-
-    public class TickHandler {
-        public TickHandler(DateTimeOffset time, Action action) {
-            Time = time;
-            Action = action;
-        }
-
-        public DateTimeOffset Time { get; }
-        public Action Action { get; }
-    }
 }
