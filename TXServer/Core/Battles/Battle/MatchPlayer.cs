@@ -288,7 +288,7 @@ namespace TXServer.Core.Battles
                     PrevTankPosition = new();
 
                     if (Battle.ModeHandler is TDMHandler handler)
-                        Battle.UpdateScore(handler.BattleViewFor(Player.BattlePlayer).EnemyTeamEntity);
+                        Battle.UpdateScore(handler.BattleViewFor(Player.BattlePlayer).AllyTeamEntity, -1);
                 }
 
                 SelfDestructionTime = null;
