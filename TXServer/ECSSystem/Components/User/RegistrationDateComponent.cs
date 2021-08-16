@@ -2,12 +2,13 @@
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Components
+namespace TXServer.ECSSystem.Components.User
 {
     [SerialVersionUID(1439270018242)]
     public class RegistrationDateComponent : Component
     {
-        [OptionalMapped]
-        public DateTime? Date { get; set; } = null;
+        public RegistrationDateComponent(DateTimeOffset date) {}
+
+        [OptionalMapped] public DateTime? Date { get; set; } = null;
     }
 }

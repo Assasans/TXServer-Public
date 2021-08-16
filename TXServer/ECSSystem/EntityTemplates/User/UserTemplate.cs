@@ -20,7 +20,7 @@ namespace TXServer.ECSSystem.EntityTemplates.User
 
                 new UserUidComponent(player.Data.Username),
                 new UserCountryComponent(player.Data.CountryCode),
-                new RegistrationDateComponent(),
+                new RegistrationDateComponent(player.Data.RegistrationDate),
 
                 new UserMoneyComponent(player.Data.Crystals),
                 new UserXCrystalsComponent(player.Data.XCrystals),

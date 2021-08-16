@@ -104,14 +104,14 @@ namespace TXServer.Core
         {
             // todo: compare ALL players in database
             players ??= Server.Instance.Connection.Pool;
-            return players.Where(p => p.Data.LeagueIndex == player.Data.LeagueIndex)
+            return players.Where(p => p.Data?.LeagueIndex == player.Data.LeagueIndex)
                        .OrderByDescending(p => p.Data.Reputation).ToList().IndexOf(player) + 1;
         }
         public static int GetSeasonPlace(Player player, List<Player> players = null)
         {
             // todo: compare ALL players in database
             players ??= Server.Instance.Connection.Pool;
-            return players.OrderByDescending(p => p?.Data.Reputation ?? 0).ToList().IndexOf(player) + 1;
+            return players.OrderByDescending(p => p.Data?.Reputation ?? 0).ToList().IndexOf(player) + 1;
         }
     }
 }

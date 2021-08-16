@@ -207,6 +207,16 @@ namespace TXServer.ECSSystem.GlobalEntities
                 case PremiumQuestUserItemTemplate:
                     //todo
                     return;
+                case PresetMarketItemTemplate:
+                    //todo preset management
+                    userItem = new Entity(
+                        new TemplateAccessor(
+                            Activator.CreateInstance((marketItem.TemplateAccessor.Template as IMarketItemTemplate)
+                                .UserItemType) as IEntityTemplate, marketItem.TemplateAccessor.ConfigPath),
+                        marketItem.Components.ToArray());
+                    (userItem.TemplateAccessor.Template as IUserItemTemplate).AddUserItemComponents(player, userItem);
+                    player.ShareEntities(userItem);
+                    break;
                 case ShellMarketItemTemplate:
                     player.Data.Shells.Add(marketItem.EntityId);
                     break;
@@ -267,6 +277,8 @@ namespace TXServer.ECSSystem.GlobalEntities
 
             {typeof(PremiumBoostMarketItemTemplate), typeof(PremiumBoostUserItemTemplate)},
             {typeof(PremiumQuestMarketItemTemplate), typeof(PremiumQuestUserItemTemplate)},
+
+            {typeof(PresetMarketItemTemplate), typeof(PresetUserItemTemplate)},
 
             {typeof(HullSkinMarketItemTemplate), typeof(HullSkinUserItemTemplate)},
             {typeof(ShellMarketItemTemplate), typeof(ShellUserItemTemplate)},
