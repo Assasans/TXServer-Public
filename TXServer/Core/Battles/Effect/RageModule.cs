@@ -50,7 +50,6 @@ namespace TXServer.Core.Battles.Effect
         public override void Init()
         {
             base.Init();
-            Level = 10;
             ReduceCooldownTimePerKill =
                 Config.GetComponent<ModuleRageEffectReduceCooldownTimePerKillPropertyComponent>(ConfigPath)
                     .UpgradeLevel2Values[Level];
