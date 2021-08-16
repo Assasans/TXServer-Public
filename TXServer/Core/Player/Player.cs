@@ -330,10 +330,10 @@ namespace TXServer.Core
 
         public void Tick()
         {
-            foreach ((Entity notification, DateTimeOffset timeLimit) in Notifications.ToList())
+            foreach ((Entity notification, DateTimeOffset timeLimit) in TempNotifications.ToList())
             {
                 if (DateTimeOffset.UtcNow <= timeLimit) continue;
-                Notifications.Remove(notification);
+                TempNotifications.Remove(notification);
                 UnshareEntities(notification);
             }
         }
@@ -341,6 +341,6 @@ namespace TXServer.Core
         public override string ToString() => $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : null)})" : null)}";
         private EndPoint _EndPoint;
 
-        public readonly Dictionary<Entity, DateTimeOffset> Notifications = new();
+        public readonly Dictionary<Entity, DateTimeOffset> TempNotifications = new();
     }
 }

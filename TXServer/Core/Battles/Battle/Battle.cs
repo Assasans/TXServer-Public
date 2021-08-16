@@ -388,7 +388,7 @@ namespace TXServer.Core.Battles
         {
             Player player = baseBattlePlayer.Player;
 
-            if (IsMatchMaking || baseBattlePlayer is Spectator) MatchMaking.ProcessDeserterState(player, this);
+            if (IsMatchMaking && baseBattlePlayer is not Spectator) MatchMaking.ProcessDeserterState(player, this);
 
             player.UnshareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
 

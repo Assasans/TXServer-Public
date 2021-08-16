@@ -54,11 +54,11 @@ namespace TXServer.Core.ChatCommands
             foreach (ChatCommandConditions condition in Enum.GetValues<ChatCommandConditions>())
             {
                 if ((desc.Item2 & condition) != condition || (playerConditions & condition) == condition) continue;
-                CommandReply(ChatCommands.ConditionErrors[condition], player);
+                ScreenMessage(ChatCommands.ConditionErrors[condition], player);
                 return;
             }
 
-            CommandReply(desc.Item3(player, args[1..]), player);
+            ScreenMessage(desc.Item3(player, args[1..]), player);
         }
 
         private static string ChangeBattleMode(Player player, string[] args)
@@ -120,13 +120,13 @@ namespace TXServer.Core.ChatCommands
             return $"{(newParams.DisabledModules ? "Deactivated" : "Activated")} modules";
         }
 
-        private static void CommandReply(string message, Player player)
+        private static void ScreenMessage(string message, Player player)
         {
             Entity notification = SimpleTextNotificationTemplate.CreateEntity(
                 $"Command{(message.StartsWith("error") ? "" : ":")} {message}");
 
             player.ShareEntities(notification);
-            player.Notifications.Add(notification, DateTimeOffset.UtcNow.AddSeconds(10));
+            player.TempNotifications.Add(notification, DateTimeOffset.UtcNow.AddSeconds(10));
         }
 
         private static string DailyBonusRecharge(Player player, string[] args)
@@ -309,12 +309,7 @@ namespace TXServer.Core.ChatCommands
             if (args.Length < 2) return "error: no argument for message content";
 
             foreach (Player target in targets)
-            foreach (Entity entity in target.EntityList.Where(e =>
-                e.TemplateAccessor.Template.GetType() == typeof(SimpleTextNotificationTemplate)))
-                target.UnshareEntities(entity);
-
-            Entity notification = SimpleTextNotificationTemplate.CreateEntity(string.Join(" ", args[1..]));
-            targets.ShareEntities(notification);
+                ScreenMessage(string.Join(" ", args[1..]), target);
 
             return $"Sent message to {targets.Count} target{(targets.Count > 1 ? "s" : "")}";
         }
