@@ -12,7 +12,7 @@ namespace TXServer.Core.Battles.Matchmaking
     {
         private static void FindOrCreateBattle(Player player)
         {
-            Battle battle = ServerConnection.BattlePool.OrderBy(b => b.JoinedTankPlayers).
+            Battle battle = ServerConnection.BattlePool.OrderBy(b => b.JoinedTankPlayers.Count()).
                 FirstOrDefault(IsValidToEnter) ?? CreateMatchMakingBattle();
 
             battle.AddPlayer(player, false);
@@ -27,7 +27,7 @@ namespace TXServer.Core.Battles.Matchmaking
 
         public static void FindSquadBattle(Squad squad)
         {
-            Battle battle = ServerConnection.BattlePool.OrderBy(b => b.JoinedTankPlayers).
+            Battle battle = ServerConnection.BattlePool.OrderBy(b => b.JoinedTankPlayers.Count()).
                 FirstOrDefault(b => IsValidForSquad(b, squad)) ?? CreateMatchMakingBattle();
 
             foreach (SquadPlayer participant in squad.Participants)
