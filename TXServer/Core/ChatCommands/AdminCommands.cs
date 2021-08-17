@@ -8,6 +8,7 @@ using TXServer.Core.Commands;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Notification;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
@@ -18,28 +19,30 @@ namespace TXServer.Core.ChatCommands
 {
     public static class AdminCommands
     {
-        private static readonly Dictionary<string, (string, ChatCommandConditions, Func<Player, string[], string>)> Commands = new()
+        private static readonly Dictionary<string, (string, ChatCommandConditions, Func<Player, string[], string>)>
+            Commands = new(StringComparer.InvariantCultureIgnoreCase)
         {
-            { "battlemode", ("battlemode [opt: shortcut]", ChatCommandConditions.InactiveBattle, ChangeBattleMode) },
-            { "dailybonus", (null, ChatCommandConditions.None, DailyBonusRecharge)},
+            { "battleMode", ("battlemode [opt: shortcut]", ChatCommandConditions.InactiveBattle, ChangeBattleMode) },
+            { "competition", ("competition [start/finish/reset]", ChatCommandConditions.None, FractionsCompetitionEditor) },
+            { "dailyBonus", (null, ChatCommandConditions.None, DailyBonusRecharge)},
             { "finish", (null, ChatCommandConditions.ActiveBattle, Finish) },
-            { "competition", ("competition [start/finish/reset]", ChatCommandConditions.None, FractionsCompetitionEditor )},
-            { "friendlyfire", (null, ChatCommandConditions.InactiveBattle, ChangeFriendlyFire) },
+            { "friendlyFire", (null, ChatCommandConditions.InactiveBattle, ChangeFriendlyFire) },
+            { "giveItem", (null, ChatCommandConditions.Admin, GiveItem) },
             { "goldrain", (null, ChatCommandConditions.ActiveBattle, GoldboxRain) },
             { "immune", (null, ChatCommandConditions.InBattle, Immune) },
             { "map", ("map [opt: map name]", ChatCommandConditions.InactiveBattle, ChangeMap) },
             { "message", ("message [all/uid] [message]", ChatCommandConditions.None, Message) },
             { "modules", (null, ChatCommandConditions.InactiveBattle, ChangeModules) },
-            { "nopause", ("noPause [opt: active/inactive]", ChatCommandConditions.InBattle, NoPause)},
+            { "noPause", ("noPause [opt: active/inactive]", ChatCommandConditions.InBattle, NoPause)},
             { "open", (null, ChatCommandConditions.InBattle, Open) },
             { "pause", (null, ChatCommandConditions.InBattle, Pause) },
-            { "positioninfo", (null, ChatCommandConditions.InMatch, PositionInfo) },
-            { "recruitreward", ("recruitReward [opt: check/reset]", ChatCommandConditions.None, RecruitReward) },
+            { "positionInfo", (null, ChatCommandConditions.InMatch, PositionInfo) },
+            { "recruitReward", ("recruitReward [opt: check/reset]", ChatCommandConditions.None, RecruitReward) },
             { "reload", ("reload [opt: all]", ChatCommandConditions.None, Reload) },
             { "season", ("season [finish]", ChatCommandConditions.None, SeasonEditor ) },
             { "start", (null, ChatCommandConditions.InBattle, Start) },
             { "shutdown", (null, ChatCommandConditions.Admin, Shutdown) },
-            { "supplyrain", (null, ChatCommandConditions.ActiveBattle, SupplyRain) },
+            { "supplyRain", (null, ChatCommandConditions.ActiveBattle, SupplyRain) },
         };
 
         public static void CheckForCommand(string command, Player player)
@@ -54,11 +57,11 @@ namespace TXServer.Core.ChatCommands
             foreach (ChatCommandConditions condition in Enum.GetValues<ChatCommandConditions>())
             {
                 if ((desc.Item2 & condition) != condition || (playerConditions & condition) == condition) continue;
-                ScreenMessage(ChatCommands.ConditionErrors[condition], player);
+                ScreenMessage(ChatCommands.ConditionErrors[condition], player, true);
                 return;
             }
 
-            ScreenMessage(desc.Item3(player, args[1..]), player);
+            ScreenMessage(desc.Item3(player, args[1..]), player, true);
         }
 
         private static string ChangeBattleMode(Player player, string[] args)
@@ -118,15 +121,6 @@ namespace TXServer.Core.ChatCommands
             player.BattlePlayer.Battle.UpdateParams(newParams);
 
             return $"{(newParams.DisabledModules ? "Deactivated" : "Activated")} modules";
-        }
-
-        private static void ScreenMessage(string message, Player player)
-        {
-            Entity notification = SimpleTextNotificationTemplate.CreateEntity(
-                $"Command{(message.StartsWith("error") ? "" : ":")} {message}");
-
-            player.ShareEntities(notification);
-            player.TempNotifications.Add(notification, DateTimeOffset.UtcNow.AddSeconds(10));
         }
 
         private static string DailyBonusRecharge(Player player, string[] args)
@@ -251,6 +245,46 @@ namespace TXServer.Core.ChatCommands
             }
 
             return message;
+        }
+
+        private static string GiveItem(Player player, string[] args)
+        {
+            if (args.Length < 2) return "error: missing user name/id and item id arguments";
+
+            List<Player> targets = new List<Player>();
+            switch (args[0])
+            {
+                case "all":
+                    targets = player.Server.Connection.Pool;
+                    break;
+                default:
+                    Player target = player.Server.FindPlayerByUsername(args[0]);
+                    if (target is null) return $"error: couldn't find target '{args[0]}'";
+                    targets.Add(target);
+                    break;
+            }
+
+            if (!long.TryParse(args[1], out long id))
+                return "error: item id argument needs to be a number";
+            Entity marketItem = player.EntityList.SingleOrDefault(e =>
+                e.EntityId == id && e.GetComponent<MarketItemGroupComponent>()?.Key == id);
+            if (marketItem is null) return "error: couldn't find a valid item with this code";
+
+            int duplicateCount = 0;
+            foreach (Player p in targets)
+            {
+                if (p.Data.OwnsMarketItem(marketItem))
+                {
+                    duplicateCount++;
+                    continue;
+                }
+                p.SaveNewMarketItem(marketItem);
+                p.ShareEntities(NewItemNotificationTemplate.CreateEntity(p.ClientSession, marketItem));
+            }
+
+            return $"Added '{marketItem.TemplateAccessor.ConfigPath.Split("/").Last()}' to " +
+                   $"{targets.Count - duplicateCount} user" +
+                   $"{(duplicateCount > 0 ? $", skipped {duplicateCount} " + "user because the item would be duplicated" : "")}";
         }
 
         private static string GoldboxRain(Player player, string[] args)
@@ -425,6 +459,15 @@ namespace TXServer.Core.ChatCommands
             return $"Target{(targets.Count > 1 ? "s" : "")} rejoin{(targets.Count < 2 ? "s" : "")}";
         }
 
+        private static void ScreenMessage(string message, Player player, bool isCommand = false)
+        {
+            message = isCommand ? $"Command{(message.StartsWith("error") ? "" : ":")} {message}" : message;
+            Entity notification = SimpleTextNotificationTemplate.CreateEntity(message);
+
+            player.ShareEntities(notification);
+            player.TempNotifications.TryAdd(notification, DateTimeOffset.UtcNow.AddSeconds(10));
+        }
+
         private static string SeasonEditor(Player player, string[] args)
         {
             switch (args[0].ToLower())
@@ -462,7 +505,7 @@ namespace TXServer.Core.ChatCommands
 
                     return $"finished season {player.ServerData.SeasonNumber - 1} & " +
                            $"started season {player.ServerData.SeasonNumber}";
-                case "leagueplace":
+                case "leaguePlace":
                     if (args.Length < 2) return "error: missing argument for place";
                     if (!int.TryParse(args[1], out int leaguePlace))
                         return $"error: unable to parse '{args[1]} as number'";

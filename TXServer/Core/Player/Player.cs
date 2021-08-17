@@ -333,14 +333,14 @@ namespace TXServer.Core
             foreach ((Entity notification, DateTimeOffset timeLimit) in TempNotifications.ToList())
             {
                 if (DateTimeOffset.UtcNow <= timeLimit) continue;
-                TempNotifications.Remove(notification);
-                UnshareEntities(notification);
+                if (TempNotifications.TryRemove(notification, out _))
+                    UnshareEntities(notification);
             }
         }
 
         public override string ToString() => $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : null)})" : null)}";
         private EndPoint _EndPoint;
 
-        public readonly Dictionary<Entity, DateTimeOffset> TempNotifications = new();
+        public readonly ConcurrentDictionary<Entity, DateTimeOffset> TempNotifications = new();
     }
 }

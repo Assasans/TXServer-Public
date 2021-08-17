@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.Squads;
+using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Time;
 using TXServer.ECSSystem.Components.User;
+using TXServer.ECSSystem.Events.Matchmaking;
+using TXServer.ECSSystem.Events.MatchMaking;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles.Matchmaking
@@ -34,7 +37,12 @@ namespace TXServer.Core.Battles.Matchmaking
                 battle.AddPlayer(participant.Player, false);
         }
 
-        public static void EnterMatchMaking(Player player) => WaitingPlayers.Add(player, DateTimeOffset.UtcNow);
+        public static void EnterMatchMaking(Player player, Entity mode = null)
+        {
+            if (mode is not null)
+                player.SendEvent(new EnteredToMatchMakingEvent(), mode);
+            WaitingPlayers.Add(player, DateTimeOffset.UtcNow);
+        }
 
         private static bool IsValidToEnter(Battle battle)
         {
@@ -68,6 +76,18 @@ namespace TXServer.Core.Battles.Matchmaking
                     return true;
             }
             return false;
+        }
+
+        public static void ExitMatchMaking(Player player, Entity matchMaking = null, bool selfAction = true)
+        {
+            if (player.IsInBattle)
+                player.BattlePlayer.WaitingForExit = true;
+
+            if (matchMaking is not null)
+                player.SendEvent(new ExitedFromMatchMakingEvent(selfAction), matchMaking);
+
+            if (WaitingPlayers.ContainsKey(player))
+                WaitingPlayers.Remove(player);
         }
 
         public static void ProcessDeserterState(Player player, Battle battle)
@@ -134,6 +154,6 @@ namespace TXServer.Core.Battles.Matchmaking
             };
         }
 
-        private static Dictionary<Player, DateTimeOffset> WaitingPlayers = new();
+        private static readonly Dictionary<Player, DateTimeOffset> WaitingPlayers = new();
     }
 }

@@ -13,13 +13,9 @@ namespace TXServer.ECSSystem.Events.MatchMaking
             // Validate given mode entity
             foreach (Entity existingMode in MatchmakingModes.GlobalItems.GetAllItems())
             {
-                if (mode.EntityId == existingMode.EntityId)
-                {
-                    player.SendEvent(new EnteredToMatchMakingEvent(), mode);
-                    player.SendEvent(new EnteredToMatchMakingEvent(), mode);
-                    Core.Battles.Matchmaking.MatchMaking.EnterMatchMaking(player);
-                    return;
-                }
+                if (mode.EntityId != existingMode.EntityId) continue;
+                Core.Battles.Matchmaking.MatchMaking.EnterMatchMaking(player, mode);
+                return;
             }
         }
     }

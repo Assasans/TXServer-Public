@@ -24,7 +24,8 @@ namespace TXServer.Core.ChatCommands
 {
     public static class ChatCommands
     {
-        private static readonly Dictionary<string, (string, ChatCommandConditions, Func<Player, string[], string>)> Commands = new()
+        private static readonly Dictionary<string, (string, ChatCommandConditions, Func<Player, string[], string>)>
+            Commands = new()
         {
             { "help", ("help [opt: hackBattle]", ChatCommandConditions.None, Help) },
             { "ping", (null, ChatCommandConditions.None, Ping) },

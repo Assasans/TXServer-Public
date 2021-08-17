@@ -10,15 +10,7 @@ namespace TXServer.ECSSystem.Events.Matchmaking
     {
         public bool InBattle { get; set; }
 
-        public void Execute(Player player, Entity lobby)
-        {
-            if (!player.IsInBattle)
-                return;
-
-            player.BattlePlayer.WaitingForExit = true;
-
-            if (lobby.TemplateAccessor.Template is MatchMakingLobbyTemplate)
-                player.SendEvent(new ExitedFromMatchMakingEvent(true), lobby);
-        }
+        public void Execute(Player player, Entity lobby) =>
+            Core.Battles.Matchmaking.MatchMaking.ExitMatchMaking(player, lobby);
     }
 }

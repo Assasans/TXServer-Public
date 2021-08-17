@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.EntityTemplates
 	[SerialVersionUID(1481176055388L)]
 	public class NewItemNotificationTemplate : IEntityTemplate
 	{
-        public static Entity CreateEntity(Entity entity, Entity item, int amount)
+        public static Entity CreateEntity(Entity entity, Entity item, int amount = 1)
         {
             return new(new TemplateAccessor(new NewItemNotificationTemplate(), "notification/newitem"),
                 new NotificationGroupComponent(entity),
