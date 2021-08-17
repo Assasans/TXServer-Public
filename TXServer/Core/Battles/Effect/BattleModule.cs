@@ -45,7 +45,7 @@ namespace TXServer.Core.Battles.Effect {
                 ?.UpgradeLevel2Values[Level] ?? 0;
         }
 
-        private float GetConfigByLevel(List<float> statsPerLevel) =>
+        protected float GetConfigByLevel(List<float> statsPerLevel) =>
             statsPerLevel.Count - 1 < Level ? statsPerLevel.Last() : statsPerLevel[Level];
 
         private void ActivateCooldown()

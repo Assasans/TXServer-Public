@@ -69,8 +69,8 @@ namespace TXServer.Core.Battles.Effect
                 .UpgradeLevel2Values[Level];
             TargetingDistance = Config.GetComponent<ModuleEffectTargetingDistancePropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
-            TargetingPeriod = Config.GetComponent<ModuleEffectTargetingPeriodPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level];
+            TargetingPeriod = GetConfigByLevel(Config
+                .GetComponent<ModuleEffectTargetingPeriodPropertyComponent>(ConfigPath).UpgradeLevel2Values);
         }
 
         public override float BaseDamage(Entity weapon, MatchPlayer target)
