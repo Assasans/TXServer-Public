@@ -17,6 +17,7 @@ using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 using TXServer.Core.Database;
 using TXDatabase.NetworkEvents.Communications;
+using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Notification;
 using TXServer.ECSSystem.EntityTemplates.Notification.FractionsCompetition;
 using TXServer.ECSSystem.EntityTemplates.User;
@@ -187,6 +188,16 @@ namespace TXServer.Core
 
             SendEvent(new PaymentSectionLoadedEvent(), user);
             SendEvent(new FriendsLoadedEvent(this), ClientSession);
+
+            foreach (Entity entity in EntityList.ToArray().Where((entity) => entity.TemplateAccessor.Template is PremiumOfferTemplate))
+            {
+                SendEvent(new UpdateGoodsPriceEvent()
+                {
+                    Currency = "USD",
+                    Price = 123.45,
+                    DiscountCoeff = 0.25f
+                }, entity);
+            }
 
             return true;
         }

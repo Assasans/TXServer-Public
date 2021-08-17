@@ -7,7 +7,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 {
     public static class PremiumOffers
     {
-        public static Items GlobalItems = new Items();
+        public static Items GlobalItems { get; } = new();
 
         public class Items : ItemList
         {
