@@ -17,7 +17,6 @@ using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 using TXServer.Core.Database;
 using TXDatabase.NetworkEvents.Communications;
-using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Notification;
 using TXServer.ECSSystem.EntityTemplates.Notification.FractionsCompetition;
 using TXServer.ECSSystem.EntityTemplates.User;
@@ -189,26 +188,6 @@ namespace TXServer.Core
             SendEvent(new PaymentSectionLoadedEvent(), user);
             SendEvent(new FriendsLoadedEvent(this), ClientSession);
 
-            foreach (Entity entity in EntityList.ToArray().Where((entity) => entity.TemplateAccessor.Template is PremiumOfferTemplate))
-            {
-                SendEvent(new UpdateGoodsPriceEvent()
-                {
-                    Currency = "USD",
-                    Price = 123.45,
-                    DiscountCoeff = 0.25f
-                }, entity);
-            }
-
-            foreach (Entity entity in EntityList.ToArray().Where((entity) => entity.TemplateAccessor.Template is GoldBonusOfferTemplate))
-            {
-                SendEvent(new UpdateGoodsPriceEvent()
-                {
-                    Currency = "USD",
-                    Price = 543.21,
-                    DiscountCoeff = 0.5f
-                }, entity);
-            }
-
             return true;
         }
 
@@ -247,6 +226,31 @@ namespace TXServer.Core
 
         public void UpdateFractionScores() =>
             SendEvent(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition);
+
+        public void UpdateShop()
+        {
+            foreach (Entity entity in EntityList.ToArray())
+            {
+                SpecialOfferGroupComponent specialOfferGroupComponent =
+                    entity.GetComponent<SpecialOfferGroupComponent>();
+                if (specialOfferGroupComponent is null) continue;
+
+                Dictionary<string, (double, float)> prices = specialOfferGroupComponent.Prices;
+                string currency = specialOfferGroupComponent.Currencies.ContainsKey(Data.CountryCode)
+                    ? specialOfferGroupComponent.Currencies[Data.CountryCode]
+                    : "EUR";
+                prices.TryGetValue(currency, out (double, float) price);
+                if (price == default)
+                    (currency, price) = (prices.First().Key, prices.First().Value);
+
+                SendEvent(new UpdateGoodsPriceEvent()
+                {
+                    Currency = currency,
+                    Price = price.Item1,
+                    DiscountCoeff = price.Item2
+                }, entity);
+            }
+        }
 
         public Entity GetMarketItemByUser(Entity userItem) => ResourceManager.GetMarketItem(this, userItem);
         public Entity GetUserItemByMarket(Entity marketItem) => ResourceManager.GetUserItem(this, marketItem);
