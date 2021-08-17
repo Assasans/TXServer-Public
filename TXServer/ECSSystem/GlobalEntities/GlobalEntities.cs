@@ -67,7 +67,8 @@ namespace TXServer.ECSSystem.GlobalEntities
 
             typeof(News),
 
-            typeof(PremiumOffers)
+            typeof(PremiumOffers),
+            typeof(GoldBonusOffers)
         };
 
         static ResourceManager()

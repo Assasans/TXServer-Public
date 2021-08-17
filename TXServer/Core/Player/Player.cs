@@ -199,6 +199,16 @@ namespace TXServer.Core
                 }, entity);
             }
 
+            foreach (Entity entity in EntityList.ToArray().Where((entity) => entity.TemplateAccessor.Template is GoldBonusOfferTemplate))
+            {
+                SendEvent(new UpdateGoodsPriceEvent()
+                {
+                    Currency = "USD",
+                    Price = 543.21,
+                    DiscountCoeff = 0.5f
+                }, entity);
+            }
+
             return true;
         }
 
