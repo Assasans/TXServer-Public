@@ -31,7 +31,7 @@ namespace TXServer.Core.Battles.Effect
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
             MatchPlayer.Battle.PlayersInMap.SendEvent(new TriggerEffectExecuteEvent(), EffectEntity);
-            MatchPlayer.Weapon.RemoveComponent<ShootableComponent>();
+            MatchPlayer.Weapon.TryRemoveComponent<ShootableComponent>();
 
             MatchPlayer.TemperatureHits.Clear();
             Damage.DealNewTemperature(EffectEntity, MarketItem, MatchPlayer, MatchPlayer);
