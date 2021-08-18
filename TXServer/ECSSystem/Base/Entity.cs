@@ -138,7 +138,7 @@ namespace TXServer.ECSSystem.Base
 
             if (successful)
             {
-                foreach (Player player in PlayerReferences.Where(x => x != excludedFromSending))
+                foreach (Player player in PlayerReferences.ToArray().Where(x => x != excludedFromSending))
                     player.Connection.QueueCommands(new ComponentRemoveCommand(this, componentType));
             }
 
