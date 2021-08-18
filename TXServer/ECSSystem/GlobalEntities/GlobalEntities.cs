@@ -67,6 +67,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
             typeof(News),
 
+            typeof(PersonalSpecialOffers),
             typeof(PremiumOffers),
             typeof(GoldBonusOffers)
         };
