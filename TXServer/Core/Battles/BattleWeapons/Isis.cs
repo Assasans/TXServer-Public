@@ -20,6 +20,8 @@ namespace TXServer.Core.Battles.BattleWeapons
                 MarketItemPath).FinalValue;
             SelfHealPercentage = Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.
                 SelfHealingPropertyComponent>(MarketItemPath).FinalValue;
+
+            NotFriendlyFireUsable = true;
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)

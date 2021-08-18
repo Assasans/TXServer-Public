@@ -7,6 +7,7 @@ namespace TXServer.Core.Battles.BattleWeapons
     {
         public Thunder(MatchPlayer matchPlayer) : base(matchPlayer)
         {
+            AllowsSelfDamage = true;
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)

@@ -29,7 +29,7 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
             foreach (HitTarget hitTarget in Targets)
             {
                 if (matchPlayer.IsEnemyOf(Damage.GetTargetByHit(matchPlayer, hitTarget)) ||
-                    matchPlayer.Battle.Params.FriendlyFire)
+                     matchPlayer.Battle.Params.FriendlyFire && !matchPlayer.BattleWeapon.NotFriendlyFireUsable)
                     Damage.HandleHit(weapon, matchPlayer, hitTarget);
                 else
                     Damage.HandleMateHit(weapon, matchPlayer, hitTarget);

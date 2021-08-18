@@ -18,6 +18,9 @@ namespace TXServer.ECSSystem.Events.Chat
     {
         public void Execute(Player player, Entity chat)
         {
+            Message = Message.Trim();
+            if (!IsValidToSend()) return;
+
             Core.Battles.Battle battle = player.BattlePlayer?.Battle;
 
             if (ChatCommands.CheckForCommand(player, Message, out string commandReply))
@@ -75,6 +78,14 @@ namespace TXServer.ECSSystem.Events.Chat
                         battle?.MatchTankPlayers.Where(x => x.Team == player.BattlePlayer.Team));
                     break;
             }
+        }
+
+        private bool IsValidToSend()
+        {
+            // todo: word blacklist
+            if (Message[1..].StartsWith("runCommand")) return false;
+            if (Message.Length is not (> 0 and <= 400)) return false;
+            return true;
         }
 
         public string Message { get; set; }

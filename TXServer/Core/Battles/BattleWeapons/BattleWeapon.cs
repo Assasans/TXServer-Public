@@ -132,6 +132,9 @@ namespace TXServer.Core.Battles.BattleWeapons
         private string BattleItemPath => "battle/weapon/" + MarketItemPath.Split('/').Last();
         public List<Component> CustomComponents { get; } = new();
 
+        public bool AllowsSelfDamage { get; protected init; }
+        public bool NotFriendlyFireUsable { get; protected init; }
+
         protected float CooldownIntervalSec { get; }
         protected float DamagePerSecond { get; }
 

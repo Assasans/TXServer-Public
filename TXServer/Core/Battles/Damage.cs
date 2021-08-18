@@ -84,7 +84,7 @@ namespace TXServer.Core.Battles
             bool healed = true;
             matchPlayer.Tank.ChangeComponent<HealthComponent>(component =>
             {
-                if (component.MaxHealth <= component.CurrentHealth + healHp)
+                if (component.CurrentHealth + healHp > component.MaxHealth)
                 {
                     healed = false;
                     return;
@@ -287,12 +287,13 @@ namespace TXServer.Core.Battles
             MatchPlayer target = GetTargetByHit(shooter, hitTarget);
             (Entity weaponMarketItem, _) = GetWeaponItems(weapon, shooter);
 
-            if (shooter.BattleWeapon.IsOnCooldown(target) || target.TemperatureFromAllHits() == 0) return;
+            if (shooter.BattleWeapon.IsOnCooldown(target)) return;
 
             if (shooter.BattleWeapon.GetType() == typeof(Isis))
                 ((Isis) shooter.BattleWeapon).HealMate(target, hitTarget);
 
-            DealNewTemperature(weapon, weaponMarketItem, target, shooter, onlyNormalize:true);
+            if (target.TemperatureFromAllHits() != 0)
+                DealNewTemperature(weapon, weaponMarketItem, target, shooter, onlyNormalize:true);
         }
 
 
