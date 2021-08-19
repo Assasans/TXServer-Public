@@ -14,10 +14,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TXServer", "TXServer\TXServ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TXServerConsole", "TXServerConsole\TXServerConsole.csproj", "{00C34BAA-9DC9-4264-BDF0-099962F90FAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TXDatabaseShared", "TXDatabaseShared\TXDatabaseShared.csproj", "{AF68E21B-83D8-4302-9ACB-9D021B7BF416}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TXDatabase", "TXDatabase\TXDatabase.csproj", "{4FE285AC-F69F-47BD-8650-520ED557E6F7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,14 +32,6 @@ Global
 		{00C34BAA-9DC9-4264-BDF0-099962F90FAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00C34BAA-9DC9-4264-BDF0-099962F90FAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00C34BAA-9DC9-4264-BDF0-099962F90FAC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF68E21B-83D8-4302-9ACB-9D021B7BF416}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF68E21B-83D8-4302-9ACB-9D021B7BF416}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF68E21B-83D8-4302-9ACB-9D021B7BF416}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF68E21B-83D8-4302-9ACB-9D021B7BF416}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4FE285AC-F69F-47BD-8650-520ED557E6F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4FE285AC-F69F-47BD-8650-520ED557E6F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4FE285AC-F69F-47BD-8650-520ED557E6F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4FE285AC-F69F-47BD-8650-520ED557E6F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

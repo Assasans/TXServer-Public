@@ -25,7 +25,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TXDatabaseShared\TXDatabaseShared.csproj" />
-  </ItemGroup>
 </Project>
