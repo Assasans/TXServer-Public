@@ -65,7 +65,12 @@ namespace TXServer.ECSSystem.GlobalEntities
 
             typeof(Chats),
 
-            typeof(News)
+            typeof(News),
+
+            typeof(PersonalSpecialOffers),
+            typeof(XCrystalsPacks),
+            typeof(PremiumOffers),
+            typeof(GoldBonusOffers)
         };
 
         static ResourceManager()

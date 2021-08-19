@@ -13,7 +13,11 @@ namespace TXServer.ECSSystem.GlobalEntities
         {
             public Entity _1000boxes { get; } = new Entity(-1799018136, new TemplateAccessor(new GoldBonusOfferTemplate(), "payment/goods/goldbonus/1000boxes"),
                 new SpecialOfferDurationComponent(),
-                new SpecialOfferGroupComponent(-1799018136),
+                new SpecialOfferGroupComponent(-1799018136, new Dictionary<string, (double, float)>
+                {
+                    { "EUR", (73.90, 0) },
+                    { "RUB", (3990.00, 0) }
+                }),
                 new PackIdComponent(-1799018136),
                 new ItemsPackFromConfigComponent(),
                 new CrystalsPackComponent(),
@@ -24,7 +28,11 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new XCrystalsPackComponent());
             public Entity _800boxes { get; } = new Entity(1242971667, new TemplateAccessor(new GoldBonusOfferTemplate(), "payment/goods/goldbonus/800boxes"),
                 new SpecialOfferDurationComponent(),
-                new SpecialOfferGroupComponent(1242971667),
+                new SpecialOfferGroupComponent(1242971667, new Dictionary<string, (double, float)>
+                {
+                    { "EUR", (69.90, 0) },
+                    { "RUB", (3749.00, 0) }
+                }),
                 new PackIdComponent(1242971667),
                 new ItemsPackFromConfigComponent(),
                 new CrystalsPackComponent(),
@@ -35,7 +43,11 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new XCrystalsPackComponent());
             public Entity _80boxes { get; } = new Entity(-467522065, new TemplateAccessor(new GoldBonusOfferTemplate(), "payment/goods/goldbonus/80boxes"),
                 new SpecialOfferDurationComponent(),
-                new SpecialOfferGroupComponent(-467522065),
+                new SpecialOfferGroupComponent(-467522065, new Dictionary<string, (double, float)>
+                {
+                    { "EUR", (9.99, 0) },
+                    { "RUB", (499.00, 0) }
+                }),
                 new PackIdComponent(-467522065),
                 new ItemsPackFromConfigComponent(),
                 new CrystalsPackComponent(),
@@ -46,7 +58,11 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new XCrystalsPackComponent());
             public Entity _8boxes { get; } = new Entity(724226707, new TemplateAccessor(new GoldBonusOfferTemplate(), "payment/goods/goldbonus/8boxes"),
                 new SpecialOfferDurationComponent(),
-                new SpecialOfferGroupComponent(724226707),
+                new SpecialOfferGroupComponent(724226707, new Dictionary<string, (double, float)>
+                {
+                    { "EUR", (1.49, 0) },
+                    { "RUB", (79.00, 0) }
+                }),
                 new PackIdComponent(724226707),
                 new ItemsPackFromConfigComponent(),
                 new CrystalsPackComponent(),

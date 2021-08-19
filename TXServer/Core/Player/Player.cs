@@ -227,6 +227,36 @@ namespace TXServer.Core
         public void UpdateFractionScores() =>
             SendEvent(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition);
 
+        public void UpdateShop()
+        {
+            foreach (Entity entity in EntityList.ToArray())
+            {
+                SpecialOfferGroupComponent specialOfferGroupComponent =
+                    entity.GetComponent<SpecialOfferGroupComponent>();
+                if (specialOfferGroupComponent is null) continue;
+
+                Dictionary<string, (double, float)> prices = specialOfferGroupComponent.Prices;
+                string currency = specialOfferGroupComponent.Currencies.ContainsKey(Data.CountryCode)
+                    ? specialOfferGroupComponent.Currencies[Data.CountryCode]
+                    : "EUR";
+                prices.TryGetValue(currency, out (double, float) price);
+                if (price == default)
+                {
+                    if (prices.Any())
+                        (currency, price) = (prices.First().Key, prices.First().Value);
+                    else
+                        (currency, price) = ("EUR", (99.99, 0));
+                }
+
+                SendEvent(new UpdateGoodsPriceEvent()
+                {
+                    Currency = currency,
+                    Price = price.Item1,
+                    DiscountCoeff = price.Item2
+                }, entity);
+            }
+        }
+
         public Entity GetMarketItemByUser(Entity userItem) => ResourceManager.GetMarketItem(this, userItem);
         public Entity GetUserItemByMarket(Entity marketItem) => ResourceManager.GetUserItem(this, marketItem);
         public int GetUserItemLevel(Entity userItem) => ResourceManager.GetUserItemLevel(this, userItem);
