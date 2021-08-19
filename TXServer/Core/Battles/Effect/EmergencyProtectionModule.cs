@@ -49,7 +49,7 @@ namespace TXServer.Core.Battles.Effect
                 Damage.DealHeal(healHp, MatchPlayer);
             }
 
-            MatchPlayer.Weapon.AddComponent(new ShootableComponent());
+            MatchPlayer.Weapon.TryAddComponent(new ShootableComponent());
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
 
             EffectEntity = null;

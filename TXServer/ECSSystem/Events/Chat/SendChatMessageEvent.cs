@@ -82,9 +82,9 @@ namespace TXServer.ECSSystem.Events.Chat
 
         private bool IsValidToSend()
         {
-            // todo: word blacklist
-            if (Message[1..].StartsWith("runCommand")) return false;
             if (Message.Length is not (> 0 and <= 400)) return false;
+            // todo: word blacklist
+            if (Message.Length > 1 && Message[1..].StartsWith("runCommand")) return false;
             return true;
         }
 

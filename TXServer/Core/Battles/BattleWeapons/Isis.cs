@@ -12,9 +12,9 @@ namespace TXServer.Core.Battles.BattleWeapons
         public Isis(MatchPlayer matchPlayer) : base(matchPlayer)
         {
             DecreaseFriendTemperature = -Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.
-                DecreaseFriendTemperaturePropertyComponent>(MarketItemPath).FinalValue;
+                DecreaseFriendTemperaturePropertyComponent>(MarketItemPath).FinalValue / 2;
             IncreaseFriendTemperature = Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.
-                IncreaseFriendTemperaturePropertyComponent>(MarketItemPath).FinalValue;
+                IncreaseFriendTemperaturePropertyComponent>(MarketItemPath).FinalValue / 1.75f;
 
             HealPerSecond = Config.GetComponent<TXServer.ECSSystem.ServerComponents.Damage.HealingPropertyComponent>(
                 MarketItemPath).FinalValue;

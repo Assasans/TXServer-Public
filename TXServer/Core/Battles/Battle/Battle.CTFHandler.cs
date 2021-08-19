@@ -61,11 +61,10 @@ namespace TXServer.Core.Battles
             {
                 base.Tick();
 
-                foreach (Flag flag in Flags.Values)
-                {
-                    if (flag.State == FlagState.Dropped && DateTime.UtcNow > flag.ReturnStartTime)
-                        flag.Return();
-                }
+                if (Flags?.Values != null)
+                    foreach (Flag flag in Flags.Values)
+                        if (flag.State == FlagState.Dropped && DateTime.UtcNow > flag.ReturnStartTime)
+                            flag.Return();
             }
 
             public override void OnMatchJoin(BaseBattlePlayer battlePlayer)

@@ -1,4 +1,5 @@
-﻿using TXServer.ECSSystem.Base;
+﻿using System;
+using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 using TXServer.ECSSystem.Types;
 
@@ -27,8 +28,9 @@ namespace TXServer.Core.Battles.Effect {
         protected override void Tick() {
             IsEnabled = MatchPlayer.Player.Data.GoldBonus > 0 &&
                         MatchPlayer.Battle.BattleState is BattleState.Running &&
+                        MatchPlayer.Battle.CountdownTimer > 60 &&
                         MatchPlayer.Battle.DroppedGoldBoxes < Battle.MaxDroppedGoldBoxes &&
                         !MatchPlayer.Battle.WaitingGoldBoxSenders.Contains(MatchPlayer.Player);
-		}
+        }
 	}
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using TXServer.Core.Battles.Effect;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Weapon;
@@ -59,7 +60,11 @@ namespace TXServer.Core.Battles.BattleWeapons
         {
             ResetReload();
             CurrentCartridgeCount = MaxCartridgeCount;
-            Weapon.TryAddComponent(new ShootableComponent());
+
+            if (!(MatchPlayer.TryGetModule(typeof(EmergencyProtectionModule), out BattleModule module) &&
+                  module.EffectIsActive))
+                Weapon.TryAddComponent(new ShootableComponent());
+
             MatchPlayer.SendEvent(new SetMagazineReadyEvent(), Weapon);
         }
 
