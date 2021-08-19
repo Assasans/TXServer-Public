@@ -15,7 +15,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786427),
                 new SpecialOfferGroupComponent(-122786427, new Dictionary<string, (double, float)>
                 {
-                    { "USD", (123.45, 0) }
                 }),
                 new XCrystalsPackComponent()
                 {
@@ -26,7 +25,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786426),
                 new SpecialOfferGroupComponent(-122786426, new Dictionary<string, (double, float)>
                 {
-                    { "USD", (123.45, 0) }
                 }),
                 new XCrystalsPackComponent()
                 {
@@ -37,7 +35,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786424),
                 new SpecialOfferGroupComponent(-122786424, new Dictionary<string, (double, float)>
                 {
-                    { "USD", (123.45, 0) }
                 }),
                 new XCrystalsPackComponent()
                 {
@@ -48,7 +45,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786423),
                 new SpecialOfferGroupComponent(-122786423, new Dictionary<string, (double, float)>
                 {
-                    { "USD", (123.45, 0) }
                 }),
                 new XCrystalsPackComponent()
                 {
@@ -59,7 +55,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786425),
                 new SpecialOfferGroupComponent(-122786425, new Dictionary<string, (double, float)>
                 {
-                    { "USD", (123.45, 0) }
                 }),
                 new XCrystalsPackComponent()
                 {
@@ -70,7 +65,6 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786422),
                 new SpecialOfferGroupComponent(-122786422, new Dictionary<string, (double, float)>
                 {
-                    { "USD", (123.45, 0) }
                 }),
                 new XCrystalsPackComponent()
                 {

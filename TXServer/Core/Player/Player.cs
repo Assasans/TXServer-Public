@@ -241,7 +241,12 @@ namespace TXServer.Core
                     : "EUR";
                 prices.TryGetValue(currency, out (double, float) price);
                 if (price == default)
-                    (currency, price) = (prices.First().Key, prices.First().Value);
+                {
+                    if (prices.Any())
+                        (currency, price) = (prices.First().Key, prices.First().Value);
+                    else
+                        (currency, price) = ("EUR", (99.99, 0));
+                }
 
                 SendEvent(new UpdateGoodsPriceEvent()
                 {
