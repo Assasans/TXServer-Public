@@ -25,21 +25,21 @@ namespace TXServer.ECSSystem.GlobalEntities
         public class Items : ItemList
         {
             public Entity _1000boxes { get; } = new Entity(new TemplateAccessor(new PersonalSpecialOfferPropertiesTemplate(), ""),
-                new SpecialOfferGroupComponent(GoldBonusOffers.GlobalItems._1000boxes),
+                new SpecialOfferGroupComponent(GoldBonusOffers.GlobalItems._400boxes),
                 new PackIdComponent(0),
                 new DiscountComponent(0),
                 new SpecialOfferRemainingTimeComponent(),
                 new PaymentIntentComponent(),
                 new SpecialOfferVisibleComponent());
             public Entity _800boxes { get; } = new Entity(new TemplateAccessor(new PersonalSpecialOfferPropertiesTemplate(), ""),
-                new SpecialOfferGroupComponent(GoldBonusOffers.GlobalItems._800boxes),
+                new SpecialOfferGroupComponent(GoldBonusOffers.GlobalItems._80boxes),
                 new PackIdComponent(0),
                 new DiscountComponent(0),
                 new SpecialOfferRemainingTimeComponent(),
                 new PaymentIntentComponent(),
                 new SpecialOfferVisibleComponent());
             public Entity _80boxes { get; } = new Entity(new TemplateAccessor(new PersonalSpecialOfferPropertiesTemplate(), ""),
-                new SpecialOfferGroupComponent(GoldBonusOffers.GlobalItems._80boxes),
+                new SpecialOfferGroupComponent(GoldBonusOffers.GlobalItems._50boxes),
                 new PackIdComponent(0),
                 new DiscountComponent(0),
                 new SpecialOfferRemainingTimeComponent(),

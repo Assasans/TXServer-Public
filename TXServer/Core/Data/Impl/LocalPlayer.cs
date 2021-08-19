@@ -19,7 +19,7 @@ namespace TXServer.Core.Data.Impl
                 Username = "Tanker";
                 HashedPassword = "abc";
                 RememberMe = true;
-                CountryCode = "EN";
+                CountryCode = "US";
                 Admin = true;
                 Beta = true;
                 Mod = true;

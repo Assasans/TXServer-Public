@@ -15,7 +15,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786427),
                 new SpecialOfferGroupComponent(-122786427, new Dictionary<string, (double, float)>
                 {
-                    { "RUB", (99, 0) }
+                    { "USD", (2, 0) },
+                    { "RUB", (100, 0) }
                 }),
                 new XCrystalsPackComponent()
                 {
@@ -26,6 +27,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786426),
                 new SpecialOfferGroupComponent(-122786426, new Dictionary<string, (double, float)>
                 {
+                    { "USD", (3.99, 0) },
+                    { "RUB", (199, 0) }
                 }),
                 new XCrystalsPackComponent()
                 {
@@ -36,6 +39,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786425),
                 new SpecialOfferGroupComponent(-122786425, new Dictionary<string, (double, float)>
                 {
+                    { "USD", (11.99, 0) },
                     { "RUB", (599, 0) }
                 }),
                 new XCrystalsPackComponent()
@@ -47,6 +51,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786424),
                 new SpecialOfferGroupComponent(-122786424, new Dictionary<string, (double, float)>
                 {
+                    { "USD", (23.99, 0) },
                     { "RUB", (1199, 0) }
                 }),
                 new XCrystalsPackComponent()
@@ -58,6 +63,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786423),
                 new SpecialOfferGroupComponent(-122786423, new Dictionary<string, (double, float)>
                 {
+                    { "USD", (59.99, 0) },
                     { "RUB", (2999, 0) }
                 }),
                 new XCrystalsPackComponent()
@@ -69,6 +75,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786422),
                 new SpecialOfferGroupComponent(-122786422, new Dictionary<string, (double, float)>
                 {
+                    { "USD", (99.99, 0) },
                     { "RUB", (4999, 0) }
                 }),
                 new XCrystalsPackComponent()
