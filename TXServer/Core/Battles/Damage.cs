@@ -84,7 +84,7 @@ namespace TXServer.Core.Battles
             bool healed = true;
             matchPlayer.Tank.ChangeComponent<HealthComponent>(component =>
             {
-                if (component.CurrentHealth + healHp > component.MaxHealth)
+                if (component.CurrentHealth >= component.MaxHealth)
                 {
                     healed = false;
                     return;

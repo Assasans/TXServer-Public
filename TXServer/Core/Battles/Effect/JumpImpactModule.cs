@@ -17,7 +17,7 @@ namespace TXServer.Core.Battles.Effect
 		public override void Activate()
         {
 			EffectEntity = JumpEffectTemplate.CreateEntity(MatchPlayer, ForceMultiplier);
-            MatchPlayer.Battle.JoinedTankPlayers.ShareEntities(EffectEntity);
+            MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
             Schedule(Deactivate);
 		}

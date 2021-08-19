@@ -15,6 +15,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786427),
                 new SpecialOfferGroupComponent(-122786427, new Dictionary<string, (double, float)>
                 {
+                    { "RUB", (99, 0) }
                 }),
                 new XCrystalsPackComponent()
                 {
@@ -31,10 +32,22 @@ namespace TXServer.ECSSystem.GlobalEntities
                     Amount = 250,
                     Bonus = 75
                 });
+            public Entity _750crystals { get; } = new Entity(-122786425, new TemplateAccessor(new XCrystalsPackTemplate(), ""),
+                new PackIdComponent(-122786425),
+                new SpecialOfferGroupComponent(-122786425, new Dictionary<string, (double, float)>
+                {
+                    { "RUB", (599, 0) }
+                }),
+                new XCrystalsPackComponent()
+                {
+                    Amount = 750,
+                    Bonus = 300
+                });
             public Entity _1500crystals { get; } = new Entity(-122786424, new TemplateAccessor(new XCrystalsPackTemplate(), ""),
                 new PackIdComponent(-122786424),
                 new SpecialOfferGroupComponent(-122786424, new Dictionary<string, (double, float)>
                 {
+                    { "RUB", (1199, 0) }
                 }),
                 new XCrystalsPackComponent()
                 {
@@ -45,26 +58,18 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new PackIdComponent(-122786423),
                 new SpecialOfferGroupComponent(-122786423, new Dictionary<string, (double, float)>
                 {
+                    { "RUB", (2999, 0) }
                 }),
                 new XCrystalsPackComponent()
                 {
                     Amount = 3750,
                     Bonus = 2000
                 });
-            public Entity _750crystals { get; } = new Entity(-122786425, new TemplateAccessor(new XCrystalsPackTemplate(), ""),
-                new PackIdComponent(-122786425),
-                new SpecialOfferGroupComponent(-122786425, new Dictionary<string, (double, float)>
-                {
-                }),
-                new XCrystalsPackComponent()
-                {
-                    Amount = 750,
-                    Bonus = 300
-                });
             public Entity _6250crystals { get; } = new Entity(-122786422, new TemplateAccessor(new XCrystalsPackTemplate(), ""),
                 new PackIdComponent(-122786422),
                 new SpecialOfferGroupComponent(-122786422, new Dictionary<string, (double, float)>
                 {
+                    { "RUB", (4999, 0) }
                 }),
                 new XCrystalsPackComponent()
                 {

@@ -22,6 +22,7 @@ namespace TXServer.ECSSystem.Components
         public readonly Dictionary<string, string> Currencies = new(StringComparer.InvariantCultureIgnoreCase)
         {
             { "DE", "EUR" },
+            { "IT", "EUR" },
             { "RU", "RUB" },
             { "US", "USD" }
         };
