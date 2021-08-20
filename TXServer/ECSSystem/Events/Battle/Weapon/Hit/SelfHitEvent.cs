@@ -17,7 +17,7 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
 
             MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
 
-            if (matchPlayer.TankState == TankState.Dead)
+            if (matchPlayer.TankState == TankState.Dead && !matchPlayer.BattleWeapon.IsBulletWeapon)
                 return;
 
             if (weapon.TemplateAccessor.Template.GetType() == typeof(HammerBattleItemTemplate))

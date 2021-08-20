@@ -69,6 +69,7 @@ namespace TXServer.Core.Battles.Effect
             base.Init();
             DeactivateOnTankDisable = false;
             IsAffectedByEmp = false;
+            WeaponType = typeof(DroneWeaponTemplate);
 
             TargetingDistance = Config.GetComponent<ModuleEffectTargetingDistancePropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];

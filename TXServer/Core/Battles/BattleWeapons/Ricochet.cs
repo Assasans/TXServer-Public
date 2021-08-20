@@ -13,6 +13,8 @@ namespace TXServer.Core.Battles.BattleWeapons
     {
         public Ricochet(MatchPlayer matchPlayer) : base(matchPlayer)
         {
+            IsBulletWeapon = true;
+
             float energyChargePerShot =
                 Config.GetComponent<EnergyConfig.EnergyChargePerShotPropertyComponent>(MarketItemPath).FinalValue;
             float energyRechargeSpeed =

@@ -7,6 +7,7 @@ namespace TXServer.Core.Battles.BattleWeapons
     {
         public Twins(MatchPlayer matchPlayer) : base(matchPlayer)
         {
+            IsBulletWeapon = true;
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)

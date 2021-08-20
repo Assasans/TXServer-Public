@@ -320,8 +320,8 @@ namespace TXServer.Core
 
                     stopwatch.Restart();
                     foreach (Player player in Pool.ToArray())
-                        if (player.IsActive)
-                            player?.Tick();
+                        if (player is {IsActive: true})
+                            player.Tick();
 
                     stopwatch.Stop();
 

@@ -254,8 +254,9 @@ namespace TXServer.Core.Battles
 
         private static (Entity, BattleModule) GetWeaponItems(Entity weapon, MatchPlayer shooter)
         {
-            BattleModule battleModule = shooter.Modules
-                .SingleOrDefault(m => m.EffectEntity == weapon || m.EffectEntities.Contains(weapon));
+            BattleModule battleModule = shooter.Modules.SingleOrDefault(m =>
+                    m.EffectEntity == weapon || m.EffectEntities.Contains(weapon) ||
+                    m.WeaponType == weapon.TemplateAccessor.Template.GetType());
 
             return (battleModule != null ? battleModule.MarketItem : shooter.Player.CurrentPreset.Weapon, battleModule);
         }
