@@ -188,25 +188,9 @@ namespace TXServer.Core
             SendEvent(new PaymentSectionLoadedEvent(), user);
             SendEvent(new FriendsLoadedEvent(this), ClientSession);
 
+            CheckForItems();
+
             return true;
-        }
-
-        public void CheckRankUp() => Leveling.CheckRankUp(this);
-        public void CheckTankRankUp(Entity item) => Leveling.CheckTankRankUp(item, this);
-
-        public void CheckRecruitReward()
-        {
-            if (Data.LastRecruitReward is not null &&
-                (DateTimeOffset.UtcNow - Data.LastRecruitReward).Value.TotalHours < 24 ||
-                Data.RecruitRewardDay > 14)
-                return;
-
-            Data.LastRecruitReward = DateTimeOffset.UtcNow;
-            Data.RecruitRewardDay++;
-
-            Entity notification = LoginRewardNotificationTemplate.CreateEntity(this);
-            ShareEntities(notification);
-            SendEvent(new ShowNotificationGroupEvent(1), notification);
         }
 
         public void CheckNotifications()
@@ -223,6 +207,33 @@ namespace TXServer.Core
             Fractions.CheckForNotifications(this);
             Leagues.CheckForNotifications(this);
         }
+
+
+        private void CheckForItems()
+        {
+            if (Data.Beta && 1 == 2) // not yet
+                foreach (Entity reward in ResourceManager.BetaRewards.Where(reward => !Data.OwnsMarketItem(reward)))
+                    SaveNewMarketItem(reward);
+        }
+
+        public void CheckRecruitReward()
+        {
+            if (Data.LastRecruitReward is not null &&
+                (DateTimeOffset.UtcNow - Data.LastRecruitReward).Value.TotalHours < 24 ||
+                Data.RecruitRewardDay > 14)
+                return;
+
+            Data.LastRecruitReward = DateTimeOffset.UtcNow;
+            Data.RecruitRewardDay++;
+
+            Entity notification = LoginRewardNotificationTemplate.CreateEntity(this);
+            ShareEntities(notification);
+            SendEvent(new ShowNotificationGroupEvent(1), notification);
+        }
+
+        public void CheckRankUp() => Leveling.CheckRankUp(this);
+        public void CheckTankRankUp(Entity item) => Leveling.CheckTankRankUp(item, this);
+
 
         public void UpdateFractionScores() =>
             SendEvent(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition);
@@ -350,9 +361,13 @@ namespace TXServer.Core
         {
             foreach (Entity entity in entities)
             {
-                EntityList.Remove(entity);
+                if (EntityList.Remove(entity))
+                    Connection.QueueCommands(new EntityUnshareCommand(entity));
+                else
+                    Logger.Log($"{this}: Warning: wanted to unshare a not shared entity of type " +
+                               $"'{entity.TemplateAccessor.Template.GetType()}'");
                 entity.PlayerReferences.Remove(this);
-                Connection.QueueCommands(new EntityUnshareCommand(entity));
+
             }
         }
 

@@ -259,7 +259,8 @@ namespace TXServer.ECSSystem.GlobalEntities
             }
         }
 
-        public static readonly Dictionary<Type, Type> MarketToUserTemplate = new()
+
+        private static readonly Dictionary<Type, Type> MarketToUserTemplate = new()
         {
             {typeof(AvatarMarketItemTemplate), typeof(AvatarUserItemTemplate)},
 
@@ -318,6 +319,13 @@ namespace TXServer.ECSSystem.GlobalEntities
             typeof(ThunderMarketItemTemplate),
             typeof(TwinsMarketItemTemplate),
             typeof(VulcanMarketItemTemplate),
+        };
+
+        public static readonly List<Entity> BetaRewards = new()
+        {
+            HullSkins.GlobalItems.HornetT0gold,
+            Paints.GlobalItems.Walker,
+            Shells.GlobalItems.RailgunGlitch
         };
     }
 }
