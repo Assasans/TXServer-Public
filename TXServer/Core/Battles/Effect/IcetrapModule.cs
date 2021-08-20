@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Effect.Mine;
+using TXServer.ECSSystem.Components.Battle.Module.Icetrap;
 using TXServer.ECSSystem.Components.Battle.Module.Mine;
 using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
@@ -11,16 +13,16 @@ using TXServer.ECSSystem.Events.Battle.Effect.Mine;
 
 namespace TXServer.Core.Battles.Effect
 {
-    public class MineModule : BattleModule
+    public class IcetrapModule : BattleModule
     {
-        public MineModule(MatchPlayer matchPlayer, Entity garageModule) : base(
+        public IcetrapModule(MatchPlayer matchPlayer, Entity garageModule) : base(
             matchPlayer,
             ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
         ) { }
 
         public override void Activate()
         {
-            Entity mine = MineEffectTemplate.CreateEntity(MatchPlayer, activationTime: ActivationTime,
+            Entity mine = IcetrapEffectTemplate.CreateEntity(MatchPlayer, activationTime: ActivationTime,
                 beginHideDistance: BeginHideDistance, damageMaxRadius: DamageMaxRadius,
                 damageMinRadius: DamageMinRadius, damageMinPercent: DamageMinPercent, hideRange: HideRange,
                 impact: Impact);
@@ -63,11 +65,16 @@ namespace TXServer.Core.Battles.Effect
                 .UpgradeLevel2Values[Level];
             TriggeringArea = Config.GetComponent<ModuleMineEffectTriggeringAreaPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
+            TemperatureDuration = Config.GetComponent<ModuleIcetrapEffectTemperatureDurationPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level];
+            TemperatureChange = Config.GetComponent<ModuleIcetrapEffectTemperatureLimitPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level];
         }
 
         public override float BaseDamage(Entity weapon, MatchPlayer target)
         {
             Explode(weapon);
+            Damage.DealNewTemperature(weapon, MarketItem, target, MatchPlayer);
             return base.BaseDamage(weapon, target);
         }
 
@@ -75,7 +82,6 @@ namespace TXServer.Core.Battles.Effect
         private void Explode(Entity mine)
         {
             MatchPlayer.Battle.PlayersInMap.SendEvent(new MineExplosionEvent(), mine);
-            MatchPlayer.Battle.PlayersInMap.UnshareEntities(mine);
             EffectEntities.Remove(mine);
         }
 
@@ -109,5 +115,6 @@ namespace TXServer.Core.Battles.Effect
         private float HideRange { get; set; }
         private float Impact { get; set; }
         private float TriggeringArea { get; set; }
+        private float TemperatureDuration { get; set; }
     }
 }

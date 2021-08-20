@@ -12,7 +12,6 @@ namespace TXServer.ECSSystem.Events.User.Lobby
             foreach (long invitedUserId in InvitedUsersIds)
             {
                 Player remotePlayer = Server.Instance.FindPlayerByUid(invitedUserId);
-
                 remotePlayer.SendEvent(new InvitedToLobbyEvent(player), remotePlayer.User);
             }
         }

@@ -108,13 +108,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(2),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
                 new ModuleCardsCompositionComponent(2));
-            /*public Entity Icetrap { get; } = new Entity(-1177680131, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/3/icetrap"),
+            public Entity Icetrap { get; } = new Entity(-1177680131, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/3/icetrap"),
                 new ParentGroupComponent(-1177680131),
                 new MarketItemGroupComponent(-1177680131),
                 new ModuleTankPartComponent(TankPartModuleType.TANK),
                 new ModuleTierComponent(2),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.ACTIVE),
-                new ModuleCardsCompositionComponent(2));*/
+                new ModuleCardsCompositionComponent(2));
             public Entity Invulnerability { get; } = new Entity(1924597477, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/active/3/invulnerability"),
                 new ParentGroupComponent(1924597477),
                 new MarketItemGroupComponent(1924597477),
@@ -129,13 +129,13 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ModuleTierComponent(0),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
                 new ModuleCardsCompositionComponent(0));
-            /*public Entity Tempblock { get; } = new Entity(596921121, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/passive/1/tempblock"),
+            public Entity Tempblock { get; } = new Entity(596921121, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/passive/1/tempblock"),
                 new ParentGroupComponent(596921121),
                 new MarketItemGroupComponent(596921121),
                 new ModuleTankPartComponent(TankPartModuleType.TANK),
                 new ModuleTierComponent(0),
                 new ModuleBehaviourTypeComponent(ModuleBehaviourType.PASSIVE),
-                new ModuleCardsCompositionComponent(0));*/
+                new ModuleCardsCompositionComponent(0));
             public Entity Acceleratedgears { get; } = new Entity(1365914179, new TemplateAccessor(new ModuleMarketItemTemplate(), "garage/module/module/tank/passive/2/acceleratedgears"),
                 new ParentGroupComponent(1365914179),
                 new MarketItemGroupComponent(1365914179),
@@ -288,6 +288,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             [GlobalItems.Firering] = typeof(FireRingModule),
             [GlobalItems.Forcefield] = typeof(ForceFieldModule),
             [GlobalItems.Gold] = typeof(GoldModule),
+            [GlobalItems.Icetrap] = typeof(IcetrapModule),
             [GlobalItems.Increaseddamage] = typeof(IncreasedDamageModule),
             [GlobalItems.Invisibility] = typeof(InvisibilityModule),
             [GlobalItems.Invulnerability] = typeof(InvulnerabilityModule),
@@ -300,6 +301,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             [GlobalItems.Sapper] = typeof(SapperModule),
             [GlobalItems.Sonar] = typeof(SonarModule),
             [GlobalItems.Spidermine] = typeof(SpiderMineModule),
+            [GlobalItems.Tempblock] = typeof(TempblockModule),
             [GlobalItems.Turbospeed] = typeof(TurboSpeedModule)
         };
     }

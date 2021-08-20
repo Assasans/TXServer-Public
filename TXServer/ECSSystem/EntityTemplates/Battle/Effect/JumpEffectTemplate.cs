@@ -2,6 +2,7 @@
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Module;
+using TXServer.ECSSystem.Components.Battle.Module.JumpImpact;
 
 namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
 {
