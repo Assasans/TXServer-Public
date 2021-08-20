@@ -17,6 +17,10 @@ using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 using TXServer.Core.Database;
 using TXDatabase.NetworkEvents.Communications;
+using TXServer.ECSSystem.EntityTemplates.Battle;
+using TXServer.ECSSystem.EntityTemplates.Battle.Bonus;
+using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
+using TXServer.ECSSystem.EntityTemplates.Chat;
 using TXServer.ECSSystem.EntityTemplates.Notification;
 using TXServer.ECSSystem.EntityTemplates.Notification.FractionsCompetition;
 using TXServer.ECSSystem.EntityTemplates.User;
@@ -363,9 +367,9 @@ namespace TXServer.Core
             {
                 if (EntityList.Remove(entity))
                     Connection.QueueCommands(new EntityUnshareCommand(entity));
-                else
+                else if (IsActive)
                     Logger.Log($"{this}: Warning: wanted to unshare a not shared entity of type " +
-                               $"'{entity.TemplateAccessor.Template.GetType()}'");
+                               $"'{entity.TemplateAccessor.Template.GetType().Name}'");
                 entity.PlayerReferences.Remove(this);
 
             }
