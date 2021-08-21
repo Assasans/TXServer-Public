@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			PlayerData data = player.Server.Database.FetchPlayerDataByEmail(Email);
+			PlayerData data = player.Server.Database.GetPlayerDataByEmail(Email);
 			if (data == null) return; // Player#LogIn(Entity) will kick the player
 			data.Player = player;
 			player.Data = data;

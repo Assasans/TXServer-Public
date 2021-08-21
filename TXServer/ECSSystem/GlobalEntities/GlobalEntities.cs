@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TXServer.Core;
+using TXServer.Core.Battles.Effect;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -202,9 +203,12 @@ namespace TXServer.ECSSystem.GlobalEntities
                         MarketToUserTemplate[marketItem.TemplateAccessor.Template.GetType()] ==
                         e.TemplateAccessor.Template.GetType() && e.GetComponent<ParentGroupComponent>().Key == id);
 
-                    player.Data.Modules.TryGetValue(id, out (int level, int cards) moduleInfo);
-                    moduleInfo.cards += amount;
-                    player.Data.Modules[id] = moduleInfo;
+                    if (!player.Data.Modules.TryGetValue(id, out ModuleInfo moduleInfo))
+                    {
+                        moduleInfo = new ModuleInfo(0, 0);
+                        player.Data.Modules[id] = moduleInfo;
+                    }
+                    moduleInfo.Cards += amount;
                     break;
                 case PremiumBoostMarketItemTemplate:
                     player.Data.RenewPremium(new TimeSpan(days: amount, 0, 0, 0));

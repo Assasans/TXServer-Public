@@ -1,6 +1,7 @@
+using System.Linq;
 using TXServer.Core;
-using TXServer.Core.Database;
 using TXServer.Core.Protocol;
+using TXServer.Database;
 using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Events.Entrance
@@ -10,42 +11,28 @@ namespace TXServer.ECSSystem.Events.Entrance
     {
         public void Execute(Player player, Entity entity)
         {
-            if (Server.DatabaseNetwork.IsReady)
+            PlayerData data = player.Server.Database.GetPlayerData(Uid);
+            if (data == null)
             {
-                PacketSorter.GetUserViaUsername(Uid, response =>
-                {
-                    PlayerData data = new PlayerDataProxy(
-                        response.uid,
-                        Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.username),
-                        Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.hashedPassword),
-                        Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.email),
-                        response.emailVerified,
-                        Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.hardwareId),
-                        Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.hardwareToken)
-                    );
-                    if (data.HardwareId == HardwareFingerprint) {
-                        data.Player = player;
-                        player.Data = data;
-
-                        // Still need to somehow get the token from the EncryptedToken but idk how, I'll get there soon
-
-                        player.LogInWithDatabase(entity);
-                    }
-                    else player.SendEvent(new AutoLoginFailedEvent(), entity);
-                });
+                player.SendEvent(new UidInvalidEvent(), entity);
+                player.SendEvent(new LoginFailedEvent(), entity);
+                return;
             }
-            else
+
+            if (data.HardwareId == HardwareFingerprint && data.AutoLoginToken != null)
             {
-                PlayerData data = player.Server.Database.FetchPlayerData(Uid);
-                // Player#LogIn(Entity) will kick the player if data == null
-                if (data != null)
+                data.Player = player;
+                player.Data = data;
+
+                byte[] token = player.EncryptionComponent.RsaDecrypt(EncryptedToken);
+                if (data.AutoLoginToken.SequenceEqual(token))
                 {
-                    data.Player = player;
-                    player.Data = data;
+                    player.LogInWithDatabase(entity);
+                    return;
                 }
-
-                player.LogIn(entity);
             }
+
+            player.SendEvent(new AutoLoginFailedEvent(), entity);
         }
 
         public string Uid { get; set; }

@@ -52,7 +52,7 @@ namespace TXServer.ECSSystem.EntityTemplates.User
 
                 new QuestReadyComponent(),
                 new UserPublisherComponent(),
-                new ConfirmedUserEmailComponent(player.Data.Email, player.Data.Subscribed),
+                new ConfirmedUserEmailComponent(player.Data.Email, player.Data.EmailSubscribed),
                 new UserSubscribeComponent());
 
             if (player.Data.Admin)

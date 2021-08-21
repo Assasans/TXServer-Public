@@ -206,7 +206,7 @@ namespace TXServer.Core.ChatCommands
                     }
                     else return $"Error, '{target.Data.Username}' isn't in a match";
                 default:
-                    target.Data.SetAutoLogin(false);
+                    target.Data.RememberMe = false;
                     target.Dispose();
                     return $"Kicked '{target.Data.Username}' from the server";
             }

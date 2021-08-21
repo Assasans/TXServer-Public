@@ -1,8 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using MongoDB.Driver;
 using TXServer.Core;
-using TXServer.Core.Data.Database.Impl;
+using TXServer.Database;
+using TXServer.Library;
 
 namespace TXServerConsole
 {
@@ -122,12 +128,32 @@ namespace TXServerConsole
                 return;
             }
 
+            DatabaseConfig databaseConfig = JsonSerializer.Deserialize<DatabaseConfig>(File.ReadAllText("Library/Database.json"), new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            DatabaseContext database = new DatabaseContext(databaseConfig);
+
             Server.Instance = new Server
             {
                 Settings = settings,
-                Database = new LocalDatabase()
+                Database = database
+                // Database = new LocalDatabase()
             };
             Server.Instance.Start();
+
+            // database.Players.DeleteOne(Builders<PlayerData>.Filter.Eq("UniqueId", 1234));
+            // var data = new PlayerData(1234);
+            // data.InitDefault();
+            // data.Username = "Assasans";
+            // data.PasswordHash = Convert.FromBase64String("10onDIlsKilLbl9y5sLMLd34PUk2Mkcv7s5I/be5dOM=");
+            // data.Email = "swimmin2@gmail.com";
+            // data.EmailVerified = true;
+            // data.CountryCode = "UA";
+            // data.EmailSubscribed = true;
+            // data.PremiumExpirationDate = DateTime.Now + TimeSpan.FromDays(1000);
+            // bool success = data.Save();
         }
     }
 }

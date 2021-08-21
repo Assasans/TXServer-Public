@@ -13,9 +13,9 @@ namespace TXServer.ECSSystem.Components
             Key = entity.EntityId;
         }
 
-        public GroupComponent(long Key)
+        public GroupComponent(long key)
         {
-            this.Key = Key;
+            Key = key;
         }
 
         public long ComponentSerialUID => GetType().GetCustomAttribute<SerialVersionUIDAttribute>().Id;

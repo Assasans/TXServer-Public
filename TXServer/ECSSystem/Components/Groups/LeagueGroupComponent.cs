@@ -6,11 +6,11 @@ namespace TXServer.ECSSystem.Components
     [SerialVersionUID(1503298026299)]
     public class LeagueGroupComponent : GroupComponent
     {
-        public LeagueGroupComponent(Entity Key) : base(Key)
+        public LeagueGroupComponent(Entity key) : base(key)
         {
         }
 
-        public LeagueGroupComponent(long Key) : base(Key)
+        public LeagueGroupComponent(long key) : base(key)
         {
         }
     }

@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Windows;
-using TXServer.Core.Data.Database.Impl;
+using TXServer.Database;
 using TXServerUI;
 
 namespace TXServer.Core
@@ -50,10 +52,18 @@ namespace TXServer.Core
 
             if (Server.Instance == null)
             {
+                DatabaseConfig databaseConfig = JsonSerializer.Deserialize<DatabaseConfig>(File.ReadAllText("Library/Config.json"), new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
+
+                DatabaseContext database = new DatabaseContext(databaseConfig);
+
                 Server.Instance = new Server
                 {
                     Settings = settings,
-                    Database = new LocalDatabase(),
+                    Database = database,
+                    // Database = new LocalDatabase(),
                     UserErrorHandler = ((MainWindow)Application.Current.MainWindow).HandleCriticalError
                 };
                 Server.Instance.Start();

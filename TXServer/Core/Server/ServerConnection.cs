@@ -6,10 +6,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using TXServer.Core.Battles;
@@ -46,6 +48,10 @@ namespace TXServer.Core
                 File.ReadAllText(ContainerInfoLocation), new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                IncludeFields = true
+            });
+
+            SessionRsaParameters = JsonSerializer.Deserialize<RSAParameters>(File.ReadAllText(SessionRsaParametersLocation), new JsonSerializerOptions {
                 IncludeFields = true
             });
 
@@ -374,8 +380,10 @@ namespace TXServer.Core
         private static string ServerMapInfoLocation => "Library/ServerMapInfo.json";
         private static string ContainerInfoLocation => "Library/BlueprintContainers.json";
         private static string HeightMapInfoLocation => "Library/HeightMaps.json";
+        private static string SessionRsaParametersLocation => "Library/PasswordKey.json";
         public static Dictionary<string, MapInfo> ServerMapInfo { get; private set; }
         public static Dictionary<string, ContainerInfo.ContainerInfo> ContainerInfos { get; private set; }
         public static Dictionary<string, HeightMap> HeightMaps { get; private set; }
+        public static RSAParameters SessionRsaParameters { get; private set; }
     }
 }

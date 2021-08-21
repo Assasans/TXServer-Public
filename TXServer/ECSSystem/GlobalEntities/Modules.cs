@@ -9,6 +9,7 @@ using TXServer.ECSSystem.Components.Item.Module;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 using TXServer.ECSSystem.Types;
+using ModuleInfo = TXServer.Core.Battles.Effect.ModuleInfo;
 
 namespace TXServer.ECSSystem.GlobalEntities
 {
@@ -45,12 +46,12 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 long id = item.GetComponent<MarketItemGroupComponent>().Key;
 
-                if (player.Data.Modules.TryGetValue(id, out (int, int) moduleInfo) && moduleInfo.Item1 > 0)
+                if (player.Data.Modules.TryGetValue(id, out ModuleInfo moduleInfo) && moduleInfo.Level > 0)
                     item.Components.Add(new UserGroupComponent(player.User.EntityId));
 
                 item.Components.Add(new ModuleGroupComponent(item.EntityId));
                 item.Components.Add(new ModuleUpgradeLevelComponent(player.Data.Modules.ContainsKey(id)
-                    ? player.Data.Modules[id].Item1
+                    ? player.Data.Modules[id].Level
                     : 0));
             }
 

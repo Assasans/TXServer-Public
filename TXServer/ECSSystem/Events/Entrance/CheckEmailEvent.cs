@@ -1,6 +1,5 @@
 ﻿using System.Net.Mail;
 using TXServer.Core;
-using TXServer.Core.Database;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -20,14 +19,14 @@ namespace TXServer.ECSSystem.Events
 			{
 				var addr = new MailAddress(Email);
 
-                if (Server.DatabaseNetwork.IsReady)
-                    PacketSorter.EmailAvailable(addr.Address, result =>
-                    {
-                        if (result.result)
-                            player.SendEvent(new EmailVacantEvent(Email), entity);
-                        else player.SendEvent(new EmailOccupiedEvent(Email), entity);
-                    });
-                else
+                // if (Server.DatabaseNetwork.IsReady)
+                //     PacketSorter.EmailAvailable(addr.Address, result =>
+                //     {
+                //         if (result.result)
+                //             player.SendEvent(new EmailVacantEvent(Email), entity);
+                //         else player.SendEvent(new EmailOccupiedEvent(Email), entity);
+                //     });
+                // else
                 {
                     /*bool emailIsOccupied = false;
                     if (emailIsOccupied)

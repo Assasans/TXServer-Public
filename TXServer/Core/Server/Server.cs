@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using TXServer.Core.Battles;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;
-using TXServer.Core.Database;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core
@@ -18,14 +18,13 @@ namespace TXServer.Core
 
         public ServerSettings Settings { get; init; }
         public IDatabase Database { get; init; }
+        public bool HasDatabase => true;
         public ServerData ServerData { get; set; }
         public Action UserErrorHandler { get; init; }
         public ModuleRegistry ModuleRegistry { get; }
         public List<PlayerData> StoredPlayerData { get; } = new();
 
-
-        public static ServerConfig Config => ServerConfig.Instance;
-        public static DatabaseNetwork DatabaseNetwork => DatabaseNetwork.Instance;
+        // private DatabaseContext _databaseContext;
 
         public Server()
         {
@@ -37,17 +36,16 @@ namespace TXServer.Core
         {
             Logger.Log("Starting server...");
 
-            // The database needs the config so load it
-            ServerConfig.Load("Config.json");
-            // Connect to the database only if there is no current connection or if it is not in a ready state
-            if (DatabaseNetwork.Instance == null ||
-                !DatabaseNetwork.Instance.IsReady)
-                new DatabaseNetwork().Connect(null);
+            ServerData = Database.GetServerData();
+            if (ServerData == null)
+            {
+                ServerData = new ServerData();
+                ServerData.InitDefault();
+                ServerData.Save();
+            }
 
-            ServerData = new ServerData();
             Connection = new ServerConnection(this);
             Connection.Start(Settings.IPAddress, Settings.Port, Settings.MaxPlayers);
-            Database.Startup();
         }
 
         public Player FindPlayerByUid(long uid) =>

@@ -15,8 +15,6 @@ using TXServer.ECSSystem.Events;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
-using TXServer.Core.Database;
-using TXDatabase.NetworkEvents.Communications;
 using TXServer.ECSSystem.EntityTemplates.Notification;
 using TXServer.ECSSystem.EntityTemplates.Notification.FractionsCompetition;
 using TXServer.ECSSystem.EntityTemplates.User;
@@ -62,7 +60,7 @@ namespace TXServer.Core
         public BattleTankPlayer BattlePlayer { get; set; }
         public Spectator Spectator { get; set; }
         public SquadPlayer SquadPlayer { get; set; }
-        public RSAEncryptionComponent EncryptionComponent { get; } = new();
+        public EncryptionComponent EncryptionComponent { get; } = new(4096); // Original server used 520 bits
 
         public ConcurrentHashSet<Entity> EntityList { get; } = new();
 
@@ -116,27 +114,9 @@ namespace TXServer.Core
 
         public void LogInWithDatabase(Entity clientSession)
         {
-            if (!Server.DatabaseNetwork.IsReady)
-            {
-                LogIn(clientSession);
-                return;
-            }
             Logger.Log($"{this}: Loading data from database {Data.Username} ({Data.UniqueId}).");
 
-            // Time to block chain all the stuff ;-;
-            PlayerDataProxy dataProxy = (PlayerDataProxy)Data;
-            PacketSorter.GetUserSettings(Data.UniqueId, settingsData =>
-            {
-                dataProxy.SetSettings(
-                    Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(settingsData.countryCode),
-                    new DateTime(settingsData.premiumExpiration),
-                    settingsData.subscribed
-                );
-                // Request the other stuff here.... I think stats is next?
-                // After your done, in the last block chain call LogIn()
-                Server.DatabaseNetwork.Socket.emit(new UserLoggedInEvent() { uid = Data.UniqueId });
-                LogIn(clientSession);
-            });
+            LogIn(clientSession);
         }
 
         public bool LogIn(Entity clientSession)

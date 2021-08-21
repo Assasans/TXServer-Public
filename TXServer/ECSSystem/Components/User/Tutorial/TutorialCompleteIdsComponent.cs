@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Components.User.Tutorial
     [SerialVersionUID(1505286737090)]
     public class TutorialCompleteIdsComponent : Component
     {
-        public TutorialCompleteIdsComponent(List<ulong> completedIds, Player player)
+        public TutorialCompleteIdsComponent(IEnumerable<ulong> completedIds, Player player)
         {
             // ReSharper disable once PossibleNullReferenceException
             CompletedIds = ((IPEndPoint) player.Connection.Socket.RemoteEndPoint).Address.Equals(IPAddress.Loopback)

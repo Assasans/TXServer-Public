@@ -1,0 +1,7 @@
+{
+  "host": "localhost",
+  "port": 27017,
+  "username": "revive-tx",
+  "password": "1234567890",
+  "database": "revive-tx"
+}

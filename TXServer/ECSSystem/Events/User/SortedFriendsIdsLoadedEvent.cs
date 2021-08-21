@@ -11,9 +11,9 @@ namespace TXServer.ECSSystem.Events.Friend
     {
         public SortedFriendsIdsLoadedEvent(Player player)
         {
-            Dictionary<List<long>, Dictionary<long, string>> listToDict = new ()
+            Dictionary<IList<long>, Dictionary<long, string>> listToDict = new ()
             {
-                { player.Data.AcceptedFriendIds, FriendsAcceptedIds }, 
+                { player.Data.AcceptedFriendIds, FriendsAcceptedIds },
                 { player.Data.IncomingFriendIds, FriendsIncomingIds },
                 { player.Data.OutgoingFriendIds, FriendsOutgoingIds }
             };

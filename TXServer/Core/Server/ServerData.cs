@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MongoDB.Bson.Serialization.Attributes;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core
@@ -8,11 +9,44 @@ namespace TXServer.Core
     {
         public ServerData()
         {
-            // todo: load data from database
         }
 
-        public bool FractionsCompetitionActive { get; set; }
-        public bool FractionsCompetitionFinished { get; set; }
+        public void InitDefault()
+        {
+            ReleaseGiftMaxRegistrationDate = DateTimeOffset.UtcNow;
+        }
+
+        [BsonId] public int Id
+        {
+            get => _id;
+            protected set
+            {
+                _id = value;
+
+                Save();
+            }
+        }
+
+        public bool FractionsCompetitionActive
+        {
+            get => _fractionsCompetitionActive;
+            set
+            {
+                _fractionsCompetitionActive = value;
+
+                Save();
+            }
+        }
+        public bool FractionsCompetitionFinished
+        {
+            get => _fractionsCompetitionFinished;
+            set
+            {
+                _fractionsCompetitionFinished = value;
+
+                Save();
+            }
+        }
         public long FractionsCompetitionCryFund => (AntaeusScore + FrontierScore) * 3;
         public long AntaeusScore
         {
@@ -20,28 +54,93 @@ namespace TXServer.Core
             set
             {
                 _antaeusScore = value;
+
+                Save();
+
+                if (Server.Instance.Connection == null) return;
+
                 foreach (Player player in Server.Instance.Connection.Pool)
                     player.UpdateFractionScores();
             }
         }
-        public long AntaeusUserCount { get; set; }
+        public long AntaeusUserCount
+        {
+            get => _antaeusUserCount;
+            set
+            {
+                _antaeusUserCount = value;
+
+                Save();
+            }
+        }
         public long FrontierScore
         {
             get => _frontierScore;
             set
             {
                 _frontierScore = value;
+
+                Save();
+
+                if (Server.Instance.Connection == null) return;
+
                 foreach (Player player in Server.Instance.Connection.Pool)
                     player.UpdateFractionScores();
             }
         }
-        public long FrontierUserCount { get; set; }
+        public long FrontierUserCount
+        {
+            get => _frontierUserCount;
+            set
+            {
+                _frontierUserCount = value;
 
-        public bool SpreadLastSeasonRewards { get; set; }
-        public int SeasonNumber { get; set; }
+                Save();
+            }
+        }
 
-        public bool SpreadReleaseGift { get; set; }
-        public DateTimeOffset ReleaseGiftMaxRegistrationDate { get; set; } = DateTimeOffset.UtcNow;
+        public bool SpreadLastSeasonRewards
+        {
+            get => _spreadLastSeasonRewards;
+            set
+            {
+                _spreadLastSeasonRewards = value;
+
+                Save();
+            }
+        }
+        public int SeasonNumber
+        {
+            get => _seasonNumber;
+            set
+            {
+                _seasonNumber = value;
+
+                Save();
+            }
+        }
+
+        public bool SpreadReleaseGift
+        {
+            get => _spreadReleaseGift;
+            set
+            {
+                _spreadReleaseGift = value;
+
+                Save();
+            }
+        }
+
+        public DateTimeOffset ReleaseGiftMaxRegistrationDate
+        {
+            get => _releaseGiftMaxRegistrationDate;
+            set
+            {
+                _releaseGiftMaxRegistrationDate = value;
+
+                Save();
+            }
+        }
 
 
         private long _antaeusScore;
@@ -65,5 +164,20 @@ namespace TXServer.Core
             { 12, (Graffiti.GlobalItems.Season11.EntityId, Graffiti.GlobalItems.Season11top.EntityId) },
             { 13, (Graffiti.GlobalItems.Season12.EntityId, Graffiti.GlobalItems.Season12top.EntityId) }
         };
+
+        private bool _fractionsCompetitionActive;
+        private bool _fractionsCompetitionFinished;
+        private long _antaeusUserCount;
+        private long _frontierUserCount;
+        private bool _spreadLastSeasonRewards;
+        private int _seasonNumber;
+        private bool _spreadReleaseGift;
+        private DateTimeOffset _releaseGiftMaxRegistrationDate;
+        private int _id;
+
+        public bool Save()
+        {
+            return Server.Instance.Database.SaveServerData(this);
+        }
     }
 }

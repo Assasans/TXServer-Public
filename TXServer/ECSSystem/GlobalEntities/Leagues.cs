@@ -1,4 +1,5 @@
-﻿using TXServer.Core;
+﻿using System.Collections.Generic;
+using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.BattleRewards;
@@ -11,6 +12,15 @@ namespace TXServer.ECSSystem.GlobalEntities
     public static class Leagues
     {
         public static Items GlobalItems { get; } = new Items();
+
+        public static Dictionary<int, Entity> ByIndex { get; } = new Dictionary<int, Entity>()
+        {
+            [0] = GlobalItems.Training,
+            [1] = GlobalItems.Bronze,
+            [2] = GlobalItems.Silver,
+            [3] = GlobalItems.Gold,
+            [4] = GlobalItems.Master
+        };
 
         public class Items : ItemList
         {

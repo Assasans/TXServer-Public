@@ -3,7 +3,7 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.3" />
+    <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
     <PackageReference Include="SharpZipLib" Version="1.3.1" />
     <PackageReference Include="YamlDotNet" Version="11.1.1" />
@@ -16,10 +16,6 @@
   <ItemGroup>
     <None Update="Library/HeightMaps/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Library/Config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Link>Config.json</Link>
     </None>
     <None Update="Library/*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -14,6 +14,6 @@ namespace TXServer.ECSSystem.Components.DailyBonus
             SelfOnlyPlayer = player;
         }
 
-        public List<long> ReceivedRewards { get; set; }
+        public IList<long> ReceivedRewards { get; set; }
     }
 }
