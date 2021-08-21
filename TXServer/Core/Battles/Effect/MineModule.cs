@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
@@ -33,7 +34,7 @@ namespace TXServer.Core.Battles.Effect
         public override void Deactivate()
         {
             foreach (Entity mine in EffectEntities)
-                MatchPlayer.Battle.PlayersInMap.UnshareEntities(mine);
+                Explode(mine);
             EffectEntities.Clear();
         }
 
@@ -62,7 +63,7 @@ namespace TXServer.Core.Battles.Effect
             Impact = Config.GetComponent<ModuleMineEffectImpactPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
             TriggeringArea = Config.GetComponent<ModuleMineEffectTriggeringAreaPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level];
+                .UpgradeLevel2Values[Level] + 1.7f;
         }
 
         public override float BaseDamage(Entity weapon, MatchPlayer target)
@@ -90,11 +91,14 @@ namespace TXServer.Core.Battles.Effect
             base.Tick();
 
             foreach ((Entity mine, Vector3 position) in Positions)
-            foreach (BattleTankPlayer player in MatchPlayer.Battle.MatchTankPlayers)
             {
-                if (!MatchPlayer.IsEnemyOf(player.MatchPlayer)) return;
-                if (Vector3.Distance(player.MatchPlayer.TankPosition, position) < TriggeringArea + 1.7)
-                    TryExplode(mine);
+                List<MatchPlayer> players = MatchPlayer.Battle.MatchTankPlayers.Select(p => p.MatchPlayer).ToList();
+                for (int i = 0; i < MatchPlayer.Battle.MatchTankPlayers.Count; i++)
+                {
+                    if (MatchPlayer.IsEnemyOf(players[i]) &&
+                        Vector3.Distance(players[i].TankPosition, position) < TriggeringArea)
+                        TryExplode(mine);
+                }
             }
         }
 

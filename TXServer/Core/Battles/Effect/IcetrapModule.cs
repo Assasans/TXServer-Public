@@ -11,6 +11,7 @@ using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 using TXServer.ECSSystem.Events.Battle.Effect.Mine;
+using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles.Effect
 {
@@ -44,6 +45,7 @@ namespace TXServer.Core.Battles.Effect
         {
             base.Init();
             IsAffectedByEmp = false;
+            WeaponType = typeof(IcetrapEffectTemplate);
 
             ActivationTime = (long) Config.GetComponent<ModuleEffectActivationTimePropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
@@ -98,12 +100,14 @@ namespace TXServer.Core.Battles.Effect
             base.Tick();
 
             foreach ((Entity mine, Vector3 position) in Positions)
-            foreach (BattleTankPlayer player in MatchPlayer.Battle.MatchTankPlayers.ToArray())
             {
-                if (!MatchPlayer.IsEnemyOf(player.MatchPlayer)) return;
-                Console.WriteLine(Vector3.Distance(player.MatchPlayer.TankPosition, position));
-                if (Vector3.Distance(player.MatchPlayer.TankPosition, position) < TriggeringArea)
-                    TryExplode(mine);
+                List<MatchPlayer> players = MatchPlayer.Battle.MatchTankPlayers.Select(p => p.MatchPlayer).ToList();
+                for (int i = 0; i < MatchPlayer.Battle.MatchTankPlayers.Count; i++)
+                {
+                    if (MatchPlayer.IsEnemyOf(players[i]) &&
+                        Vector3.Distance(players[i].TankPosition, position) < TriggeringArea)
+                        TryExplode(mine);
+                }
             }
         }
 

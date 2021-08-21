@@ -271,7 +271,7 @@ namespace TXServer.Core.Battles.Effect {
         public Entity ModuleEntity { get; }
         public Entity EffectEntity { get; protected set; }
         public List<Entity> EffectEntities { get; } = new();
-        public Type WeaponType { get; set; }
+        public Type WeaponType { get; protected set; }
         public ModuleBehaviourType ModuleType { get; set; }
 
         public bool IsCheat { get; set; }

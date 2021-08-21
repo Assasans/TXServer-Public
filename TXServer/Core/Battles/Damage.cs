@@ -106,8 +106,6 @@ namespace TXServer.Core.Battles
         {
             (_, BattleModule module) = GetWeaponItems(weapon, shooter);
             bool isModule = module != null;
-            Console.WriteLine(isModule);
-            Console.WriteLine(weapon.TemplateAccessor.Template);
             float maxHeatDamage = isModule ? module.MaxHeatDamage : shooter.BattleWeapon.MaxHeatDamage;
             float temperatureChange;
             float totalTemperature = target.TemperatureFromAllHits();
