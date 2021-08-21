@@ -74,9 +74,9 @@ namespace TXServer.ECSSystem.GlobalEntities
             public Entity Forcefield { get; } = new Entity(2100727840, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/forcefield"),
                 new ParentGroupComponent(Modules.GlobalItems.Forcefield),
                 new MarketItemGroupComponent(2100727840));
-            /*public Entity Icetrap { get; } = new Entity(1914815875, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/icetrap"),
+            public Entity Icetrap { get; } = new Entity(1914815875, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/icetrap"),
                 new ParentGroupComponent(Modules.GlobalItems.Icetrap),
-                new MarketItemGroupComponent(1914815875));*/
+                new MarketItemGroupComponent(1914815875));
             public Entity Increaseddamage { get; } = new Entity(465438765, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/increaseddamage"),
                 new ParentGroupComponent(Modules.GlobalItems.Increaseddamage),
                 new MarketItemGroupComponent(465438765));
@@ -110,9 +110,9 @@ namespace TXServer.ECSSystem.GlobalEntities
             public Entity Spidermine { get; } = new Entity(709690204, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/spidermine"),
                 new ParentGroupComponent(Modules.GlobalItems.Spidermine),
                 new MarketItemGroupComponent(709690204));
-            /*public Entity Tempblock { get; } = new Entity(-23536107, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/tempblock"),
+            public Entity Tempblock { get; } = new Entity(-23536107, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/tempblock"),
                 new ParentGroupComponent(Modules.GlobalItems.Tempblock),
-                new MarketItemGroupComponent(-23536107));*/
+                new MarketItemGroupComponent(-23536107));
             public Entity Turbospeed { get; } = new Entity(1378523021, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/turbospeed"),
                 new ParentGroupComponent(Modules.GlobalItems.Turbospeed),
                 new MarketItemGroupComponent(1378523021));
@@ -124,7 +124,7 @@ namespace TXServer.ECSSystem.GlobalEntities
             //GlobalItem.RepairKit,
             GlobalItems.Turbospeed,
             GlobalItems.Backhitdefence,
-            //GlobalItems.Tempblock,
+            GlobalItems.Tempblock,
             GlobalItems.Emp,
             GlobalItems.Mine,
             GlobalItems.Sonar,
@@ -148,7 +148,7 @@ namespace TXServer.ECSSystem.GlobalEntities
         public static readonly List<Entity> Tier3Modules = new()
         {
             GlobalItems.Firering,
-            //GlobalItems.Icetrap,
+            GlobalItems.Icetrap,
             GlobalItems.Invulnerability,
             GlobalItems.Emergencyprotection,
             GlobalItems.Drone,

@@ -446,7 +446,7 @@ namespace TXServer.Core.Battles
             get => Tank.GetComponent<TemperatureComponent>().Temperature;
             set => Tank.ChangeComponent<TemperatureComponent>(component => component.Temperature = value);
         }
-        public TemperatureConfigComponent TemperatureConfigComponent { get; }
+        public TemperatureConfigComponent TemperatureConfigComponent { get; set; }
 
         public ConcurrentDictionary<Type, TranslatedEvent> TranslatedEvents { get; } = new();
 

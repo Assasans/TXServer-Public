@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.ServerComponents.Hit;
+using TXServer.ECSSystem.ServerComponents.Weapon;
+using TXServer.Library;
 
 namespace TXServer.Core.Battles.BattleWeapons
 {
@@ -11,9 +13,13 @@ namespace TXServer.Core.Battles.BattleWeapons
         {
             DeltaTemperaturePerSecond = Config
                 .GetComponent<DeltaTemperaturePerSecondPropertyComponent>(MarketItemPath).FinalValue;
+            TargetHeatingMultiplier =
+                Config.GetComponent<VulcanWeapon.TargetHeatMultiplierPropertyComponent>(MarketItemPath).FinalValue;
 
             MaxHeatDamage = 105;
             MinHeatDamage = 50;
+
+            TemperatureLimit = 0.5f;
         }
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)
@@ -28,7 +34,7 @@ namespace TXServer.Core.Battles.BattleWeapons
         }
 
         public override float TemperatureDeltaPerHit(float targetTemperature) =>
-            DeltaTemperaturePerSecond * CooldownIntervalSec / 0.75f;
+            DeltaTemperaturePerSecond * CooldownIntervalSec * TargetHeatingMultiplier;
 
         public override bool IsOnCooldown(MatchPlayer target)
         {
@@ -77,13 +83,13 @@ namespace TXServer.Core.Battles.BattleWeapons
             if (temperatureHit != default)
             {
                 temperatureHit.CurrentTemperature += DeltaTemperaturePerSecond;
-                temperatureHit.CurrentTemperature = Math.Clamp(temperatureHit.CurrentTemperature, 0, 1);
+                temperatureHit.CurrentTemperature = Math.Clamp(temperatureHit.CurrentTemperature, 0, 0.5f);
                 MatchPlayer.TemperatureHits[MatchPlayer.TemperatureHits.FindIndex(
                     t => t.Shooter == MatchPlayer && t.WeaponMarketItem == MarketItem)] = temperatureHit;
             }
             else
                 MatchPlayer.TemperatureHits.Add(new TemperatureHit(DeltaTemperaturePerSecond, MaxOverheatTemperatureDamage,
-                    MinOverheatTemperatureDamage, MatchPlayer, Weapon, MarketItem));
+                    MinOverheatTemperatureDamage, MatchPlayer, Weapon, MarketItem, TemperatureLimit));
         }
 
         public DateTimeOffset? LastVulcanHeatTactTime { get; set; }
@@ -97,5 +103,7 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         private const float MaxOverheatTemperatureDamage = 150;
         private const float MinOverheatTemperatureDamage = 50;
+
+        private float TargetHeatingMultiplier { get; }
     }
 }

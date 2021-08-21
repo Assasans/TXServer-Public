@@ -104,14 +104,16 @@ namespace TXServer.Core.Battles
         public static void DealNewTemperature(Entity weapon, Entity weaponMarketItem, MatchPlayer target,
             MatchPlayer shooter, bool onlyNormalize = false)
         {
-            bool isModule = IsModule(weaponMarketItem);
-            float maxHeatDamage = shooter.BattleWeapon.MaxHeatDamage;
+            (_, BattleModule module) = GetWeaponItems(weapon, shooter);
+            bool isModule = module != null;
+            Console.WriteLine(isModule);
+            Console.WriteLine(weapon.TemplateAccessor.Template);
+            float maxHeatDamage = isModule ? module.MaxHeatDamage : shooter.BattleWeapon.MaxHeatDamage;
             float temperatureChange;
             float totalTemperature = target.TemperatureFromAllHits();
 
             if (isModule)
             {
-                (Entity _, BattleModule module) = GetWeaponItems(weapon, shooter);
                 maxHeatDamage = module.MaxHeatDamage;
                 temperatureChange = module.TemperatureChange;
             }
@@ -164,7 +166,7 @@ namespace TXServer.Core.Battles
             {
                 target.TemperatureHits.Add(new TemperatureHit(temperatureChange, maxHeatDamage,
                     isModule ? 0 : shooter.BattleWeapon.MinHeatDamage, shooter,
-                    weapon, weaponMarketItem));
+                    weapon, weaponMarketItem, isModule ? 1 : shooter.BattleWeapon.TemperatureLimit));
             }
 
             float temperature = target.Temperature = target.TemperatureFromAllHits();
@@ -198,7 +200,7 @@ namespace TXServer.Core.Battles
                 {
                     // heat: damage
                     float heatDamage = MathUtils.Map(temperatureHit.CurrentTemperature,
-                        0, temperatureConfig.MaxTemperature, temperatureHit.MinDamage,
+                        0,  temperatureHit.TemperatureLimit, temperatureHit.MinDamage,
                         temperatureHit.MaxDamage);
                     if (heatDamage >= 1)
                         DealDamage(temperatureHit.WeaponMarketItem, matchPlayer, temperatureHit.Shooter, heatDamage,
@@ -425,14 +427,16 @@ namespace TXServer.Core.Battles
 
     public class TemperatureHit
     {
-        public TemperatureHit(float currentTemperature, float maxDamage, float minDamage, MatchPlayer shooter, Entity weapon,
-            Entity weaponMarketItem)
+        public TemperatureHit(float currentTemperature, float maxDamage, float minDamage, MatchPlayer shooter,
+            Entity weapon, Entity weaponMarketItem, float temperatureLimit = 1)
         {
             CurrentTemperature = currentTemperature;
             LastTact = DateTimeOffset.UtcNow;
             MaxDamage = maxDamage;
             MinDamage = minDamage;
             Shooter = shooter;
+            TemperatureLimit = temperatureLimit;
+
             Weapon = weapon;
             WeaponMarketItem = weaponMarketItem;
         }
@@ -442,6 +446,8 @@ namespace TXServer.Core.Battles
 
         public float MaxDamage { get; }
         public float MinDamage { get; }
+
+        public float TemperatureLimit { get; }
 
         public MatchPlayer Shooter { get; }
 
