@@ -114,6 +114,8 @@ namespace TXServer.Core.Battles
             Battle.PlayersInMap.SendEvent(new RoundUserStatisticsUpdatedEvent(), RoundUser);
             Battle.SortRoundUsers();
             if (Battle.IsMatchMaking) Player.CheckRankUp();
+
+            if (Battle.ModeHandler is DMHandler dmHandler) dmHandler.UpdateScore();
         }
 
         public int GetScoreWithBonus(int score) => (int) (PersonalBattleResult.ScoreBattleSeriesMultiplier * score + (Player.Data.IsPremium ? score * 0.5 : 0));
@@ -282,7 +284,6 @@ namespace TXServer.Core.Battles
                     TankState = TankState.Dead;
                     Battle.PlayersInMap.SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
 
-                    UpdateStatistics(-10, -1, 0, 1, null);
                     Player.User.ChangeComponent<UserStatisticsComponent>(
                         component => component.Statistics["SUICIDES"]++);
 

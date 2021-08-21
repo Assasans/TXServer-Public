@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Battle;
+using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles
@@ -54,6 +56,13 @@ namespace TXServer.Core.Battles
 
             public void Tick()
             {
+            }
+
+            public void UpdateScore()
+            {
+                int maxScore = Battle.MatchTankPlayers.Select(battleTankPlayer => battleTankPlayer.MatchPlayer
+                    .RoundUser.GetComponent<RoundUserStatisticsComponent>().ScoreWithoutBonuses).Prepend(0).Max();
+                Battle.BattleEntity.ChangeComponent<ScoreLimitComponent>(component => component.ScoreLimit = maxScore);
             }
 
             public BattleTankPlayer AddPlayer(Player player)

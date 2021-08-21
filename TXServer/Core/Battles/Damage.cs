@@ -353,7 +353,10 @@ namespace TXServer.Core.Battles
                 killer.UpdateStatistics(10, additiveKills: 1, 0, 0, null);
             }
             else
+            {
                 battle.PlayersInMap.SendEvent(new SelfDestructionBattleUserEvent(), victim.BattleUser);
+                killer.UpdateStatistics(-10, additiveKills: 0, 0, 1, null);
+            }
 
             victim.UpdateStatistics(0, 0, 0, 1, killer);
 

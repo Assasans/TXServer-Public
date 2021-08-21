@@ -6,11 +6,11 @@ namespace TXServer.ECSSystem.Components.Battle
     [SerialVersionUID(1436532217083L)]
     public class BattleScoreComponent : Component
     {
-        public BattleScoreComponent(int Score, int ScoreRed, int ScoreBlue)
+        public BattleScoreComponent(int score, int scoreRed, int scoreBlue)
         {
-            this.Score = Score;
-            this.ScoreRed = ScoreRed;
-            this.ScoreBlue = ScoreBlue;
+            Score = score;
+            ScoreRed = scoreRed;
+            ScoreBlue = scoreBlue;
         }
 
         public int Score { get; set; }

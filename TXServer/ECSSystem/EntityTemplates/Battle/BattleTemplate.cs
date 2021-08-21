@@ -8,11 +8,12 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
 {
     public abstract class BattleTemplate : IEntityTemplate
     {
-		protected static Entity CreateEntity(Entity battleLobby, BattleTemplate template, string modeName, int scoreLimit, int timeLimit, int warmingUpTimeLimit)
+		protected static Entity CreateEntity(Entity battleLobby, BattleTemplate template, string modeName,
+            int scoreLimit, int timeLimit, int warmingUpTimeLimit)
 		{
 			UserLimitComponent userLimitComponent = battleLobby.GetComponent<UserLimitComponent>();
 
-			Entity entity = new Entity(new TemplateAccessor(template, "battle/modes/" + modeName),
+			Entity entity = new(new TemplateAccessor(template, "battle/modes/" + modeName),
 				new ScoreLimitComponent(scoreLimit),
 				new TimeLimitComponent(timeLimit, warmingUpTimeLimit),
 				new BattleStartTimeComponent(new DateTimeOffset(DateTime.UtcNow)),
