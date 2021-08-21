@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
@@ -83,6 +84,7 @@ namespace TXServer.Core.Battles.Effect
         {
             MatchPlayer.Battle.PlayersInMap.SendEvent(new MineExplosionEvent(), mine);
             EffectEntities.Remove(mine);
+            MatchPlayer.Battle.PlayersInMap.Where(p => p.Player.EntityList.Contains(mine)).UnshareEntities(mine);
         }
 
         private void TryExplode(Entity mine)
@@ -96,10 +98,11 @@ namespace TXServer.Core.Battles.Effect
             base.Tick();
 
             foreach ((Entity mine, Vector3 position) in Positions)
-            foreach (BattleTankPlayer player in MatchPlayer.Battle.MatchTankPlayers)
+            foreach (BattleTankPlayer player in MatchPlayer.Battle.MatchTankPlayers.ToArray())
             {
                 if (!MatchPlayer.IsEnemyOf(player.MatchPlayer)) return;
-                if (Vector3.Distance(player.MatchPlayer.TankPosition, position) < TriggeringArea + 1.7)
+                Console.WriteLine(Vector3.Distance(player.MatchPlayer.TankPosition, position));
+                if (Vector3.Distance(player.MatchPlayer.TankPosition, position) < TriggeringArea)
                     TryExplode(mine);
             }
         }

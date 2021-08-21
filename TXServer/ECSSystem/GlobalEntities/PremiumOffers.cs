@@ -15,8 +15,9 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new SpecialOfferDurationComponent(),
                 new SpecialOfferGroupComponent(-763254490, new Dictionary<string, (double, float)>
                 {
+                    { "EUR", (1.99, 0) },
                     { "USD", (1.99, 0) },
-                    { "RUB", (199, 0) },
+                    { "RUB", (99, 0) },
                 }),
                 new PackIdComponent(-763254490),
                 new ItemsPackFromConfigComponent(),
@@ -31,8 +32,9 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new SpecialOfferDurationComponent(),
                 new SpecialOfferGroupComponent(-1186619009, new Dictionary<string, (double, float)>
                 {
+                    { "EUR", (2.99, 0) },
                     { "USD", (3.99, 0) },
-                    { "RUB", (599, 0) },
+                    { "RUB", (199, 0) },
                 }),
                 new PackIdComponent(-1186619009),
                 new ItemsPackFromConfigComponent(),
@@ -46,7 +48,9 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new SpecialOfferDurationComponent(),
                 new SpecialOfferGroupComponent(1869516473, new Dictionary<string, (double, float)>
                 {
+                    { "EUR", (3.99, 0) },
                     { "USD", (3.99, 0) },
+                    { "RUB", (199, 0) },
                 }),
                 new PackIdComponent(1869516473),
                 new ItemsPackFromConfigComponent(),
@@ -61,7 +65,8 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new SpecialOfferDurationComponent(),
                 new SpecialOfferGroupComponent(1957963539, new Dictionary<string, (double, float)>
                 {
-                    { "USD", (11.99, 0) }
+                    { "USD", (11.99, 0) },
+                    { "RUB", (599, 0) },
                 }),
                 new PackIdComponent(1957963539),
                 new ItemsPackFromConfigComponent(),

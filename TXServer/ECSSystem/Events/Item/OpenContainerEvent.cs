@@ -15,6 +15,7 @@ namespace TXServer.ECSSystem.Events.Item
 		public void Execute(Player player, Entity container)
         {
             int containerAmount = player.Data.Containers[container.GetComponent<MarketItemGroupComponent>().Key];
+            if (containerAmount < 1) return;
 
             // remove opened container from user
             player.Data.Containers[container.GetComponent<MarketItemGroupComponent>().Key] = 0;
@@ -30,7 +31,6 @@ namespace TXServer.ECSSystem.Events.Item
 
         private List<Entity> OpenContainer(Player player, Entity container, int containerAmount)
         {
-            List<Entity> notifications = new List<Entity>();
             Entity containerMarketItem = player.EntityList.Single(e =>
                 e.EntityId == container.GetComponent<MarketItemGroupComponent>().Key);
 

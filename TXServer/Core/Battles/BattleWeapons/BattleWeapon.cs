@@ -151,6 +151,8 @@ namespace TXServer.Core.Battles.BattleWeapons
         protected float RadiusOfMaxSplashDamage { get; }
         protected float RadiusOfMinSplashDamage { get; }
 
+        public float TemperatureLimit { get; init; } = 1;
+
         public WeaponRotationComponent OriginalWeaponRotationComponent { get; set; }
     }
 }

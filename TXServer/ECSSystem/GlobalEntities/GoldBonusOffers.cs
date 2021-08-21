@@ -16,6 +16,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new SpecialOfferGroupComponent(-1799018136, new Dictionary<string, (double, float)>
                 {
                     { "EUR", (73.90, 0) },
+                    { "UAH", (639.99, 0) },
                     { "USD", (27.99, 0) },
                     { "RUB", (3990.00, 0) }
                 }),
@@ -32,6 +33,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new SpecialOfferGroupComponent(1242971667, new Dictionary<string, (double, float)>
                 {
                     { "EUR", (69.90, 0) },
+                    { "UAH", (159.99, 0) },
                     { "USD", (7.99, 0) },
                     { "RUB", (3749.00, 0) }
                 }),
@@ -48,6 +50,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new SpecialOfferGroupComponent(-467522065, new Dictionary<string, (double, float)>
                 {
                     { "EUR", (9.99, 0) },
+                    { "UAH", (139.99, 0) },
                     { "USD", (5.99, 0) },
                     { "RUB", (499.00, 0) }
                 }),
@@ -64,6 +67,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new SpecialOfferGroupComponent(724226707, new Dictionary<string, (double, float)>
                 {
                     { "EUR", (1.49, 0) },
+                    { "UAH", (32.99, 0) },
                     { "USD", (1.49, 0) },
                     { "RUB", (79.00, 0) }
                 }),
