@@ -3,7 +3,6 @@ using System.Linq;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.ServerComponents.Hit;
 using TXServer.ECSSystem.ServerComponents.Weapon;
-using TXServer.Library;
 
 namespace TXServer.Core.Battles.BattleWeapons
 {
@@ -24,7 +23,7 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)
         {
-            if (IsOverheating(5500))
+            if (IsOverheating(6000))
                 Damage.DealNewTemperature(Weapon, MarketItem, target, MatchPlayer);
 
             float damage = (int) DamagePerSecond * CooldownIntervalSec;
@@ -88,8 +87,12 @@ namespace TXServer.Core.Battles.BattleWeapons
                     t => t.Shooter == MatchPlayer && t.WeaponMarketItem == MarketItem)] = temperatureHit;
             }
             else
-                MatchPlayer.TemperatureHits.Add(new TemperatureHit(DeltaTemperaturePerSecond, MaxOverheatTemperatureDamage,
-                    MinOverheatTemperatureDamage, MatchPlayer, Weapon, MarketItem, TemperatureLimit));
+            {
+                MatchPlayer.TemperatureHits.Add(new TemperatureHit(DeltaTemperaturePerSecond,
+                    MaxOverheatTemperatureDamage, MinOverheatTemperatureDamage, MatchPlayer, Weapon, MarketItem,
+                    lastTact:DateTimeOffset.UtcNow.AddSeconds(-5), temperatureLimit:TemperatureLimit));
+                MatchPlayer.Temperature = MatchPlayer.TemperatureFromAllHits();
+            }
         }
 
         public DateTimeOffset? LastVulcanHeatTactTime { get; set; }
@@ -97,7 +100,7 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         private float DeltaTemperaturePerSecond { get; }
 
-        private bool IsOverheating(float minMs = 5000) => VulcanShootingStartTime != null &&
+        private bool IsOverheating(float minMs = 5100) => VulcanShootingStartTime != null &&
                                                           (DateTimeOffset.UtcNow - VulcanShootingStartTime).Value
                                                           .TotalMilliseconds >= minMs;
 

@@ -169,7 +169,8 @@ namespace TXServer.Core.Battles
 
                 target.TemperatureHits.Add(new TemperatureHit(temperatureChange, maxHeatDamage,
                     isModule ? 0 : shooter.BattleWeapon.MinHeatDamage, shooter,
-                    weapon, weaponMarketItem, temperatureLimit, normalizationBlockEndTime));
+                    weapon, weaponMarketItem, temperatureLimit: temperatureLimit,
+                    normalizationBlockEndTime: normalizationBlockEndTime));
             }
 
             float temperature = target.Temperature = target.TemperatureFromAllHits();
@@ -198,7 +199,7 @@ namespace TXServer.Core.Battles
 
                 float temperatureDelta = temperatureHit.CurrentTemperature switch
                 {
-                    > 0 => -temperatureConfig.AutoDecrementInMs * temperatureConfig.TactPeriodInMs / 2,
+                    > 0 => -temperatureConfig.AutoDecrementInMs * temperatureConfig.TactPeriodInMs / 1.25f,
                     < 0 => temperatureConfig.AutoIncrementInMs * temperatureConfig.TactPeriodInMs / 1.75f,
                     _ => 0
                 };
@@ -434,11 +435,11 @@ namespace TXServer.Core.Battles
     public class TemperatureHit
     {
         public TemperatureHit(float currentTemperature, float maxDamage, float minDamage, MatchPlayer shooter,
-            Entity weapon, Entity weaponMarketItem, float temperatureLimit = 1,
+            Entity weapon, Entity weaponMarketItem, DateTimeOffset lastTact = default, float temperatureLimit = 1,
             DateTimeOffset? normalizationBlockEndTime = null)
         {
             CurrentTemperature = currentTemperature;
-            LastTact = DateTimeOffset.UtcNow;
+            LastTact = lastTact == default ? DateTimeOffset.UtcNow : lastTact;
             MaxDamage = maxDamage;
             MinDamage = minDamage;
             Shooter = shooter;

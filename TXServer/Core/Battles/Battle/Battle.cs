@@ -333,7 +333,7 @@ namespace TXServer.Core.Battles
                 module.ShareEffect(battlePlayer.Player);
 
             // Enter battle and add critical entities
-            battlePlayer.Player.User.AddComponent(BattleEntity.GetComponent<BattleGroupComponent>());
+            battlePlayer.Player.User.TryAddComponent(BattleEntity.GetComponent<BattleGroupComponent>());
             ModeHandler.OnMatchJoin(battlePlayer);
 
             if (battlePlayer is Spectator spectator)

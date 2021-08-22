@@ -1,5 +1,5 @@
 host: *ip*
-acceptorPort: 61886
+acceptorPort: 5050
 configVersion: master-48606
 bundleDbVersion: master-48606
 resourcesUrl: http://*ip*:8080/resources
