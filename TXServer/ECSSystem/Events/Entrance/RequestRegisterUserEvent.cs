@@ -20,7 +20,7 @@ namespace TXServer.ECSSystem.Events.Entrance
                 return;
             }
 
-            byte[] passwordHash = HexUtils.StringToBytes(player.EncryptionComponent.RsaDecryptString(Convert.FromBase64String(EncryptedPasswordDigest)));
+            byte[] passwordHash = player.EncryptionComponent.RsaDecrypt(Convert.FromBase64String(EncryptedPasswordDigest));
             byte[] autoLoginToken = new byte[32];
             new Random().NextBytes(autoLoginToken);
 
@@ -45,38 +45,6 @@ namespace TXServer.ECSSystem.Events.Entrance
             }, player.ClientSession);
 
             player.LogInWithDatabase(entity);
-
-            // Server.Instance.Database.reg
-            // PacketSorter.RegisterUser(new RegsiterUserRequest()
-            // {
-            //     encryptedUsername = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(Uid),
-            //     encryptedHashedPassword = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(finalPass),
-            //     encryptedEmail = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(Email),
-            //     encryptedHardwareId = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(HardwareFingerprint),
-            //     encryptedHardwareToken = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt(generatedToken),
-            //     encryptedCountryCode = Server.DatabaseNetwork.Socket.RSAEncryptionComponent.Encrypt("US"), // TODO SOON (c) 2021: Assign the country code based on IP location
-            //     subscribed = Subscribed
-            // }, response =>
-            // {
-            //     PlayerData data = new PlayerDataProxy(
-            //         response.uid,
-            //         Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.username),
-            //         Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.hashedPassword),
-            //         Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.email),
-            //         response.emailVerified,
-            //         Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.hardwareId),
-            //         Server.DatabaseNetwork.Socket.RSADecryptionComponent.DecryptToString(response.hardwareToken)
-            //     );
-            //     data.Player = player;
-            //     player.Data = data;
-            //     player.SendEvent(new SaveAutoLoginTokenEvent()
-            //     {
-            //         Uid = player.Data.Username,
-            //         Token = Encoding.UTF8.GetBytes(generatedToken)
-            //     }, player.ClientSession);
-            //
-            //     player.LogInWithDatabase(entity);
-            // });
         }
         public string Uid { get; set; }
         public string EncryptedPasswordDigest { get; set; }

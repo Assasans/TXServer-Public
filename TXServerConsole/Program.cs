@@ -7,7 +7,9 @@ using System.Text;
 using System.Text.Json;
 using MongoDB.Driver;
 using TXServer.Core;
+using TXServer.Core.Data.Database;
 using TXServer.Database;
+using TXServer.Database.Provider;
 using TXServer.Library;
 
 namespace TXServerConsole
@@ -26,12 +28,13 @@ namespace TXServerConsole
 
         static void Help()
         {
-            Console.WriteLine("-r,   --run                 ip, port, maxPlayers Start server.\n" +
-                              "-nhm, --disable-height-maps                      Disable loading of height maps.\n" +
-                              "-np,  --disable-ping                             Disable sending of ping messages.\n" +
-                              "-t,   --enable-tracing                           Enable packet tracing (works only in debug builds).\n" +
-                              "-st,  --enable-stack-trace                       Enable outputting command stack trace of commands (works only with packet tracing enabled).\n" +
-                              "-h,   --help                                     Display this help.");
+            Console.WriteLine("-r,   --run                  ip, port, maxPlayers  Start server.\n" +
+                              "-db,  --database                             name  Set database provider (available providers: memory, mongo).\n" +
+                              "-nhm, --disable-height-maps                        Disable loading of height maps.\n" +
+                              "-np,  --disable-ping                               Disable sending of ping messages.\n" +
+                              "-t,   --enable-tracing                             Enable packet tracing (works only in debug builds).\n" +
+                              "-st,  --enable-stack-trace                         Enable outputting command stack trace of commands (works only with packet tracing enabled).\n" +
+                              "-h,   --help                                       Display this help.");
         }
 
         static void Main(string[] args)
@@ -50,7 +53,10 @@ namespace TXServerConsole
                 return;
             }
 
-            ServerSettings settings = new();
+            ServerSettings settings = new()
+            {
+                DatabaseProvider = "memory"
+            };
 
             HashSet<string> uniqueArgs = new();
 
@@ -72,6 +78,15 @@ namespace TXServerConsole
                             settings.IPAddress = IPAddress.Parse(pair.Value[0]);
                             settings.Port = Int16.Parse(pair.Value[1]);
                             settings.MaxPlayers = Int32.Parse(pair.Value[2]);
+                            break;
+                        case "db":
+                        case "-database":
+                            if (!CheckParamCount(pair.Key, 1, pair.Value.Length)) return;
+                            string provider = pair.Value[0];
+                            if (provider is "memory" or "mongo")
+                                settings.DatabaseProvider = provider;
+                            else
+                                Console.WriteLine($"[Warning] Unknown database provider: {provider}");
                             break;
                         case "nhm":
                         case "-disable-height-maps":
@@ -111,7 +126,7 @@ namespace TXServerConsole
                             Help();
                             return;
                         default:
-                            Console.WriteLine($"Unknown parameter: {pair.Key}");
+                            Console.WriteLine($"[Warning] Unknown parameter: {pair.Key}");
                             return;
                     }
                 }
@@ -133,16 +148,21 @@ namespace TXServerConsole
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
 
-            DatabaseContext database = new DatabaseContext(databaseConfig);
+            IDatabase database = settings.DatabaseProvider switch
+            {
+                "memory" => new InMemoryDatabase(),
+                "mongo" => new MongoDatabase(databaseConfig),
+                _ => throw new InvalidOperationException($"Unknown database provider: {settings.DatabaseProvider}")
+            };
 
             Server.Instance = new Server
             {
                 Settings = settings,
                 Database = database
-                // Database = new LocalDatabase()
             };
             Server.Instance.Start();
 
+            // Manual registration:
             // database.Players.DeleteOne(Builders<PlayerData>.Filter.Eq("UniqueId", 1234));
             // var data = new PlayerData(1234);
             // data.InitDefault();

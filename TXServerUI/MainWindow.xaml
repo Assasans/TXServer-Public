@@ -70,6 +70,13 @@
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
+                
+                <GroupBox x:Name="DatabaseProviderGroupBox" Header="Debug options" Margin="3">
+                    <StackPanel x:Name="DatabaseProviderPanel">
+                        <RadioButton GroupName="DatabaseProvider" Content="In-memory" Tag="memory" IsChecked="True" />
+                        <RadioButton GroupName="DatabaseProvider" Content="MongoDB" Tag="mongo" />
+                    </StackPanel>
+                </GroupBox>
             </StackPanel>
         </StackPanel>
         <GroupBox x:Name="StateGroupBox" Header="State" Margin="3" Grid.Column="1" Padding="3">

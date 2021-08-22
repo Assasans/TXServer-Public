@@ -5,7 +5,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
+using TXServer.Core.Data.Database;
 using TXServer.Database;
+using TXServer.Database.Provider;
 using TXServerUI;
 
 namespace TXServer.Core
@@ -57,13 +59,17 @@ namespace TXServer.Core
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });
 
-                DatabaseContext database = new DatabaseContext(databaseConfig);
+                IDatabase database = settings.DatabaseProvider switch
+                {
+                    "memory" => new InMemoryDatabase(),
+                    "mongo" => new MongoDatabase(databaseConfig),
+                    _ => throw new InvalidOperationException($"Unknown database provider: {settings.DatabaseProvider}")
+                };
 
                 Server.Instance = new Server
                 {
                     Settings = settings,
                     Database = database,
-                    // Database = new LocalDatabase(),
                     UserErrorHandler = ((MainWindow)Application.Current.MainWindow).HandleCriticalError
                 };
                 Server.Instance.Start();

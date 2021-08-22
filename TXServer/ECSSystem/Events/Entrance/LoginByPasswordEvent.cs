@@ -1,9 +1,8 @@
 using System;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using TXServer.Core;
 using TXServer.Core.Protocol;
+using TXServer.Database.Provider;
 using TXServer.ECSSystem.Base;
 
 namespace TXServer.ECSSystem.Events
@@ -13,7 +12,7 @@ namespace TXServer.ECSSystem.Events
     {
         public void Execute(Player player, Entity clientSession)
         {
-            if (!player.EncryptionComponent.GetLoginPasswordHash(player.Data.PasswordHash).SequenceEqual(Convert.FromBase64String(PasswordEncipher)))
+            if (player.Server.Database is not InMemoryDatabase && !player.EncryptionComponent.GetLoginPasswordHash(player.Data.PasswordHash).SequenceEqual(Convert.FromBase64String(PasswordEncipher)))
             {
                 player.SendEvent(new InvalidPasswordEvent(), clientSession);
                 player.SendEvent(new LoginFailedEvent(), clientSession);
@@ -42,21 +41,6 @@ namespace TXServer.ECSSystem.Events
                 player.LogInWithDatabase(clientSession);
             else
                 player.SendEvent(new LoginFailedEvent(), clientSession);
-
-
-            // {
-            //     if (!player.IsBanned)
-            //     {
-            //         player.Data.RememberMe = RememberMe;
-            //         player.Data.HashedPassword = PasswordEncipher;
-            //         player.Data.HardwareId = HardwareFingerprint;
-            //         player.LogIn(clientSession);
-            //     }
-            //     else
-            //         player.SendEvent(new LoginFailedEvent(), clientSession);
-            //
-            //
-            // }
         }
 
         public string HardwareFingerprint { get; set; }

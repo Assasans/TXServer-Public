@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
@@ -64,11 +65,23 @@ namespace TXServerUI
 
         private void StartServer()
         {
+            string provider = "memory";
+            foreach(RadioButton button in DatabaseProviderPanel.Children.OfType<RadioButton>())
+            {
+                if (button.IsChecked)
+                {
+                    provider = button.Tag;
+                    break;
+                }
+            }
+
             ServerSettings settings = new()
             {
                 IPAddress = (IPAddress)IPAddressComboBox.SelectedItem,
                 Port = short.Parse(PortTextBox.Text),
                 MaxPlayers = int.Parse(MaxPlayersTextBox.Text),
+
+                DatabaseProvider = provider,
 
                 DisableHeightMaps = DisableHeightMapsCheckBox.IsChecked.GetValueOrDefault(),
 

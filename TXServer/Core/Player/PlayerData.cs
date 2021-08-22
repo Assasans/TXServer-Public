@@ -1,14 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Options;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.ChatCommands;
-using TXServer.Core.Commands;
-using TXServer.Core.Data.Database;
 using TXServer.Core.Configuration;
 using TXServer.Core.Logging;
 using TXServer.Database.Observable;
@@ -27,10 +23,6 @@ using TXServer.ECSSystem.ServerComponents;
 
 namespace TXServer.Core
 {
-    public interface ICloneable<out T>
-    {
-        T Clone();
-    }
 
     public class PlayerData : ICloneable<PlayerData>
     {
@@ -39,14 +31,14 @@ namespace TXServer.Core
             backingField = value;
             bool success = Server.Instance.Database.UpdatePlayerData(this, name, value);
 
-            Logger.Debug($"Update property {name}: {value} [success: {success}]");
+            Logger.Debug($"[User/{Username}] Update property {name}: {value} [success: {success}]");
         }
 
         private void RaiseChanged<T>(string name, T value)
         {
             bool success = Server.Instance.Database.UpdatePlayerData(this, name, value);
 
-            Logger.Debug($"Update property {name}: {value} [success: {success}]");
+            Logger.Debug($"[User/{Username}] Update property {name}: {value} [success: {success}]");
         }
 
         public void InitDefault()
@@ -64,7 +56,7 @@ namespace TXServer.Core
             CheatSusActions = 0;
 
             Crystals = 1000000;
-            XCrystals = 50000;
+            XCrystals = 1000000;
             Experience = 0;
             GoldBonus = 5;
             PremiumExpirationDate = DateTime.MinValue;
@@ -132,8 +124,6 @@ namespace TXServer.Core
             UniqueId = uniqueId;
         }
 
-        [Obsolete]
-        [BsonIgnore] protected PlayerData Original { get; set; }
         [BsonIgnore] public Player Player { get; set; }
 
         public string Username
@@ -760,10 +750,7 @@ namespace TXServer.Core
 
         public PlayerData Clone()
         {
-            var clone = (PlayerData) MemberwiseClone();
-            clone.Original = null;
-
-            return clone;
+            return (PlayerData) MemberwiseClone();
         }
 
         private string _username;

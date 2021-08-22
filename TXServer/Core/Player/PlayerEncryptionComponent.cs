@@ -1,13 +1,12 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using TXServer.Core.Logging;
 using TXServer.ECSSystem.Events;
 using TXServer.Library;
 
 namespace TXServer.Core
 {
-    public class EncryptionComponent : IDisposable
+    public class PlayerEncryptionComponent : IDisposable
     {
         private readonly RSACryptoServiceProvider _provider;
         private readonly SHA256Managed _sha256;
@@ -16,7 +15,7 @@ namespace TXServer.Core
 
         public string PublicKey => $"{Convert.ToBase64String(_parameters.Modulus)}:{Convert.ToBase64String(_parameters.Exponent)}";
 
-        public EncryptionComponent(int keyLength = 520)
+        public PlayerEncryptionComponent(int keyLength = 520)
         {
             _provider = new RSACryptoServiceProvider(keyLength);
             _sha256 = new SHA256Managed();
@@ -27,7 +26,6 @@ namespace TXServer.Core
 
         public byte[] GetLoginPasswordHash(byte[] passwordHash)
         {
-            // byte[] passwordHash = Decrypt(encryptedPasswordHash);
             byte[] hashPasscodeXor = XorArrays(passwordHash, Convert.FromBase64String(new PersonalPasscodeEvent().Passcode));
             byte[] concat = ConcatenateArrays(hashPasscodeXor, passwordHash);
 

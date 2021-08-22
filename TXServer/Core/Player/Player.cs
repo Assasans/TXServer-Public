@@ -60,7 +60,7 @@ namespace TXServer.Core
         public BattleTankPlayer BattlePlayer { get; set; }
         public Spectator Spectator { get; set; }
         public SquadPlayer SquadPlayer { get; set; }
-        public EncryptionComponent EncryptionComponent { get; } = new(4096); // Original server used 520 bits
+        public PlayerEncryptionComponent EncryptionComponent { get; } = new(4096); // Original server used 520 bits
 
         public ConcurrentHashSet<Entity> EntityList { get; } = new();
 
