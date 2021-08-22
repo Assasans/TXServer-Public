@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Text.RegularExpressions;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Effect.Mine;
@@ -11,7 +11,6 @@ using TXServer.ECSSystem.Components.Battle.Module.MultipleUsage;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 using TXServer.ECSSystem.Events.Battle.Effect.Mine;
-using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles.Effect
 {
@@ -66,19 +65,25 @@ namespace TXServer.Core.Battles.Effect
                 .UpgradeLevel2Values[Level];
             Impact = Config.GetComponent<ModuleMineEffectImpactPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
-            TriggeringArea = Config.GetComponent<ModuleMineEffectTriggeringAreaPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level];
-            TemperatureDuration = Config.GetComponent<ModuleIcetrapEffectTemperatureDurationPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level];
             TemperatureChange = Config.GetComponent<ModuleIcetrapEffectTemperatureLimitPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level];
+            TemperatureNormalizationBlock = Config.GetComponent<
+                ModuleIcetrapEffectTemperatureDurationPropertyComponent>(ConfigPath).UpgradeLevel2Values[Level];
+            TriggeringArea = Config.GetComponent<ModuleMineEffectTriggeringAreaPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
         }
 
-        public override float BaseDamage(Entity weapon, MatchPlayer target)
+        public override float BaseDamage(Entity mine, MatchPlayer target)
         {
-            Explode(weapon);
-            Damage.DealNewTemperature(weapon, MarketItem, target, MatchPlayer);
-            return base.BaseDamage(weapon, target);
+            if (EffectEntities.Contains(mine))
+                Explode(mine);
+
+            target.TemperatureHits.Clear();
+            target.Temperature = MatchPlayer.TemperatureFromAllHits();
+            target.SpeedByTemperature();
+            Damage.DealNewTemperature(mine, MarketItem, target, MatchPlayer);
+
+            return base.BaseDamage(mine, target);
         }
 
 

@@ -349,6 +349,7 @@ namespace TXServer.Core.Battles.Effect {
         public float MaxHeatDamage { get; protected set; }
 
         public float TemperatureChange { get; protected set; }
+        public float TemperatureNormalizationBlock { get; protected set; }
 
 
         public readonly List<TickHandler> TickHandlers;

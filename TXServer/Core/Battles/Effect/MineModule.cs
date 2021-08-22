@@ -66,10 +66,11 @@ namespace TXServer.Core.Battles.Effect
                 .UpgradeLevel2Values[Level] + 1.7f;
         }
 
-        public override float BaseDamage(Entity weapon, MatchPlayer target)
+        public override float BaseDamage(Entity mine, MatchPlayer target)
         {
-            Explode(weapon);
-            return base.BaseDamage(weapon, target);
+            if (EffectEntities.Contains(mine))
+                Explode(mine);
+            return base.BaseDamage(mine, target);
         }
 
 

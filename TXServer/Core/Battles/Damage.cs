@@ -162,9 +162,14 @@ namespace TXServer.Core.Battles
             }
             else
             {
+                DateTimeOffset? normalizationBlockEndTime = isModule
+                    ? DateTimeOffset.UtcNow.AddMilliseconds(module.TemperatureNormalizationBlock)
+                    : null;
+                float temperatureLimit = isModule ? 1 : shooter.BattleWeapon.TemperatureLimit;
+
                 target.TemperatureHits.Add(new TemperatureHit(temperatureChange, maxHeatDamage,
                     isModule ? 0 : shooter.BattleWeapon.MinHeatDamage, shooter,
-                    weapon, weaponMarketItem, isModule ? 1 : shooter.BattleWeapon.TemperatureLimit));
+                    weapon, weaponMarketItem, temperatureLimit, normalizationBlockEndTime));
             }
 
             float temperature = target.Temperature = target.TemperatureFromAllHits();
@@ -186,6 +191,9 @@ namespace TXServer.Core.Battles
             {
                 if ((DateTimeOffset.UtcNow - temperatureHit.LastTact).TotalMilliseconds <
                     matchPlayer.TemperatureConfigComponent.TactPeriodInMs) continue;
+                if (temperatureHit.NormalizationBlockEndTime != null &&
+                    DateTimeOffset.UtcNow < temperatureHit.NormalizationBlockEndTime.Value) continue;
+
                 temperatureHit.LastTact = DateTimeOffset.UtcNow;
 
                 float temperatureDelta = temperatureHit.CurrentTemperature switch
@@ -426,14 +434,17 @@ namespace TXServer.Core.Battles
     public class TemperatureHit
     {
         public TemperatureHit(float currentTemperature, float maxDamage, float minDamage, MatchPlayer shooter,
-            Entity weapon, Entity weaponMarketItem, float temperatureLimit = 1)
+            Entity weapon, Entity weaponMarketItem, float temperatureLimit = 1,
+            DateTimeOffset? normalizationBlockEndTime = null)
         {
             CurrentTemperature = currentTemperature;
             LastTact = DateTimeOffset.UtcNow;
             MaxDamage = maxDamage;
             MinDamage = minDamage;
             Shooter = shooter;
+
             TemperatureLimit = temperatureLimit;
+            NormalizationBlockEndTime = normalizationBlockEndTime;
 
             Weapon = weapon;
             WeaponMarketItem = weaponMarketItem;
@@ -444,6 +455,8 @@ namespace TXServer.Core.Battles
 
         public float MaxDamage { get; }
         public float MinDamage { get; }
+
+        public DateTimeOffset? NormalizationBlockEndTime { get; set; }
 
         public float TemperatureLimit { get; }
 
