@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text.RegularExpressions;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Effect.Mine;
@@ -35,7 +34,7 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Deactivate()
         {
-            foreach (Entity mine in EffectEntities)
+            foreach (Entity mine in EffectEntities.ToArray())
                 MatchPlayer.Battle.PlayersInMap.UnshareEntities(mine);
             EffectEntities.Clear();
         }

@@ -25,7 +25,8 @@ namespace TXServer.Core.Battles.Effect
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
             foreach (BattleModule module in
-                MatchPlayer.Modules.Where(m => m.ModuleEntity is not null && m.IsOnCooldown))
+                MatchPlayer.Modules.Where(m => m.ModuleEntity is not null &&
+                                               m.ModuleEntity.HasComponent<InventoryCooldownStateComponent>()))
             {
                 module.ModuleEntity.ChangeComponent<InventoryCooldownStateComponent>(component =>
                     component.CooldownTime = (int) (component.CooldownTime - ReduceCooldownTimePerKill));

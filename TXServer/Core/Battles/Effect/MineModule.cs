@@ -33,7 +33,7 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Deactivate()
         {
-            foreach (Entity mine in EffectEntities)
+            foreach (Entity mine in EffectEntities.ToArray())
                 Explode(mine);
             EffectEntities.Clear();
         }
@@ -46,7 +46,7 @@ namespace TXServer.Core.Battles.Effect
             ActivationTime = (long) Config.GetComponent<ModuleEffectActivationTimePropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
             BeginHideDistance = Config.GetComponent<ModuleMineEffectBeginHideDistancePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level];
+                .UpgradeLevel2Values[Level] + 3;
             DamageMaxRadius = Config
                 .GetComponent<ModuleMineEffectSplashDamageMaxRadiusPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
@@ -59,11 +59,11 @@ namespace TXServer.Core.Battles.Effect
             ExplosionDelayMs = Config.GetComponent<ModuleMineEffectExplosionDelayMSPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
             HideRange = Config.GetComponent<ModuleMineEffectHideRangePropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level];
+                .UpgradeLevel2Values[Level] + 3;
             Impact = Config.GetComponent<ModuleMineEffectImpactPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
             TriggeringArea = Config.GetComponent<ModuleMineEffectTriggeringAreaPropertyComponent>(ConfigPath)
-                .UpgradeLevel2Values[Level] + 1.7f;
+                .UpgradeLevel2Values[Level] + 4;
         }
 
         public override float BaseDamage(Entity mine, MatchPlayer target)

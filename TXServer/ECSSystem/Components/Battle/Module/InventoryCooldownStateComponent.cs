@@ -3,10 +3,13 @@
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Components.Battle.Module {
+namespace TXServer.ECSSystem.Components.Battle.Module
+{
 	[SerialVersionUID(1486635434064L)]
-	public class InventoryCooldownStateComponent : Component {
-		public InventoryCooldownStateComponent(int cooldownTime, DateTime cooldownStartTime) {
+	public class InventoryCooldownStateComponent : Component
+    {
+		public InventoryCooldownStateComponent(int cooldownTime, DateTime cooldownStartTime)
+        {
 			CooldownTime = cooldownTime;
 			CooldownStartTime = cooldownStartTime;
 		}

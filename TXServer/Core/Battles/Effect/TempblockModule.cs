@@ -53,6 +53,13 @@ namespace TXServer.Core.Battles.Effect
                 (TemperatureConfigComponent) MatchPlayer.TemperatureConfigComponent.Clone();
         }
 
+        public float LowerTemperatureChange(float temperatureChange)
+        {
+            if (temperatureChange < 0)
+                return temperatureChange + Decrement * MatchPlayer.TemperatureConfigComponent.TactPeriodInMs / 10;
+            return temperatureChange - Increment * MatchPlayer.TemperatureConfigComponent.TactPeriodInMs / 10;
+        }
+
         private float Decrement { get; set; }
         private float Increment { get; set; }
         private TemperatureConfigComponent OriginalTemperatureConfigComponent { get; set; }

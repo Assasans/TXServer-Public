@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
+using TXServer.Core.Battles.Effect;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.ServerComponents.Hit;
 using TXServer.ECSSystem.ServerComponents.Weapon;
+using TXServer.Library;
 
 namespace TXServer.Core.Battles.BattleWeapons
 {
@@ -23,7 +25,7 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)
         {
-            if (IsOverheating(6000))
+            if (IsOverheating())
                 Damage.DealNewTemperature(Weapon, MarketItem, target, MatchPlayer);
 
             float damage = (int) DamagePerSecond * CooldownIntervalSec;
@@ -33,7 +35,8 @@ namespace TXServer.Core.Battles.BattleWeapons
         }
 
         public override float TemperatureDeltaPerHit(float targetTemperature) =>
-            DeltaTemperaturePerSecond * CooldownIntervalSec * TargetHeatingMultiplier;
+            MathUtils.Map(MatchPlayer.TemperatureFromAllHits(), 0, 0.5f, 0,
+                DeltaTemperaturePerSecond * CooldownIntervalSec) * 2;
 
         public override bool IsOnCooldown(MatchPlayer target)
         {
@@ -79,16 +82,20 @@ namespace TXServer.Core.Battles.BattleWeapons
             TemperatureHit temperatureHit = MatchPlayer.TemperatureHits.SingleOrDefault(t =>
                 t.Shooter == MatchPlayer && t.Weapon == Weapon);
 
+            float deltaTemperature = DeltaTemperaturePerSecond;
+            if (MatchPlayer.TryGetModule(out TempblockModule tempblockModule))
+                deltaTemperature = tempblockModule.LowerTemperatureChange(deltaTemperature);
+
             if (temperatureHit != default)
             {
-                temperatureHit.CurrentTemperature += DeltaTemperaturePerSecond;
+                temperatureHit.CurrentTemperature += deltaTemperature;
                 temperatureHit.CurrentTemperature = Math.Clamp(temperatureHit.CurrentTemperature, 0, 0.5f);
                 MatchPlayer.TemperatureHits[MatchPlayer.TemperatureHits.FindIndex(
                     t => t.Shooter == MatchPlayer && t.WeaponMarketItem == MarketItem)] = temperatureHit;
             }
             else
             {
-                MatchPlayer.TemperatureHits.Add(new TemperatureHit(DeltaTemperaturePerSecond,
+                MatchPlayer.TemperatureHits.Add(new TemperatureHit(deltaTemperature,
                     MaxOverheatTemperatureDamage, MinOverheatTemperatureDamage, MatchPlayer, Weapon, MarketItem,
                     lastTact:DateTimeOffset.UtcNow.AddSeconds(-5), temperatureLimit:TemperatureLimit));
                 MatchPlayer.Temperature = MatchPlayer.TemperatureFromAllHits();

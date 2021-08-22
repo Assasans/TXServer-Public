@@ -10,6 +10,7 @@ using TXServer.ECSSystem.Components.Battle.Effect;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Round;
+using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
 using TXServer.ECSSystem.GlobalEntities;
@@ -120,6 +121,9 @@ namespace TXServer.Core.Battles
 
             if (Math.Abs(temperatureChange) <= 0) return;
 
+            if (target.TryGetModule(out TempblockModule tempblockModule))
+                temperatureChange = tempblockModule.LowerTemperatureChange(temperatureChange);
+
             temperatureChange =
                 NormalizeTemperature(totalTemperature + temperatureChange, target) - target.Temperature;
 
@@ -145,7 +149,8 @@ namespace TXServer.Core.Battles
                     }
 
                     tempHit.CurrentTemperature += temperatureChange;
-                    target.Temperature = target.TemperatureFromAllHits();
+                    float t = target.Temperature = target.TemperatureFromAllHits();
+                    if (t - temperatureChange < 0) target.SpeedByTemperature();
                 }
             }
 
@@ -153,10 +158,12 @@ namespace TXServer.Core.Battles
 
             TemperatureHit temperatureHit =
                 target.TemperatureHits.SingleOrDefault(t => t.Shooter == shooter && t.WeaponMarketItem == weaponMarketItem);
+            float temperatureLimit = isModule ? 1 : shooter.BattleWeapon.TemperatureLimit;
 
             if (temperatureHit != default)
             {
-                temperatureHit.CurrentTemperature += temperatureChange;
+                temperatureHit.CurrentTemperature = Math.Clamp(temperatureHit.CurrentTemperature + temperatureChange,
+                    -1, temperatureLimit);
                 target.TemperatureHits[target.TemperatureHits.FindIndex(
                     t => t.Shooter == shooter && t.WeaponMarketItem == weaponMarketItem)] = temperatureHit;
             }
@@ -165,7 +172,6 @@ namespace TXServer.Core.Battles
                 DateTimeOffset? normalizationBlockEndTime = isModule
                     ? DateTimeOffset.UtcNow.AddMilliseconds(module.TemperatureNormalizationBlock)
                     : null;
-                float temperatureLimit = isModule ? 1 : shooter.BattleWeapon.TemperatureLimit;
 
                 target.TemperatureHits.Add(new TemperatureHit(temperatureChange, maxHeatDamage,
                     isModule ? 0 : shooter.BattleWeapon.MinHeatDamage, shooter,
@@ -203,6 +209,12 @@ namespace TXServer.Core.Battles
                     < 0 => temperatureConfig.AutoIncrementInMs * temperatureConfig.TactPeriodInMs / 1.75f,
                     _ => 0
                 };
+
+                // Vulcan enemy heat up extra
+                if (temperatureHit.Weapon.TemplateAccessor.Template.GetType() == typeof(VulcanBattleItemTemplate) &&
+                    temperatureHit.Shooter != matchPlayer)
+                    temperatureDelta *= 1.5f;
+
                 if (temperatureHit.CurrentTemperature > 0)
                 {
                     // heat: damage

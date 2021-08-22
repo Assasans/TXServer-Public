@@ -72,7 +72,7 @@ namespace TXServer.Core.Data.Impl
                 Graffities = new List<long> {1001404575};
                 Hulls = new Dictionary<long, long> {{537781597, 0}};
                 HullSkins = new List<long> {1589207088};
-                Modules = new Dictionary<long, (int, int)>();
+                Modules = new Dictionary<long, (int, int)>{{1133911248, (0, 9999)}, {-105040547, (0, 9999)}};
                 Paints = new List<long> {-20020438};
                 Shards = new Dictionary<long, int>();
                 Shells = new List<long> {-966935184, 807172229, 357929046, 48235025, 1067800943, 1322064226, 70311513,

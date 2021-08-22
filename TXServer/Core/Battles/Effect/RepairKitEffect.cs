@@ -31,9 +31,6 @@ namespace TXServer.Core.Battles.Effect
             EffectEntity = HealingEffectTemplate.CreateEntity(MatchPlayer, (long) duration);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
-
-            MatchPlayer.Tank.ChangeComponent(new TemperatureComponent(0));
-
             Schedule(TimeSpan.FromMilliseconds(duration), Deactivate);
         }
 
@@ -72,8 +69,8 @@ namespace TXServer.Core.Battles.Effect
         }
 
         // TODO: find configs for repair kit module (card) & init
-        private float HpPerMs { get; set; } = 0.633f;
-        private float TickPeriod { get; set; } = 250;
+        private float HpPerMs { get; } = 0.633f;
+        private float TickPeriod { get; } = 250;
 
         private DateTimeOffset LastTickTime { get; set; }
         private TimeSpan DifferenceToLastHeal => LastTickTime == default ? default : DateTimeOffset.UtcNow - LastTickTime;
