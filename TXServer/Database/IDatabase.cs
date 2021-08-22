@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 
 namespace TXServer.Core.Data.Database
 {
@@ -6,8 +8,8 @@ namespace TXServer.Core.Data.Database
     {
         // PlayerData
 
-        PlayerData GetPlayerData(string username);
-        PlayerData GetPlayerDataByEmail(string email);
+        PlayerData? GetPlayerData(string username);
+        PlayerData? GetPlayerDataByEmail(string email);
 
         bool SavePlayerData(PlayerData data);
 

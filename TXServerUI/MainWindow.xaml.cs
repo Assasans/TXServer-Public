@@ -1,7 +1,10 @@
+using System;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using TXServer.Core;
 
@@ -33,14 +36,14 @@ namespace TXServerUI
             _ = UpdateStateText();
         }
 
-        public void HandleCriticalError()
+        public void HandleCriticalError(Exception exception)
         {
             if (errorState) return;
             errorState = true;
 
             Dispatcher.Invoke(() =>
             {
-                MessageBox.Show("An error occured while starting server. Try running application as administrator.", "", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"An error occured while starting server. Try running application as administrator.\n{exception.GetType().Name}: {exception.Message}", "", MessageBoxButton.OK, MessageBoxImage.Error);
                 StopServer();
             });
         }
@@ -64,11 +67,23 @@ namespace TXServerUI
 
         private void StartServer()
         {
+            string provider = "memory";
+            foreach(RadioButton button in DatabaseProviderPanel.Children.OfType<RadioButton>())
+            {
+                if (button.IsChecked == true)
+                {
+                    provider = (string)button.Tag;
+                    break;
+                }
+            }
+
             ServerSettings settings = new()
             {
                 IPAddress = (IPAddress)IPAddressComboBox.SelectedItem,
                 Port = short.Parse(PortTextBox.Text),
                 MaxPlayers = int.Parse(MaxPlayersTextBox.Text),
+
+                DatabaseProvider = provider,
 
                 DisableHeightMaps = DisableHeightMapsCheckBox.IsChecked.GetValueOrDefault(),
 

@@ -1,20 +1,19 @@
-using System;
-using System.Collections.Generic;
-using MongoDB.Bson.Serialization;
+#nullable enable
+
 using MongoDB.Driver;
 using TXServer.Core;
 using TXServer.Core.Data.Database;
 
-namespace TXServer.Database
+namespace TXServer.Database.Provider
 {
-    public class DatabaseContext : IDatabase
+    public class MongoDatabase : IDatabase
     {
         private readonly MongoClient _client;
         private readonly IMongoDatabase _database;
 
         private readonly DatabaseConfig _config;
 
-        public DatabaseContext(DatabaseConfig config)
+        public MongoDatabase(DatabaseConfig config)
         {
             _config = config;
 
@@ -24,6 +23,7 @@ namespace TXServer.Database
             //     Credential = MongoCredential.CreateCredential(config.Database, config.Username, config.Password)
             // });
 
+            // TODO(Assasans): Remove hardcoded connection string
             _client = new MongoClient(MongoClientSettings.FromConnectionString("mongodb://revive-tx:1234567890@127.0.0.1:27017/revive-tx?authSource=admin"));
             _database = _client.GetDatabase(config.Database);
         }

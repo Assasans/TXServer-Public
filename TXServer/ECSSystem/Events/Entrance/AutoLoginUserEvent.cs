@@ -14,8 +14,7 @@ namespace TXServer.ECSSystem.Events.Entrance
             PlayerData data = player.Server.Database.GetPlayerData(Uid);
             if (data == null)
             {
-                player.SendEvent(new UidInvalidEvent(), entity);
-                player.SendEvent(new LoginFailedEvent(), entity);
+                player.SendEvent(new AutoLoginFailedEvent(), entity);
                 return;
             }
 

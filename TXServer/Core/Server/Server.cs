@@ -18,9 +18,8 @@ namespace TXServer.Core
 
         public ServerSettings Settings { get; init; }
         public IDatabase Database { get; init; }
-        public bool HasDatabase => true;
         public ServerData ServerData { get; set; }
-        public Action UserErrorHandler { get; init; }
+        public Action<Exception> UserErrorHandler { get; init; }
         public ModuleRegistry ModuleRegistry { get; }
         public List<PlayerData> StoredPlayerData { get; } = new();
 
@@ -35,6 +34,7 @@ namespace TXServer.Core
         public void Start()
         {
             Logger.Log("Starting server...");
+            Logger.Log($"Database provider: {Database.GetType().Name}");
 
             ServerData = Database.GetServerData();
             if (ServerData == null)
@@ -85,7 +85,7 @@ namespace TXServer.Core
         {
             Logger.Error($"Fatal error: {exception}");
             Stop();
-            UserErrorHandler?.Invoke();
+            UserErrorHandler?.Invoke(exception);
         }
     }
 }
