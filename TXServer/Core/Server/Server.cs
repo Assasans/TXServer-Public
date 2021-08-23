@@ -19,7 +19,7 @@ namespace TXServer.Core
         public ServerSettings Settings { get; init; }
         public IDatabase Database { get; init; }
         public ServerData ServerData { get; set; }
-        public Action UserErrorHandler { get; init; }
+        public Action<Exception> UserErrorHandler { get; init; }
         public ModuleRegistry ModuleRegistry { get; }
         [Obsolete("Use Server#IDatabase")]
         public List<PlayerData> StoredPlayerData { get; } = new();
@@ -85,7 +85,7 @@ namespace TXServer.Core
         {
             Logger.Error($"Fatal error: {exception}");
             Stop();
-            UserErrorHandler?.Invoke();
+            UserErrorHandler?.Invoke(exception);
         }
     }
 }

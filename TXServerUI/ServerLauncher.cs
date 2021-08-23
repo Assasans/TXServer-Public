@@ -54,7 +54,7 @@ namespace TXServer.Core
 
             if (Server.Instance == null)
             {
-                DatabaseConfig databaseConfig = JsonSerializer.Deserialize<DatabaseConfig>(File.ReadAllText("Library/Config.json"), new JsonSerializerOptions
+                DatabaseConfig databaseConfig = JsonSerializer.Deserialize<DatabaseConfig>(File.ReadAllText("Library/Database.json"), new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 });
@@ -66,13 +66,22 @@ namespace TXServer.Core
                     _ => throw new InvalidOperationException($"Unknown database provider: {settings.DatabaseProvider}")
                 };
 
+                Action<Exception> errorHandler = ((MainWindow) Application.Current.MainWindow).HandleCriticalError;
+
                 Server.Instance = new Server
                 {
                     Settings = settings,
                     Database = database,
-                    UserErrorHandler = ((MainWindow)Application.Current.MainWindow).HandleCriticalError
+                    UserErrorHandler = errorHandler
                 };
-                Server.Instance.Start();
+                try
+                {
+                    Server.Instance.Start();
+                }
+                catch (Exception exception)
+                {
+                    errorHandler(exception);
+                }
             }
 
             return Server.Instance;
