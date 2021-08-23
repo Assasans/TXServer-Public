@@ -17,6 +17,10 @@ namespace TXServer.Database.Provider
 
         // PlayerData
 
+        public IReadOnlyList<PlayerData> GetPlayers() => Players.AsReadOnly();
+
+        public long GetPlayerCount() => Players.Count;
+
         public PlayerData GetPlayerData(string username)
         {
             PlayerData player = Players.SingleOrDefault((player) => player.Username == username);
@@ -25,6 +29,7 @@ namespace TXServer.Database.Provider
                 player = new PlayerData(DateTimeOffset.UtcNow.Ticks);
                 player.InitDefault();
                 player.Username = username;
+                Players.Add(player);
             }
 
             return player;
@@ -38,6 +43,7 @@ namespace TXServer.Database.Provider
                 player = new PlayerData(DateTimeOffset.UtcNow.Ticks);
                 player.InitDefault();
                 player.Email = email;
+                Players.Add(player);
             }
 
             return player;
@@ -50,9 +56,11 @@ namespace TXServer.Database.Provider
             Players[index] = player;
             return true;
         }
+
         public bool UpdatePlayerData(PlayerData player, string field, object value) => true; // PlayerData is a reference type, property should be automatically updated in the list
 
         public bool IsUsernameAvailable(string username) => !Players.Any((player) => player.Username == username);
+        public bool IsEmailAvailable(string email) => !Players.Any((player) => player.Email == email);
 
         // ServerData
 

@@ -1,12 +1,16 @@
 ﻿#nullable enable
 
-using System;
+using System.Collections.Generic;
 
 namespace TXServer.Core.Data.Database
 {
     public interface IDatabase
     {
         // PlayerData
+
+        IReadOnlyList<PlayerData> GetPlayers();
+
+        long GetPlayerCount();
 
         PlayerData? GetPlayerData(string username);
         PlayerData? GetPlayerDataByEmail(string email);
@@ -16,6 +20,7 @@ namespace TXServer.Core.Data.Database
         bool UpdatePlayerData(PlayerData player, string field, object value);
 
         bool IsUsernameAvailable(string username);
+        bool IsEmailAvailable(string email);
 
         // ServerData
 
@@ -23,7 +28,6 @@ namespace TXServer.Core.Data.Database
         bool SaveServerData(ServerData data);
 
         // bool Startup();
-
         bool Shutdown();
     }
 }

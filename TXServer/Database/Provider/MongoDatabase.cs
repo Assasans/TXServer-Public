@@ -1,8 +1,10 @@
 #nullable enable
 
+using System.Collections.Generic;
 using MongoDB.Driver;
 using TXServer.Core;
 using TXServer.Core.Data.Database;
+using TXServer.Core.Logging;
 
 namespace TXServer.Database.Provider
 {
@@ -17,14 +19,12 @@ namespace TXServer.Database.Provider
         {
             _config = config;
 
-            // _client = new MongoClient(new MongoClientSettings()
-            // {
-            //     Server = new MongoServerAddress(config.Host, config.Port),
-            //     Credential = MongoCredential.CreateCredential(config.Database, config.Username, config.Password)
-            // });
-
-            // TODO(Assasans): Remove hardcoded connection string
-            _client = new MongoClient(MongoClientSettings.FromConnectionString("mongodb://revive-tx:1234567890@127.0.0.1:27017/revive-tx?authSource=admin"));
+            Logger.Debug($"Connecting to {config.Username}@{config.Host}:{config.Port}/{config.Database}...");
+            _client = new MongoClient(new MongoClientSettings()
+            {
+                Server = new MongoServerAddress(config.Host, config.Port),
+                Credential = MongoCredential.CreateCredential("admin", config.Username, config.Password)
+            });
             _database = _client.GetDatabase(config.Database);
         }
 
@@ -32,6 +32,10 @@ namespace TXServer.Database.Provider
         public IMongoCollection<ServerData> Servers => _database.GetCollection<ServerData>("servers");
 
         // PlayerData
+
+        public IReadOnlyList<PlayerData> GetPlayers() => Players.Find(Builders<PlayerData>.Filter.Empty).ToList();
+
+        public long GetPlayerCount() => Players.CountDocuments(Builders<PlayerData>.Filter.Empty);
 
         public PlayerData? GetPlayerData(string username) => Players.Find(Builders<PlayerData>.Filter.Eq("Username", username)).SingleOrDefault();
         public PlayerData? GetPlayerDataByEmail(string email) => Players.Find(Builders<PlayerData>.Filter.Eq("Email", email)).SingleOrDefault();
@@ -51,6 +55,7 @@ namespace TXServer.Database.Provider
         ).ModifiedCount > 0;
 
         public bool IsUsernameAvailable(string username) => Players.Find(Builders<PlayerData>.Filter.Eq("Username", username)).CountDocuments() < 1;
+        public bool IsEmailAvailable(string email) => Players.Find(Builders<PlayerData>.Filter.Eq("Email", email)).CountDocuments() < 1;
 
         // ServerData
 

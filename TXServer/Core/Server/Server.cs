@@ -21,9 +21,8 @@ namespace TXServer.Core
         public ServerData ServerData { get; set; }
         public Action UserErrorHandler { get; init; }
         public ModuleRegistry ModuleRegistry { get; }
+        [Obsolete("Use Server#IDatabase")]
         public List<PlayerData> StoredPlayerData { get; } = new();
-
-        // private DatabaseContext _databaseContext;
 
         public Server()
         {
@@ -35,6 +34,7 @@ namespace TXServer.Core
         {
             Logger.Log("Starting server...");
             Logger.Log($"Database provider: {Database.GetType().Name}");
+            Logger.Log($"Registered players: {Database.GetPlayerCount()}");
 
             ServerData = Database.GetServerData();
             if (ServerData == null)

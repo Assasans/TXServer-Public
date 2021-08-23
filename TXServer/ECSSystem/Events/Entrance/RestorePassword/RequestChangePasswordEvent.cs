@@ -9,8 +9,14 @@ namespace TXServer.ECSSystem.Events.Entrance.RestorePassword
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			// TODO: save in database + log in
-		}
+            // TODO(Assasans): Save in database & login
+            // byte[] passwordHash = player.EncryptionComponent.RsaDecrypt(Convert.FromBase64String(PasswordDigest));
+
+            // player.Data.PasswordHash = passwordHash;
+            // player.Data.HardwareId = HardwareFingerprint;
+            // player.Data.AutoLoginToken = null;
+        }
+
 		public string PasswordDigest { get; set; }
 		public string HardwareFingerprint { get; set; }
 	}
