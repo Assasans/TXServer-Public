@@ -42,6 +42,6 @@ namespace TXServer.Core.Battles.BattleWeapons
         public DateTimeOffset? ShaftAimingBeginTime { get; private set; }
         private double? ShaftLastAimingDurationMs { get; set; }
 
-        private const float RotationAimingStateMultiplier = 0.3f;
+        public const float RotationAimingStateMultiplier = 0.3f;
     }
 }

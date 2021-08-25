@@ -467,7 +467,7 @@ namespace TXServer.Core.Battles
         private void ProcessMatchPlayers()
         {
             foreach (MatchPlayer matchPlayer in MatchTankPlayers.ToList().Select(x => x.MatchPlayer))
-                matchPlayer.Tick();
+                matchPlayer?.Tick();
         }
 
         private void ProcessBonuses(double deltaTime)
