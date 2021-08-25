@@ -791,7 +791,7 @@ namespace TXServer.Core.ChatCommands
                 {
                     if (Int32.TryParse(args[0], out int number))
                     {
-                        SpawnPoint spawnPoint = player.BattlePlayer.MatchPlayer._spawnCoordinates.SingleOrDefault(s =>
+                        SpawnPoint spawnPoint = player.BattlePlayer.MatchPlayer.SpawnCoordinates.SingleOrDefault(s =>
                             s.Number == number);
 
                         if (spawnPoint is not null)

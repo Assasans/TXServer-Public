@@ -14,15 +14,17 @@ namespace TXServer.ECSSystem.Components.Battle.Round
             KillAssists = killAssists;
             Deaths = deaths;
         }
-        
+
+        public RoundUserStatisticsComponent() => Place = ScoreWithoutBonuses = Kills = KillAssists = Deaths = 0;
+
         public int Place { get; set; }
-        
+
         public int ScoreWithoutBonuses { get; set; }
-        
+
         public int Kills { get; set; }
-        
+
         public int KillAssists { get; set; }
-        
+
         public int Deaths { get; set; }
     }
 }

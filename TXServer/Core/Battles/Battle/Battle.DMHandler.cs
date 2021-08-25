@@ -5,6 +5,7 @@ using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Round;
+using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles
@@ -48,6 +49,14 @@ namespace TXServer.Core.Battles
 
             public void CompleteWarmUp()
             {
+                foreach (BattleTankPlayer player in Battle.JoinedTankPlayers)
+                {
+                    player.MatchPlayer.RoundUser.ChangeComponent(new RoundUserStatisticsComponent());
+                    Battle.PlayersInMap.SendEvent(new RoundUserStatisticsUpdatedEvent(), player.MatchPlayer.RoundUser);
+
+                    player.MatchPlayer.UserResult.Deaths = player.MatchPlayer.UserResult.Kills =
+                        player.MatchPlayer.UserResult.KillAssists = 0;
+                }
             }
 
             public void OnFinish()

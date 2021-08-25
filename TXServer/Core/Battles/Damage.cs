@@ -40,7 +40,7 @@ namespace TXServer.Core.Battles
             if (isBackHit) damage *= 1.20f;
             if (isTurretHit) damage *= 2;
 
-            if (isBackHit && victim.TryGetModule(out BackhitDefenceModule backhitDefModule) &&
+            if ((isBackHit || isTurretHit) && victim.TryGetModule(out BackhitDefenceModule backhitDefModule) &&
                 backhitDefModule.EffectIsActive)
                 damage = backhitDefModule.GetReducedDamage(damage);
 

@@ -72,9 +72,9 @@ namespace TXServer.Core.Battles
                 Config.GetComponent<TemperatureConfigComponent>(Tank.TemplateAccessor.ConfigPath);
 
             if (Battle.ModeHandler is TeamBattleHandler handler)
-                _spawnCoordinates = handler.BattleViewFor(Player.BattlePlayer).SpawnPoints;
+                SpawnCoordinates = handler.BattleViewFor(Player.BattlePlayer).SpawnPoints;
             else
-                _spawnCoordinates = ((DMHandler)Battle.ModeHandler).SpawnPoints;
+                SpawnCoordinates = ((DMHandler)Battle.ModeHandler).SpawnPoints;
         }
 
         public IEnumerable<Entity> GetEntities()
@@ -93,7 +93,8 @@ namespace TXServer.Core.Battles
             { TankState.Dead, (typeof(TankDeadStateComponent), 3) },
         };
 
-        public void UpdateStatistics(int additiveScore, int additiveKills, int additiveKillAssists, int additiveDeath, MatchPlayer killer)
+        public void UpdateStatistics(int additiveScore, int additiveKills, int additiveKillAssists, int additiveDeath,
+            MatchPlayer killer = null)
         {
             if (!Player.IsActive) return;
 
@@ -149,10 +150,10 @@ namespace TXServer.Core.Battles
 
             if (NextTeleportPoint == null)
             {
-                LastSpawnPoint = _spawnCoordinates.Count == 1
-                    ? _spawnCoordinates[0]
-                    : _spawnCoordinates.Where(spawnCoordinate => spawnCoordinate.Number != LastSpawnPoint?.Number)
-                        .ElementAt(new Random().Next(_spawnCoordinates.Count - 1));
+                LastSpawnPoint = SpawnCoordinates.Count == 1
+                    ? SpawnCoordinates[0]
+                    : SpawnCoordinates.Where(spawnCoordinate => spawnCoordinate.Number != LastSpawnPoint?.Number)
+                        .ElementAt(new Random().Next(SpawnCoordinates.Count - 1));
             }
             else
             {
@@ -284,6 +285,7 @@ namespace TXServer.Core.Battles
                     TankState = TankState.Dead;
                     Battle.PlayersInMap.SendEvent(new SelfDestructionBattleUserEvent(), BattleUser);
 
+                    UpdateStatistics(-10, 0, 0, 1);
                     Player.User.ChangeComponent<UserStatisticsComponent>(
                         component => component.Statistics["SUICIDES"]++);
 
@@ -483,6 +485,6 @@ namespace TXServer.Core.Battles
         public SpawnPoint LastSpawnPoint { get; private set; }
         public TeleportPoint LastTeleportPoint { get; private set; }
         public TeleportPoint NextTeleportPoint { get; set; }
-        public readonly IList<SpawnPoint> _spawnCoordinates;
+        public readonly IList<SpawnPoint> SpawnCoordinates;
     }
 }
