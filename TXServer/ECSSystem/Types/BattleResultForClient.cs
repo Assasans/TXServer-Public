@@ -10,7 +10,7 @@ namespace TXServer.ECSSystem.Types
 	{
         public BattleResultForClient(BaseBattlePlayer battlePlayer)
         {
-            Battle battle = battlePlayer.Battle;
+            Core.Battles.Battle battle = battlePlayer.Battle;
             BattleId = battle.BattleEntity.EntityId;
             MapId = battle.MapEntity.EntityId;
             BattleMode = battle.Params.BattleMode;
@@ -19,7 +19,7 @@ namespace TXServer.ECSSystem.Types
             Spectator = battlePlayer.GetType() == typeof(Spectator);
             PersonalResult = (battlePlayer as BattleTankPlayer)?.MatchPlayer.PersonalBattleResult;
 
-            if (battle.ModeHandler is Battle.TeamBattleHandler handler)
+            if (battle.ModeHandler is Core.Battles.Battle.TeamBattleHandler handler)
             {
                 RedTeamScore = handler.RedTeamEntity.GetComponent<TeamScoreComponent>().Score;
                 BlueTeamScore = handler.BlueTeamEntity.GetComponent<TeamScoreComponent>().Score;
@@ -29,7 +29,7 @@ namespace TXServer.ECSSystem.Types
             }
             else
             {
-                DmUsers = ((Battle.DMHandler)battle.ModeHandler).Results.ToList();
+                DmUsers = ((Core.Battles.Battle.SoloBattleHandler)battle.ModeHandler).Results.ToList();
                 DmScore = DmUsers.Sum(user => user.Kills);
             }
         }

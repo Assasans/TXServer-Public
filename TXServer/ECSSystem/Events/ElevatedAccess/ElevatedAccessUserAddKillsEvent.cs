@@ -12,9 +12,9 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 		public void Execute(Player player, Entity entity)
         {
             if (!player.IsInMatch || !player.Data.Admin) return;
-			var battlePlayer = (BattleTankPlayer)player.BattlePlayer;
+			var battlePlayer = player.BattlePlayer;
 
-			battlePlayer.MatchPlayer.UpdateStatistics(0, additiveKills:Count, 0, 0, null);
+			battlePlayer.MatchPlayer.UpdateStatistics(0, additiveKills:Count, 0, 0);
 			if (battlePlayer.Battle.ModeHandler is TDMHandler)
 				battlePlayer.Battle.UpdateScore(battlePlayer.Team, Count);
 		}

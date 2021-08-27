@@ -26,6 +26,7 @@ using TXServer.ECSSystem.Events.Battle.Weapon.Hammer;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents.Tank;
 using TXServer.ECSSystem.Types;
+using TXServer.ECSSystem.Types.Battle;
 using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 
@@ -74,7 +75,7 @@ namespace TXServer.Core.Battles
             if (Battle.ModeHandler is TeamBattleHandler handler)
                 SpawnCoordinates = handler.BattleViewFor(Player.BattlePlayer).SpawnPoints;
             else
-                SpawnCoordinates = ((DMHandler)Battle.ModeHandler).SpawnPoints;
+                SpawnCoordinates = ((SoloBattleHandler)Battle.ModeHandler).SpawnPoints;
         }
 
         public IEnumerable<Entity> GetEntities()
@@ -320,7 +321,8 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            if (CollisionsPhase == Battle.CollisionsComponent.SemiActiveCollisionsPhase)
+            if (CollisionsPhase == Battle.CollisionsComponent.SemiActiveCollisionsPhase &&
+                !Battle.DisqualifiedPlayers.Contains(this))
             {
                 Battle.CollisionsComponent.SemiActiveCollisionsPhase++;
 

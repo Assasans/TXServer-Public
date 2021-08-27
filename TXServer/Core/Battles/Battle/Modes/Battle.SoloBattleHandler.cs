@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TXServer.Core.ServerMapInformation;
@@ -12,7 +12,7 @@ namespace TXServer.Core.Battles
 {
     public partial class Battle
     {
-        public class DMHandler : IBattleModeHandler
+        public abstract class SoloBattleHandler : IBattleModeHandler
         {
             public Battle Battle { get; init; }
 
@@ -29,7 +29,7 @@ namespace TXServer.Core.Battles
 
             public IList<SpawnPoint> SpawnPoints { get; private set; }
 
-            public void SetupBattle()
+            public virtual void SetupBattle()
             {
                 SpawnPoints = Battle.CurrentMapInfo.SpawnPoints.Deathmatch;
             }
@@ -63,7 +63,7 @@ namespace TXServer.Core.Battles
             {
             }
 
-            public void Tick()
+            public virtual void Tick()
             {
             }
 

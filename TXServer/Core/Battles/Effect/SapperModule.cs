@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Module.Sapper;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core.Battles.Effect
 {
@@ -42,12 +44,23 @@ namespace TXServer.Core.Battles.Effect
                 .UpgradeLevel2Values[Level];
         }
 
-        public float ReduceDamage(float damage)
+        public override float DamageWithEffect(float damage, MatchPlayer target, bool isHeatDamage, bool isModuleDamage,
+            Entity weaponMarketItem)
         {
+            if (!(Mines.Contains(weaponMarketItem.TemplateAccessor.Template.GetType()) && EffectIsActive &&
+                  !IsOnCooldown))
+                return damage;
+
             Activate();
             return damage * DamageResistanceEffect;
         }
 
         private float DamageResistanceEffect { get; set; }
+
+        private List<Type> Mines = new()
+        {
+            Modules.GlobalItems.Mine.GetType(),
+            Modules.GlobalItems.Spidermine.GetType(),
+        };
     }
 }
