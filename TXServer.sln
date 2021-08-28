@@ -8,8 +8,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TXServerUI", "TXServerUI\TXServerUI.csproj", "{A5629BB3-948D-47B9-B794-7F797827E55B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TXServer", "TXServer\TXServer.csproj", "{DFDDA70D-4042-4D49-BED9-C1E57FFC13C8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TXServerConsole", "TXServerConsole\TXServerConsole.csproj", "{00C34BAA-9DC9-4264-BDF0-099962F90FAC}"
@@ -20,10 +18,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A5629BB3-948D-47B9-B794-7F797827E55B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A5629BB3-948D-47B9-B794-7F797827E55B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A5629BB3-948D-47B9-B794-7F797827E55B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A5629BB3-948D-47B9-B794-7F797827E55B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DFDDA70D-4042-4D49-BED9-C1E57FFC13C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DFDDA70D-4042-4D49-BED9-C1E57FFC13C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFDDA70D-4042-4D49-BED9-C1E57FFC13C8}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -2,7 +2,7 @@
   "profiles": {
     "TXServerConsole": {
       "commandName": "Project",
-      "commandLineArgs": "--run 127.0.0.1 5050 5 --enable-tracing --disable-ping --disable-height-maps"
+      "commandLineArgs": "--run 0.0.0.0"
     }
   }
 }
