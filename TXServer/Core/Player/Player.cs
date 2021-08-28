@@ -384,7 +384,7 @@ namespace TXServer.Core
         {
             foreach ((Entity notification, DateTimeOffset timeLimit) in TempNotifications.ToList())
             {
-                if (DateTimeOffset.UtcNow <= timeLimit) continue;
+                if (DateTimeOffset.UtcNow <= timeLimit || notification is null) continue;
                 if (TempNotifications.TryRemove(notification, out _))
                     UnshareEntities(notification);
             }

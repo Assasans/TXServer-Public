@@ -41,7 +41,7 @@ namespace TXServer.Core.Battles.Matchmaking
         {
             if (mode is not null)
                 player.SendEvent(new EnteredToMatchMakingEvent(), mode);
-            WaitingPlayers.Add(player, DateTimeOffset.UtcNow);
+            WaitingPlayers.Add(player, DateTimeOffset.UtcNow.AddSeconds(2));
         }
 
         private static bool IsValidToEnter(Battle battle)
@@ -136,7 +136,7 @@ namespace TXServer.Core.Battles.Matchmaking
                     WaitingPlayers.Remove(player);
                     continue;
                 }
-                if (DateTimeOffset.UtcNow <= joinTime.AddSeconds(2)) continue;
+                if (DateTimeOffset.UtcNow < joinTime) continue;
 
                 FindOrCreateBattle(player);
                 WaitingPlayers.Remove(player);
