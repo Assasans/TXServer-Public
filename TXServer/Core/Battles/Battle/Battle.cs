@@ -32,6 +32,9 @@ namespace TXServer.Core.Battles
             Params = battleParams;
             IsMatchMaking = isMatchMaking;
 
+            if (Params is not null)
+                ExtendedBattleMode = (ExtendedBattleMode) (int) Params.BattleMode;
+
             if (isMatchMaking)
                 TypeHandler = new MatchMakingBattleHandler { Battle = this };
             else
@@ -74,8 +77,6 @@ namespace TXServer.Core.Battles
 
         private (Entity, int) ConvertMapParams(ClientBattleParams newParams, bool isMatchMaking)
         {
-            ExtendedBattleMode = (ExtendedBattleMode) (int) Params.BattleMode;
-
             Entity mapEntity = Maps.GlobalItems.Rio;
             int maxPlayers = newParams.MaxPlayers;
             foreach (PropertyInfo property in typeof(Maps.Items).GetProperties())

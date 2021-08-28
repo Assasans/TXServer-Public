@@ -12,6 +12,7 @@ using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.Events.Matchmaking;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
+using TXServer.ECSSystem.Types.Battle;
 
 namespace TXServer.Core.Battles
 {
@@ -40,6 +41,7 @@ namespace TXServer.Core.Battles
                         MapId: matchMakingMaps[index].MapId,
                         MaxPlayers: 20, TimeLimit: 10, ScoreLimit: 0, FriendlyFire: false, GravityType.EARTH,
                         KillZoneEnabled: true, DisabledModules: false);
+                    Battle.ExtendedBattleMode = (ExtendedBattleMode) (int) Battle.Params.BattleMode;
                 }
 
                 (Battle.MapEntity, Battle.Params.MaxPlayers) = Battle.ConvertMapParams(Battle.Params, Battle.IsMatchMaking);

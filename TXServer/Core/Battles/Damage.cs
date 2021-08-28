@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -252,7 +252,7 @@ namespace TXServer.Core.Battles
         private static float GetHpWithEffects(float damage, MatchPlayer target, MatchPlayer shooter,
             bool isModule, bool isHeatDamage, Entity weaponMarketItem)
         {
-            List<BattleModule> modules = target.Modules;
+            List<BattleModule> modules = target.Modules.ToList();
             if (shooter != null)
                 modules.AddRange(shooter.Modules);
 
