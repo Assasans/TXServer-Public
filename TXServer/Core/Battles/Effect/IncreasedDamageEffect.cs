@@ -1,9 +1,11 @@
 using System;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Module.IncreasedDamage;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
+using TXServer.ECSSystem.Types.Battle;
 
 namespace TXServer.Core.Battles.Effect
 {
@@ -51,6 +53,14 @@ namespace TXServer.Core.Battles.Effect
             // min & max factor are the same for this module
             ModuleFactor = Config.GetComponent<ModuleDamageEffectMaxFactorPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
+        }
+
+        public override float DamageWithEffect(float damage, MatchPlayer target, bool isHeatDamage, bool isModuleDamage,
+            Entity weaponMarketItem)
+        {
+            if (!EffectIsActive || isHeatDamage || isModuleDamage ||
+                  MatchPlayer.Battle.ExtendedBattleMode is ExtendedBattleMode.HPS) return damage;
+            return IsCheat ? target.Tank.GetComponent<HealthComponent>().CurrentHealth : damage * Factor;
         }
 
         public float Factor => IsSupply ? 1.5f : ModuleFactor;

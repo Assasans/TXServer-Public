@@ -161,6 +161,9 @@ namespace TXServer.Core.Battles.Effect {
         public virtual float BaseDamage(Entity weapon, MatchPlayer target) =>
             (int) Math.Round(new Random().NextGaussianRange(MinDamage, MaxDamage));
 
+        public virtual float DamageWithEffect(float damage, MatchPlayer target, bool isHeatDamage, bool isModuleDamage,
+            Entity weaponMarketItem) => damage;
+
         protected void ChangeDuration(float duration)
         {
             TickHandlers.Clear();

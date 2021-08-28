@@ -18,6 +18,7 @@ using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
+using TXServer.ECSSystem.Types.Battle;
 using static TXServer.Core.Battles.Battle;
 
 namespace TXServer.Core.ChatCommands
@@ -41,6 +42,7 @@ namespace TXServer.Core.ChatCommands
             { "gravity", ("gravity [number]", ChatCommandConditions.BattleOwner | ChatCommandConditions.HackBattle, Gravity) },
             { "kickback", ("kickback [number] [target]", ChatCommandConditions.HackBattle, Kickback) },
             { "kill", ("kill [target]", ChatCommandConditions.InMatch | ChatCommandConditions.Admin, KillPlayer) },
+            { "mode", ("kill [target]", ChatCommandConditions.BattleOwner | ChatCommandConditions.NonHackBattle | ChatCommandConditions.InactiveBattle, Mode) },
             { "tp", ("teleport [target]", ChatCommandConditions.Premium | ChatCommandConditions.InMatch | ChatCommandConditions.HackBattle, Teleport) },
             { "turretReload", ("turretReload [instant/never] [target]", ChatCommandConditions.HackBattle, ReloadTime) },
             { "turretRotation", ("turretRotation [instant/stuck/norm/number]", ChatCommandConditions.HackBattle, TurretRotation) },
@@ -53,6 +55,7 @@ namespace TXServer.Core.ChatCommands
             { ChatCommandConditions.Admin, "You are not an admin" },
             { ChatCommandConditions.BattleOwner, "You need to be the battle owner" },
             { ChatCommandConditions.HackBattle, "HackBattle is not enabled or you don't have permission to it" },
+            { ChatCommandConditions.NonHackBattle, "This command is not allowed in HackBattles" },
             { ChatCommandConditions.InactiveBattle, "You need to be in a battle lobby with no active players in-battle" },
             { ChatCommandConditions.ActiveBattle, "You need to be in a battle with active players in-battle" },
             { ChatCommandConditions.InBattle, "You need to be in a battle" },
@@ -612,6 +615,32 @@ namespace TXServer.Core.ChatCommands
                 return "'Error', you don't have any cases or punishments";
             return player.Data.Punishments.Aggregate("",
                     (current, punishment) => current + punishment.CreateLogMsg(player));
+        }
+
+        private static string Mode(Player player, string[] args)
+        {
+            if (args.Length < 1) return "Command error, missing argument: mode";
+
+            ExtendedBattleMode newBattleMode;
+            ClientBattleParams oldParams = player.BattlePlayer.Battle.Params;
+
+            switch (args[0])
+            {
+                case "hps":
+                    newBattleMode = ExtendedBattleMode.HPS;
+                    oldParams.BattleMode = BattleMode.DM;
+                    break;
+                default:
+                    return $"Command error: didn't find battle mode '{args[0]}'";
+            }
+
+            if (player.BattlePlayer.Battle.ExtendedBattleMode == newBattleMode)
+                return "Very funny";
+
+            player.BattlePlayer.Battle.ExtendedBattleMode = newBattleMode;
+            player.BattlePlayer.Battle.UpdateParams(player.BattlePlayer.Battle.Params);
+
+            return $"Changed battleMode to {newBattleMode.ToString()}";
         }
 
         private static string Ping(Player player, string[] args)

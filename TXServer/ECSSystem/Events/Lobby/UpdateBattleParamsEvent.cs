@@ -2,6 +2,7 @@
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Types;
+using TXServer.ECSSystem.Types.Battle;
 
 namespace TXServer.ECSSystem.Events.Lobby
 {
@@ -9,7 +10,9 @@ namespace TXServer.ECSSystem.Events.Lobby
 	public class UpdateBattleParamsEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity session)
-		{
+        {
+            player.BattlePlayer.Battle.ExtendedBattleMode =
+                (ExtendedBattleMode) (int) player.BattlePlayer.Battle.Params.BattleMode;
 			player.BattlePlayer.Battle.UpdateParams(Params);
 		}
 

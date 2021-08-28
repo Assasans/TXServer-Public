@@ -70,7 +70,7 @@ namespace TXServer.ECSSystem.Types
         public int BonusesTaken { get; set; } = 0;
 
         public bool UnfairMatching => _battlePlayer.Battle.JoinedTankPlayers.Count() <= 3 ||
-                                      _battlePlayer.Battle.ModeHandler is Battle.TeamBattleHandler tbHandler &&
+                                      _battlePlayer.Battle.ModeHandler is Core.Battles.Battle.TeamBattleHandler tbHandler &&
                                       Math.Abs(tbHandler.RedTeamPlayers.Count - tbHandler.BlueTeamPlayers.Count) >= 2;
         public bool Deserted { get; set; }
 

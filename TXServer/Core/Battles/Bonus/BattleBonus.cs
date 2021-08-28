@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using TXServer.Core.Battles.Effect;
 using TXServer.ECSSystem.Base;
+using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Types;
 using TXServer.ECSSystem.EntityTemplates.Battle.Bonus;
 using TXServer.ECSSystem.Events.Battle.Bonus;
@@ -12,12 +13,13 @@ namespace TXServer.Core.Battles
 {
     public class BattleBonus
     {
-        public BattleBonus(BonusType bonusType, ServerMapInformation.Bonus bonus, Battle battle)
+        public BattleBonus(BonusType bonusType, ServerMapInformation.Bonus bonus, Battle battle,
+            BonusState bonusState = BonusState.Unused)
         {
             BonusType = bonusType;
             Position = bonus.Position;
             HasParachute = bonus.HasParachute;
-            State = BonusState.Unused;
+            State = bonusState;
             if (!HasParachute) SpawnHeight = 0;
             if (battle.TypeHandler is not Battle.MatchMakingBattleHandler) GoldboxCrystals = 0;
             Battle = battle;
@@ -53,10 +55,18 @@ namespace TXServer.Core.Battles
             State = BonusType == BonusType.GOLD ? BonusState.Unused : BonusState.ReDrop;
             battlePlayer.MatchPlayer.UserResult.BonusesTaken += 1;
 
+            // kill supply for hot potato game mode
+            if (battlePlayer.Battle.ModeHandler is HPSHandler handler && handler.KillingBonus == BonusType)
+            {
+                handler.TakeSupply(battlePlayer.MatchPlayer, BonusType);
+                return;
+            }
+
             switch (BonusType)
             {
                 case BonusType.GOLD:
                     player.Data.Crystals += CurrentCrystals;
+                    player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["GOLDS"]++);
                     Battle.PlayersInMap.UnshareEntities(BonusRegion);
                     break;
                 default:
@@ -79,7 +89,7 @@ namespace TXServer.Core.Battles
         public BonusType BonusType { get; }
         private Vector3 Position { get; }
         private int SpawnHeight { get; } = 30;
-        private bool HasParachute { get; }
+        public bool HasParachute { get; }
         private Battle Battle { get; }
 
         private static int GoldboxCrystals { get; set; } = 1000;

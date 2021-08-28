@@ -21,6 +21,7 @@ using TXServer.ECSSystem.Events.Battle.Bonus;
 using TXServer.ECSSystem.Events.Battle.Score;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
+using TXServer.ECSSystem.Types.Battle;
 
 namespace TXServer.Core.Battles
 {
@@ -29,6 +30,7 @@ namespace TXServer.Core.Battles
         public Battle(ClientBattleParams battleParams, bool isMatchMaking, Player owner)
         {
             Params = battleParams;
+            ExtendedBattleMode = (ExtendedBattleMode) (int) Params.BattleMode;
             IsMatchMaking = isMatchMaking;
 
             if (isMatchMaking)
@@ -52,11 +54,12 @@ namespace TXServer.Core.Battles
             CollisionsComponent = BattleEntity.GetComponent<BattleTankCollisionsComponent>();
 
             IBattleModeHandler prevHandler = ModeHandler;
-            ModeHandler = Params.BattleMode switch
+            ModeHandler = ExtendedBattleMode switch
             {
-                BattleMode.CTF => new CTFHandler { Battle = this },
-                BattleMode.TDM => new TDMHandler { Battle = this },
-                BattleMode.DM or _ => new DMHandler { Battle = this },
+                ExtendedBattleMode.CTF => new CTFHandler { Battle = this },
+                ExtendedBattleMode.HPS => new HPSHandler { Battle = this },
+                ExtendedBattleMode.TDM => new TDMHandler { Battle = this },
+                ExtendedBattleMode.DM or _ => new DMHandler { Battle = this }
             };
 
             if (prevHandler != null)
@@ -112,7 +115,7 @@ namespace TXServer.Core.Battles
 
             CreateBattle();
 
-            if (Params.BattleMode is not BattleMode.DM)
+            if (ModeHandler.GetType().BaseType == typeof(TeamBattleHandler))
             {
                 var handler = (TeamBattleHandler)ModeHandler;
                 foreach (BattleTankPlayer battlePlayer in JoinedTankPlayers.ToList())
@@ -344,7 +347,7 @@ namespace TXServer.Core.Battles
 
                 MatchPlayer matchPlayer =
                     new(tankPlayer, BattleEntity, (ModeHandler as TeamBattleHandler)?.BattleViewFor(tankPlayer)
-                        .AllyTeamResults ?? ((DMHandler) ModeHandler).Results);
+                        .AllyTeamResults ?? ((SoloBattleHandler) ModeHandler).Results);
                 tankPlayer.MatchPlayer = matchPlayer;
 
                 if (!Params.DisabledModules)
@@ -591,9 +594,9 @@ namespace TXServer.Core.Battles
 
         private static readonly Dictionary<BattleMode, Func<Entity, int, int, int, Entity>> BattleEntityCreators = new()
         {
-            { BattleMode.DM, DMTemplate.CreateEntity },
-            { BattleMode.TDM, TDMTemplate.CreateEntity },
             { BattleMode.CTF, CTFTemplate.CreateEntity },
+            { BattleMode.DM, DMTemplate.CreateEntity },
+            { BattleMode.TDM, TDMTemplate.CreateEntity }
         };
 
         public readonly Dictionary<GravityType, float> GravityTypes = new()
@@ -605,6 +608,7 @@ namespace TXServer.Core.Battles
         };
 
         public ClientBattleParams Params { get; private set; }
+        public ExtendedBattleMode ExtendedBattleMode { get; set; }
         public bool IsMatchMaking { get; }
         public Entity MapEntity { get; private set; }
         public bool SuppressInactivityKick { get; set; }
@@ -713,6 +717,7 @@ namespace TXServer.Core.Battles
         public List<BattleTankPlayer> MatchTankPlayers { get; } = new();
         public List<Spectator> Spectators { get; } = new();
         public IEnumerable<BaseBattlePlayer> PlayersInMap => MatchTankPlayers.Concat(Spectators.Cast<BaseBattlePlayer>());
+        public List<MatchPlayer> DisqualifiedPlayers { get; } = new();
 
         private bool IsEnoughPlayers => ModeHandler.IsEnoughPlayers;
         private TeamColor LosingTeam => ModeHandler.LosingTeam;

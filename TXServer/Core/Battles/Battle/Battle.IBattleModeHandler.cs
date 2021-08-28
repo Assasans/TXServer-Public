@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Events.Battle.Score;

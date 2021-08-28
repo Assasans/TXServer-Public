@@ -67,6 +67,10 @@ namespace TXServer.Core.Battles.Effect
 
         }
 
+        public override float DamageWithEffect(float damage, MatchPlayer target, bool isHeatDamage, bool isModuleDamage,
+            Entity weaponMarketItem)
+            => EffectIsActive && !isModuleDamage && target != MatchPlayer ? damage * DamageFactor : damage;
+
 
         public float DamageFactor { get; private set; }
         private float MaxHpPercentWorking { get; set; }

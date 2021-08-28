@@ -16,6 +16,7 @@ using TXServer.ECSSystem.Events.Battle.VisualScore;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents.Tank;
 using TXServer.ECSSystem.Types;
+using TXServer.ECSSystem.Types.Battle;
 using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 
@@ -30,10 +31,8 @@ namespace TXServer.Core.Battles
             if (victim.TryGetModule(out InvulnerabilityModule module)) if (module.EffectIsActive) return;
             if (victim.TryGetModule(out EmergencyProtectionModule epModule)) if (epModule.EffectIsActive) return;
 
-            damager.UserResult.Damage += (int) damage;
-
             bool isTurretHit = (damager.BattleWeapon as Shaft)?.ShaftAimingBeginTime != null &&
-                             IsTurretHit(localHitPoint, victim.Tank);
+                               IsTurretHit(localHitPoint, victim.Tank);
             if (isBackHit == false)
                 isBackHit = !isTurretHit && IsBackHit(localHitPoint, victim.Tank);
 
@@ -49,6 +48,8 @@ namespace TXServer.Core.Battles
 
             damage = GetHpWithEffects(damage, victim, damager, IsModule(weaponMarketItem), isHeatDamage,
                 weaponMarketItem);
+
+            damager.UserResult.Damage += (int) damage;
 
             victim.Tank.ChangeComponent<HealthComponent>(component =>
             {
@@ -249,26 +250,12 @@ namespace TXServer.Core.Battles
         private static float GetHpWithEffects(float damage, MatchPlayer target, MatchPlayer shooter,
             bool isModule, bool isHeatDamage, Entity weaponMarketItem)
         {
-            if (!isModule && shooter.TryGetModule(out AdrenalineModule adrenalineModule) &&
-                adrenalineModule.EffectIsActive)
-                damage *= adrenalineModule.DamageFactor;
+            List<BattleModule> modules = target.Modules;
+            if (shooter != null)
+                modules.AddRange(shooter.Modules);
 
-            if (!isModule && !isHeatDamage && shooter.TryGetModule(out IncreasedDamageModule damageModule) &&
-                damageModule.EffectIsActive)
-            {
-                if (damageModule.IsCheat)
-                    damage = target.Tank.GetComponent<HealthComponent>().CurrentHealth;
-                else
-                    damage *= damageModule.Factor;
-            }
-
-            if (target.TryGetModule(out AbsorbingArmorEffect armorModule) && armorModule.EffectIsActive)
-                damage *= armorModule.Factor();
-
-            // todo: add common mine to mine boolean when added
-            bool mine = isModule && weaponMarketItem == Modules.GlobalItems.Spidermine;
-            if (mine && target.TryGetModule(out SapperModule sapperModule) && !sapperModule.IsOnCooldown)
-                damage = sapperModule.ReduceDamage(damage);
+            foreach (BattleModule module in target.Modules)
+                damage = module.DamageWithEffect(damage, target, isHeatDamage, isModule, weaponMarketItem);
 
             return damage;
         }
@@ -288,6 +275,8 @@ namespace TXServer.Core.Battles
             MatchPlayer target = GetTargetByHit(shooter, hitTarget);
             (Entity marketItem, BattleModule battleModule) = GetWeaponItems(weapon, shooter);
             bool isModule = battleModule is not null;
+
+            if (!isModule && shooter.Battle.ExtendedBattleMode is ExtendedBattleMode.HPS) return;
 
             if (target.TankState is not TankState.Active) return;
             if (!isModule && shooter.BattleWeapon.IsOnCooldown(target)) return;
@@ -343,8 +332,8 @@ namespace TXServer.Core.Battles
         }
 
         private static bool IsModule(Entity weaponMarketItem) =>
-            Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem) ||
-            weaponMarketItem.HasComponent<EffectComponent>();
+            weaponMarketItem is not null && (Modules.GlobalItems.GetAllItems().Contains(weaponMarketItem) ||
+                                             weaponMarketItem.HasComponent<EffectComponent>());
 
 
         private static float NormalizeTemperature(float temperature, MatchPlayer target)
@@ -360,6 +349,8 @@ namespace TXServer.Core.Battles
             // module trigger: Kamikadze
             if (victim.TryGetModule(out KamikadzeModule kamikadzeModule) && !kamikadzeModule.IsOnCooldown)
                 kamikadzeModule.Activate();
+
+            (victim.Battle.ModeHandler as HPSHandler)?.OnKill(victim);
 
             victim.TankState = TankState.Dead;
             Battle battle = victim.Battle;
