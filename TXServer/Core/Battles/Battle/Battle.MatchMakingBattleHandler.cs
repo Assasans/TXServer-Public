@@ -33,11 +33,13 @@ namespace TXServer.Core.Battles
             {
                 if (Battle.Params == null)
                 {
-                    List<MapInfo> matchMakingMaps = ServerConnection.ServerMapInfo.Values.Where(p => p.MatchMaking).ToList();
-                    Random random = new();
-                    int index = random.Next(matchMakingMaps.Count);
-                    Battle.Params = new ClientBattleParams(MatchMaking.BattleModePicker(), MapId: matchMakingMaps[index].MapId,
-                        MaxPlayers: 20, TimeLimit: 10, ScoreLimit: 0, FriendlyFire: false, GravityType.EARTH, KillZoneEnabled: true, DisabledModules: false);
+                    List<MapInfo> matchMakingMaps =
+                        ServerConnection.ServerMapInfo.Values.Where(p => p.MatchMaking).ToList();
+                    int index = new Random().Next(matchMakingMaps.Count);
+                    Battle.Params = new ClientBattleParams(MatchMaking.BattleModePicker(),
+                        MapId: matchMakingMaps[index].MapId,
+                        MaxPlayers: 20, TimeLimit: 10, ScoreLimit: 0, FriendlyFire: false, GravityType.EARTH,
+                        KillZoneEnabled: true, DisabledModules: false);
                 }
 
                 (Battle.MapEntity, Battle.Params.MaxPlayers) = Battle.ConvertMapParams(Battle.Params, Battle.IsMatchMaking);

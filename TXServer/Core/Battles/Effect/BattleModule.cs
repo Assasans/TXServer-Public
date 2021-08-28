@@ -136,6 +136,10 @@ namespace TXServer.Core.Battles.Effect {
             EmpLockEnd = null;
         }
 
+        public virtual bool AllowsDamage() => true;
+
+        public virtual void On_Death() {}
+
         public void ShareEffect(Player joiningPlayer)
         {
             if (EffectEntity != null)

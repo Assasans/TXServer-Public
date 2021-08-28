@@ -26,7 +26,7 @@ namespace TXServer.Core.Battles
                 list.Sort(new ScoreComparer());
 
                 int place = 1;
-                foreach (BattleTankPlayer battlePlayer in list)
+                foreach (BattleTankPlayer battlePlayer in list.ToArray())
                 {
                     if (battlePlayer.MatchPlayer == null) continue;
 

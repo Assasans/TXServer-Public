@@ -56,6 +56,13 @@ namespace TXServer.Core.Battles.Effect
             return base.BaseDamage(weapon, target);
         }
 
+        public override void On_Death()
+        {
+            base.On_Death();
+            if (!IsOnCooldown && !IsEmpLocked)
+                Activate();
+        }
+
         private float DamageMinPercent { get; set; }
         private float Impact { get; set; }
         private float SplashRadius { get; set; }

@@ -71,6 +71,8 @@ namespace TXServer.Core.Battles.Effect
             TemperatureChange = (float) MathUtils.Map(Level, 0, 9, -0.8, -1);
         }
 
+        public override bool AllowsDamage() => !EffectIsActive;
+
         private DateTimeOffset ImmunityEndTime { get; set; }
 
         private float AdditiveHpFactor { get; set; }

@@ -27,10 +27,11 @@ namespace TXServer.Core.Battles
         public static void DealDamage(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer damager,
             float damage, bool isBackHit = false, Vector3 localHitPoint = new(), bool isHeatDamage = false)
         {
-            // triggers for Invulnerability & Emergency Protection modules
-            if (victim.TryGetModule(out InvulnerabilityModule module)) if (module.EffectIsActive) return;
-            if (victim.TryGetModule(out EmergencyProtectionModule epModule)) if (epModule.EffectIsActive) return;
+            foreach (BattleModule module in victim.Modules)
+                if (!module.AllowsDamage()) return;
 
+
+            // backHit & turretHit
             bool isTurretHit = (damager.BattleWeapon as Shaft)?.ShaftAimingBeginTime != null &&
                                IsTurretHit(localHitPoint, victim.Tank);
             if (isBackHit == false)
@@ -45,6 +46,7 @@ namespace TXServer.Core.Battles
 
             bool isCritical = !IsModule(weaponMarketItem) && damager.BattleWeapon.IsCritical(victim, localHitPoint);
             if (isCritical) damage = damager.BattleWeapon.DamageWithCritical(isBackHit, damage);
+
 
             damage = GetHpWithEffects(damage, victim, damager, IsModule(weaponMarketItem), isHeatDamage,
                 weaponMarketItem);
@@ -346,11 +348,9 @@ namespace TXServer.Core.Battles
 
         private static void ProcessKill(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer killer)
         {
-            // module trigger: Kamikadze
-            if (victim.TryGetModule(out KamikadzeModule kamikadzeModule) && !kamikadzeModule.IsOnCooldown)
-                kamikadzeModule.Activate();
-
-            (victim.Battle.ModeHandler as HPSHandler)?.OnKill(victim);
+            foreach (BattleModule battleModule in victim.Modules)
+                battleModule.On_Death();
+            (victim.Battle.ModeHandler as HPSHandler)?.On_Death(victim);
 
             victim.TankState = TankState.Dead;
             Battle battle = victim.Battle;

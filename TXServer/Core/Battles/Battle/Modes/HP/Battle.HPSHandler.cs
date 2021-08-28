@@ -26,7 +26,7 @@ namespace TXServer.Core.Battles
             }
         }
 
-        public void OnKill(MatchPlayer victim)
+        public void On_Death(MatchPlayer victim)
         {
             if (!Battle.DisqualifiedPlayers.Contains(victim))
                 Battle.DisqualifiedPlayers.Add(victim);

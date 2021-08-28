@@ -49,7 +49,7 @@ namespace TXServer.Core.Battles
 
             public void CompleteWarmUp()
             {
-                foreach (BattleTankPlayer player in Battle.JoinedTankPlayers)
+                foreach (BattleTankPlayer player in Battle.MatchTankPlayers)
                 {
                     player.MatchPlayer.RoundUser.ChangeComponent(new RoundUserStatisticsComponent());
                     Battle.PlayersInMap.SendEvent(new RoundUserStatisticsUpdatedEvent(), player.MatchPlayer.RoundUser);
