@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events.Friend
         {
             Dictionary<List<long>, Dictionary<long, string>> listToDict = new ()
             {
-                { player.Data.AcceptedFriendIds, FriendsAcceptedIds }, 
+                { player.Data.AcceptedFriendIds, FriendsAcceptedIds },
                 { player.Data.IncomingFriendIds, FriendsIncomingIds },
                 { player.Data.OutgoingFriendIds, FriendsOutgoingIds }
             };
@@ -23,7 +23,7 @@ namespace TXServer.ECSSystem.Events.Friend
                 foreach (long friendId in listPair.Key)
                 {
                     Player friend = Server.Instance.FindPlayerByUid(friendId);
-                    if (friend != null && friend.IsLoggedIn)
+                    if (friend != null && friend.IsLoggedIn && !listPair.Value.ContainsKey(friendId))
                         listPair.Value.Add(friendId, friend.User.GetComponent<UserUidComponent>().Uid);
                 }
             }
