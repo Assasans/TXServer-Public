@@ -154,6 +154,6 @@ namespace TXServer.Core.Battles.Matchmaking
             };
         }
 
-        private static readonly Dictionary<Player, DateTimeOffset> WaitingPlayers = new();
+        public static readonly Dictionary<Player, DateTimeOffset> WaitingPlayers = new();
     }
 }

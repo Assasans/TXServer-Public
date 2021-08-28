@@ -17,6 +17,7 @@ using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 using TXServer.Core.Database;
 using TXDatabase.NetworkEvents.Communications;
+using TXServer.Core.Battles.Matchmaking;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.EntityTemplates.Battle.Bonus;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
@@ -42,6 +43,8 @@ namespace TXServer.Core
         public bool IsInBattle => BattlePlayer != null;
         public bool IsBattleOwner => (BattlePlayer?.Battle.TypeHandler as CustomBattleHandler)?.Owner == this;
         public bool IsInMatch => BattlePlayer?.MatchPlayer != null;
+        public bool IsInMatchMaking => MatchMaking.WaitingPlayers.ContainsKey(this) ||
+                                       IsInBattle && BattlePlayer.Battle.IsMatchMaking;
 
         public bool IsBanned => Data.Punishments.Any(p => p.Type is PunishmentType.Ban && p.IsActive);
         public bool IsMuted => Data.Punishments.Any(p => p.Type is PunishmentType.Mute && p.IsActive);

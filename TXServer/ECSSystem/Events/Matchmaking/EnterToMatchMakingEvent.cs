@@ -10,6 +10,8 @@ namespace TXServer.ECSSystem.Events.MatchMaking
     {
         public void Execute(Player player, Entity mode)
         {
+            if (player.IsInMatchMaking) return;
+
             // Validate given mode entity
             foreach (Entity existingMode in MatchmakingModes.GlobalItems.GetAllItems())
             {
