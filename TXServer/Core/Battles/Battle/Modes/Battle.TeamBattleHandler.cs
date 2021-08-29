@@ -78,7 +78,9 @@ namespace TXServer.Core.Battles
                     { BattleMode.TDM, Battle.CurrentMapInfo.SpawnPoints.TeamDeathmatch }
                 };
 
-                SpawnPoints = teamModesSpawnPoints[Battle.Params.BattleMode] ?? teamModesSpawnPoints.Values.Where(b => b != null).First();
+                SpawnPoints = teamModesSpawnPoints.ContainsKey(Battle.Params.BattleMode)
+                    ? teamModesSpawnPoints[Battle.Params.BattleMode]
+                    : teamModesSpawnPoints.Values.First(b => b != null);
             }
 
             public void SetupBattle(IBattleModeHandler prevHandler)
