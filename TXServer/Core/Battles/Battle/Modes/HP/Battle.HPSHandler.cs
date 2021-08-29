@@ -16,7 +16,7 @@ namespace TXServer.Core.Battles
             nextDropDelayMs = Math.Clamp(nextDropDelayMs, MinDropDelayMs, MaxDropDelayMs);
             NextDropTime = DateTimeOffset.UtcNow.AddMilliseconds(nextDropDelayMs);
 
-            foreach (BattleTankPlayer player in Battle.JoinedTankPlayers.ToArray())
+            foreach (BattleTankPlayer player in Battle.MatchTankPlayers.ToArray())
             {
                 if (player.MatchPlayer.TankState is not TankState.Active) continue;
 

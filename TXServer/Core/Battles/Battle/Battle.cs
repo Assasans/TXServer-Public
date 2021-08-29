@@ -99,6 +99,7 @@ namespace TXServer.Core.Battles
         public void UpdateParams(ClientBattleParams @params)
         {
             Params = @params;
+            ExtendedBattleMode = (ExtendedBattleMode) (int) Params.BattleMode;
             (MapEntity, _) = ConvertMapParams(@params, IsMatchMaking);
 
             List<Component> paramComponents = new(){
