@@ -49,7 +49,7 @@ namespace TXServer.Core
         public void SetSettings(string countryCode, DateTime premiumExpiration, bool subscribed)
         {
             CountryCode = countryCode;
-            // todo: fix avatar in db (set to long [Entity ID] instead of string]
+
             Avatar = 6224;
             PremiumExpirationDate = premiumExpiration;
             Subscribed = subscribed;

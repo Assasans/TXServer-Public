@@ -638,7 +638,7 @@ namespace TXServer.Core.ChatCommands
                 return "Very funny";
 
             player.BattlePlayer.Battle.ExtendedBattleMode = newBattleMode;
-            player.BattlePlayer.Battle.UpdateParams(player.BattlePlayer.Battle.Params);
+            player.BattlePlayer.Battle.UpdateParams(player.BattlePlayer.Battle.Params, true);
 
             return $"Changed battleMode to {newBattleMode.ToString()}";
         }

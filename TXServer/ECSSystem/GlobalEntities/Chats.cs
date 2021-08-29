@@ -10,7 +10,6 @@ namespace TXServer.ECSSystem.GlobalEntities
 
         public class Items : ItemList
         {
-            // TODO: multiple (language) chats + choose the correct one at ChatMessageReceivedEvent.SystemMessageTarget
             public Entity Ru { get; } = new(-968268831, new TemplateAccessor(new GeneralChatTemplate(), "/chat/general/ru"),
                 new GeneralChatComponent(),
                 new ChatComponent());

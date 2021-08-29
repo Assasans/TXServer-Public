@@ -6,6 +6,5 @@ namespace TXServer.ECSSystem.Components.Battle.Incarnation
     [SerialVersionUID(1482301974067)]
     public class TankClientIncarnationComponent : Component
     {
-        //todo is this only client-sided? See TankIncarnationSystem
     }
 }

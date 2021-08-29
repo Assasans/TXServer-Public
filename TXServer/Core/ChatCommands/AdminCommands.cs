@@ -99,7 +99,9 @@ namespace TXServer.Core.ChatCommands
                 .Where(mapInfo => mapInfo.MapId != player.BattlePlayer.Battle.Params.MapId).ToList();
 
             string prevMapName = player.BattlePlayer.Battle.CurrentMapInfo.Name;
-            string newMapName = args.Length == 0 ? otherMaps[new Random().Next(otherMaps.Count)].Name : args[0];
+            string newMapName = args.Length == 0
+                ? otherMaps[new Random().Next(otherMaps.Count)].Name
+                : string.Join(" ", args);
             long? newMapId = ServerConnection.ServerMapInfo.Values.SingleOrDefault(m =>
                 string.Equals(m.Name, newMapName, StringComparison.CurrentCultureIgnoreCase))?.MapId;
 

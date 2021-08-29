@@ -47,7 +47,7 @@ namespace TXServer.Core
         public long UniqueId { get; }
         public string Email { get; protected set; }
         protected bool EmailVerified { get; set; }
-        public bool Subscribed { get; protected set; }
+        public bool Subscribed { get; set; }
 
         public string HashedPassword { get; set; }
         public string HardwareId { get; set; }

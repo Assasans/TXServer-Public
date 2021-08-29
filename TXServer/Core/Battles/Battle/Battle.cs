@@ -96,10 +96,11 @@ namespace TXServer.Core.Battles
             return (mapEntity, maxPlayers);
         }
 
-        public void UpdateParams(ClientBattleParams @params)
+        public void UpdateParams(ClientBattleParams @params, bool suppressModeUpdate = false)
         {
             Params = @params;
-            ExtendedBattleMode = (ExtendedBattleMode) (int) Params.BattleMode;
+            if (!suppressModeUpdate)
+                ExtendedBattleMode = (ExtendedBattleMode) (int) Params.BattleMode;
             (MapEntity, _) = ConvertMapParams(@params, IsMatchMaking);
 
             List<Component> paramComponents = new(){

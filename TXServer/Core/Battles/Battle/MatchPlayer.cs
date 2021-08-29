@@ -89,7 +89,7 @@ namespace TXServer.Core.Battles
         {
             { TankState.New, (typeof(TankNewStateComponent), 0) },
             { TankState.Spawn, (typeof(TankSpawnStateComponent), 1.5) },
-            { TankState.SemiActive, (typeof(TankSemiActiveStateComponent), 0.75) },
+            { TankState.SemiActive, (typeof(TankSemiActiveStateComponent), 0.5) },
             { TankState.Active, (typeof(TankActiveStateComponent), 0) },
             { TankState.Dead, (typeof(TankDeadStateComponent), 3) }
         };

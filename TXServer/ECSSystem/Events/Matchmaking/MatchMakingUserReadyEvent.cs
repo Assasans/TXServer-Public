@@ -12,7 +12,6 @@ namespace TXServer.ECSSystem.Events.Matchmaking
     {
         public void Execute(Player player, Entity lobby)
         {
-            //todo handle it in the lobby
             player.User.AddComponent(new MatchMakingUserReadyComponent());
 
             if (player.BattlePlayer.Battle.BattleState == BattleState.Running)

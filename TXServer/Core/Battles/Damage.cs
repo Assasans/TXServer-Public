@@ -98,9 +98,8 @@ namespace TXServer.Core.Battles
             });
             if (!healed) return healed;
 
-            matchPlayer.SendEvent(new DamageInfoEvent(healHp, matchPlayer.TankPosition, healHit:true), matchPlayer.Tank);
+            matchPlayer.SendEvent(new DamageInfoEvent(healHp, healHit:true), matchPlayer.Tank);
             matchPlayer.HealthChanged();
-            // Todo: fix position of heal info
 
             return healed;
         }

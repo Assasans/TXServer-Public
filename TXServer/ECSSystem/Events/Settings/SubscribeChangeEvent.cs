@@ -3,19 +3,21 @@ using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 
-namespace TXServer.ECSSystem.Events
+namespace TXServer.ECSSystem.Events.Settings
 {
 	[SerialVersionUID(1482844606270L)]
 	public class SubscribeChangeEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity entity)
-		{
-			// TODO: save changed subscribed bool in database
+        {
+            player.Data.Subscribed = Subscribed;
+
 			if (Subscribed)
 				player.User.AddComponent(new UserSubscribeComponent());
 			else
 				player.User.RemoveComponent<UserSubscribeComponent>();
 		}
+
 		public bool Subscribed { get; set; }
 	}
 }

@@ -6,6 +6,6 @@ namespace TXServer.ECSSystem.Events.Entrance.RestorePassword
 	[SerialVersionUID(1460461200896L)]
 	public class SendAgainRestorePasswordEvent : ECSEvent
 	{
-		// TODO: add to email client
+		// TODO: add to discord system
 	}
 }

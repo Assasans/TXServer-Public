@@ -38,7 +38,6 @@ namespace TXServer.Core.Battles.Effect
         {
             base.Init();
 
-            // todo: correct damage
             DamageMinPercent = Config.GetComponent<ModuleEffectSplashDamageMinPercentPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
             Impact = Config.GetComponent<ModuleEffectImpactPropertyComponent>(ConfigPath)
