@@ -1151,9 +1151,9 @@ namespace TXServer.Core
         public void ChangeBlockedPlayer(PlayerData user)
         {
             if (Relations.ContainsId(user.UniqueId, PlayerRelation.RelationType.Blocked))
-                Relations.RemoveType(user.UniqueId, PlayerRelation.RelationType.Reported);
+                Relations.RemoveType(user.UniqueId, PlayerRelation.RelationType.Blocked);
             else
-                Relations.Add(PlayerRelation.Create(this, user, PlayerRelation.RelationType.Reported));
+                Relations.Add(PlayerRelation.Create(this, user, PlayerRelation.RelationType.Blocked));
         }
 
         public void AddReportedPlayer(PlayerData user)
