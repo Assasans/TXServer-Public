@@ -28,7 +28,8 @@ namespace TXServer.Database
                 .IncludeOptimized(player => player.Weapons.Select(weapon => weapon.Skins))
                 .IncludeOptimized(player => player.Weapons.Select(weapon => weapon.ShellSkins))
                 .IncludeOptimized(player => player.Modules)
-                .IncludeOptimized(player => player.Shards);
+                .IncludeOptimized(player => player.Shards)
+                .IncludeOptimized(player => player.Statistics);
         }
     }
 }

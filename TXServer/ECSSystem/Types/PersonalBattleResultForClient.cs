@@ -30,7 +30,7 @@ namespace TXServer.ECSSystem.Types
         {
             if (MatchPlayer.Battle.IsMatchMaking)
             {
-                if (_player.User.GetComponent<UserStatisticsComponent>().Statistics["ALL_BATTLES_PARTICIPATED"] >= 4)
+                if (_player.Data.Statistics.AllBattlesParticipated >= 4)
                     _player.Data.CurrentBattleSeries++;
 
                 // Player experience
@@ -63,55 +63,45 @@ namespace TXServer.ECSSystem.Types
                     Reward = reward;
                 }
 
-                _player.User.ChangeComponent<UserStatisticsComponent>(component =>
-                {
-                    component.Statistics["ALL_BATTLES_PARTICIPATED"]++;
-                    component.Statistics["BATTLES_PARTICIPATED"]++;
-                    component.Statistics["BATTLES_PARTICIPATED_IN_SEASON"]++;
-                    component.Statistics["DEATHS"] =
-                        MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().Deaths;
-                    component.Statistics["KILLS"] =
-                        MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().Kills;
+                _player.Data.Statistics.AllBattlesParticipated++;
+                _player.Data.Statistics.BattlesParticipated++;
+                _player.Data.Statistics.BattlesParticipatedInSeason++;
+                _player.Data.Statistics.Deaths = MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().Deaths;
+                _player.Data.Statistics.Kills = MatchPlayer.RoundUser.GetComponent<RoundUserStatisticsComponent>().Kills;
 
-                    switch (_player.BattlePlayer.Battle.ModeHandler.TeamBattleResultFor(_player.BattlePlayer))
-                    {
-                        case TeamBattleResult.WIN:
-                            component.Statistics["VICTORIES"]++;
-                            break;
-                        case TeamBattleResult.DEFEAT:
-                            component.Statistics["DEFEATS"]++;
-                            break;
-                        case TeamBattleResult.DRAW or _:
-                            component.Statistics["DRAWS"]++;
-                            break;
-                    }
-                    switch (_player.BattlePlayer.Battle.Params.BattleMode)
-                    {
-                        case BattleMode.CTF:
-                            component.Statistics["CTF_PLAYED"]++;
-                            break;
-                        case BattleMode.TDM:
-                            component.Statistics["TDM_PLAYED"]++;
-                            break;
-                        case BattleMode.DM or _:
-                            component.Statistics["DM_PLAYED"]++;
-                            break;
-                    }
-                });
+                switch (_player.BattlePlayer.Battle.ModeHandler.TeamBattleResultFor(_player.BattlePlayer))
+                {
+                    case TeamBattleResult.WIN:
+                        _player.Data.Statistics.Victories++;
+                        break;
+                    case TeamBattleResult.DEFEAT:
+                        _player.Data.Statistics.Defeats++;
+                        break;
+                    case TeamBattleResult.DRAW or _:
+                        _player.Data.Statistics.Draws++;
+                        break;
+                }
             }
             else
             {
-                _player.User.ChangeComponent<UserStatisticsComponent>(component =>
-                {
-                    component.Statistics["ALL_CUSTOM_BATTLES_PARTICIPATED"]++;
-                    component.Statistics["CUSTOM_BATTLES_PARTICIPATED"]++;
-                });
+                _player.Data.Statistics.AllCustomBattlesParticipated++;
+                _player.Data.Statistics.CustomBattlesParticipated++;
             }
 
-            _player.User.ChangeComponent<UserStatisticsComponent>(component =>
+            switch (_player.BattlePlayer.Battle.Params.BattleMode)
             {
-                component.Statistics[$"{MatchPlayer.Battle.Params.BattleMode}_PLAYED"]++;
-            });
+                case BattleMode.CTF:
+                    _player.Data.Statistics.CtfPlayed++;
+                    break;
+                case BattleMode.TDM:
+                    _player.Data.Statistics.TdmPlayed++;
+                    break;
+                case BattleMode.DM or _:
+                    _player.Data.Statistics.DmPlayed++;
+                    break;
+            }
+
+            _player.User.ChangeComponent<UserStatisticsComponent>();
         }
 
         private readonly Player _player;

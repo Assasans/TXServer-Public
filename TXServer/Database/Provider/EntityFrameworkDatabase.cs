@@ -137,6 +137,11 @@ namespace TXServer.Database.Provider
                 entity.HasKey(container => new { container.PlayerId, container.EntityId });
             });
 
+            builder.Entity<PlayerStatistics>(entity =>
+            {
+                entity.HasKey(statistics => new { statistics.PlayerId });
+            });
+
             builder.Entity<PlayerData>(entity =>
             {
                 entity.Ignore(player => player.Player);
@@ -144,6 +149,7 @@ namespace TXServer.Database.Provider
         }
 
         public DbSet<PlayerData> Players { get; protected set; } = null!;
+        public DbSet<PlayerStatistics> PlayerStatistics { get; protected set; } = null!;
 
         public DbSet<PlayerData.PlayerRelation> Relations { get; protected set; } = null!;
         public DbSet<Punishment> Punishments { get; protected set; } = null!;

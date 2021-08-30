@@ -26,8 +26,7 @@ namespace TXServer.ECSSystem.Events.DailyBonus
             DailyBonusCycleComponent cycleComponent =
                 player.Data.DailyBonusCycle > 0 ? endlessCycleComponent : firstCycleComponent;
 
-            if (player.User.GetComponent<UserStatisticsComponent>().Statistics["BATTLES_PARTICIPATED"] <
-                bonusConfig.BattleCountToUnlockDailyBonuses)
+            if (player.Data.Statistics.BattlesParticipated < bonusConfig.BattleCountToUnlockDailyBonuses)
                 return;
 
             // collect reward

@@ -22,29 +22,29 @@ namespace TXServer.Core.ChatCommands
     {
         private static readonly Dictionary<string, (string, ChatCommandConditions, Func<Player, string[], string>)>
             Commands = new(StringComparer.InvariantCultureIgnoreCase)
-        {
-            { "battleMode", ("battlemode [opt: shortcut]", ChatCommandConditions.InactiveBattle, ChangeBattleMode) },
-            { "competition", ("competition [start/finish/reset]", ChatCommandConditions.None, FractionsCompetitionEditor) },
-            { "dailyBonus", (null, ChatCommandConditions.None, DailyBonusRecharge)},
-            { "finish", (null, ChatCommandConditions.ActiveBattle, Finish) },
-            { "friendlyFire", (null, ChatCommandConditions.InactiveBattle, ChangeFriendlyFire) },
-            { "giveItem", (null, ChatCommandConditions.Admin, GiveItem) },
-            { "goldrain", (null, ChatCommandConditions.ActiveBattle, GoldboxRain) },
-            { "immune", (null, ChatCommandConditions.InBattle, Immune) },
-            { "map", ("map [opt: map name]", ChatCommandConditions.InactiveBattle, ChangeMap) },
-            { "message", ("message [all/uid] [message]", ChatCommandConditions.None, Message) },
-            { "modules", (null, ChatCommandConditions.InactiveBattle, ChangeModules) },
-            { "noPause", ("noPause [opt: active/inactive]", ChatCommandConditions.InBattle, NoPause)},
-            { "open", (null, ChatCommandConditions.InBattle, Open) },
-            { "pause", (null, ChatCommandConditions.InBattle, Pause) },
-            { "positionInfo", (null, ChatCommandConditions.InMatch, PositionInfo) },
-            { "recruitReward", ("recruitReward [opt: check/reset]", ChatCommandConditions.None, RecruitReward) },
-            { "reload", ("reload [opt: all]", ChatCommandConditions.None, Reload) },
-            { "season", ("season [finish]", ChatCommandConditions.None, SeasonEditor ) },
-            { "start", (null, ChatCommandConditions.InBattle, Start) },
-            { "shutdown", (null, ChatCommandConditions.Admin, Shutdown) },
-            { "supplyRain", (null, ChatCommandConditions.ActiveBattle, SupplyRain) },
-        };
+            {
+                { "battleMode", ("battlemode [opt: shortcut]", ChatCommandConditions.InactiveBattle, ChangeBattleMode) },
+                { "competition", ("competition [start/finish/reset]", ChatCommandConditions.None, FractionsCompetitionEditor) },
+                { "dailyBonus", (null, ChatCommandConditions.None, DailyBonusRecharge) },
+                { "finish", (null, ChatCommandConditions.ActiveBattle, Finish) },
+                { "friendlyFire", (null, ChatCommandConditions.InactiveBattle, ChangeFriendlyFire) },
+                { "giveItem", (null, ChatCommandConditions.Admin, GiveItem) },
+                { "goldrain", (null, ChatCommandConditions.ActiveBattle, GoldboxRain) },
+                { "immune", (null, ChatCommandConditions.InBattle, Immune) },
+                { "map", ("map [opt: map name]", ChatCommandConditions.InactiveBattle, ChangeMap) },
+                { "message", ("message [all/uid] [message]", ChatCommandConditions.None, Message) },
+                { "modules", (null, ChatCommandConditions.InactiveBattle, ChangeModules) },
+                { "noPause", ("noPause [opt: active/inactive]", ChatCommandConditions.InBattle, NoPause) },
+                { "open", (null, ChatCommandConditions.InBattle, Open) },
+                { "pause", (null, ChatCommandConditions.InBattle, Pause) },
+                { "positionInfo", (null, ChatCommandConditions.InMatch, PositionInfo) },
+                { "recruitReward", ("recruitReward [opt: check/reset]", ChatCommandConditions.None, RecruitReward) },
+                { "reload", ("reload [opt: all]", ChatCommandConditions.None, Reload) },
+                { "season", ("season [finish]", ChatCommandConditions.None, SeasonEditor) },
+                { "start", (null, ChatCommandConditions.InBattle, Start) },
+                { "shutdown", (null, ChatCommandConditions.Admin, Shutdown) },
+                { "supplyRain", (null, ChatCommandConditions.ActiveBattle, SupplyRain) },
+            };
 
         public static void CheckForCommand(string command, Player player)
         {
@@ -454,7 +454,7 @@ namespace TXServer.Core.ChatCommands
             {
                 battlePlayer.Battle.KeepRunning = true;
                 battlePlayer.Rejoin = true;
-                battlePlayer.SendEvent(new KickFromBattleEvent(), (battlePlayer as BattleTankPlayer)?.MatchPlayer.BattleUser ?? ((Spectator)battlePlayer).BattleUser);
+                battlePlayer.SendEvent(new KickFromBattleEvent(), (battlePlayer as BattleTankPlayer)?.MatchPlayer.BattleUser ?? ((Spectator) battlePlayer).BattleUser);
             }
 
             return $"Target{(targets.Count > 1 ? "s" : "")} rejoin{(targets.Count < 2 ? "s" : "")}";
@@ -477,8 +477,8 @@ namespace TXServer.Core.ChatCommands
                     if (args.Length < 2) return "error: missing argument for battle amount";
                     if (!int.TryParse(args[1], out int count)) return $"error: unable to parse '{args[1]} as number'";
 
-                    player.User.ChangeComponent<UserStatisticsComponent>(component =>
-                        component.Statistics["BATTLES_PARTICIPATED_IN_SEASON"] = count);
+                    player.Data.Statistics.BattlesParticipatedInSeason = count;
+                    player.User.ChangeComponent<UserStatisticsComponent>();
 
                     return $"Your battles in current season counter has been set to {count}";
                 case "finish":
@@ -489,11 +489,9 @@ namespace TXServer.Core.ChatCommands
                     List<Player> uneditedPlayers = Server.Instance.Connection.Pool;
                     foreach (Player p in uneditedPlayers)
                     {
-                        p.User.ChangeComponent<UserStatisticsComponent>(component =>
-                        {
-                            p.Data.LastSeasonBattles = component.Statistics["BATTLES_PARTICIPATED_IN_SEASON"];
-                            component.Statistics["BATTLES_PARTICIPATED_IN_SEASON"] = 0;
-                        });
+                        p.Data.LastSeasonBattles = player.Data.Statistics.BattlesParticipatedInSeason;
+                        player.Data.Statistics.BattlesParticipatedInSeason = 0;
+                        p.User.ChangeComponent<UserStatisticsComponent>();
 
                         p.Data.LastSeasonLeagueIndex = p.Data.LeagueIndex;
                         p.Data.LastSeasonLeaguePlace = Leveling.GetLeaguePlace(p, uneditedPlayers);

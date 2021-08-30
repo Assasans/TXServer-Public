@@ -21,7 +21,8 @@ namespace TXServer.ECSSystem.Events.Battle.Bonus
 
             if (battleBonus.BonusType == BonusType.GOLD)
             {
-                player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["GOLDS"]++);
+                player.Data.Statistics.Golds++;
+                player.User.ChangeComponent<UserStatisticsComponent>();
 
                 if (battle.WaitingGoldBoxSenders.Any())
                 {

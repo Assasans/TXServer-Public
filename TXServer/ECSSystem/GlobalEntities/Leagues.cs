@@ -68,7 +68,7 @@ namespace TXServer.ECSSystem.GlobalEntities
                     out (long normalId, long _) graffiti) &&
                 player.HasEntityWithId(graffiti.normalId, out Entity graffitiReward) &&
                 !player.Data.OwnsMarketItem(graffitiReward) &&
-                player.User.GetComponent<UserStatisticsComponent>().Statistics["BATTLES_PARTICIPATED_IN_SEASON"] > 9)
+                player.Data.Statistics.BattlesParticipatedInSeason > 9)
                 player.SaveNewMarketItem(graffitiReward);
         }
     }

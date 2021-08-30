@@ -26,6 +26,7 @@ using GlobalEntities = TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core
 {
+
     // public class Preset
     // {
     //     [BsonIgnore] public PlayerData PlayerData { get; }
@@ -348,6 +349,8 @@ namespace TXServer.Core
                     shellSkins: new List<PlayerWeaponShellSkin> { PlayerWeaponShellSkin.Create(this, weapon.EntityId, shell.EntityId) }
                 ));
             }
+
+            Statistics = PlayerStatistics.Create(this);
 
             ReceivedFractionsCompetitionReward = false;
             ReceivedReleaseReward = false;
@@ -1055,6 +1058,8 @@ namespace TXServer.Core
         public virtual List<PlayerModule> Modules { get; set; } = new List<PlayerModule>();
 
         public virtual List<PlayerContainerShards> Shards { get; set; } = new List<PlayerContainerShards>();
+
+        public virtual PlayerStatistics Statistics { get; set; }
 
         // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableList<long> Graffities { get; private set; }
         // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableDictionary<long, long> Hulls { get; private set; }

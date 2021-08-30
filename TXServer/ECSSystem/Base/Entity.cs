@@ -117,6 +117,12 @@ namespace TXServer.ECSSystem.Base
                 player.Connection.QueueCommands(new ComponentChangeCommand(this, component));
         }
 
+        public void ChangeComponent<T>() where T : Component
+        {
+            T component = GetComponent<T>() ?? throw new ArgumentException("Component was not found", typeof(T).Name);
+            ChangeComponent(component);
+        }
+
         public void ChangeComponent<T>(Action<T> action) where T : Component
         {
             T component = GetComponent<T>() ?? throw new ArgumentException("Component was not found", typeof(T).Name);

@@ -12,6 +12,7 @@ namespace TXServer.Core.Data.Database
     public interface IDatabase
     {
         DbSet<PlayerData> Players { get; }
+        DbSet<PlayerStatistics> PlayerStatistics { get; }
 
         DbSet<PlayerData.PlayerRelation> Relations { get; }
         DbSet<Punishment> Punishments { get;}
@@ -38,10 +39,8 @@ namespace TXServer.Core.Data.Database
         DbSet<Invite> Invites { get; }
         DbSet<BlockedUsername> BlockedUsernames { get; }
 
-
         // PlayerData
-
-
+        
         PlayerData? GetPlayerData(string username);
         PlayerData? GetPlayerDataById(long id);
         PlayerData? GetPlayerDataByEmail(string email);

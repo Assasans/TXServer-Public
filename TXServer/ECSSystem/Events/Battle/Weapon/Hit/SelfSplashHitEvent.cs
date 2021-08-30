@@ -29,9 +29,11 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
                 matchPlayer.BattleWeapon.AllowsSelfDamage && hitTarget.Entity == player.BattlePlayer.MatchPlayer.Tank))
                 Damage.HandleHit(weapon, player.BattlePlayer.MatchPlayer, splashTarget, true);
 
-            player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["SHOTS"]++);
-            player.User.ChangeComponent<UserStatisticsComponent>(component =>
-                component.Statistics["HITS"] += Targets.Concat(SplashTargets).Distinct().Count());
+            int hitCount = Targets.Concat(SplashTargets).Distinct().Count();
+
+            player.Data.Statistics.Shots++;
+            player.Data.Statistics.Hits += hitCount;
+            player.User.ChangeComponent<UserStatisticsComponent>();
         }
 
 		public override IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteSplashHitEvent>();

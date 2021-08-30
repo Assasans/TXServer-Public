@@ -29,15 +29,15 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
             foreach (HitTarget hitTarget in Targets)
             {
                 if (matchPlayer.IsEnemyOf(Damage.GetTargetByHit(matchPlayer, hitTarget)) ||
-                     matchPlayer.Battle.Params.FriendlyFire && !matchPlayer.BattleWeapon.NotFriendlyFireUsable)
+                    matchPlayer.Battle.Params.FriendlyFire && !matchPlayer.BattleWeapon.NotFriendlyFireUsable)
                     Damage.HandleHit(weapon, matchPlayer, hitTarget);
                 else
                     Damage.HandleMateHit(weapon, matchPlayer, hitTarget);
             }
 
-            player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["SHOTS"]++);
-            player.User.ChangeComponent<UserStatisticsComponent>(component =>
-                component.Statistics["HITS"] += Targets.Count);
+            player.Data.Statistics.Shots++;
+            player.Data.Statistics.Hits += Targets.Count;
+            player.User.ChangeComponent<UserStatisticsComponent>();
 
             (matchPlayer.BattleWeapon as Core.Battles.BattleWeapons.Shaft)?.ResetAiming();
         }

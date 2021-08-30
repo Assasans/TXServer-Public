@@ -32,7 +32,7 @@ namespace TXServer.ECSSystem.EntityTemplates.User
 
                 new FractionUserScoreComponent(player.Data.FractionUserScore),
 
-                new UserStatisticsComponent(),
+                new UserStatisticsComponent(player),
                 new FavoriteEquipmentStatisticsComponent(),
                 new KillsEquipmentStatisticsComponent(),
                 new BattleLeaveCounterComponent(0, 0),
