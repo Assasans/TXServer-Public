@@ -9,7 +9,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 	{
 		public void Execute(Player player, Entity entity)
 		{
-            if (!player.Data.Admin) return;
+            if (!player.Data.IsAdmin) return;
 
 			player.Data.Reputation = Count;
 		}

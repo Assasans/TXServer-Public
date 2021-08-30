@@ -19,7 +19,7 @@ namespace TXServer.ECSSystem.Events.Settings
 		{
             Dictionary<Entity, int> rewards = new();
 
-			if (player.Data.Admin)
+			if (player.Data.IsAdmin)
             {
 				var currencyCodes = new Dictionary<string, Entity>
 				{

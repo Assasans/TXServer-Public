@@ -96,7 +96,7 @@ namespace TXServer.Core
             Logger.Log($"{this} has disconnected.");
 
             Server.StoredPlayerData.RemoveAll(pd => pd.UniqueId == Data?.UniqueId);
-            if (Data is {RememberMe: true})
+            if (Data is { RememberMe: true })
                 Server.StoredPlayerData.Add(Data);
         }
 
@@ -137,8 +137,8 @@ namespace TXServer.Core
             List<string> admins = new() { "NoNick", "Tim203", "M8", "Kaveman", "Assasans" };
             if (!admins.Contains(Data.Username))
             {
-                Data.Admin = false;
-                Data.Mod = false;
+                Data.IsAdmin = false;
+                Data.IsModerator = false;
             }
 
             Entity user = UserTemplate.CreateEntity(this);
@@ -151,16 +151,16 @@ namespace TXServer.Core
             SetEquipment();
 
             foreach (Entity item in new[]
-            {
-                GetUserItemByMarket(GetEntityById(Data.Avatar)),
-                CurrentPreset.WeaponItem,
-                CurrentPreset.HullItem,
-                CurrentPreset.WeaponPaint,
-                CurrentPreset.TankPaint,
-                CurrentPreset.Graffiti,
-            }.Concat(CurrentPreset.HullSkins.Values)
-             .Concat(CurrentPreset.WeaponSkins.Values)
-             .Concat(CurrentPreset.WeaponShells.Values))
+                {
+                    GetUserItemByMarket(GetEntityById(Data.Avatar)),
+                    CurrentPreset.WeaponItem,
+                    CurrentPreset.HullItem,
+                    CurrentPreset.WeaponPaint,
+                    CurrentPreset.TankPaint,
+                    CurrentPreset.Graffiti,
+                }.Concat(CurrentPreset.HullSkins.Values)
+                .Concat(CurrentPreset.WeaponSkins.Values)
+                .Concat(CurrentPreset.WeaponShells.Values))
             {
                 item.AddComponent(new MountedItemComponent());
             }
@@ -264,7 +264,7 @@ namespace TXServer.Core
         /// Shares users of players.
         /// </summary>
         /// <param name="players">Players with users to be shared.</param>
-        public void SharePlayers(params Player[] players) => SharePlayers((IEnumerable<Player>)players);
+        public void SharePlayers(params Player[] players) => SharePlayers((IEnumerable<Player>) players);
         /// <summary>
         /// Shares users of players.
         /// </summary>
@@ -285,7 +285,7 @@ namespace TXServer.Core
         /// Unshares users of players.
         /// </summary>
         /// <param name="players">Players with users to be unshared.</param>
-        public void UnsharePlayers(params Player[] players) => UnsharePlayers((IEnumerable<Player>)players);
+        public void UnsharePlayers(params Player[] players) => UnsharePlayers((IEnumerable<Player>) players);
         /// <summary>
         /// Unshares users of players.
         /// </summary>
@@ -314,7 +314,7 @@ namespace TXServer.Core
             Connection.QueueCommands(new SendEventCommand(@event, entities));
         }
 
-        public void ShareEntities(params Entity[] entities) => ShareEntities((IEnumerable<Entity>)entities);
+        public void ShareEntities(params Entity[] entities) => ShareEntities((IEnumerable<Entity>) entities);
         public void ShareEntities(IEnumerable<Entity> entities)
         {
             foreach (Entity entity in entities)
@@ -325,7 +325,7 @@ namespace TXServer.Core
             }
         }
 
-        public void UnshareEntities(params Entity[] entities) => UnshareEntities((IEnumerable<Entity>)entities);
+        public void UnshareEntities(params Entity[] entities) => UnshareEntities((IEnumerable<Entity>) entities);
         public void UnshareEntities(IEnumerable<Entity> entities)
         {
             foreach (Entity entity in entities)

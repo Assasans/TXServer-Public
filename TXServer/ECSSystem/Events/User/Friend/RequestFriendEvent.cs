@@ -9,16 +9,20 @@ namespace TXServer.ECSSystem.Events.User.Friend
     {
         public void Execute(Player player, Entity clientSession)
         {
-            Player remotePlayer = Server.Instance.FindPlayerByUid(User.EntityId);
-            if (remotePlayer != null && remotePlayer.IsLoggedIn)
-            {
-                remotePlayer.Data.AddIncomingFriend(player.User.EntityId);
-                remotePlayer.SendEvent(new IncomingFriendAddedEvent(player.User.EntityId), remotePlayer.User);
-            }
+            PlayerData remotePlayer = player.Server.Database.GetPlayerDataById(User.EntityId);
 
-            player.Data.AddOutgoingFriend(User.EntityId);
-            player.UnsharePlayers(remotePlayer);
-            player.SendEvent(new OutgoingFriendAddedEvent(remotePlayer.User.EntityId), clientSession);
+            // Remove target player from blacklist
+            player.Data.Relations.RemoveType(remotePlayer.UniqueId, PlayerData.PlayerRelation.RelationType.Blocked);
+
+            player.Data.AddOutgoingFriend(remotePlayer);
+            player.UnsharePlayers(remotePlayer.Player);
+            player.SendEvent(new OutgoingFriendAddedEvent(remotePlayer.Player.User.EntityId), clientSession);
+
+            remotePlayer.AddIncomingFriend(player.Data);
+            if (remotePlayer.Player != null && remotePlayer.Player.IsLoggedIn)
+            {
+                remotePlayer.Player.SendEvent(new IncomingFriendAddedEvent(player.User.EntityId), remotePlayer.Player.User);
+            }
         }
     }
 }

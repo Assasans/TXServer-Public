@@ -11,12 +11,14 @@ namespace TXServer.ECSSystem.Events.User
         public void Execute(Player player, Entity entity)
         {
             // todo: report system / add user to a check list
-            player.Data.AddReportedPlayer(UserId);
+            PlayerData data = player.Server.Database.GetPlayerDataById(UserId);
+
+            player.Data.AddReportedPlayer(data);
         }
-		
+
         public long UserId { get; set; }
         public InteractionSource InteractionSource { get; set; }
         public long SourceId { get; set; }
     }
-	
+
 }

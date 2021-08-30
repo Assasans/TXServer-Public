@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
     {
         public void Execute(Player player, Entity session)
         {
-            if (!player.Data.Admin) return;
+            if (!player.Data.IsAdmin) return;
 
             AdminCommands.CheckForCommand(Command, player);
         }

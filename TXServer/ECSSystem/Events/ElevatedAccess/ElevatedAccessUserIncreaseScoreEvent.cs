@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 	{
 		public void Execute(Player player, Entity entity)
 		{
-            if (!player.Data.Admin) return;
+            if (!player.Data.IsAdmin) return;
 
 			if (player.BattlePlayer?.Battle.ModeHandler is not TeamBattleHandler handler) return;
 

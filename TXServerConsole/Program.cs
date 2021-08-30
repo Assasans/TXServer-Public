@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
-using MongoDB.Driver;
 using TXServer.Core;
 using TXServer.Core.Data.Database;
 using TXServer.Database;
+using TXServer.Database.Entity;
 using TXServer.Database.Provider;
-using TXServer.Library;
 
 namespace TXServerConsole
 {
@@ -29,7 +27,7 @@ namespace TXServerConsole
         static void Help()
         {
             Console.WriteLine("-r,   --run                  ip, port, maxPlayers  Start server.\n" +
-                              "-db,  --database                             name  Set database provider (available providers: memory, mongo).\n" +
+                              "-db,  --database                             name  Set database provider (available providers: memory, mysql).\n" +
                               "-nhm, --disable-height-maps                        Disable loading of height maps.\n" +
                               "-np,  --disable-ping                               Disable sending of ping messages.\n" +
                               "-t,   --enable-tracing                             Enable packet tracing (works only in debug builds).\n" +
@@ -83,7 +81,7 @@ namespace TXServerConsole
                         case "-database":
                             if (!CheckParamCount(pair.Key, 1, pair.Value.Length)) return;
                             string provider = pair.Value[0];
-                            if (provider is "memory" or "mongo")
+                            if (provider is "memory" or "mysql")
                                 settings.DatabaseProvider = provider;
                             else
                                 Console.WriteLine($"[Warning] Unknown database provider: {provider}");
@@ -150,10 +148,19 @@ namespace TXServerConsole
 
             IDatabase database = settings.DatabaseProvider switch
             {
-                "memory" => new InMemoryDatabase(),
-                "mongo" => new MongoDatabase(databaseConfig),
+                "memory" => new InMemoryDatabase(new InMemoryDatabaseConfig()
+                {
+                    Database = databaseConfig.Database
+                }),
+                "mysql" => new MySqlDatabase(databaseConfig),
                 _ => throw new InvalidOperationException($"Unknown database provider: {settings.DatabaseProvider}")
             };
+
+            // Comment this to not recreate database structure on start, deleting all data
+            // Uncomment if data model has been changed
+            // TODO(Assasans): EF Migrations should be used in production
+            (database as EntityFrameworkDatabase)?.Database.EnsureDeleted();
+            (database as EntityFrameworkDatabase)?.Database.EnsureCreated();
 
             Server.Instance = new Server
             {
@@ -162,18 +169,63 @@ namespace TXServerConsole
             };
             Server.Instance.Start();
 
-            // Manual registration:
-            // database.Players.DeleteOne(Builders<PlayerData>.Filter.Eq("UniqueId", 1234));
-            // var data = new PlayerData(1234);
-            // data.InitDefault();
-            // data.Username = "Assasans";
-            // data.PasswordHash = Convert.FromBase64String("10onDIlsKilLbl9y5sLMLd34PUk2Mkcv7s5I/be5dOM=");
-            // data.Email = "swimmin2@gmail.com";
-            // data.EmailVerified = true;
-            // data.CountryCode = "UA";
-            // data.EmailSubscribed = true;
-            // data.PremiumExpirationDate = DateTime.Now + TimeSpan.FromDays(1000);
-            // bool success = data.Save();
+            lock (database)
+            {
+                if (!database.BlockedUsernames.Any())
+                {
+                    database.BlockedUsernames.Add(BlockedUsername.Create("Godmode_ON", "Reserved"));
+                    database.BlockedUsernames.Add(BlockedUsername.Create("Assasans"));
+                }
+
+                if (!database.Invites.Any())
+                {
+                    string[] invites = new[]
+                    {
+                        "NoNick", "Tim203", "M8", "Kaveman", "Assasans",
+                        "Concodroid", "Corpserdefg",
+                        "SH42913",
+                        "Bodr", "C6OI", "Legendar-X", "Pchelik", "networkspecter", "DageLV", "F24_dark",
+                        "Black_Wolf", "NN77296", "MEWPASCO", "Doctor", "TowerCrusher", "Kurays", "AlveroHUN", "Inctrice", "NicolasIceberg", "Bilmez", "Kotovsky"
+                    };
+                    database.Invites.AddRange(invites.Select(Invite.Create));
+                }
+
+                // Manual registration
+                if (!database.Players.Any(player => player.UniqueId == 1234))
+                {
+                    var data = new PlayerData(1234);
+                    data.InitDefault();
+                    data.Username = "Assasans";
+                    data.PasswordHash = Convert.FromBase64String("10onDIlsKilLbl9y5sLMLd34PUk2Mkcv7s5I/be5dOM=");
+                    data.DiscordId = 738672017791909900;
+                    data.IsDiscordVerified = true;
+                    data.CountryCode = "UA";
+                    data.PremiumExpirationDate = DateTime.Now + TimeSpan.FromDays(1000);
+
+                    // data.Punishments.Add(Punishment.Create(PunishmentType.Mute, data, "Sussy baka", null, DateTimeOffset.Now + TimeSpan.FromDays(100), false));
+
+                    database.Players.Add(data);
+                }
+
+                if (!database.Players.Any(player => player.UniqueId == 4321))
+                {
+                    var data = new PlayerData(4321);
+                    data.InitDefault();
+                    data.Username = "RELATIONS_TEST_USER";
+                    data.PasswordHash = Convert.FromBase64String("9uCh4qxBlFqap/+KiqoM68EqO8yYGpKa1c+BCgkOEa4=");
+
+                    database.Players.Add(data);
+                }
+
+                database.Save();
+            }
+
+            // Stopwatch stopwatch = new Stopwatch();
+            // stopwatch.Start();
+            // var player = database.Players.IncludePlayer().First();
+            // stopwatch.Stop();
+            //
+            // Console.WriteLine($"Fetched all player properties in {stopwatch.ElapsedMilliseconds} ms");
         }
     }
 }

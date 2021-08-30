@@ -40,10 +40,10 @@ namespace TXServer.ECSSystem.GlobalEntities
                     _ => item.TemplateAccessor.Template
                 };
 
-                if (player.Data.Weapons.ContainsKey(id))
+                if (player.Data.Weapons.ContainsOwnedId(id))
                     item.Components.Add(new UserGroupComponent(player.User));
 
-                player.Data.Weapons.TryGetValue(id, out long xp);
+                player.Data.Weapons.TryGetById(id, weapon => weapon.Xp, out long xp);
                 item.Components.UnionWith(new Component[]
                 {
                     new ExperienceItemComponent(xp),

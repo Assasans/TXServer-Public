@@ -24,10 +24,10 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.TemplateAccessor.Template = new TankUserItemTemplate();
 
-                if (player.Data.Hulls.ContainsKey(id))
+                if (player.Data.Hulls.ContainsOwnedId(id))
                     item.Components.Add(new UserGroupComponent(player.User.EntityId));
 
-                player.Data.Hulls.TryGetValue(id, out long xp);
+                player.Data.Hulls.TryGetById(id, hull => hull.Xp, out long xp);
                 item.Components.UnionWith(new Component[]
                 {
                     new ExperienceItemComponent(xp),

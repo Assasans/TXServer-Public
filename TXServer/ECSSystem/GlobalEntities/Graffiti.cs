@@ -22,7 +22,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.TemplateAccessor.Template = new GraffitiUserItemTemplate();
 
-                if (player.Data.Graffities.Contains(id))
+                if (player.Data.Graffiti.ContainsId(id))
                     item.Components.Add(new UserGroupComponent(player.User));
             }
 

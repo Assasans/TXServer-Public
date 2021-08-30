@@ -10,7 +10,9 @@ namespace TXServer.ECSSystem.Events.User
     {
         public void Execute(Player player, Entity entity)
         {
-            player.Data.ChangeBlockedPlayer(UserId);
+            PlayerData remotePlayer = player.Server.Database.GetPlayerDataById(UserId);
+
+            player.Data.ChangeBlockedPlayer(remotePlayer);
         }
 
         public long UserId { get; set; }

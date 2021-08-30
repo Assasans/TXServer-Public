@@ -46,13 +46,13 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 long id = item.GetComponent<MarketItemGroupComponent>().Key;
 
-                if (player.Data.Modules.TryGetValue(id, out ModuleInfo moduleInfo) && moduleInfo.Level > 0)
-                    item.Components.Add(new UserGroupComponent(player.User.EntityId));
+                if (player.Data.Modules.TryGetById(id, out PlayerData.PlayerModule moduleInfo) && moduleInfo.Level > 0)
+                item.Components.Add(new UserGroupComponent(player.User.EntityId));
 
                 item.Components.Add(new ModuleGroupComponent(item.EntityId));
-                item.Components.Add(new ModuleUpgradeLevelComponent(player.Data.Modules.ContainsKey(id)
-                    ? player.Data.Modules[id].Level
-                    : 0));
+
+                player.Data.Modules.TryGetById(id, module => module.Level, out int level);
+                item.Components.Add(new ModuleUpgradeLevelComponent(level));
             }
 
             return items;

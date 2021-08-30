@@ -85,7 +85,7 @@ namespace TXServer.Core
             {
                 Player.ClientSession = new(new TemplateAccessor(new ClientSessionTemplate(), null),
                     new ClientSessionComponent(),
-                    new SessionSecurityPublicComponent($"{Convert.ToBase64String(ServerConnection.SessionRsaParameters.Modulus)}:{Convert.ToBase64String(ServerConnection.SessionRsaParameters.Exponent)}"));
+                    new SessionSecurityPublicComponent(Player.EncryptionComponent.PublicKey));
                 if (!((IPEndPoint)Socket.RemoteEndPoint).Address.Equals(IPAddress.Loopback))
                     Player.ClientSession.AddComponent(new InviteComponent(true, null));
 

@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 	{
         public void Execute(Player player, Entity entity)
         {
-            if (!player.Data.Admin) return;
+            if (!player.Data.IsAdmin) return;
 
             ChatMessageReceivedEvent.SystemMessageTarget(ModCommands.Mute(player, new []{Uid, Reason}), player);
         }

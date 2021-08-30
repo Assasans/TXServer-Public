@@ -8,7 +8,7 @@ namespace TXServer.ECSSystem.Events
     {
         public EmailOccupiedEvent(string email)
         {
-            this.Email = email;
+            Email = email;
         }
 
         public string Email { get; set; }

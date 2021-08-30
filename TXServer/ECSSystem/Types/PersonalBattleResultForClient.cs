@@ -144,13 +144,13 @@ namespace TXServer.ECSSystem.Types
 
         public int RankExp => (int) _player.Data.Experience;
         public int RankExpDelta => ScoreWithBonus;
-		public int WeaponExp => (int) _player.Data.Weapons[_player.CurrentPreset.Weapon.EntityId];
+		public int WeaponExp => (int) _player.Data.Weapons.GetById(_player.CurrentPreset.Weapon.EntityId).Xp;
         public int TankLevel => _player.GetUserItemLevel(_player.CurrentPreset.Weapon);
         public int WeaponLevel => _player.GetUserItemLevel(_player.CurrentPreset.Weapon);
         public int WeaponInitExp =>
             (int) WeaponUserItem.GetComponent<ExperienceItemComponent>().Experience - ScoreWithBonus;
 		public int WeaponFinalExp { get; set; }
-		public int TankExp => (int) _player.Data.Hulls[_player.CurrentPreset.Hull.EntityId];
+		public int TankExp => (int) _player.Data.Hulls.GetById(_player.CurrentPreset.Hull.EntityId).Xp;
 		public int TankInitExp => (int) TankUserItem.GetComponent<ExperienceItemComponent>().Experience -
                                   ScoreWithBonus;
 		public int TankFinalExp => TankUserItem.GetComponent<ExperienceToLevelUpItemComponent>()

@@ -120,7 +120,7 @@ namespace TXServer.Core.ChatCommands
                 {
                     case "admin":
                         condition = ChatCommandConditions.Admin;
-                        if (!player.Data.Admin)
+                        if (!player.Data.IsAdmin)
                             return ConditionErrors[condition];
                         break;
                     case "hackBattle":
@@ -131,7 +131,7 @@ namespace TXServer.Core.ChatCommands
                     case "target":
                         message = "Valid arguments for 'target' in HackBattle arguments: 'username', 'all', " +
                                   "'blue'/'red' (only in team battles), 'others'";
-                        if (player.Data.Admin)
+                        if (player.Data.IsAdmin)
                             message += "\nFor battles: 'all/custom/mm/others/this' or nothing";
                         return message;
                     case "tp":
@@ -618,7 +618,7 @@ namespace TXServer.Core.ChatCommands
         {
             if (args.Length <= 0 || args[0] == player.Data.Username)
                 return $"Network latency: {player.Connection.Ping} ms";
-            if (!player.Data.Admin)
+            if (!player.Data.IsAdmin)
                 return ConditionErrors[ChatCommandConditions.Admin];
 
             Player targetPlayer = Server.Instance.FindPlayerByUsername(args[0]);
@@ -787,7 +787,7 @@ namespace TXServer.Core.ChatCommands
                 }
 
                 // specific spawn point
-                if (player.Data.Admin && teleportPoint is null)
+                if (player.Data.IsAdmin && teleportPoint is null)
                 {
                     if (Int32.TryParse(args[0], out int number))
                     {
@@ -868,12 +868,12 @@ namespace TXServer.Core.ChatCommands
         {
             ChatCommandConditions conditions = 0;
 
-            if (player.Server.Settings.TestServer || player.Data.Admin)
+            if (player.Server.Settings.TestServer || player.Data.IsAdmin)
                 conditions |= ChatCommandConditions.TestServer;
 
-            if (player.Data.Admin)
+            if (player.Data.IsAdmin)
                 conditions |= ChatCommandConditions.Admin;
-            if (player.Data.Beta || player.Data.Admin)
+            if (player.Data.IsBeta || player.Data.IsAdmin)
                 conditions |= ChatCommandConditions.Tester;
             if (player.Data.IsPremium)
                 conditions |= ChatCommandConditions.Premium;
@@ -882,12 +882,12 @@ namespace TXServer.Core.ChatCommands
             {
                 conditions |= ChatCommandConditions.InBattle;
 
-                if (player.IsBattleOwner || player.Data.Admin)
+                if (player.IsBattleOwner || player.Data.IsAdmin)
                     conditions |= ChatCommandConditions.BattleOwner;
                 if (player.BattlePlayer.Battle.TypeHandler is CustomBattleHandler handler)
                     if (handler.HackBattle && player.IsBattleOwner || handler.HackBattle && handler.HackBattleDemocracy)
                         conditions |= ChatCommandConditions.HackBattle;
-                if (player.Data.Admin)
+                if (player.Data.IsAdmin)
                     conditions |= ChatCommandConditions.HackBattle;
 
                 if (player.IsInMatch)

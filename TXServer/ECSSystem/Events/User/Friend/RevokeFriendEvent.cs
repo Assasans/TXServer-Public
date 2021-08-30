@@ -9,14 +9,15 @@ namespace TXServer.ECSSystem.Events.User.Friend
     {
         public void Execute(Player player, Entity entity)
         {
-            player.Data.RemoveFriend(User.EntityId);
+            PlayerData targetPlayer = player.Server.Database.GetPlayerDataById(User.EntityId);
+
+            player.Data.RemoveFriend(targetPlayer);
             player.SendEvent(new OutgoingFriendRemovedEvent(User.EntityId), entity);
 
-            Player remotePlayer = Server.Instance.FindPlayerByUid(User.EntityId);
-            if (remotePlayer != null && remotePlayer.IsLoggedIn)
+            targetPlayer.RemoveFriend(player.Data);
+            if (targetPlayer.Player != null && targetPlayer.Player.IsLoggedIn)
             {
-                remotePlayer.Data.RemoveFriend(player.User.EntityId);
-                remotePlayer.SendEvent(new IncomingFriendRemovedEvent(player.User.EntityId), remotePlayer.User);
+                targetPlayer.Player.SendEvent(new IncomingFriendRemovedEvent(player.User.EntityId), targetPlayer.Player.User);
             }
         }
     }

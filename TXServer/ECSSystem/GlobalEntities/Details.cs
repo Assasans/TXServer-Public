@@ -24,7 +24,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.Components.Add(new UserGroupComponent(player.User));
 
-                int count = player.Data.Shards.ContainsKey(id) ? player.Data.Shards[id] : 0;
+                player.Data.Shards.TryGetById(id, shards => shards.Amount, out int count);
                 item.Components.Add(new UserItemCounterComponent(count));
             }
 

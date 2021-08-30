@@ -10,17 +10,17 @@ namespace TXServer.ECSSystem.Events.User.Friend
     {
         public void Execute(Player player, Entity entity)
         {
-            Player targetPlayer = Server.Instance.FindPlayerByUid(UserId);
-            
-            if (targetPlayer != null && targetPlayer.IsLoggedIn)
+            PlayerData targetPlayer = player.Server.Database.GetPlayerDataById(UserId);
+
+            targetPlayer.AddIncomingFriend(player.Data);
+            if (targetPlayer.Player != null && targetPlayer.Player.IsLoggedIn)
             {
-                targetPlayer.Data.AddIncomingFriend(player.User.EntityId);
-                targetPlayer.SendEvent(new IncomingFriendAddedEvent(player.User.EntityId), targetPlayer.User);
+                targetPlayer.Player.SendEvent(new IncomingFriendAddedEvent(player.User.EntityId), targetPlayer.Player.User);
             }
 
-            player.Data.AddOutgoingFriend(UserId);
+            player.Data.AddOutgoingFriend(targetPlayer);
         }
-        
+
         public long UserId { get; set; }
         public InteractionSource InteractionSource { get; set; }
         public long SourceId { get; set; }

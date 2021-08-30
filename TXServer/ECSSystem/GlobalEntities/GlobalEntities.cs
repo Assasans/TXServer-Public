@@ -81,6 +81,14 @@ namespace TXServer.ECSSystem.GlobalEntities
 
         private static volatile Entity[] _collectedGlobalEntities = Array.Empty<Entity>();
 
+        public static Entity[] GetGlobalEntities()
+        {
+            Entity[] entities = new Entity[_collectedGlobalEntities.Length];
+            _collectedGlobalEntities.CopyTo(entities, 0);
+
+            return entities;
+        }
+
         public static Entity[] GetEntities(Player player, Entity user)
         {
             Entity[] userEntities = GetUserEntities(player, user);
@@ -149,8 +157,9 @@ namespace TXServer.ECSSystem.GlobalEntities
 
         public static int GetUserItemLevel(Player player, Entity userItem)
         {
-            Dictionary<long, long> xpDictionary =
-                player.Data.Hulls.Concat(player.Data.Weapons).ToDictionary(x => x.Key, x => x.Value);
+            Dictionary<long, long> xpDictionary = player.Data.Hulls.Select(hull => (hull.EntityId, hull.Xp))
+                .Concat(player.Data.Weapons.Select(weapon => (weapon.EntityId, weapon.Xp)))
+                .ToDictionary(x => x.EntityId, x => x.Xp);
             xpDictionary.TryGetValue(userItem.EntityId, out long xp);
             return xp is 0 ? 1 : GetItemLevelByXp(xp);
         }
@@ -171,42 +180,50 @@ namespace TXServer.ECSSystem.GlobalEntities
             switch (marketItem.TemplateAccessor.Template)
             {
                 case AvatarMarketItemTemplate:
-                    player.Data.Avatars.Add(marketItem.EntityId);
+                    player.Data.Avatars.Add(PlayerData.PlayerAvatar.Create(player.Data, marketItem.EntityId));
                     break;
                 case ChildGraffitiMarketItemTemplate or GraffitiMarketItemTemplate:
-                    player.Data.Graffities.Add(marketItem.EntityId);
+                    player.Data.Graffiti.Add(PlayerData.PlayerGraffiti.Create(player.Data, marketItem.EntityId));
                     break;
                 case ContainerPackPriceMarketItemTemplate or GameplayChestMarketItemTemplate or
                     TutorialGameplayChestMarketItemTemplate or DonutChestMarketItemTemplate:
-                    player.Data.Containers.TryGetValue(marketItem.EntityId, out int oldAmount);
-                    player.Data.Containers[marketItem.EntityId] = oldAmount + amount;
+                    if (!player.Data.Containers.TryGetById(marketItem.EntityId, out PlayerData.PlayerContainer container))
+                    {
+                        container = PlayerData.PlayerContainer.Create(player.Data, marketItem.EntityId);
+                        player.Data.Containers.Add(container);
+                    }
+                    container.Count += amount;
                     break;
                 case CrystalMarketItemTemplate:
                     player.Data.Crystals += amount;
                     break;
                 case DetailMarketItemTemplate:
-                    if (player.Data.Shards.ContainsKey(marketItem.EntityId))
-                        player.Data.Shards[marketItem.EntityId] += amount;
+                    if (player.Data.Shards.ContainsId(marketItem.EntityId))
+                        player.Data.Shards.GetById(marketItem.EntityId).Amount += amount;
                     else
-                        player.Data.Shards[marketItem.EntityId] = amount;
+                        player.Data.Shards.Add(PlayerData.PlayerContainerShards.Create(player.Data, marketItem.EntityId, amount));
                     break;
                 case GoldBonusMarketItemTemplate:
                     player.Data.GoldBonus += amount;
                     updateItemCounter = false;
                     break;
                 case HullSkinMarketItemTemplate:
-                    player.Data.HullSkins.Add(marketItem.EntityId);
+                    long hullId = marketItem.GetComponent<ParentGroupComponent>().Key;
+                    if (!player.Data.Hulls.GetById(hullId).Skins.ContainsId(marketItem.EntityId))
+                    {
+                        player.Data.Hulls.GetById(hullId).Skins.Add(PlayerData.PlayerHullSkin.Create(player.Data, hullId, marketItem.EntityId));
+                    }
                     break;
                 case ModuleCardMarketItemTemplate:
-                    long id = marketItem.GetComponent<ParentGroupComponent>().Key;
+                    long moduleId = marketItem.GetComponent<ParentGroupComponent>().Key;
                     userItem = player.EntityList.Single(e =>
                         MarketToUserTemplate[marketItem.TemplateAccessor.Template.GetType()] ==
-                        e.TemplateAccessor.Template.GetType() && e.GetComponent<ParentGroupComponent>().Key == id);
+                        e.TemplateAccessor.Template.GetType() && e.GetComponent<ParentGroupComponent>().Key == moduleId);
 
-                    if (!player.Data.Modules.TryGetValue(id, out ModuleInfo moduleInfo))
+                    if (!player.Data.Modules.TryGetById(moduleId, out PlayerData.PlayerModule moduleInfo))
                     {
-                        moduleInfo = new ModuleInfo(0, 0);
-                        player.Data.Modules[id] = moduleInfo;
+                        moduleInfo = PlayerData.PlayerModule.Create(player.Data, moduleId);
+                        player.Data.Modules.Add(moduleInfo);
                     }
                     moduleInfo.Cards += amount;
                     break;
@@ -227,26 +244,46 @@ namespace TXServer.ECSSystem.GlobalEntities
                     player.ShareEntities(userItem);
                     break;
                 case ShellMarketItemTemplate:
-                    player.Data.Shells.Add(marketItem.EntityId);
+                {
+                    long weaponId = marketItem.GetComponent<ParentGroupComponent>().Key;
+                    if (!player.Data.Weapons.GetById(weaponId).ShellSkins.ContainsId(marketItem.EntityId))
+                    {
+                        player.Data.Weapons.GetById(weaponId).ShellSkins.Add(PlayerData.PlayerWeaponShellSkin.Create(player.Data, weaponId, marketItem.EntityId));
+                    }
                     break;
+                }
                 case TankPaintMarketItemTemplate:
-                    player.Data.Paints.Add(marketItem.EntityId);
+                    player.Data.Paints.Add(PlayerData.PlayerPaint.Create(player.Data, marketItem.EntityId));
                     break;
                 case TankMarketItemTemplate:
-                    player.Data.Hulls.Add(marketItem.EntityId, 0);
+                    if (!player.Data.Hulls.ContainsId(marketItem.EntityId))
+                        player.Data.Hulls.Add(PlayerData.PlayerHull.Create(player.Data, marketItem.EntityId, true));
+                    PlayerData.PlayerHull hull = player.Data.Hulls.GetById(marketItem.EntityId);
+                    if (!hull.IsOwned) hull.IsOwned = true;
+
                     if (!player.Data.OwnsMarketItem(Hulls.DefaultSkins[marketItem]))
                         player.SaveNewMarketItem(Hulls.DefaultSkins[marketItem]);
                     break;
                 case { } n when WeaponTemplates.Contains(n.GetType()):
-                    player.Data.Weapons.Add(marketItem.EntityId, 0);
+                    if (!player.Data.Weapons.ContainsId(marketItem.EntityId))
+                        player.Data.Weapons.Add(PlayerData.PlayerWeapon.Create(player.Data, marketItem.EntityId, true));
+                    PlayerData.PlayerWeapon weapon = player.Data.Weapons.GetById(marketItem.EntityId);
+                    if (!weapon.IsOwned) weapon.IsOwned = true;
+
                     if (!player.Data.OwnsMarketItem(Weapons.DefaultSkins[marketItem]))
                         player.SaveNewMarketItem(Weapons.DefaultSkins[marketItem]);
                     break;
                 case WeaponSkinMarketItemTemplate:
-                    player.Data.WeaponSkins.Add(marketItem.EntityId);
+                {
+                    long weaponId = marketItem.GetComponent<ParentGroupComponent>().Key;
+                    if (!player.Data.Weapons.GetById(weaponId).Skins.ContainsId(marketItem.EntityId))
+                    {
+                        player.Data.Weapons.GetById(weaponId).Skins.Add(PlayerData.PlayerWeaponSkin.Create(player.Data, weaponId, marketItem.EntityId));
+                    }
                     break;
+                }
                 case WeaponPaintMarketItemTemplate:
-                    player.Data.Covers.Add(marketItem.EntityId);
+                    player.Data.Covers.Add(PlayerData.PlayerCover.Create(player.Data, marketItem.EntityId));
                     break;
                 case XCrystalMarketItemTemplate:
                     player.Data.XCrystals += amount;

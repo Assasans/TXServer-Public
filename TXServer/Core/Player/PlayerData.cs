@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.Options;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.ChatCommands;
 using TXServer.Core.Configuration;
@@ -20,38 +22,221 @@ using TXServer.ECSSystem.Events.DailyBonus;
 using TXServer.ECSSystem.Events.Item;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents;
+using GlobalEntities = TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core
 {
+    // public class Preset
+    // {
+    //     [BsonIgnore] public PlayerData PlayerData { get; }
+    //
+    //     [BsonId] public Entity Entity { get; }
+    //
+    //     public PresetNameComponent NameComponent
+    //     {
+    //         get => Entity.GetComponent<PresetNameComponent>() ?? _nameComponent;
+    //         set
+    //         {
+    //             SetAndRaiseIfChanged(nameof(NameComponent), ref _nameComponent, value);
+    //
+    //             if (Entity == null) return;
+    //             Entity.AddOrChangeComponent(value);
+    //         }
+    //     }
+    //
+    //     public PresetEquipmentComponent EquipmentComponent
+    //     {
+    //         get => Entity.GetComponent<PresetEquipmentComponent>() ?? _equipmentComponent;
+    //         set
+    //         {
+    //             SetAndRaiseIfChanged(nameof(EquipmentComponent), ref _equipmentComponent, value);
+    //
+    //             if (Entity == null) return;
+    //             Entity.AddOrChangeComponent(value);
+    //         }
+    //     }
+    //
+    //     public Preset(PlayerData playerData, Entity entity)
+    //     {
+    //         PlayerData = playerData;
+    //         Entity = entity;
+    //     }
+    //
+    //     public void InitDefault()
+    //     {
+    //         NameComponent = new PresetNameComponent(this, "Unnamed preset");
+    //         EquipmentComponent = new PresetEquipmentComponent(this);
+    //     }
+    //
+    //     public bool Save()
+    //     {
+    //         return PlayerData.Save();
+    //     }
+    //
+    //     private void SetAndRaiseIfChanged<T>(string name, ref T backingField, T value)
+    //     {
+    //         backingField = value;
+    //         bool success = PlayerData.Save();
+    //
+    //         Logger.Debug($"[Preset/{Entity.EntityId}] Update property {name}: {value} [success: {success}]");
+    //     }
+    //
+    //     private void RaiseChanged<T>(string name, T value)
+    //     {
+    //         bool success = PlayerData.Save();
+    //
+    //         Logger.Debug($"[Preset/{Entity.EntityId}] Update property {name}: {value} [success: {success}]");
+    //     }
+    //
+    //     private void RemountEquipment()
+    //     {
+    //         PresetEquipmentComponent component = Entity.GetComponent<PresetEquipmentComponent>();
+    //         if (component != null) Entity.RemoveComponent<PresetEquipmentComponent>();
+    //         Entity.AddComponent(component);
+    //     }
+    //
+    //     private PresetNameComponent _nameComponent;
+    //     private PresetEquipmentComponent _equipmentComponent;
+    // }
+
+    public static class DatabaseEntityExtensions
+    {
+        public static TEntity GetById<TEntity>(this IEnumerable<TEntity> entities, long entityId) where TEntity : PlayerData.IEntity
+        {
+            return entities.SingleOrDefault(entity => entity.EntityId == entityId);
+        }
+
+        public static bool ContainsId<TEntity>(this IEnumerable<TEntity> entities, long entityId) where TEntity : PlayerData.IEntity
+        {
+            return entities.Any(entity => entity.EntityId == entityId);
+        }
+
+        public static IEnumerable<long> ToIds<TEntity>(this IEnumerable<TEntity> entities) where TEntity : PlayerData.IEntity
+        {
+            return entities.Select(entity => entity.EntityId);
+        }
+
+        public static bool TryGetById<TEntity>(this IEnumerable<TEntity> entities, long entityId, [MaybeNullWhen(false)] out TEntity property)
+            where TEntity : PlayerData.IEntity
+        {
+            TEntity entity = entities.GetById(entityId);
+            if (entity == null)
+            {
+                property = default;
+                return false;
+            }
+
+            property = entity;
+            return true;
+        }
+
+        public static bool TryGetById<TEntity, TProperty>(this IEnumerable<TEntity> entities, long entityId, Func<TEntity, TProperty> resolver, [MaybeNullWhen(false)] out TProperty property)
+            where TEntity : PlayerData.IEntity
+        {
+            TEntity entity = entities.GetById(entityId);
+            if (entity == null)
+            {
+                property = default;
+                return false;
+            }
+
+            property = resolver(entity);
+            return true;
+        }
+    }
+
+    public static class PlayerEquipmentExtensions
+    {
+        public static TEntity GetOwnedById<TEntity>(this IEnumerable<TEntity> entities, long entityId) where TEntity : PlayerData.IEntity, PlayerData.IPlayerEquipment
+        {
+            return entities.SingleOrDefault(entity => entity.EntityId == entityId && entity.IsOwned);
+        }
+
+        public static bool ContainsOwnedId<TEntity>(this IEnumerable<TEntity> entities, long entityId) where TEntity : PlayerData.IEntity, PlayerData.IPlayerEquipment
+        {
+            return entities.Any(entity => entity.EntityId == entityId && entity.IsOwned);
+        }
+
+        public static IEnumerable<long> ToOwnedIds<TEntity>(this IEnumerable<TEntity> entities) where TEntity : PlayerData.IEntity, PlayerData.IPlayerEquipment
+        {
+            return entities.Where(entity => entity.IsOwned).Select(entity => entity.EntityId);
+        }
+    }
+
+    public static class PlayerRelationExtensions
+    {
+        public static TEntity GetById<TEntity>(this IEnumerable<TEntity> entities, long relationId, long targetId, PlayerData.PlayerRelation.RelationType? type = null) where TEntity : PlayerData.PlayerRelation
+        {
+            return entities.SingleOrDefault(entity =>
+            {
+                if (entity.RelationId != relationId || entity.TargetId != targetId) return false;
+                if (type != null && entity.Type != type) return false;
+                return true;
+            });
+        }
+
+        public static List<TEntity> GetAllById<TEntity>(this IEnumerable<TEntity> entities, long targetId, PlayerData.PlayerRelation.RelationType? type = null) where TEntity : PlayerData.PlayerRelation
+        {
+            return entities.Where(entity =>
+            {
+                if (entity.TargetId != targetId) return false;
+                if (type != null && entity.Type != type) return false;
+                return true;
+            }).ToList();
+        }
+
+        public static List<TEntity> FilterType<TEntity>(this IEnumerable<TEntity> entities, PlayerData.PlayerRelation.RelationType type) where TEntity : PlayerData.PlayerRelation
+        {
+            return entities.Where(entity => entity.Type == type).ToList();
+        }
+
+        public static bool ContainsId<TEntity>(this IEnumerable<TEntity> entities, long relationId, long targetId, PlayerData.PlayerRelation.RelationType? type = null) where TEntity : PlayerData.PlayerRelation
+        {
+            return entities.Any(entity =>
+            {
+                if (entity.RelationId != relationId || entity.TargetId != targetId) return false;
+                if (type != null && entity.Type != type) return false;
+                return true;
+            });
+        }
+
+        public static bool ContainsId<TEntity>(this IEnumerable<TEntity> entities, long targetId, PlayerData.PlayerRelation.RelationType? type = null) where TEntity : PlayerData.PlayerRelation
+        {
+            return entities.Any(entity =>
+            {
+                if (entity.TargetId != targetId) return false;
+                if (type != null && entity.Type != type) return false;
+                return true;
+            });
+        }
+
+        public static void RemoveType<TEntity>(this IList<TEntity> entities, long targetId, PlayerData.PlayerRelation.RelationType type) where TEntity : PlayerData.PlayerRelation
+        {
+            foreach (TEntity entity in entities.ToArray().Where(entity => entity.TargetId == targetId && entity.Type == type))
+            {
+                entities.Remove(entity);
+            }
+        }
+
+        public static bool ContainsType<TEntity>(this IEnumerable<TEntity> entities, PlayerData.PlayerRelation.RelationType type) where TEntity : PlayerData.PlayerRelation
+        {
+            return entities.Any(entity => entity.Type == type);
+        }
+    }
 
     public class PlayerData : ICloneable<PlayerData>
     {
-        private void SetAndRaiseIfChanged<T>(string name, ref T backingField, T value)
-        {
-            backingField = value;
-            bool success = Server.Instance.Database.UpdatePlayerData(this, name, value);
-
-            Logger.Debug($"[User/{Username}] Update property {name}: {value} [success: {success}]");
-        }
-
-        private void RaiseChanged<T>(string name, T value)
-        {
-            bool success = Server.Instance.Database.UpdatePlayerData(this, name, value);
-
-            Logger.Debug($"[User/{Username}] Update property {name}: {value} [success: {success}]");
-        }
-
         public void InitDefault()
         {
-            Email = "none";
-            EmailSubscribed = false;
+            DiscordId = null;
+            IsDiscordVerified = false;
             Username = "Tanker";
             PasswordHash = Array.Empty<byte>();
             RememberMe = true;
             CountryCode = "EN";
-            Admin = true;
-            Beta = true;
-            Mod = true;
+            IsAdmin = true;
+            IsBeta = true;
+            IsModerator = true;
 
             CheatSusActions = 0;
 
@@ -61,7 +246,9 @@ namespace TXServer.Core
             GoldBonus = 5;
             PremiumExpirationDate = DateTime.MinValue;
 
-            Fraction = null;
+            Presets = new ObservableList<Entity>();
+
+            FractionIndex = null;
             FractionUserScore = 0;
 
             DailyBonusCycle = 0;
@@ -74,43 +261,93 @@ namespace TXServer.Core
             RecruitRewardDay = 0;
 
             LastSeasonBattles = 0;
-            LastSeasonLeagueId = Leagues.GlobalItems.Training.EntityId;
             LastSeasonLeagueIndex = 0;
             LastSeasonPlace = 1;
             LastSeasonLeaguePlace = 1;
             SeasonsReputation = new ObservableDictionary<int, int> { { Server.Instance.ServerData.SeasonNumber, 100 } };
 
-            League = Leagues.GlobalItems.Training;
             LeagueChestScore = 0;
             LeagueIndex = 0;
             Reputation = 100;
 
-            AcceptedFriendIds = new ObservableList<long>();
-            IncomingFriendIds = new ObservableList<long>();
-            OutgoingFriendIds = new ObservableList<long>();
-            BlockedPlayerIds = new ObservableList<long>();
-            ReportedPlayerIds = new ObservableList<long>();
+            // AcceptedFriendIds = new ObservableList<long>();
+            // IncomingFriendIds = new ObservableList<long>();
+            // OutgoingFriendIds = new ObservableList<long>();
+            // BlockedPlayerIds = new ObservableList<long>();
+            // ReportedPlayerIds = new ObservableList<long>();
 
-            Punishments = new ObservableList<Punishment>();
+            Punishments = new List<Punishment>();
             CompletedTutorialIds = new ObservableList<ulong>();
 
-            Avatar = 6224;
-            Avatars = new ObservableList<long> { 6224 };
-            Containers = new ObservableDictionary<long, int>();
-            Covers = new ObservableList<long> { -172249613 };
-            Graffities = new ObservableList<long> { 1001404575 };
-            Hulls = new ObservableDictionary<long, long> { { 537781597, 0 } };
-            HullSkins = new ObservableList<long> { 1589207088 };
-            Modules = new ObservableDictionary<long, ModuleInfo>();
-            Paints = new ObservableList<long> { -20020438 };
-            Shards = new ObservableDictionary<long, int>();
-            Shells = new ObservableList<long>
+            Dictionary<Entity, Entity> defaultHulls = new Dictionary<Entity, Entity>();
+            foreach ((Entity weapon, Entity skin) in GlobalEntities.Hulls.DefaultSkins)
             {
-                -966935184, 807172229, 357929046, 48235025, 1067800943, 1322064226, 70311513,
-                530945311, -1408603862, 139800007, 366763244
+                defaultHulls.Add(weapon, skin);
+            }
+
+            Dictionary<Entity, (Entity Skin, Entity Shell)> defaultWeapons = new Dictionary<Entity, (Entity, Entity)>();
+            foreach ((Entity weapon, Entity skin) in GlobalEntities.Weapons.DefaultSkins)
+            {
+                Entity shell = Shells.DefaultShells[weapon];
+
+                defaultWeapons.Add(weapon, (skin, shell));
+            }
+
+            Avatar = 6224;
+            Avatars = new List<PlayerAvatar> { PlayerAvatar.Create(this, 6224) };
+            // Containers = new ObservableDictionary<long, int>();
+            // Covers = new ObservableList<long> { -172249613 };
+            Covers = new List<PlayerCover> { PlayerCover.Create(this, -172249613) };
+            Graffiti = new List<PlayerGraffiti> { PlayerGraffiti.Create(this, 1001404575) };
+            Hulls = new List<PlayerHull>
+            {
+                PlayerHull.Create(
+                    this,
+                    GlobalEntities.Hulls.GlobalItems.Hunter.EntityId,
+                    true,
+                    skins: new List<PlayerHullSkin> { PlayerHullSkin.Create(this, GlobalEntities.Hulls.GlobalItems.Hunter.EntityId, defaultHulls[GlobalEntities.Hulls.GlobalItems.Hunter].EntityId) }
+                )
             };
-            Weapons = new ObservableDictionary<long, long> { { -2005747272, 0 } };
-            WeaponSkins = new ObservableList<long> { 2008385753 };
+            foreach ((Entity hull, Entity skin) in defaultHulls)
+            {
+                if (Hulls.ContainsId(hull.EntityId)) continue;
+                Hulls.Add(PlayerHull.Create(
+                    this,
+                    hull.EntityId,
+                    false,
+                    skins: new List<PlayerHullSkin> { PlayerHullSkin.Create(this, hull.EntityId, skin.EntityId) }
+                ));
+            }
+
+            Modules = new List<PlayerModule>();
+            Paints = new List<PlayerPaint> { PlayerPaint.Create(this, -20020438) };
+            Shards = new List<PlayerContainerShards>();
+            // Shells = new List<long>
+            // {
+            //     -966935184, 807172229, 357929046, 48235025, 1067800943, 1322064226, 70311513,
+            //     530945311, -1408603862, 139800007, 366763244
+            // };
+            Weapons = new List<PlayerWeapon>
+            {
+                PlayerWeapon.Create(
+                    this,
+                    GlobalEntities.Weapons.GlobalItems.Smoky.EntityId,
+                    true,
+                    skins: new List<PlayerWeaponSkin> { PlayerWeaponSkin.Create(this, GlobalEntities.Weapons.GlobalItems.Smoky.EntityId, defaultWeapons[GlobalEntities.Weapons.GlobalItems.Smoky].Skin.EntityId) },
+                    shellSkins: new List<PlayerWeaponShellSkin> { PlayerWeaponShellSkin.Create(this, GlobalEntities.Weapons.GlobalItems.Smoky.EntityId, defaultWeapons[GlobalEntities.Weapons.GlobalItems.Smoky].Shell.EntityId) }
+                )
+            };
+            foreach ((Entity weapon, (Entity skin, Entity shell)) in defaultWeapons)
+            {
+                if (Weapons.ContainsId(weapon.EntityId)) continue;
+                Weapons.Add(PlayerWeapon.Create(
+                    this,
+                    weapon.EntityId,
+                    false,
+                    skins: new List<PlayerWeaponSkin> { PlayerWeaponSkin.Create(this, weapon.EntityId, skin.EntityId) },
+                    shellSkins: new List<PlayerWeaponShellSkin> { PlayerWeaponShellSkin.Create(this, weapon.EntityId, shell.EntityId) }
+                ));
+            }
 
             ReceivedFractionsCompetitionReward = false;
             ReceivedReleaseReward = false;
@@ -118,97 +355,135 @@ namespace TXServer.Core
             RewardedLeagues = new ObservableList<long>();
         }
 
-        [BsonConstructor]
-        public PlayerData(long uniqueId)
+        public PlayerData()
+        {
+        }
+
+        public PlayerData(long uniqueId) : this()
         {
             UniqueId = uniqueId;
         }
 
-        [BsonIgnore] public Player Player { get; set; }
+        [NotMapped] public Player Player { get; set; }
 
         public string Username
         {
             get => _username;
             set
             {
-                SetAndRaiseIfChanged(nameof(Username), ref _username, value);
+                _username = value;
 
                 if (Player?.User is null) return;
                 Player?.User.ChangeComponent(new UserUidComponent(value));
             }
         }
-        [BsonId] public long UniqueId
+        [Key] public long UniqueId { get; set; }
+
+        public long? DiscordId
         {
-            get => _uniqueId;
-            set => SetAndRaiseIfChanged(nameof(UniqueId), ref _uniqueId, value);
+            get => _discordId;
+            set
+            {
+                _discordId = value;
+
+                if (Player?.User is null) return;
+                if (IsDiscordVerified)
+                    Player.User.AddOrChangeComponent(new ConfirmedUserEmailComponent(DiscordTag, false));
+                else
+                    Player.User.AddOrChangeComponent(new UnconfirmedUserEmailComponent(DiscordTag));
+            }
         }
+
+        public string DiscordTag => $"{DiscordId}@discord.account";
+
+        public bool IsDiscordVerified
+        {
+            get => _isDiscordVerified;
+            set
+            {
+                bool wasVerified = _isDiscordVerified;
+
+                _isDiscordVerified = value;
+
+                if (Player?.User is null) return;
+                switch (value)
+                {
+                    case true when !wasVerified:
+                        Player.User.RemoveComponent<UnconfirmedUserEmailComponent>();
+                        Player.User.AddOrChangeComponent(new ConfirmedUserEmailComponent(DiscordTag, false));
+                        break;
+                    case false when wasVerified:
+                        Player.User.RemoveComponent<ConfirmedUserEmailComponent>();
+                        Player.User.AddOrChangeComponent(new UnconfirmedUserEmailComponent(DiscordTag));
+                        break;
+                }
+            }
+        }
+
+        [Obsolete("Email replaced with Discord account linking")]
         public string Email
         {
             get => _email;
             set
             {
-                SetAndRaiseIfChanged(nameof(Email), ref _email, value);
+                _email = value;
 
                 if (Player?.User is null) return;
                 Player.User.AddOrChangeComponent(new ConfirmedUserEmailComponent(value, false));
             }
         }
-        public bool EmailVerified
-        {
-            get => _emailVerified;
-            set => SetAndRaiseIfChanged(nameof(EmailVerified), ref _emailVerified, value);
-        }
+
+        [Obsolete("Email replaced with Discord account linking")]
+        public bool EmailVerified { get; set; }
+
+        [Obsolete("Email replaced with Discord account linking")]
         public bool EmailSubscribed
         {
             get => _emailSubscribed;
             set
             {
-                SetAndRaiseIfChanged(nameof(EmailSubscribed), ref _emailSubscribed, value);
+                _emailSubscribed = value;
 
                 if (Player?.User is null) return;
                 Player.User.AddOrChangeComponent(new ConfirmedUserEmailComponent(Email, value));
             }
         }
 
-        public byte[] PasswordHash
-        {
-            get => _passwordHash;
-            set => SetAndRaiseIfChanged(nameof(PasswordHash), ref _passwordHash, value);
-        }
-        public string HardwareId { get => _hardwareId; set => SetAndRaiseIfChanged(nameof(HardwareId), ref _hardwareId, value); }
-        public byte[] AutoLoginToken { get => _autoLoginToken; set => SetAndRaiseIfChanged(nameof(AutoLoginToken), ref _autoLoginToken, value); }
+        public byte[] PasswordHash { get; set; }
+        public string HardwareId { get; set; }
+        public byte[] AutoLoginToken { get; set; }
 
         public bool RememberMe
         {
             get => _rememberMe;
             set
             {
-                SetAndRaiseIfChanged(nameof(RememberMe), ref _rememberMe, value);
+                _rememberMe = value;
                 if (!value) AutoLoginToken = null;
             }
         }
 
-        public int CheatSusActions { get => _cheatSusActions; set => SetAndRaiseIfChanged(nameof(CheatSusActions), ref _cheatSusActions, value); }
+        public int CheatSusActions { get; set; }
 
         public string CountryCode
         {
             get => _countryCode;
             set
             {
-                SetAndRaiseIfChanged(nameof(CountryCode), ref _countryCode, value);
+                _countryCode = value;
 
                 if (Player?.User is null) return;
                 Player.User.ChangeComponent(new UserCountryComponent(value));
             }
         }
 
-        public bool Admin
+        public bool IsAdmin
         {
-            get => _admin;
+            get => _isAdmin;
             set
             {
-                bool wasAdmin = _admin;
-                SetAndRaiseIfChanged(nameof(Admin), ref _admin, value);
+                bool wasAdmin = _isAdmin;
+                _isAdmin = value;
 
                 if (Player?.User is null) return;
                 switch (value)
@@ -222,13 +497,13 @@ namespace TXServer.Core
                 }
             }
         }
-        public bool Beta
+        public bool IsBeta
         {
-            get => _beta;
+            get => _isBeta;
             set
             {
-                bool wasBeta = _beta;
-                SetAndRaiseIfChanged(nameof(Beta), ref _beta, value);
+                bool wasBeta = _isBeta;
+                _isBeta = value;
 
                 if (Player?.User is null) return;
                 switch (value)
@@ -242,14 +517,14 @@ namespace TXServer.Core
                 }
             }
         }
-        public bool Mod { get => _mod; set => SetAndRaiseIfChanged(nameof(Mod), ref _mod, value); }
+        public bool IsModerator { get; set; }
 
         public long Crystals
         {
             get => _crystals;
             set
             {
-                SetAndRaiseIfChanged(nameof(Crystals), ref _crystals, value);
+                _crystals = value;
 
                 if (Player?.User is null) return;
                 Player.User.ChangeComponent(new UserMoneyComponent(value));
@@ -260,7 +535,7 @@ namespace TXServer.Core
             get => _xCrystals;
             set
             {
-                SetAndRaiseIfChanged(nameof(XCrystals), ref _xCrystals, value);
+                _xCrystals = value;
 
                 if (Player?.User is null) return;
                 Player.User.ChangeComponent(new UserXCrystalsComponent(value));
@@ -273,7 +548,7 @@ namespace TXServer.Core
             get => _experience;
             set
             {
-                SetAndRaiseIfChanged(nameof(Experience), ref _experience, value);
+                _experience = value;
 
                 if (Player?.User is null) return;
                 Player.User.ChangeComponent(new UserExperienceComponent(value));
@@ -285,7 +560,7 @@ namespace TXServer.Core
             get => _goldBonus;
             set
             {
-                SetAndRaiseIfChanged(nameof(GoldBonus), ref _goldBonus, value);
+                _goldBonus = value;
 
                 if (Player?.User is null) return;
                 Player.EntityList.SingleOrDefault(e => e.TemplateAccessor.Template is GoldBonusUserItemTemplate)
@@ -293,14 +568,15 @@ namespace TXServer.Core
             }
         }
 
-        [BsonIgnore] public Entity Fraction { get; set; }
+        public Entity Fraction => FractionIndex != null ? Fractions.ByIndex[FractionIndex.Value] : null;
+        public int? FractionIndex { get; set; }
 
         public long FractionUserScore
         {
             get => _fractionUserScore;
             set
             {
-                SetAndRaiseIfChanged(nameof(FractionUserScore), ref _fractionUserScore, value);
+                _fractionUserScore = value;
 
                 if (Player?.User is null) return;
                 Player.User.ChangeComponent<FractionUserScoreComponent>(component => component.TotalEarnedPoints = value);
@@ -312,7 +588,7 @@ namespace TXServer.Core
             get => _dailyBonusCycle;
             set
             {
-                SetAndRaiseIfChanged(nameof(DailyBonusCycle), ref _dailyBonusCycle, value);
+                _dailyBonusCycle = value;
 
                 if (Player?.User is null) return;
                 Player.User.ChangeComponent<UserDailyBonusCycleComponent>(component => component.CycleNumber = value);
@@ -324,7 +600,7 @@ namespace TXServer.Core
             get => _dailyBonusNextReceiveDate;
             set
             {
-                SetAndRaiseIfChanged(nameof(DailyBonusNextReceiveDate), ref _dailyBonusNextReceiveDate, value);
+                _dailyBonusNextReceiveDate = value;
 
                 if (Player?.User is null) return;
                 Player.User.ChangeComponent<UserDailyBonusNextReceivingDateComponent>(component =>
@@ -334,20 +610,13 @@ namespace TXServer.Core
                 });
             }
         }
-        public ObservableCollection<long> DailyBonusReceivedRewards
-        {
-            get => _dailyBonusReceivedRewards;
-            set
-            {
-                SetAndRaiseIfChanged(nameof(DailyBonusReceivedRewards), ref _dailyBonusReceivedRewards, value);
-            }
-        }
+        [NotMapped /* TODO */] public ObservableCollection<long> DailyBonusReceivedRewards { get; set; } = new ObservableCollection<long>();
         public int DailyBonusZone
         {
             get => _dailyBonusZone;
             set
             {
-                SetAndRaiseIfChanged(nameof(DailyBonusZone), ref _dailyBonusZone, value);
+                _dailyBonusZone = value;
 
                 if (Player?.User is null) return;
                 Player.User.ChangeComponent<UserDailyBonusZoneComponent>(component => component.ZoneNumber = value);
@@ -355,38 +624,18 @@ namespace TXServer.Core
             }
         }
 
-        public DateTimeOffset RegistrationDate
-        {
-            get => _registrationDate;
-            set => SetAndRaiseIfChanged(nameof(RegistrationDate), ref _registrationDate, value);
-        }
-        public DateTimeOffset? LastRecruitReward
-        {
-            get => _lastRecruitReward;
-            set => SetAndRaiseIfChanged(nameof(LastRecruitReward), ref _lastRecruitReward, value);
-        }
-        public int RecruitRewardDay
-        {
-            get => _recruitRewardDay;
-            set => SetAndRaiseIfChanged(nameof(RecruitRewardDay), ref _recruitRewardDay, value);
-        }
+        public DateTimeOffset RegistrationDate { get; set; }
+        public DateTimeOffset? LastRecruitReward { get; set; }
+        public int RecruitRewardDay { get; set; }
 
-        [BsonIgnore] public Entity League { get; protected set; }
-        public int LeagueIndex
-        {
-            get => _leagueIndex;
-            protected set
-            {
-                SetAndRaiseIfChanged(nameof(LeagueIndex), ref _leagueIndex, value);
-                League = Leagues.ByIndex[value];
-            }
-        }
+        public Entity League => Leagues.ByIndex[LeagueIndex];
+        public int LeagueIndex { get; protected set; }
         public int Reputation
         {
             get => _reputation;
             set
             {
-                SetAndRaiseIfChanged(nameof(Reputation), ref _reputation, value);
+                _reputation = value;
 
                 SeasonsReputation ??= new ObservableDictionary<int, int>();
                 SeasonsReputation[Server.Instance.ServerData.SeasonNumber] = value;
@@ -401,75 +650,119 @@ namespace TXServer.Core
             get => _leagueChestScore;
             set
             {
-                SetAndRaiseIfChanged(nameof(LeagueChestScore), ref _leagueChestScore, value);
+                _leagueChestScore = value;
 
                 if (Player?.User is null) return;
                 Player.User.ChangeComponent<GameplayChestScoreComponent>(component => component.Current = value);
             }
         }
 
-        public long LastSeasonBattles
-        {
-            get => _lastSeasonBattles;
-            set => SetAndRaiseIfChanged(nameof(LastSeasonBattles), ref _lastSeasonBattles, value);
-        }
-        public long LastSeasonLeagueId
-        {
-            get => _lastSeasonLeagueId;
-            set => SetAndRaiseIfChanged(nameof(LastSeasonLeagueId), ref _lastSeasonLeagueId, value);
-        }
-        public int LastSeasonLeagueIndex
-        {
-            get => _lastSeasonLeagueIndex;
-            set => SetAndRaiseIfChanged(nameof(LastSeasonLeagueIndex), ref _lastSeasonLeagueIndex, value);
-        }
-        public int LastSeasonPlace
-        {
-            get => _lastSeasonPlace;
-            set => SetAndRaiseIfChanged(nameof(LastSeasonPlace), ref _lastSeasonPlace, value);
-        }
-        public int LastSeasonLeaguePlace
-        {
-            get => _lastSeasonLeaguePlace;
-            set => SetAndRaiseIfChanged(nameof(LastSeasonLeaguePlace), ref _lastSeasonLeaguePlace, value);
-        }
+        public long LastSeasonBattles { get; set; }
+        public Entity LastSeasonLeague => Leagues.ByIndex[LastSeasonLeagueIndex];
+        public int LastSeasonLeagueIndex { get; set; }
+        public int LastSeasonPlace { get; set; }
+        public int LastSeasonLeaguePlace { get; set; }
 
-        [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfArrays)] public ObservableDictionary<int, int> SeasonsReputation { get; protected set; }
+        [NotMapped /* TODO */] public virtual ObservableDictionary<int, int> SeasonsReputation { get; protected set; } = new ObservableDictionary<int, int>();
 
         public DateTime PremiumExpirationDate
         {
             get => _premiumExpirationDate;
             set
             {
-                SetAndRaiseIfChanged(nameof(PremiumExpirationDate), ref _premiumExpirationDate, value);
+                _premiumExpirationDate = value;
 
                 if (Player?.User is null) return;
                 Player.User.AddOrChangeComponent(new PremiumAccountBoostComponent(PremiumExpirationDate));
             }
         }
 
-        [BsonIgnore] public ObservableList<Entity> Presets { get; } = new();
+        // TODO(Assasans)
+        [NotMapped /* TODO */] public virtual ObservableList<Entity> Presets { get; private set; } = new ObservableList<Entity>();
 
-        public ObservableList<long> AcceptedFriendIds { get; private set; }
-        public ObservableList<long> IncomingFriendIds { get; private set; }
-        public ObservableList<long> OutgoingFriendIds { get; private set; }
-        public ObservableList<long> BlockedPlayerIds { get; private set; }
-        public ObservableList<long> ReportedPlayerIds { get; private set; }
+        public class PlayerRelation
+        {
+            public static PlayerRelation Create(PlayerData player, PlayerData target, RelationType type)
+            {
+                return new PlayerRelation()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    Target = target,
+                    TargetId = target.UniqueId,
+                    Type = type
+                };
+            }
 
-        public ObservableList<ulong> CompletedTutorialIds { get; set; }
+            public enum RelationType
+            {
+                Unknown = 0,
 
-        [BsonIgnore] public ObservableList<Punishment> Punishments { get; protected set; } = new ObservableList<Punishment>(); // TODO(Assasans): Store in DB
+                Friend,
+                IncomingFriend,
+                OutgoingFriend,
 
-        public ObservableList<long> Avatars { get; protected set; }
-        [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfArrays)] public ObservableDictionary<long, int> Containers { get; protected set; }
-        public ObservableList<long> Covers { get; protected set; }
+                Blocked,
+
+                Reported
+            }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+            public long RelationId { get; set; }
+
+            public long TargetId { get; set; }
+            public virtual PlayerData Target { get; set; }
+
+            public RelationType Type { get; set; }
+        }
+
+        public virtual List<PlayerRelation> Relations { get; private set; } = new List<PlayerRelation>();
+
+        // [Obsolete("Replaced by Relations", true)] [NotMapped /* TODO */] public virtual ObservableList<long> AcceptedFriendIds { get; private set; } = new ObservableList<long>();
+        // [Obsolete("Replaced by Relations", true)] [NotMapped /* TODO */] public virtual ObservableList<long> IncomingFriendIds { get; private set; } = new ObservableList<long>();
+        // [Obsolete("Replaced by Relations", true)] [NotMapped /* TODO */] public virtual ObservableList<long> OutgoingFriendIds { get; private set; } = new ObservableList<long>();
+        // [Obsolete("Replaced by Relations", true)] [NotMapped /* TODO */] public virtual ObservableList<long> BlockedPlayerIds { get; private set; } = new ObservableList<long>();
+        // [Obsolete("Replaced by Relations", true)] [NotMapped /* TODO */] public virtual ObservableList<long> ReportedPlayerIds { get; private set; } = new ObservableList<long>();
+
+        [NotMapped /* TODO */] public virtual ObservableList<ulong> CompletedTutorialIds { get; private set; } = new ObservableList<ulong>();
+
+        public virtual List<Punishment> Punishments { get; private set; } = new List<Punishment>();
+
+        public class PlayerAvatar : IEntity
+        {
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long EntityId { get; set; }
+
+            public static PlayerAvatar Create(PlayerData player, long entityId)
+            {
+                return new PlayerAvatar
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    EntityId = entityId
+                };
+            }
+        }
+
+        // [NotMapped /* TODO */] public virtual List<PlayerAvatar> Avatars { get; private set; } = new List<PlayerAvatar>();
+
+        // [NotMapped /* TODO */] public ObservableDictionary<long, int> Containers { get; private set; }
+        public virtual List<PlayerContainer> Containers { get; set; } = new List<PlayerContainer>();
+        // [NotMapped /* TODO */] public virtual ObservableList<long> Covers { get; private set; } = new ObservableList<long>();
 
         public long Avatar
         {
             get => _avatar;
             set
             {
-                SetAndRaiseIfChanged(nameof(Avatar), ref _avatar, value);
+                _avatar = value;
 
                 if (Player?.User is null) return;
                 string configPath = Player.GetEntityById(value).TemplateAccessor.ConfigPath;
@@ -478,126 +771,329 @@ namespace TXServer.Core
                 Player.User.ChangeComponent<UserAvatarComponent>(component => component.Id = avatarId);
             }
         }
-        public ObservableList<long> Graffities { get; protected set; }
-        [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfArrays)] public ObservableDictionary<long, long> Hulls
+
+        public interface IEntity
         {
-            get => _hulls;
-            protected set
-            {
-                _hulls = value;
-                _hulls.Changed += (_, _) => RaiseChanged(nameof(Hulls), _hulls);
-            }
-        }
-        public ObservableList<long> HullSkins
-        {
-            get => _hullSkins;
-            protected set
-            {
-                _hullSkins = value;
-                _hullSkins.Changed += (_, _) => RaiseChanged(nameof(HullSkins), _hullSkins);
-            }
-        }
-        [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfArrays)] public ObservableDictionary<long, ModuleInfo> Modules
-        {
-            get => _modules;
-            protected set
-            {
-                _modules = value;
-                _modules.Changed += (_, _) => RaiseChanged(nameof(Modules), _modules);
-            }
-        }
-        public ObservableList<long> Paints
-        {
-            get => _paints;
-            protected set
-            {
-                _paints = value;
-                _paints.Changed += (_, _) => RaiseChanged(nameof(Paints), _paints);
-            }
-        }
-        [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfArrays)] public ObservableDictionary<long, int> Shards
-        {
-            get => _shards;
-            protected set
-            {
-                _shards = value;
-                _shards.Changed += (_, _) => RaiseChanged(nameof(Shards), _shards);
-            }
-        }
-        public ObservableList<long> Shells
-        {
-            get => _shells;
-            protected set
-            {
-                _shells = value;
-                _shells.Changed += (_, _) => RaiseChanged(nameof(Shells), _shells);
-            }
-        }
-        [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfArrays)] public ObservableDictionary<long, long> Weapons
-        {
-            get => _weapons;
-            protected set
-            {
-                _weapons = value;
-                _weapons.Changed += (_, _) => RaiseChanged(nameof(Weapons), _weapons);
-            }
-        }
-        public ObservableList<long> WeaponSkins
-        {
-            get => _weaponSkins;
-            protected set
-            {
-                _weaponSkins = value;
-                _weaponSkins.Changed += (_, _) => RaiseChanged(nameof(WeaponSkins), _weaponSkins);
-            }
+            long PlayerId { get; set; }
+            long EntityId { get; set; }
         }
 
-        public bool ReceivedFractionsCompetitionReward
+        public class PlayerContainer : IEntity
         {
-            get => _receivedFractionsCompetitionReward;
-            set => SetAndRaiseIfChanged(nameof(ReceivedFractionsCompetitionReward), ref _receivedFractionsCompetitionReward, value);
-        }
-        public bool ReceivedReleaseReward
-        {
-            get => _receivedReleaseReward;
-            set => SetAndRaiseIfChanged(nameof(ReceivedReleaseReward), ref _receivedReleaseReward, value);
-        }
-        public bool ReceivedLastSeasonReward
-        {
-            get => _receivedLastSeasonReward;
-            set => SetAndRaiseIfChanged(nameof(ReceivedLastSeasonReward), ref _receivedLastSeasonReward, value);
-        }
-        public bool ShowedFractionsCompetition
-        {
-            get => _showedFractionsCompetition;
-            set => SetAndRaiseIfChanged(nameof(ShowedFractionsCompetition), ref _showedFractionsCompetition, value);
-        }
-        public ObservableList<long> RewardedLeagues
-        {
-            get => _rewardedLeagues;
-            private set
+            public static PlayerContainer Create(PlayerData player, long entityId, int count = 0)
             {
-                _rewardedLeagues = value;
-                _rewardedLeagues.Changed += (_, _) => RaiseChanged(nameof(RewardedLeagues), _rewardedLeagues);
+                return new PlayerContainer()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    EntityId = entityId,
+                    Count = count
+                };
             }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long EntityId { get; set; }
+
+            public int Count { get; set; }
         }
 
-        public bool OwnsMarketItem(Entity marketItem) => Avatars
-            .Concat(Covers).Concat(Graffities).Concat(Hulls.Keys)
-            .Concat(HullSkins).Concat(Paints).Concat(Shells).Concat(Weapons.Keys).Concat(WeaponSkins)
+        public class PlayerPaint : IEntity
+        {
+            public static PlayerPaint Create(PlayerData player, long entityId)
+            {
+                return new PlayerPaint()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    EntityId = entityId
+                };
+            }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long EntityId { get; set; }
+        }
+
+        public class PlayerCover : IEntity
+        {
+            public static PlayerCover Create(PlayerData player, long entityId)
+            {
+                return new PlayerCover()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    EntityId = entityId
+                };
+            }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long EntityId { get; set; }
+        }
+
+        public class PlayerGraffiti : IEntity
+        {
+            public static PlayerGraffiti Create(PlayerData player, long entityId)
+            {
+                return new PlayerGraffiti()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    EntityId = entityId
+                };
+            }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long EntityId { get; set; }
+        }
+
+        public interface IPlayerEquipment
+        {
+            bool IsOwned { get; set; }
+            long Xp { get; set; }
+        }
+
+        public class PlayerHull : IEntity, IPlayerEquipment
+        {
+            public static PlayerHull Create(PlayerData player, long entityId, bool isOwned, long xp = 0, IEnumerable<PlayerHullSkin> skins = null)
+            {
+                var hull = new PlayerHull()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    EntityId = entityId,
+                    IsOwned = isOwned,
+                    Xp = xp
+                };
+                if (skins != null) hull.Skins.AddRange(skins);
+
+                return hull;
+            }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long EntityId { get; set; }
+
+            public bool IsOwned { get; set; }
+            public long Xp { get; set; }
+
+            public virtual List<PlayerHullSkin> Skins { get; set; } = new List<PlayerHullSkin>();
+        }
+
+        public class PlayerWeapon : IEntity, IPlayerEquipment
+        {
+            public static PlayerWeapon Create(PlayerData player, long entityId, bool isOwned, long xp = 0, IEnumerable<PlayerWeaponSkin> skins = null, IEnumerable<PlayerWeaponShellSkin> shellSkins = null)
+            {
+                var weapon = new PlayerWeapon()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    EntityId = entityId,
+                    IsOwned = isOwned,
+                    Xp = xp
+                };
+                if (skins != null) weapon.Skins.AddRange(skins);
+                if (shellSkins != null) weapon.ShellSkins.AddRange(shellSkins);
+
+                return weapon;
+            }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long EntityId { get; set; }
+
+            public bool IsOwned { get; set; }
+            public long Xp { get; set; }
+
+            public virtual List<PlayerWeaponSkin> Skins { get; set; } = new List<PlayerWeaponSkin>();
+            public virtual List<PlayerWeaponShellSkin> ShellSkins { get; set; } = new List<PlayerWeaponShellSkin>();
+        }
+
+        public class PlayerHullSkin : IEntity
+        {
+            public static PlayerHullSkin Create(PlayerData player, long hullId, long entityId)
+            {
+                return new PlayerHullSkin()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    HullId = hullId,
+                    EntityId = entityId
+                };
+            }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long HullId { get; set; }
+
+            // [ForeignKey("PlayerId, EntityId")]
+            public virtual PlayerHull Hull { get; set; }
+
+            public long EntityId { get; set; }
+        }
+
+        public class PlayerWeaponSkin : IEntity
+        {
+            public static PlayerWeaponSkin Create(PlayerData player, long weaponId, long entityId)
+            {
+                return new PlayerWeaponSkin()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    WeaponId = weaponId,
+                    EntityId = entityId
+                };
+            }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long WeaponId { get; set; }
+
+            // [ForeignKey("PlayerId, EntityId")]
+            public virtual PlayerWeapon Weapon { get; set; }
+
+            public long EntityId { get; set; }
+        }
+
+        public class PlayerWeaponShellSkin : IEntity
+        {
+            public static PlayerWeaponShellSkin Create(PlayerData player, long weaponId, long entityId)
+            {
+                return new PlayerWeaponShellSkin()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    WeaponId = weaponId,
+                    EntityId = entityId
+                };
+            }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long WeaponId { get; set; }
+
+            // [ForeignKey("PlayerId, EntityId")]
+            public virtual PlayerWeapon Weapon { get; set; }
+
+            public long EntityId { get; set; }
+        }
+
+        public class PlayerModule : IEntity
+        {
+            public static PlayerModule Create(PlayerData player, long entityId, int level = 0, int cards = 0)
+            {
+                return new PlayerModule()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    EntityId = entityId,
+                    Level = level,
+                    Cards = cards
+                };
+            }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long EntityId { get; set; }
+
+            public int Level { get; set; }
+            public int Cards { get; set; }
+        }
+
+        public class PlayerContainerShards : IEntity
+        {
+            public static PlayerContainerShards Create(PlayerData player, long entityId, int amount = 0)
+            {
+                return new PlayerContainerShards()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    EntityId = entityId,
+                    Amount = amount
+                };
+            }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long EntityId { get; set; }
+
+            public int Amount { get; set; }
+        }
+
+        public virtual List<PlayerPaint> Paints { get; set; } = new List<PlayerPaint>();
+        public virtual List<PlayerCover> Covers { get; set; } = new List<PlayerCover>();
+        public virtual List<PlayerGraffiti> Graffiti { get; set; } = new List<PlayerGraffiti>();
+        public virtual List<PlayerAvatar> Avatars { get; set; } = new List<PlayerAvatar>();
+
+        public virtual List<PlayerHull> Hulls { get; set; } = new List<PlayerHull>();
+        public virtual List<PlayerWeapon> Weapons { get; set; } = new List<PlayerWeapon>();
+
+        public virtual List<PlayerModule> Modules { get; set; } = new List<PlayerModule>();
+
+        public virtual List<PlayerContainerShards> Shards { get; set; } = new List<PlayerContainerShards>();
+
+        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableList<long> Graffities { get; private set; }
+        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableDictionary<long, long> Hulls { get; private set; }
+        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableList<long> HullSkins { get; private set; }
+        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableDictionary<long, ModuleInfo> Modules { get; private set; }
+        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableList<long> Paints { get; private set; }
+        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableDictionary<long, int> Shards { get; private set; }
+        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableList<long> Shells { get; private set; }
+        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableDictionary<long, long> Weapons { get; private set; }
+        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableList<long> WeaponSkins { get; private set; }
+
+        public bool ReceivedFractionsCompetitionReward { get; set; }
+        public bool ReceivedReleaseReward { get; set; }
+        public bool ReceivedLastSeasonReward { get; set; }
+        public bool ShowedFractionsCompetition { get; set; }
+        [NotMapped /* TODO */] public virtual ObservableList<long> RewardedLeagues { get; set; } = new ObservableList<long>();
+
+        public bool OwnsMarketItem(Entity marketItem) => Avatars.ToIds()
+            .Concat(Covers.ToIds())
+            .Concat(Graffiti.ToIds())
+            .Concat(Hulls.ToOwnedIds())
+            .Concat(Hulls.SelectMany(hull => hull.Skins).ToIds())
+            .Concat(Paints.ToIds())
+            .Concat(Weapons.ToOwnedIds())
+            .Concat(Weapons.SelectMany(weapon => weapon.Skins).ToIds())
+            .Concat(Weapons.SelectMany(weapon => weapon.ShellSkins).ToIds())
             .Contains(marketItem.EntityId);
 
         public bool IsPremium => PremiumExpirationDate > DateTime.UtcNow;
 
         private void SetLeague(int reputation)
         {
-            (League, LeagueIndex) = reputation switch
+            LeagueIndex = reputation switch
             {
-                <= 139 => (Leagues.GlobalItems.Training, 0),
-                >= 140 and <= 999 => (Leagues.GlobalItems.Bronze, 1),
-                >= 1000 and <= 2999 => (Leagues.GlobalItems.Silver, 2),
-                >= 3000 and <= 4499 => (Leagues.GlobalItems.Gold, 3),
-                >= 4500 => (Leagues.GlobalItems.Master, 4)
+                <= 139 => 0,
+                >= 140 and <= 999 => 1,
+                >= 1000 and <= 2999 => 2,
+                >= 3000 and <= 4499 => 3,
+                >= 4500 => 4
             };
             Player.User.TryRemoveComponent<LeagueGroupComponent>();
             Player.User.AddComponent(League.GetComponent<LeagueGroupComponent>());
@@ -619,113 +1115,89 @@ namespace TXServer.Core
         {
             DailyBonusReceivedRewards.Add(code);
 
-            RaiseChanged(nameof(DailyBonusReceivedRewards), DailyBonusReceivedRewards);
-
             Player.User.ChangeComponent<UserDailyBonusReceivedRewardsComponent>(component => component.ReceivedRewards.Add(code));
         }
         public void ResetDailyBonusRewards()
         {
             DailyBonusReceivedRewards.Clear();
 
-            RaiseChanged(nameof(DailyBonusReceivedRewards), DailyBonusReceivedRewards);
-
             Player.User.ChangeComponent<UserDailyBonusReceivedRewardsComponent>(component => component.ReceivedRewards.Clear());
         }
 
-        public void AddIncomingFriend(long userId)
+        public void AddIncomingFriend(PlayerData user)
         {
-            IncomingFriendIds.Add(userId);
-
-            RaiseChanged(nameof(IncomingFriendIds), IncomingFriendIds);
-        }
-        public void AddOutgoingFriend(long userId)
-        {
-            OutgoingFriendIds.Add(userId);
-
-            RaiseChanged(nameof(OutgoingFriendIds), OutgoingFriendIds);
-        }
-        public void AddAcceptedFriend(long userId)
-        {
-            IncomingFriendIds.Remove(userId);
-            OutgoingFriendIds.Remove(userId);
-            AcceptedFriendIds.Add(userId);
-
-            RaiseChanged(nameof(IncomingFriendIds), IncomingFriendIds);
-            RaiseChanged(nameof(OutgoingFriendIds), OutgoingFriendIds);
-            RaiseChanged(nameof(AcceptedFriendIds), AcceptedFriendIds);
-        }
-        public void RemoveFriend(long userId)
-        {
-            IncomingFriendIds.Remove(userId);
-            OutgoingFriendIds.Remove(userId);
-            AcceptedFriendIds.Remove(userId);
-
-            RaiseChanged(nameof(IncomingFriendIds), IncomingFriendIds);
-            RaiseChanged(nameof(OutgoingFriendIds), OutgoingFriendIds);
-            RaiseChanged(nameof(AcceptedFriendIds), AcceptedFriendIds);
+            Relations.Add(PlayerRelation.Create(this, user, PlayerRelation.RelationType.IncomingFriend));
         }
 
-        public void ChangeBlockedPlayer(long userId)
+        public void AddOutgoingFriend(PlayerData user)
         {
-            if (BlockedPlayerIds.Contains(userId)) BlockedPlayerIds.Remove(userId);
-            else BlockedPlayerIds.Add(userId);
-
-            RaiseChanged(nameof(BlockedPlayerIds), BlockedPlayerIds);
+            Relations.Add(PlayerRelation.Create(this, user, PlayerRelation.RelationType.OutgoingFriend));
         }
 
-        public void AddReportedPlayer(long userId)
+        public void AddAcceptedFriend(PlayerData user)
         {
-            ReportedPlayerIds.Add(userId);
+            Relations.RemoveType(user.UniqueId, PlayerRelation.RelationType.IncomingFriend);
+            Relations.RemoveType(user.UniqueId, PlayerRelation.RelationType.OutgoingFriend);
+            Relations.Add(PlayerRelation.Create(this, user, PlayerRelation.RelationType.Friend));
+        }
 
-            RaiseChanged(nameof(ReportedPlayerIds), ReportedPlayerIds);
+        public void RemoveFriend(PlayerData user)
+        {
+            Relations.RemoveType(user.UniqueId, PlayerRelation.RelationType.IncomingFriend);
+            Relations.RemoveType(user.UniqueId, PlayerRelation.RelationType.OutgoingFriend);
+            Relations.RemoveType(user.UniqueId, PlayerRelation.RelationType.Friend);
+        }
+
+        public void ChangeBlockedPlayer(PlayerData user)
+        {
+            if (Relations.ContainsId(user.UniqueId, PlayerRelation.RelationType.Blocked))
+                Relations.RemoveType(user.UniqueId, PlayerRelation.RelationType.Reported);
+            else
+                Relations.Add(PlayerRelation.Create(this, user, PlayerRelation.RelationType.Reported));
+        }
+
+        public void AddReportedPlayer(PlayerData user)
+        {
+            Relations.Add(PlayerRelation.Create(this, user, PlayerRelation.RelationType.Reported));
         }
 
         public void AddCompletedTutorial(ulong tutorialId)
         {
             CompletedTutorialIds.Add(tutorialId);
 
-            RaiseChanged(nameof(CompletedTutorialIds), CompletedTutorialIds);
-
-            if(Player?.User is null) return;
+            if (Player?.User is null) return;
             Player.User.ChangeComponent<TutorialCompleteIdsComponent>(component => component.CompletedIds.Add(tutorialId));
         }
 
         public void AddHullXp(int xp, Entity hull)
         {
-            Hulls[hull.EntityId] += xp;
-
-            RaiseChanged(nameof(Hulls), Hulls);
+            Hulls.GetById(hull.EntityId).Xp += xp;
 
             ResourceManager
                 .GetUserItem(Player, hull)
-                .ChangeComponent<ExperienceItemComponent>(component => component.Experience = Hulls[hull.EntityId]);
+                .ChangeComponent<ExperienceItemComponent>(component => component.Experience = Hulls.GetById(hull.EntityId).Xp);
         }
         public void AddWeaponXp(int xp, Entity weapon)
         {
-            Weapons[weapon.EntityId] += xp;
-
-            RaiseChanged(nameof(Weapons), Weapons);
+            Weapons.GetById(weapon.EntityId).Xp += xp;
 
             ResourceManager
                 .GetUserItem(Player, weapon)
-                .ChangeComponent<ExperienceItemComponent>(component => component.Experience = Weapons[weapon.EntityId]);
+                .ChangeComponent<ExperienceItemComponent>(component => component.Experience = Weapons.GetById(weapon.EntityId).Xp);
         }
 
         public void UpgradeModule(Entity marketItem, bool assemble = false)
         {
-            if (!Modules.ContainsKey(marketItem.GetComponent<ParentGroupComponent>().Key)) return;
+            if (!Modules.ContainsId(marketItem.GetComponent<ParentGroupComponent>().Key)) return;
 
             long id = marketItem.GetComponent<ParentGroupComponent>().Key;
-            ModuleInfo info = Modules[id];
+            PlayerModule info = Modules.GetById(id);
 
             Entity moduleUserItem = ResourceManager.GetModuleUserItem(Player, id);
             Entity cardUserItem = Player.EntityList.Single(e => e.TemplateAccessor.Template is ModuleCardUserItemTemplate && e.GetComponent<ParentGroupComponent>().Key == id);
 
             if (!assemble) info.Level++;
             info.Cards -= moduleUserItem.GetComponent<ModuleCardsCompositionComponent>().AllPrices[info.Level].Cards;
-            Modules[id] = info;
-
-            RaiseChanged(nameof(Modules), Modules);
 
             moduleUserItem.ChangeComponent<ModuleUpgradeLevelComponent>(component => component.Level = info.Level);
             cardUserItem.ChangeComponent<UserItemCounterComponent>(component => component.Count = info.Cards);
@@ -740,12 +1212,6 @@ namespace TXServer.Core
 
             // upgrade module
             Player.SendEvent(new ModuleUpgradedEvent(), moduleUserItem);
-        }
-
-        public bool Save()
-        {
-            return Server.Instance.Database.SavePlayerData(this);
-            // return false;
         }
 
         public PlayerData Clone()
@@ -769,42 +1235,14 @@ namespace TXServer.Core
         private long _fractionUserScore;
         private int _goldBonus;
         private string _countryCode;
+        private long? _discordId;
+        private bool _isDiscordVerified;
         private bool _emailSubscribed;
         private string _email;
-        private bool _admin;
-        private bool _beta;
+        private bool _isAdmin;
+        private bool _isBeta;
         private long _experience;
         private bool _rememberMe;
         private DateTime _premiumExpirationDate;
-        private byte[] _autoLoginToken;
-        private string _hardwareId;
-        private byte[] _passwordHash;
-        private bool _mod;
-        private ObservableCollection<long> _dailyBonusReceivedRewards;
-        private DateTimeOffset _registrationDate;
-        private DateTimeOffset? _lastRecruitReward;
-        private int _recruitRewardDay;
-        private int _leagueIndex;
-        private long _lastSeasonBattles;
-        private long _lastSeasonLeagueId;
-        private int _lastSeasonLeagueIndex;
-        private int _lastSeasonPlace;
-        private int _lastSeasonLeaguePlace;
-        private bool _receivedFractionsCompetitionReward;
-        private bool _receivedReleaseReward;
-        private bool _receivedLastSeasonReward;
-        private bool _showedFractionsCompetition;
-        private int _cheatSusActions;
-        private bool _emailVerified;
-        private long _uniqueId;
-        private ObservableDictionary<long, long> _hulls;
-        private ObservableList<long> _hullSkins;
-        private ObservableDictionary<long, ModuleInfo> _modules;
-        private ObservableList<long> _weaponSkins;
-        private ObservableDictionary<long, long> _weapons;
-        private ObservableList<long> _shells;
-        private ObservableDictionary<long, int> _shards;
-        private ObservableList<long> _paints;
-        private ObservableList<long> _rewardedLeagues;
     }
 }

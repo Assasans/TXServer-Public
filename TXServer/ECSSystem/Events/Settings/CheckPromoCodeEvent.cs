@@ -14,7 +14,7 @@ namespace TXServer.ECSSystem.Events.Settings
 		{
 			PromoCodeCheckResult result = PromoCodeCheckResult.INVALID;
 
-			if (player.Data.Admin)
+			if (player.Data.IsAdmin)
                 switch (Code)
                 {
                     case { } s when (s.StartsWith("c") || s.StartsWith("x")) && !s.StartsWith("xp"):

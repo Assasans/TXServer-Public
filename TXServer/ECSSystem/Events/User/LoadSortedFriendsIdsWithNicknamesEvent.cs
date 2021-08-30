@@ -11,11 +11,11 @@ namespace TXServer.ECSSystem.Events.Friend
         public void Execute(Player player, Entity entity)
         {
             Dictionary<long, string> friendsIdsAndNicknames = new();
-            foreach (long friendId in player.Data.AcceptedFriendIds)
+            foreach (PlayerData.PlayerRelation relation in player.Data.Relations.FilterType(PlayerData.PlayerRelation.RelationType.Friend))
             {
-                Player remotePlayer = Server.Instance.FindPlayerByUid(friendId);
-                if (remotePlayer != null) 
-                    friendsIdsAndNicknames.Add(friendId, remotePlayer.Data.Username);
+                PlayerData remotePlayer = player.Server.Database.GetPlayerDataById(relation.TargetId);
+                if (remotePlayer != null)
+                    friendsIdsAndNicknames.Add(relation.TargetId, remotePlayer.Username);
             }
 
             player.SendEvent(new SortedFriendsIdsWithNicknamesLoaded(friendsIdsAndNicknames), entity);

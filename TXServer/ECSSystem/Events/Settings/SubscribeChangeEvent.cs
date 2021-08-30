@@ -9,13 +9,15 @@ namespace TXServer.ECSSystem.Events
 	public class SubscribeChangeEvent : ECSEvent
 	{
 		public void Execute(Player player, Entity entity)
-		{
-			// TODO: save changed subscribed bool in database
+        {
+            player.Data.EmailSubscribed = Subscribed;
+
 			if (Subscribed)
 				player.User.AddComponent(new UserSubscribeComponent());
 			else
 				player.User.RemoveComponent<UserSubscribeComponent>();
 		}
+
 		public bool Subscribed { get; set; }
 	}
 }

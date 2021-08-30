@@ -9,16 +9,17 @@ namespace TXServer.ECSSystem.Events.User.Friend
     {
         public void Execute(Player player, Entity entity)
         {
-            player.Data.AddAcceptedFriend(User.EntityId);
+            PlayerData remotePlayer = player.Server.Database.GetPlayerDataById(User.EntityId);
+
+            player.Data.AddAcceptedFriend(remotePlayer);
             player.SendEvent(new IncomingFriendRemovedEvent(User.EntityId), entity);
             player.SendEvent(new AcceptedFriendAddedEvent(User.EntityId), entity);
 
-            Player remotePlayer = Server.Instance.FindPlayerByUid(User.EntityId);
-            if (remotePlayer != null && remotePlayer.IsLoggedIn)
+            remotePlayer.AddAcceptedFriend(player.Data);
+            if (remotePlayer.Player != null && remotePlayer.Player.IsLoggedIn)
             {
-                remotePlayer.Data.AddAcceptedFriend(player.User.EntityId);
-                remotePlayer.SendEvent(new OutgoingFriendRemovedEvent(player.User.EntityId), remotePlayer.User);
-                remotePlayer.SendEvent(new AcceptedFriendAddedEvent(player.User.EntityId), remotePlayer.User);
+                remotePlayer.Player.SendEvent(new OutgoingFriendRemovedEvent(player.User.EntityId), remotePlayer.Player.User);
+                remotePlayer.Player.SendEvent(new AcceptedFriendAddedEvent(player.User.EntityId), remotePlayer.Player.User);
             }
         }
     }

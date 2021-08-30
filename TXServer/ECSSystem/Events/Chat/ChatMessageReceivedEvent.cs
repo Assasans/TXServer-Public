@@ -12,19 +12,18 @@ using TXServer.ECSSystem.GlobalEntities;
 namespace TXServer.ECSSystem.Events.Chat
 {
     [SerialVersionUID(1450950140104L)]
-	public class ChatMessageReceivedEvent : ECSEvent
-	{
+    public class ChatMessageReceivedEvent : ECSEvent
+    {
         private static ChatMessageReceivedEvent CreateMessage(string message, Player receiver, Player sender = null)
         {
-            if (receiver is {IsLoggedIn: true} && sender != null &&
-                receiver.Data.BlockedPlayerIds.Contains(sender.User.EntityId))
+            if (receiver is { IsLoggedIn: true } && sender != null && receiver.Data.Relations.ContainsId(sender.Data.UniqueId, PlayerData.PlayerRelation.RelationType.Blocked))
                 return CreateBlockedMessage(receiver, sender);
 
             return new ChatMessageReceivedEvent
             {
                 Message = message,
                 SystemMessage = sender is null,
-                UserId = sender?.User.EntityId ?? 0,
+                UserId = sender?.Data.UniqueId ?? 0,
                 UserUid = sender?.Data.Username ?? "System",
                 UserAvatarId = sender?.User.GetComponent<UserAvatarComponent>().Id ?? ""
             };
@@ -35,8 +34,8 @@ namespace TXServer.ECSSystem.Events.Chat
             {
                 Message = receiver.Data.CountryCode is "ru" ? "[заблокированное сообщение]" : "[Blocked message]",
                 SystemMessage = false,
-                UserId = sender.User.EntityId,
-                UserUid = receiver.Data.CountryCode is "ru" ? "[Заблокирован]": "[Blocked]",
+                UserId = sender.Data.UniqueId,
+                UserUid = receiver.Data.CountryCode is "ru" ? "[Заблокирован]" : "[Blocked]",
                 UserAvatarId = ""
             };
         }
@@ -108,14 +107,14 @@ namespace TXServer.ECSSystem.Events.Chat
 
         }
 
-		public string Message { get; set; }
+        public string Message { get; set; }
 
-		public bool SystemMessage { get; set; }
+        public bool SystemMessage { get; set; }
 
-		public string UserUid { get; set; }
+        public string UserUid { get; set; }
 
-		public long UserId { get; set; }
+        public long UserId { get; set; }
 
-		public string UserAvatarId { get; set; }
-	}
+        public string UserAvatarId { get; set; }
+    }
 }

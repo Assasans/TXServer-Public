@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events.OldChatCommands
         [Obsolete("MuteUserEvent is deprecated & inaccurate, please use '!mute' as chat command instead.")]
         public void Execute(Player player, Entity entity1, Entity entity2)
         {
-            if (!player.Data.Admin || !player.Data.Mod) return;
+            if (!player.Data.IsAdmin || !player.Data.IsModerator) return;
 
             string chatCmd = $"!mute {UserUid} forever";
             ModCommands.CheckForCommand(player, chatCmd, out string commandReply);

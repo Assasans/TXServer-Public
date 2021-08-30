@@ -28,7 +28,7 @@ namespace TXServer.ECSSystem.Events.Chat
                 ChatMessageReceivedEvent.SystemMessageTarget(commandReply, chat, player);
                 return;
             }
-            if (player.Data.Mod && ModCommands.CheckForCommand(player, Message, out string reply))
+            if (player.Data.IsModerator && ModCommands.CheckForCommand(player, Message, out string reply))
             {
                 ChatMessageReceivedEvent.SystemMessageTarget(reply, chat, player);
                 return;

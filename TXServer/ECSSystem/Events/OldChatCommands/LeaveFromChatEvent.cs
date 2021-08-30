@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events.OldChatCommands
     {
         public void Execute(Player player, Entity entity1, Entity entity2)
         {
-            if (!player.Data.Admin || !player.Data.Mod) return;
+            if (!player.Data.IsAdmin || !player.Data.IsModerator) return;
 
             bool leftChat = false;
             foreach (Entity chat in player.EntityList.Where(c =>

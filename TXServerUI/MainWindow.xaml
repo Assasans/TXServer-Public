@@ -74,7 +74,7 @@
                 <GroupBox x:Name="DatabaseProviderGroupBox" Header="Database provider" Margin="3">
                     <StackPanel x:Name="DatabaseProviderPanel">
                         <RadioButton GroupName="DatabaseProvider" Content="In-memory" Margin="3" Tag="memory" IsChecked="True" />
-                        <RadioButton GroupName="DatabaseProvider" Content="MongoDB" Margin="3" Tag="mongo" />
+                        <RadioButton GroupName="DatabaseProvider" Content="MySQL" Margin="3" Tag="mysql" />
                     </StackPanel>
                 </GroupBox>
             </StackPanel>

@@ -14,7 +14,7 @@ namespace TXServer.ECSSystem.EntityTemplates.User
     {
         public static Entity CreateEntity(Player player)
         {
-            Entity user = new(new TemplateAccessor(new UserTemplate(), ""),
+            Entity user = new(player.Data.UniqueId, new TemplateAccessor(new UserTemplate(), ""),
                 new UserComponent(),
                 new UserOnlineComponent(),
 
@@ -52,16 +52,16 @@ namespace TXServer.ECSSystem.EntityTemplates.User
 
                 new QuestReadyComponent(),
                 new UserPublisherComponent(),
-                new ConfirmedUserEmailComponent(player.Data.Email, player.Data.EmailSubscribed),
+                new ConfirmedUserEmailComponent(player.Data.DiscordTag, player.Data.EmailSubscribed),
                 new UserSubscribeComponent());
 
-            if (player.Data.Admin)
+            if (player.Data.IsAdmin)
             {
                 user.Components.Add(new UserAdminComponent());
                 if (!player.Data.IsPremium)
                     player.Data.RenewPremium(new TimeSpan(23999976, 0, 0));
             }
-            if (player.Data.Beta)
+            if (player.Data.IsBeta)
                 user.Components.Add(new ClosedBetaQuestAchievementComponent());
 
             if (player.Data.Fraction is not null)

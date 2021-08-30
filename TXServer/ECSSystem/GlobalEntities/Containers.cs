@@ -42,8 +42,9 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.Components.Remove(new RestrictionByUserFractionComponent());
                 item.Components.Add(new UserGroupComponent(player.User));
-                item.Components.Add(
-                    new UserItemCounterComponent(player.Data.Containers.TryGetValue(id, out int amount) ? amount : 0));
+
+                player.Data.Containers.TryGetById(id, container => container.Count, out int amount);
+                item.Components.Add(new UserItemCounterComponent(amount));
                 item.Components.Add(new NotificationGroupComponent(item.EntityId));
             }
 

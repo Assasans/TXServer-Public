@@ -23,7 +23,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.TemplateAccessor.Template = new AvatarUserItemTemplate();
 
-                if (player.Data.Avatars.Contains(id))
+                if (player.Data.Avatars.ContainsId(id))
                     item.Components.Add(new UserGroupComponent(player.User));
             }
 

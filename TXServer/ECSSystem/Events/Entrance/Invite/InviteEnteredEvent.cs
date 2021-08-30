@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Logging;
 using TXServer.Core.Protocol;
@@ -12,18 +14,8 @@ namespace TXServer.ECSSystem.Events.Entrance.Invite
 	{
 		public void Execute(Player player, Entity entity)
 		{
-			// Todo: database immigration
-			List<string> allowedUids = new()
-			{
-				"NoNick", "Tim203", "M8", "Kaveman", "Assasans",
-				"Concodroid", "Corpserdefg",
-				"SH42913",
-				"Bodr", "C6OI", "Legendar-X", "Pchelik", "networkspecter", "DageLV", "F24_dark",
-				"Black_Wolf", "NN77296", "MEWPASCO", "Doctor", "TowerCrusher", "Kurays", "AlveroHUN", "Inctrice", "NicolasIceberg", "Bilmez", "Kotovsky"
-			};
-
-			string inviteCode = entity.GetComponent<InviteComponent>().InviteCode;
-			if (allowedUids.Contains(inviteCode) || allowedUids.Contains(inviteCode.ToLower()))
+            string inviteCode = entity.GetComponent<InviteComponent>().InviteCode;
+			if (player.Server.Database.IsInviteValid(inviteCode))
 			{
 				player.SendEvent(new CommenceRegistrationEvent(), entity);
 				Logger.Log($"{player}: New session with invite code \"{inviteCode}\"");

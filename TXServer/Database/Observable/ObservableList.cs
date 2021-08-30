@@ -4,10 +4,12 @@ using System.Collections.Generic;
 
 namespace TXServer.Database.Observable
 {
+    [Obsolete("Observable*<T> classes are obsoleted")]
     public class ChangedEventArgs
     {
     }
 
+    [Obsolete("Use List<T>")]
     public class ObservableList<T> : IList<T>
     {
         private List<T> _list = new List<T>();
@@ -54,6 +56,7 @@ namespace TXServer.Database.Observable
         IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
     }
 
+    [Obsolete("Use Dictionary<T>")]
     public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
         private Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();

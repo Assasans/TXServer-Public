@@ -14,15 +14,16 @@ namespace TXServer.ECSSystem.Events.Item
 	{
 		public void Execute(Player player, Entity container)
         {
-            int containerAmount = player.Data.Containers[container.GetComponent<MarketItemGroupComponent>().Key];
+            PlayerData.PlayerContainer playerContainer = player.Data.Containers.GetById(container.GetComponent<MarketItemGroupComponent>().Key);
+            int openAmount = Math.Min(playerContainer.Count, 100); // Prevent freeze when opening too many containers
 
             // remove opened container from user
-            player.Data.Containers[container.GetComponent<MarketItemGroupComponent>().Key] = 0;
-            container.ChangeComponent<UserItemCounterComponent>(component => component.Count = 0);
+            playerContainer.Count -= openAmount;
+            container.ChangeComponent<UserItemCounterComponent>(component => component.Count -= openAmount);
             player.SendEvent(new ItemsCountChangedEvent(1), container);
 
             List<Entity> notifications = new List<Entity>();
-            notifications.AddRange(OpenContainer(player, container, containerAmount));
+            notifications.AddRange(OpenContainer(player, container, openAmount));
 
             player.ShareEntities(notifications);
 			player.SendEvent(new ShowNotificationGroupEvent(1), notifications.First());

@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
         [Obsolete("Command is obsolete because energy has been removed")]
         public void Execute(Player player, Entity entity)
         {
-            if (!player.Data.Admin) return;
+            if (!player.Data.IsAdmin) return;
 
             ChatMessageReceivedEvent.SystemMessageTarget("Error: obsolete command, energy has been removed", player);
         }

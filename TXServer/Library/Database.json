@@ -1,7 +1,8 @@
 {
   "host": "localhost",
-  "port": 27017,
+  "port": 3306,
   "username": "revive-tx",
   "password": "1234567890",
-  "database": "revive-tx"
+  "database": "revive-tx",
+  "version": "10.6.4"
 }

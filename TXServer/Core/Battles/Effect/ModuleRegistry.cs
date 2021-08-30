@@ -48,7 +48,7 @@ namespace TXServer.Core.Battles.Effect
                 module.Level = 0;
                 if (module is not GoldModule)
                     module.Level = matchPlayer.Player.Data
-                        .Modules[garageModule.GetComponent<MarketItemGroupComponent>().Key].Level;
+                        .Modules.GetById(garageModule.GetComponent<MarketItemGroupComponent>().Key).Level;
                 module.Init();
             }
 

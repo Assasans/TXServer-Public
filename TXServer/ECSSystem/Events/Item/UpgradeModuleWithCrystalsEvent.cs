@@ -17,7 +17,7 @@ namespace TXServer.ECSSystem.Events.Item
         protected static void TryUpgradeModule(Player player, Entity marketItem, bool xCrystals = false)
         {
             long id = marketItem.GetComponent<ParentGroupComponent>().Key;
-            ModuleInfo info = player.Data.Modules[id];
+            PlayerData.PlayerModule info = player.Data.Modules.GetById(id);
             Entity moduleItem = ResourceManager.GetModuleUserItem(player, id);
 
             // check if already max level
@@ -29,7 +29,7 @@ namespace TXServer.ECSSystem.Events.Item
             int price = xCrystals ? modulePrice.XCrystals : modulePrice.Crystals;
 
             // check if player has enough blueprints to upgrade
-            if (player.Data.Modules.TryGetValue(id, out ModuleInfo blueprint) &&
+            if (player.Data.Modules.TryGetById(id, out PlayerData.PlayerModule blueprint) &&
                 blueprint.Cards < modulePrice.Cards) return;
 
             switch (xCrystals)

@@ -14,6 +14,7 @@ using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
+using Z.EntityFramework.Plus;
 
 namespace TXServer.Core.ChatCommands
 {
@@ -47,7 +48,7 @@ namespace TXServer.Core.ChatCommands
 
         public static void CheckForCommand(string command, Player player)
         {
-            if (!player.Data.Admin) return;
+            if (!player.Data.IsAdmin) return;
             string[] args = command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (!Commands.ContainsKey(args[0].ToLower())) return;
 
@@ -213,7 +214,7 @@ namespace TXServer.Core.ChatCommands
                     message = "fractions competition has been finished";
                     break;
                 case "reset":
-                    // todo: reset user fraction score of every user in database
+                    player.Server.Database.Players.Update(player => new PlayerData(0) { FractionUserScore = 0 });
                     player.ServerData.FractionsCompetitionActive = false;
                     player.ServerData.FractionsCompetitionFinished = false;
                     player.ServerData.AntaeusScore = 0;
@@ -494,7 +495,6 @@ namespace TXServer.Core.ChatCommands
                             component.Statistics["BATTLES_PARTICIPATED_IN_SEASON"] = 0;
                         });
 
-                        p.Data.LastSeasonLeagueId = p.Data.League.EntityId;
                         p.Data.LastSeasonLeagueIndex = p.Data.LeagueIndex;
                         p.Data.LastSeasonLeaguePlace = Leveling.GetLeaguePlace(p, uneditedPlayers);
                         p.Data.LastSeasonPlace = Leveling.GetSeasonPlace(p, uneditedPlayers);
@@ -521,14 +521,12 @@ namespace TXServer.Core.ChatCommands
                 case "rewardStop":
                     player.ServerData.SpreadLastSeasonRewards = false;
 
-                    // todo: this loop for every player in the database
-                    foreach (Player p in Server.Instance.Connection.Pool)
+                    player.Server.Database.Players.Update(player => new PlayerData(0)
                     {
-                        p.Data.LastSeasonLeagueId = Leagues.GlobalItems.Training.EntityId;
-                        p.Data.LastSeasonLeagueIndex = 0;
-                        p.Data.LastSeasonPlace = 1;
-                        p.Data.ReceivedLastSeasonReward = false;
-                    }
+                        LastSeasonLeagueIndex = 0,
+                        LastSeasonPlace = 1,
+                        ReceivedLastSeasonReward = false
+                    });
 
                     return "the season rewards spreading has been stopped";
                 default:

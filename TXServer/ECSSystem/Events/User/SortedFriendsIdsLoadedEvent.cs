@@ -11,20 +11,20 @@ namespace TXServer.ECSSystem.Events.Friend
     {
         public SortedFriendsIdsLoadedEvent(Player player)
         {
-            Dictionary<IList<long>, Dictionary<long, string>> listToDict = new ()
+            Dictionary<PlayerData.PlayerRelation.RelationType, Dictionary<long, string>> typeToDict = new()
             {
-                { player.Data.AcceptedFriendIds, FriendsAcceptedIds },
-                { player.Data.IncomingFriendIds, FriendsIncomingIds },
-                { player.Data.OutgoingFriendIds, FriendsOutgoingIds }
+                [PlayerData.PlayerRelation.RelationType.Friend] = FriendsAcceptedIds,
+                [PlayerData.PlayerRelation.RelationType.IncomingFriend] = FriendsIncomingIds,
+                [PlayerData.PlayerRelation.RelationType.OutgoingFriend] = FriendsOutgoingIds
             };
 
-            foreach (var listPair in listToDict)
+            foreach ((PlayerData.PlayerRelation.RelationType type, Dictionary<long, string> friends) in typeToDict)
             {
-                foreach (long friendId in listPair.Key)
+                foreach (PlayerData.PlayerRelation relation in player.Data.Relations.FilterType(type))
                 {
-                    Player friend = Server.Instance.FindPlayerByUid(friendId);
+                    Player friend = Server.Instance.FindPlayerByUid(relation.TargetId);
                     if (friend != null && friend.IsLoggedIn)
-                        listPair.Value.Add(friendId, friend.User.GetComponent<UserUidComponent>().Uid);
+                        friends.Add(relation.TargetId, friend.User.GetComponent<UserUidComponent>().Uid);
                 }
             }
         }

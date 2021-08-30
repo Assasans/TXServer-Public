@@ -1,26 +1,36 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using TXServer.Core.Logging;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.ChatCommands
 {
     public class Punishment
     {
-        public Punishment(PunishmentType type, Player victim, string reason, Dictionary<string, string> trTimes = null,
+        public Punishment()
+        {
+        }
+
+        public static Punishment Create(PunishmentType type, PlayerData victim, string reason, Dictionary<string, string> trTimes = null,
             DateTimeOffset? expirationTime = null, bool isPermanent = false)
         {
             if (type != PunishmentType.Warn && expirationTime == null)
-                throw new ArgumentNullException(nameof(expirationTime),
-                    "Expiration time can only be null on a warn punishment");
+                throw new ArgumentNullException(nameof(expirationTime), "Expiration time can only be null on a warn punishment");
 
-            StartTime = DateTimeOffset.UtcNow;
-            ExpirationTime = expirationTime ?? DateTimeOffset.UtcNow;
-            OriginalDuration = ExpirationTime - DateTimeOffset.UtcNow;
-            TrTimes = trTimes ?? new Dictionary<string, string>();
-            IsPermanent = isPermanent;
-            Reason = reason;
-            Player = victim;
-            Type = type;
+            Punishment punishment = new Punishment
+            {
+                StartTime = DateTimeOffset.UtcNow,
+                ExpirationTime = expirationTime ?? DateTimeOffset.UtcNow,
+                TrTimes = trTimes ?? new Dictionary<string, string>(),
+                IsPermanent = isPermanent,
+                Reason = reason,
+                Player = victim,
+                Type = type
+            };
+            punishment.OriginalDuration = punishment.ExpirationTime - DateTimeOffset.UtcNow;
+
+            return punishment;
         }
 
         public string CreateLogMsg(Player target)
@@ -29,28 +39,32 @@ namespace TXServer.Core.ChatCommands
             switch (target.Data.CountryCode.ToLower())
             {
                 case "de":
-                    string deType = Type switch {
+                    string deType = Type switch
+                    {
                         PunishmentType.Ban => "Ban",
                         PunishmentType.Mute => "Mute",
-                        _ => "Warnung" };
-                    msg = $"{StartTime:g}{(TrTimes.ContainsKey("de") ? $"{TrTimes["de"]}" : "")}: {deType}" +
-                               $"{(Reason != null ? $" wegen '{Reason}'" : "")}\n";
+                        _ => "Warnung"
+                    };
+                    msg = $"{StartTime:g}{(TrTimes.ContainsKey("de") ? $" {TrTimes["de"]}" : "")}: {deType}" +
+                          $"{(Reason != null ? $" wegen '{Reason}'" : "")}\n";
                     if (ForceRemoved)
                         msg += $"{ForceRemoveTime:g}:{deType} wurde entfernt{(ForceRemovedReason != null ? $" wegen '{ForceRemovedReason}'" : "")}\n";
                     break;
                 case "ru":
-                    string ruType = Type switch {
+                    string ruType = Type switch
+                    {
                         PunishmentType.Ban => "бан",
                         PunishmentType.Mute => "мут",
-                        _ => "предупреждение" };
-                    msg = $"{StartTime:g}{(TrTimes.ContainsKey("ru") ? $"{TrTimes["ru"]}" : "")}: {ruType}" +
+                        _ => "предупреждение"
+                    };
+                    msg = $"{StartTime:g}{(TrTimes.ContainsKey("ru") ? $" {TrTimes["ru"]}" : "")}: {ruType}" +
                           $"{(Reason != null ? $" по причине '{Reason}'" : "")}\n";
                     if (ForceRemoved)
                         msg += $"{ForceRemoveTime:g}:{ruType} был " +
                                $"убран{(ForceRemovedReason != null ? $" по причине '{ForceRemovedReason}'" : "")}\n";
                     break;
                 default:
-                    msg = $"{StartTime:g}{(TrTimes.ContainsKey("en") ? $"{TrTimes["en"]}" : "")}: {Type} " +
+                    msg = $"{StartTime:g}{(TrTimes.ContainsKey("en") ? $" {TrTimes["en"]}" : "")}: {Type} " +
                           $"{(Reason != null ? $"because of '{Reason}'" : "")}\n";
                     if (ForceRemoved)
                         msg += $"{ForceRemoveTime:g}: Removed {Type.ToString().ToLower()}{(ForceRemovedReason != null ? $" because of '{ForceRemovedReason}'" : "")}\n";
@@ -67,15 +81,15 @@ namespace TXServer.Core.ChatCommands
             switch (countryCode)
             {
                 case "de":
-                    trMsg = $"'{Player.Data.Username}' wurde für {TrTimes[countryCode]} {(Type == PunishmentType.Ban ? "gebannt" : "gemutet")}";
+                    trMsg = $"'{Player.Username}' wurde für {TrTimes[countryCode]} {(Type == PunishmentType.Ban ? "gebannt" : "gemutet")}";
                     if (Reason is not null) trMsg += $". Grund: {Reason}";
                     break;
                 case "ru":
-                    trMsg = $"'{Player.Data.Username}' получил {(Type == PunishmentType.Ban ? "бан" : "мут")} на {TrTimes["ru"]}";
+                    trMsg = $"'{Player.Username}' получил {(Type == PunishmentType.Ban ? "бан" : "мут")} на {TrTimes["ru"]}";
                     if (Reason is not null) trMsg += $". Причина: {Reason}";
                     break;
                 default:
-                    trMsg = $"'{Player.Data.Username}' was muted {(!IsPermanent ? "for " : "")}{TrTimes["en"]}";
+                    trMsg = $"'{Player.Username}' was muted {(!IsPermanent ? "for " : "")}{TrTimes["en"]}";
                     if (Reason is not null) trMsg += $". Reason: {Reason}";
                     break;
             }
@@ -87,9 +101,9 @@ namespace TXServer.Core.ChatCommands
         {
             return target.Data.CountryCode.ToLower() switch
             {
-                "de" => $"'{Player.Data.Username}' wurde {(Type == PunishmentType.Ban ? "entbannt" : "entmutet")}{(ForceRemovedReason != null ? $". Grund: {ForceRemovedReason}" : "")}",
-                "ru" => $"'{Player.Data.Username}' был {(Type == PunishmentType.Ban ? "разбанен" : "размучен")}{(ForceRemovedReason != null ? $". Причина: {ForceRemovedReason}" : "")}",
-                _ => $"'{Player.Data.Username}' was {(Type == PunishmentType.Ban ? "unbanned" : "unmuted")}{(ForceRemovedReason != null ? $". Reason: {ForceRemovedReason}" : "")}"
+                "de" => $"'{Player.Username}' wurde {(Type == PunishmentType.Ban ? "entbannt" : "entmutet")}{(ForceRemovedReason != null ? $". Grund: {ForceRemovedReason}" : "")}",
+                "ru" => $"'{Player.Username}' был {(Type == PunishmentType.Ban ? "разбанен" : "размучен")}{(ForceRemovedReason != null ? $". Причина: {ForceRemovedReason}" : "")}",
+                _ => $"'{Player.Username}' was {(Type == PunishmentType.Ban ? "unbanned" : "unmuted")}{(ForceRemovedReason != null ? $". Reason: {ForceRemovedReason}" : "")}"
             };
         }
 
@@ -97,9 +111,9 @@ namespace TXServer.Core.ChatCommands
         {
             return target.Data.CountryCode.ToLower() switch
             {
-                "de" => $"'{Player.Data.Username}' wurde gewarnt{(Reason != null ? $". Grund: {Reason}" : "")}",
-                "ru" => $"'{Player.Data.Username}' был предупрежден{(Reason != null ? $". Причина: {Reason}" : "")}",
-                _ => $"'{Player.Data.Username}' was warned{(Reason != null ? $". Reason: {Reason}" : "")}"
+                "de" => $"'{Player.Username}' wurde gewarnt{(Reason != null ? $". Grund: {Reason}" : "")}",
+                "ru" => $"'{Player.Username}' был предупрежден{(Reason != null ? $". Причина: {Reason}" : "")}",
+                _ => $"'{Player.Username}' was warned{(Reason != null ? $". Reason: {Reason}" : "")}"
             };
         }
 
@@ -107,9 +121,9 @@ namespace TXServer.Core.ChatCommands
         {
             return target.Data.CountryCode.ToLower() switch
             {
-                "de" => $"'{Player.Data.Username}' wurde entwarnt{(Reason != null ? $". Grund: {Reason}" : "")}",
-                "ru" => $"Игроку '{Player.Data.Username}' сняли предупреждение{(Reason != null ? $". Причина: {Reason}" : "")}",
-                _ => $"'{Player.Data.Username}' was unwarned{(Reason != null ? $". Reason: {Reason}" : "")}"
+                "de" => $"'{Player.Username}' wurde entwarnt{(Reason != null ? $". Grund: {Reason}" : "")}",
+                "ru" => $"Игроку '{Player.Username}' сняли предупреждение{(Reason != null ? $". Причина: {Reason}" : "")}",
+                _ => $"'{Player.Username}' was unwarned{(Reason != null ? $". Reason: {Reason}" : "")}"
             };
         }
 
@@ -123,23 +137,27 @@ namespace TXServer.Core.ChatCommands
             ForceRemoved ? CreateUnPunishmentMsg(target) : CreateNewPunishmentMsg(target);
 
 
-        public Player Player { get; }
-        public PunishmentType Type { get; }
+        public long PlayerId { get; set; }
+        public virtual PlayerData Player { get; set; }
 
-        public DateTimeOffset StartTime { get; }
-        public DateTimeOffset ExpirationTime { get; }
-        public TimeSpan OriginalDuration { get; }
-        public Dictionary<string, string> TrTimes { get; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long PunishmentId { get; set; }
+
+        public PunishmentType Type { get; set; }
+
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset ExpirationTime { get; set; }
+        public TimeSpan OriginalDuration { get; set; }
+        [NotMapped] public Dictionary<string, string> TrTimes { get; set; }
         public TimeSpan Duration => ExpirationTime - DateTimeOffset.UtcNow;
 
-
-        public bool ForceRemoved = false;
+        public bool ForceRemoved { get; set; }
         public DateTimeOffset ForceRemoveTime { get; set; }
 
         public bool IsActive => (DateTimeOffset.UtcNow < ExpirationTime || IsPermanent) && !ForceRemoved;
-        public bool IsPermanent { get; }
+        public bool IsPermanent { get; set; }
 
-        public string Reason { get; }
+        public string Reason { get; set; }
         public string ForceRemovedReason { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -22,7 +24,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.TemplateAccessor.Template = new ShellUserItemTemplate();
 
-                if (player.Data.Shells.Contains(id))
+                if (player.Data.Weapons.SelectMany(weapon => weapon.ShellSkins).ToIds().Contains(id))
                     item.Components.Add(new UserGroupComponent(player.User));
             }
 
@@ -170,5 +172,20 @@ namespace TXServer.ECSSystem.GlobalEntities
                 new ParentGroupComponent(Weapons.GlobalItems.Vulcan),
                 new MarketItemGroupComponent(1322064226));
         }
+
+        public static readonly Dictionary<Entity, Entity> DefaultShells = new()
+        {
+            { Weapons.GlobalItems.Flamethrower, GlobalItems.FlamethrowerOrange },
+            { Weapons.GlobalItems.Freeze, GlobalItems.FreezeSkyblue },
+            { Weapons.GlobalItems.Hammer, GlobalItems.HammerStandard },
+            { Weapons.GlobalItems.Isis, GlobalItems.IsisStandard },
+            { Weapons.GlobalItems.Railgun, GlobalItems.RailgunPaleblue },
+            { Weapons.GlobalItems.Ricochet, GlobalItems.RicochetAurulent },
+            { Weapons.GlobalItems.Shaft, GlobalItems.ShaftStandard },
+            { Weapons.GlobalItems.Smoky, GlobalItems.SmokyStandard },
+            { Weapons.GlobalItems.Thunder, GlobalItems.ThunderStandard },
+            { Weapons.GlobalItems.Twins, GlobalItems.TwinsBlue },
+            { Weapons.GlobalItems.Vulcan, GlobalItems.VulcanStandard }
+        };
     }
 }

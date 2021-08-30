@@ -16,11 +16,11 @@ namespace TXServer.ECSSystem.Components.Notification.League
         public LeagueSeasonEndRewardNotificationComponent(Player player)
         {
             SeasonNumber = player.ServerData.SeasonNumber - 1;
-            LeagueId = player.Data.LastSeasonLeagueId;
+            LeagueId = player.Data.LastSeasonLeague.EntityId;
 
             // master/top graffiti reward
-            if (new[] {Leagues.GlobalItems.Gold.EntityId, Leagues.GlobalItems.Master.EntityId}.Contains(player.Data
-                    .LastSeasonLeagueId) &&
+            if (new[] { Leagues.GlobalItems.Gold.EntityId, Leagues.GlobalItems.Master.EntityId }.Contains(player.Data
+                    .LastSeasonLeague.EntityId) &&
                 player.ServerData.SeasonGraffities.TryGetValue(player.ServerData.SeasonNumber - 1,
                     out (long _, long topId) graffiti) &&
                 player.HasEntityWithId(graffiti.topId, out Entity topGraffiti) &&

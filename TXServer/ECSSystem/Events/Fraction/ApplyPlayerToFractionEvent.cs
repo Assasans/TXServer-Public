@@ -13,7 +13,7 @@ namespace TXServer.ECSSystem.Events.Fraction
         {
             if (player.Data.Fraction is not null) return;
 
-            player.Data.Fraction = fraction;
+            player.Data.FractionIndex = Fractions.ToId[fraction];
             if (!user.HasComponent<FractionGroupComponent>())
                 user.AddComponent(fraction.GetComponent<FractionGroupComponent>());
 

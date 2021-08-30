@@ -32,7 +32,11 @@ namespace TXServer.ECSSystem.Events.Entrance
             data.HardwareId = HardwareFingerprint;
             data.EmailSubscribed = Subscribed;
             data.AutoLoginToken = autoLoginToken;
-            data.Save();
+
+            lock (player.Server.Database)
+            {
+                player.Server.Database.Players.Add(data);
+            }
 
             byte[] autoLoginTokenEncrypted = player.EncryptionComponent.EncryptAutoLoginToken(autoLoginToken, data.PasswordHash);
 

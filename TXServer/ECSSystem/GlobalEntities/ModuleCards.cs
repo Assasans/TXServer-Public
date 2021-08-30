@@ -25,9 +25,9 @@ namespace TXServer.ECSSystem.GlobalEntities
                 item.Components.Add(new UserGroupComponent(player.User.EntityId));
 
                 long moduleId = item.GetComponent<ParentGroupComponent>().Key;
-                item.Components.Add(new UserItemCounterComponent(player.Data.Modules.ContainsKey(moduleId)
-                    ? player.Data.Modules[moduleId].Cards
-                    : 0));
+
+                player.Data.Modules.TryGetById(moduleId, module => module.Cards, out int cards);
+                item.Components.Add(new UserItemCounterComponent(cards));
             }
 
             return items;

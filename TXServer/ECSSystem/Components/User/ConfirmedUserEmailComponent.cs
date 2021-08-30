@@ -6,9 +6,9 @@ namespace TXServer.ECSSystem.Components
 	[SerialVersionUID(1457515023113L)]
 	public class ConfirmedUserEmailComponent : Component
 	{
-		public ConfirmedUserEmailComponent(string Email)
+		public ConfirmedUserEmailComponent(string email)
 		{
-			this.Email = Email;
+			Email = email;
 		}
 
 		public ConfirmedUserEmailComponent(string email, bool subscribed)

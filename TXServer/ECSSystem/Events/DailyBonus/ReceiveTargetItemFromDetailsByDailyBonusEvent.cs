@@ -22,13 +22,13 @@ namespace TXServer.ECSSystem.Events.DailyBonus
             DetailItemComponent detailComponent =
                 Config.GetComponent<DetailItemComponent>(detailUserItem.TemplateAccessor.ConfigPath);
 
-            if (!player.Data.Shards.ContainsKey(DetailMarketItemId) ||
-                player.Data.Shards[DetailMarketItemId] < detailComponent.RequiredCount) return;
+            if (!player.Data.Shards.ContainsId(DetailMarketItemId) ||
+                player.Data.Shards.GetById(DetailMarketItemId).Amount < detailComponent.RequiredCount) return;
 
             // update
-            player.Data.Shards[DetailMarketItemId] -= (int) detailComponent.RequiredCount;
+            player.Data.Shards.GetById(DetailMarketItemId).Amount -= (int) detailComponent.RequiredCount;
             detailUserItem.ChangeComponent<UserItemCounterComponent>(component =>
-                component.Count = player.Data.Shards[DetailMarketItemId]);
+                component.Count = player.Data.Shards.GetById(DetailMarketItemId).Amount);
 
             Entity containerMarketItem =
                 player.EntityList.Single(e => e.EntityId == detailComponent.TargetMarketItemId);

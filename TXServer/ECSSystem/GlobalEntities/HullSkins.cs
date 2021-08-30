@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Reflection;
 using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -22,7 +23,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.TemplateAccessor.Template = new HullSkinUserItemTemplate();
 
-                if (player.Data.HullSkins.Contains(id))
+                if (player.Data.Hulls.SelectMany(hull => hull.Skins).ToIds().Contains(id))
                     item.Components.Add(new UserGroupComponent(player.User));
             }
 

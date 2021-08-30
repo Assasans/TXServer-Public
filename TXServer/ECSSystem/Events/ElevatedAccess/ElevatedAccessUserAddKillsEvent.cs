@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Events.ElevatedAccess
 	{
 		public void Execute(Player player, Entity entity)
         {
-            if (!player.IsInMatch || !player.Data.Admin) return;
+            if (!player.IsInMatch || !player.Data.IsAdmin) return;
 			var battlePlayer = (BattleTankPlayer)player.BattlePlayer;
 
 			battlePlayer.MatchPlayer.UpdateStatistics(0, additiveKills:Count, 0, 0, null);

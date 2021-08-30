@@ -82,6 +82,7 @@ namespace TXServer.Core
 
             new Thread(BattleLoop) { Name = "Battle Thread" }.Start();
             new Thread(PlayerLoop) { Name = "Player Thread" }.Start();
+            new Thread(DatabaseLoop) { Name = "Database Thread" }.Start();
 
 #if DEBUG
             if (!Server.Instance.Settings.DisablePingMessages)
@@ -350,6 +351,42 @@ namespace TXServer.Core
             }
         }
 
+        private void DatabaseLoop()
+        {
+            Stopwatch stopwatch = new();
+
+            try
+            {
+                while (true)
+                {
+                    if (!IsStarted) return;
+
+                    Logger.Trace($"> Database loop ({LastDatabaseTickDuration * 1000} ms)");
+
+                    stopwatch.Restart();
+                    Server.Database.Save();
+
+                    stopwatch.Stop();
+
+                    TimeSpan spentOnDatabase = stopwatch.Elapsed;
+
+                    stopwatch.Start();
+                    if (spentOnDatabase.TotalSeconds < DatabaseTickDuration)
+                        Thread.Sleep(TimeSpan.FromSeconds(DatabaseTickDuration) - spentOnDatabase);
+
+                    stopwatch.Stop();
+                    LastDatabaseTickDuration = stopwatch.Elapsed.TotalSeconds;
+                }
+            }
+            catch (Exception e)
+            {
+#if DEBUG
+                Debugger.Launch();
+#endif
+                HandleError(e);
+            }
+        }
+
         private static void HandleError(Exception exception) => Server.Instance.HandleError(exception);
 
         // Player pool.
@@ -369,8 +406,12 @@ namespace TXServer.Core
         private const double BattleTickDuration = 1.0 / BattleTickRate;
 
         public static double LastPlayerTickDuration { get; set; }
-        private const int PlayerTickRate = 1000;
+        private const double PlayerTickRate = 0.1;
         private const double PlayerTickDuration = 1.0 / PlayerTickRate;
+
+        public static double LastDatabaseTickDuration { get; set; }
+        private const int DatabaseTickRate = 1000;
+        private const double DatabaseTickDuration = 1.0 / PlayerTickRate;
 
         // Server state.
         public bool IsStarted { get; private set; }

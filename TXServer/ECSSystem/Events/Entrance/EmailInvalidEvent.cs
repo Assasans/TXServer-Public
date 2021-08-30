@@ -6,9 +6,9 @@ namespace TXServer.ECSSystem.Events
 	[SerialVersionUID(1455866538339)]
 	public class EmailInvalidEvent : ECSEvent
 	{
-		public EmailInvalidEvent(string Email)
+		public EmailInvalidEvent(string email)
 		{
-			this.Email = Email;
+			Email = email;
 		}
 
 		public string Email { get; set; }

@@ -1,4 +1,5 @@
-﻿using TXServer.Core;
+﻿using System.Collections.Generic;
+using TXServer.Core;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Fraction;
@@ -10,6 +11,18 @@ namespace TXServer.ECSSystem.GlobalEntities
     public static class Fractions
     {
         public static Items GlobalItems { get; } = new Items();
+
+        public static Dictionary<int, Entity> ByIndex { get; } = new Dictionary<int, Entity>()
+        {
+            [0] = GlobalItems.Antaeus,
+            [1] = GlobalItems.Frontier
+        };
+
+        public static Dictionary<Entity, int> ToId { get; } = new Dictionary<Entity, int>()
+        {
+            [GlobalItems.Antaeus] = 0,
+            [GlobalItems.Frontier] = 1
+        };
 
         public class Items : ItemList
         {

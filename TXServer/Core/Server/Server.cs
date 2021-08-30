@@ -6,6 +6,7 @@ using TXServer.Core.Battles;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;
+using TXServer.Database.Provider;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core
@@ -34,14 +35,14 @@ namespace TXServer.Core
         {
             Logger.Log("Starting server...");
             Logger.Log($"Database provider: {Database.GetType().Name}");
-            Logger.Log($"Registered players: {Database.GetPlayerCount()}");
+            Logger.Log($"Registered players: {Database.Players.Count()}");
 
-            ServerData = Database.GetServerData();
+            ServerData = Database.Servers.SingleOrDefault();
             if (ServerData == null)
             {
                 ServerData = new ServerData();
                 ServerData.InitDefault();
-                ServerData.Save();
+                Database.Servers.Add(ServerData);
             }
 
             Connection = new ServerConnection(this);
@@ -76,6 +77,9 @@ namespace TXServer.Core
             Logger.Log("Stopping server...");
 
             Connection.StopServer();
+
+            Logger.Debug("Saving database...");
+            Database.Save();
             Database.Shutdown();
 
             Logger.Log("Server is stopped.");

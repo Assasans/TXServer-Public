@@ -10,12 +10,12 @@ namespace TXServer.ECSSystem.Events
     {
         public FriendsLoadedEvent(Player player)
         {
-            foreach (long friendId in player.Data.AcceptedFriendIds)
-                AcceptedFriendsIds.Add(friendId);
-            foreach (long friendId in player.Data.IncomingFriendIds)
-                IncommingFriendsIds.Add(friendId);
-            foreach (long friendId in player.Data.OutgoingFriendIds)
-                OutgoingFriendsIds.Add(friendId);
+            foreach (PlayerData.PlayerRelation relation in player.Data.Relations.FilterType(PlayerData.PlayerRelation.RelationType.Friend))
+                AcceptedFriendsIds.Add(relation.TargetId);
+            foreach (PlayerData.PlayerRelation relation in player.Data.Relations.FilterType(PlayerData.PlayerRelation.RelationType.IncomingFriend))
+                IncommingFriendsIds.Add(relation.TargetId);
+            foreach (PlayerData.PlayerRelation relation in player.Data.Relations.FilterType(PlayerData.PlayerRelation.RelationType.OutgoingFriend))
+                OutgoingFriendsIds.Add(relation.TargetId);
         }
 
         public HashSet<long> AcceptedFriendsIds { get; set; } = new HashSet<long>();

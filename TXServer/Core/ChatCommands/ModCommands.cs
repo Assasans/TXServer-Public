@@ -48,7 +48,7 @@ namespace TXServer.Core.ChatCommands
                 out string timeResult, out Dictionary<string, string> trTimes)) return timeResult;
             string reason = args.Length > 2 ? string.Join(" ", args[2..]) : null;
 
-            target.Data.Punishments.Add(new Punishment(PunishmentType.Ban, target, reason,
+            target.Data.Punishments.Add(Punishment.Create(PunishmentType.Ban, target.Data, reason,
                 trTimes, endTime, isPermanent));
             target.Dispose();
 
@@ -70,7 +70,7 @@ namespace TXServer.Core.ChatCommands
             if (target == null && long.TryParse(targetIdentifier, out long targetUid))
                 target = Server.Instance.FindPlayerByUid(targetUid);
 
-            if (target != null && target.Data.Admin)
+            if (target != null && target.Data.IsAdmin)
             {
                 error = $"Error, '{target.Data.Username}' is an admin";
                 target = null;
@@ -251,7 +251,7 @@ namespace TXServer.Core.ChatCommands
                 out string timeResult, out Dictionary<string, string> trTimes)) return timeResult;
             string reason = args.Length > 2 ? string.Join(" ", args[2..]) : null;
 
-            target.Data.Punishments.Add(new Punishment(PunishmentType.Mute, target, reason,
+            target.Data.Punishments.Add(Punishment.Create(PunishmentType.Mute, target.Data, reason,
                 trTimes, endTime, isPermanent));
 
             GetPunishmentMsgData(target, out Entity chat, out IEnumerable<Player> msgTargets);
@@ -313,7 +313,7 @@ namespace TXServer.Core.ChatCommands
             if (!FindPlayer(args[0], out Player target, out string error)) return error;
             string reason = args.Length > 1 ? string.Join(" ", args[1..]) : null;
 
-            target.Data.Punishments.Add(new Punishment(PunishmentType.Warn, target, reason));
+            target.Data.Punishments.Add(Punishment.Create(PunishmentType.Warn, target.Data, reason));
 
             GetPunishmentMsgData(target, out Entity chat, out IEnumerable<Player> msgTargets);
             ChatMessageReceivedEvent.PunishMessageOtherPlayers(target.Data.Punishments.Last(), msgTargets,

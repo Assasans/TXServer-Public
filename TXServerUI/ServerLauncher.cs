@@ -61,8 +61,11 @@ namespace TXServer.Core
 
                 IDatabase database = settings.DatabaseProvider switch
                 {
-                    "memory" => new InMemoryDatabase(),
-                    "mongo" => new MongoDatabase(databaseConfig),
+                    "memory" => new InMemoryDatabase(new InMemoryDatabaseConfig()
+                    {
+                        Database = databaseConfig.Database
+                    }),
+                    "mysql" => new MySqlDatabase(databaseConfig),
                     _ => throw new InvalidOperationException($"Unknown database provider: {settings.DatabaseProvider}")
                 };
 

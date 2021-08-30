@@ -1,4 +1,5 @@
-﻿using TXServer.Core;
+﻿using System.Linq;
+using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
@@ -9,7 +10,8 @@ namespace TXServer.ECSSystem.Events
     {
         public void Execute(Player player, Entity entity)
         {
-            Player remotePlayer = Server.Instance.FindPlayerByUid(UserId);
+            // TODO(Assasans): Database only saves PlayerData, but UserProfileLoadedEvent requires Player entity to be shared
+            Player remotePlayer = Server.Instance.Connection.Pool.SingleOrDefault(player => player.Data.UniqueId == UserId);
 
             player.SharePlayers(remotePlayer);
             player.SendEvent(new UserProfileLoadedEvent(), remotePlayer.User);

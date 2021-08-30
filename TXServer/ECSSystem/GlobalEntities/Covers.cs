@@ -22,7 +22,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.TemplateAccessor.Template = new WeaponPaintUserItemTemplate();
 
-                if (player.Data.Covers.Contains(id))
+                if (player.Data.Covers.ContainsId(id))
                     item.Components.Add(new UserGroupComponent(player.User));
             }
 
