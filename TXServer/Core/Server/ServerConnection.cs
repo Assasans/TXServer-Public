@@ -361,8 +361,6 @@ namespace TXServer.Core
                 {
                     if (!IsStarted) return;
 
-                    Logger.Trace($"> Database loop ({LastDatabaseTickDuration * 1000} ms)");
-
                     stopwatch.Restart();
                     Server.Database.Save();
 
