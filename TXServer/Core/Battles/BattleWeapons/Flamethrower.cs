@@ -16,7 +16,7 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         public override float BaseDamage(float hitDistance, MatchPlayer target, bool isSplashHit = false)
         {
-            Damage.DealNewTemperature(Weapon, MarketItem, target, MatchPlayer);
+            Damage.DealNewTemperature(Weapon, MarketItem, target, MatchPlayer, hitDistance);
             float damage = (int) DamagePerSecond * CooldownIntervalSec;
             float modifier = DamageDistanceMultiplier(hitDistance);
 

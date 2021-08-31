@@ -47,8 +47,7 @@ namespace TXServer.Core.Battles.Effect
         public override float DamageWithEffect(float damage, MatchPlayer target, bool isHeatDamage, bool isModuleDamage,
             Entity weaponMarketItem)
         {
-            if (!(Mines.Contains(weaponMarketItem.TemplateAccessor.Template.GetType()) && EffectIsActive &&
-                  !IsOnCooldown))
+            if (!(_mines.Contains(weaponMarketItem.EntityId) && !IsOnCooldown && !IsEmpLocked))
                 return damage;
 
             Activate();
@@ -57,10 +56,11 @@ namespace TXServer.Core.Battles.Effect
 
         private float DamageResistanceEffect { get; set; }
 
-        private List<Type> Mines = new()
+        private readonly List<long> _mines = new()
         {
-            Modules.GlobalItems.Mine.GetType(),
-            Modules.GlobalItems.Spidermine.GetType(),
+            Modules.GlobalItems.Icetrap.EntityId,
+            Modules.GlobalItems.Mine.EntityId,
+            Modules.GlobalItems.Spidermine.EntityId,
         };
     }
 }

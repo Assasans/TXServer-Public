@@ -39,7 +39,7 @@ namespace TXServer.Core.Battles.Effect
         }
 
 
-        public float GetReducedDamage(float damage) => damage * Factor;
+        public float GetReducedDamage(float damage) => EffectIsActive && !IsEmpLocked ? damage * Factor : damage;
 
         private float Factor { get; set; }
     }

@@ -13,7 +13,8 @@ using TXServer.ECSSystem.Events.Battle.Effect;
 using TXServer.ECSSystem.Types;
 using TXServer.Library;
 
-namespace TXServer.Core.Battles.Effect {
+namespace TXServer.Core.Battles.Effect
+{
     public abstract class BattleModule
     {
 		protected BattleModule(MatchPlayer matchPlayer, Entity moduleEntity)
@@ -100,7 +101,7 @@ namespace TXServer.Core.Battles.Effect {
 
         public void ActivateEmpLock(float duration)
         {
-            if (IsSupply || IsCheat)
+            if (IsSupply || IsCheat || ModuleEntity is null)
             {
                 Deactivate();
                 return;
@@ -134,6 +135,9 @@ namespace TXServer.Core.Battles.Effect {
             ModuleEntity.RemoveComponent<SlotLockedByEMPComponent>();
             ModuleEntity.RemoveComponent<InventorySlotTemporaryBlockedByServerComponent>();
             EmpLockEnd = null;
+
+            if (MatchPlayer.TryGetModule(out AdrenalineModule adrenalineModule))
+                adrenalineModule.CheckActivationNecessity();
         }
 
         public virtual bool AllowsDamage() => true;
@@ -331,7 +335,6 @@ namespace TXServer.Core.Battles.Effect {
         }
         private int MaxAmmunition
         {
-            get => ModuleEntity.GetComponent<InventoryAmmunitionComponent>().MaxCount;
             set
             {
                 if (ModuleEntity.HasComponent<InventoryAmmunitionComponent>())

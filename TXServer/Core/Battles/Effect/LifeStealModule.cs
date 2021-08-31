@@ -1,11 +1,9 @@
-using System;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Module.LifeSteal;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
-using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Effect;
 
 namespace TXServer.Core.Battles.Effect

@@ -55,9 +55,10 @@ namespace TXServer.Core.Battles.Effect
 
         public float LowerTemperatureChange(float temperatureChange)
         {
+            if (IsEmpLocked) return temperatureChange;
             if (temperatureChange < 0)
-                return temperatureChange + Decrement * MatchPlayer.TemperatureConfigComponent.TactPeriodInMs / 10;
-            return temperatureChange - Increment * MatchPlayer.TemperatureConfigComponent.TactPeriodInMs / 10;
+                return temperatureChange + Decrement * MatchPlayer.TemperatureConfigComponent.TactPeriodInMs / 11;
+            return temperatureChange - Increment * MatchPlayer.TemperatureConfigComponent.TactPeriodInMs / 11;
         }
 
         private float Decrement { get; set; }

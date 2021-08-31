@@ -59,12 +59,13 @@ namespace TXServer.Core.Battles.Effect
                 return;
             }
 
-            if (healthComponent.CurrentHealth / healthComponent.MaxHealth > MaxHpPercentWorking)
+            if (healthComponent.CurrentHealth / healthComponent.MaxHealth < MaxHpPercentWorking)
             {
-                if (EffectIsActive) Deactivate();
+                if (!IsEmpLocked && !EffectIsActive)
+                    Activate();
             }
-            else if (!EffectIsActive) Activate();
-
+            else if (EffectIsActive)
+                    Deactivate();
         }
 
         public override float DamageWithEffect(float damage, MatchPlayer target, bool isHeatDamage, bool isModuleDamage,

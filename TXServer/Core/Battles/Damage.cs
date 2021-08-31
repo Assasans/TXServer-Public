@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using TXServer.Core.Battles.BattleWeapons;
@@ -13,6 +14,7 @@ using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
+using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents.Tank;
 using TXServer.ECSSystem.Types;
@@ -40,8 +42,7 @@ namespace TXServer.Core.Battles
             if (isBackHit) damage *= 1.20f;
             if (isTurretHit) damage *= 2;
 
-            if ((isBackHit || isTurretHit) && victim.TryGetModule(out BackhitDefenceModule backhitDefModule) &&
-                backhitDefModule.EffectIsActive)
+            if ((isBackHit || isTurretHit) && victim.TryGetModule(out BackhitDefenceModule backhitDefModule))
                 damage = backhitDefModule.GetReducedDamage(damage);
 
             bool isCritical = !IsModule(weaponMarketItem) && damager.BattleWeapon.IsCritical(victim, localHitPoint);
@@ -59,10 +60,8 @@ namespace TXServer.Core.Battles
 
                 if (component.CurrentHealth <= 0)
                 {
-                    if (victim.TryGetModule(out EmergencyProtectionModule ep) &&
-                        !ep.IsOnCooldown)
-                        ep.Activate();
-                    else
+                    if (!(victim.TryGetModule(out EmergencyProtectionModule ep) &&
+                          ep.TryActivate()))
                         ProcessKill(weaponMarketItem, victim, damager);
                 }
                 else
@@ -105,7 +104,7 @@ namespace TXServer.Core.Battles
         }
 
         public static void DealNewTemperature(Entity weapon, Entity weaponMarketItem, MatchPlayer target,
-            MatchPlayer shooter, bool onlyNormalize = false)
+            MatchPlayer shooter, float hitDistance = 0, bool onlyNormalize = false)
         {
             (_, BattleModule module) = GetWeaponItems(weapon, shooter);
             bool isModule = module != null;
@@ -121,8 +120,14 @@ namespace TXServer.Core.Battles
             else
                 temperatureChange = shooter.BattleWeapon.TemperatureDeltaPerHit(totalTemperature);
 
+            float original = temperatureChange;
+            if (!isModule && hitDistance > 8)
+                temperatureChange = MathUtils.Map(hitDistance, 16, 8,
+                    temperatureChange / 100 * (temperatureChange > 0 ? 45 : 15), temperatureChange);
+
             if (Math.Abs(temperatureChange) <= 0) return;
 
+            // TempBlock module
             if (target.TryGetModule(out TempblockModule tempblockModule))
                 temperatureChange = tempblockModule.LowerTemperatureChange(temperatureChange);
 

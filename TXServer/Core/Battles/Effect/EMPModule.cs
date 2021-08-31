@@ -47,10 +47,10 @@ namespace TXServer.Core.Battles.Effect
                 if (target.TryGetModule(out InvulnerabilityModule shieldModule))
                     if (shieldModule.EffectIsActive) continue;
 
-                target.SendEvent(new EMPEffectReadyEvent(), tank);
+                MatchPlayer.Battle.PlayersInMap.SendEvent(new EMPEffectReadyEvent(), tank);
 
                 foreach (BattleModule module in target.Modules.ToList()
-                    .Where(module => module.GetType() != typeof(GoldModule)))
+                    .Where(module => module.GetType() != typeof(GoldModule) && !module.IsCheat))
                     module.ActivateEmpLock(Duration);
             }
         }

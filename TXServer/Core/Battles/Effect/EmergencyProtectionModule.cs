@@ -47,6 +47,9 @@ namespace TXServer.Core.Battles.Effect
             {
                 float healHp = FixedHp + AdditiveHpFactor * MatchPlayer.Tank.GetComponent<HealthComponent>().MaxHealth;
                 Damage.DealHeal(healHp, MatchPlayer);
+                MatchPlayer.TemperatureHits.Clear();
+                MatchPlayer.Temperature = MatchPlayer.TemperatureFromAllHits();
+                MatchPlayer.SpeedByTemperature();
             }
 
             MatchPlayer.Weapon.TryAddComponent(new ShootableComponent());
@@ -68,7 +71,15 @@ namespace TXServer.Core.Battles.Effect
                 .GetComponent<ModuleEmergencyProtectionEffectHolyshieldDurationPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
 
-            TemperatureChange = (float) MathUtils.Map(Level, 0, 9, -0.8, -1);
+            TemperatureChange = (float) MathUtils.Map(Level, 0, 9, -0.8, -0.5);
+        }
+
+        public bool TryActivate()
+        {
+            if (IsOnCooldown || IsEmpLocked) return false;
+
+            Activate();
+            return true;
         }
 
         public override bool AllowsDamage() => !EffectIsActive;

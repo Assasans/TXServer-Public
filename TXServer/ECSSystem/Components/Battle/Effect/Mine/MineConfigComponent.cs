@@ -1,7 +1,8 @@
 ﻿using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 
-namespace TXServer.ECSSystem.Components.Battle.Effect.Mine {
+namespace TXServer.ECSSystem.Components.Battle.Effect.Mine
+{
     [SerialVersionUID(1431927384785L)]
     public class MineConfigComponent : Component
     {
