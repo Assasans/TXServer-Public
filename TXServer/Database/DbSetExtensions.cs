@@ -30,7 +30,8 @@ namespace TXServer.Database
                 .IncludeOptimized(player => player.Modules)
                 .IncludeOptimized(player => player.Shards)
                 .IncludeOptimized(player => player.Statistics)
-                .IncludeOptimized(player => player.DailyBonusReceivedRewards);
+                .IncludeOptimized(player => player.DailyBonusReceivedRewards)
+                .IncludeOptimized(player => player.CompletedTutorials);
         }
     }
 }

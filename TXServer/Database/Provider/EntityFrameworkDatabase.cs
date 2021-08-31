@@ -142,6 +142,11 @@ namespace TXServer.Database.Provider
                 entity.HasKey(reward => new { reward.PlayerId, reward.EntityId });
             });
 
+            builder.Entity<PlayerCompletedTutorial>(entity =>
+            {
+                entity.HasKey(tutorial => new { tutorial.PlayerId, tutorial.EntityId });
+            });
+
             builder.Entity<PlayerStatistics>(entity =>
             {
                 entity.HasKey(statistics => new { statistics.PlayerId });
@@ -177,6 +182,7 @@ namespace TXServer.Database.Provider
         public DbSet<PlayerData.PlayerContainerShards> ContainerShards { get; protected set; } = null!;
 
         public DbSet<DailyBonusReward> DailyBonusRewards { get; protected set; } = null!;
+        public DbSet<PlayerCompletedTutorial> CompletedTutorials { get; protected set; } = null!;
 
         public DbSet<ServerData> Servers { get; protected set; } = null!;
 

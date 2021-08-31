@@ -45,6 +45,25 @@ namespace TXServer.Core
         public long EntityId { get; set; }
     }
 
+    public class PlayerCompletedTutorial : PlayerData.IEntity
+    {
+        public static PlayerCompletedTutorial Create(PlayerData player, long entityId)
+        {
+            return new PlayerCompletedTutorial()
+            {
+                Player = player,
+                PlayerId = player.UniqueId,
+                EntityId = entityId
+            };
+        }
+
+        public long PlayerId { get; set; }
+        [ForeignKey("PlayerId")]
+        public virtual PlayerData Player { get; set; }
+
+        public long EntityId { get; set; }
+    }
+
     // public class Preset
     // {
     //     [BsonIgnore] public PlayerData PlayerData { get; }
@@ -296,7 +315,7 @@ namespace TXServer.Core
             // ReportedPlayerIds = new ObservableList<long>();
 
             Punishments = new List<Punishment>();
-            CompletedTutorialIds = new ObservableList<ulong>();
+            CompletedTutorials = new List<PlayerCompletedTutorial>();
 
             Dictionary<Entity, Entity> defaultHulls = new Dictionary<Entity, Entity>();
             foreach ((Entity weapon, Entity skin) in GlobalEntities.Hulls.DefaultSkins)
@@ -749,7 +768,7 @@ namespace TXServer.Core
         // [Obsolete("Replaced by Relations", true)] [NotMapped /* TODO */] public virtual ObservableList<long> BlockedPlayerIds { get; private set; } = new ObservableList<long>();
         // [Obsolete("Replaced by Relations", true)] [NotMapped /* TODO */] public virtual ObservableList<long> ReportedPlayerIds { get; private set; } = new ObservableList<long>();
 
-        [NotMapped /* TODO */] public virtual ObservableList<ulong> CompletedTutorialIds { get; private set; } = new ObservableList<ulong>();
+        public virtual List<PlayerCompletedTutorial> CompletedTutorials { get; private set; } = new List<PlayerCompletedTutorial>();
 
         public virtual List<Punishment> Punishments { get; private set; } = new List<Punishment>();
 
@@ -1182,12 +1201,12 @@ namespace TXServer.Core
             Relations.Add(PlayerRelation.Create(this, user, PlayerRelation.RelationType.Reported));
         }
 
-        public void AddCompletedTutorial(ulong tutorialId)
+        public void AddCompletedTutorial(long tutorialId)
         {
-            CompletedTutorialIds.Add(tutorialId);
+            CompletedTutorials.Add(PlayerCompletedTutorial.Create(this, tutorialId));
 
             if (Player?.User is null) return;
-            Player.User.ChangeComponent<TutorialCompleteIdsComponent>(component => component.CompletedIds.Add(tutorialId));
+            Player.User.ChangeComponent<TutorialCompleteIdsComponent>();
         }
 
         public void AddHullXp(int xp, Entity hull)

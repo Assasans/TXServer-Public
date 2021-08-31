@@ -10,45 +10,46 @@ namespace TXServer.ECSSystem.Components.User.Tutorial
     [SerialVersionUID(1505286737090)]
     public class TutorialCompleteIdsComponent : Component
     {
-        public TutorialCompleteIdsComponent(IEnumerable<ulong> completedIds, Player player)
+        public TutorialCompleteIdsComponent(Player player)
         {
-            // ReSharper disable once PossibleNullReferenceException
-            CompletedIds = ((IPEndPoint) player.Connection.Socket.RemoteEndPoint).Address.Equals(IPAddress.Loopback)
-                ? _allIds
-                : _temporarilyBlockedIds.Concat(completedIds).ToList();
+            SelfOnlyPlayer = player;
         }
 
-        public List<ulong> CompletedIds { get; set; }
+        // ReSharper disable once PossibleNullReferenceException
+        public IReadOnlyList<long> CompletedIds => ((IPEndPoint) SelfOnlyPlayer.Connection.Socket.RemoteEndPoint).Address.Equals(IPAddress.Loopback)
+            ? _allIds
+            : _temporarilyBlockedIds.Concat(SelfOnlyPlayer.Data.CompletedTutorials.ToIds()).ToList();
+
         public bool TutorialSkipped { get; set; }
 
-        private readonly List<ulong> _allIds = new()
+        private readonly List<long> _allIds = new()
         {
-            0x00000000190828D4,
-            0x000000006C508645,
-            0xFFFFFFFFFFF473B3,
-            0x000000006C508646,
-            0x000000006C508647,
-            0x000000001DC04290,
-            0x0000000066EFE2F8,
-            0xFFFFFFFFD975A705,
-            0xFFFFFFFFA0285472,
-            0xFFFFFFFFF60C1145,
-            0x000000006EC527F6
+            419965140,
+            1817216581,
+            -756813,
+            1817216582,
+            1817216583,
+            499139216,
+            1726997240,
+            -646600955,
+            -1607969678,
+            -166981307,
+            1858414582
         };
 
-        private readonly List<ulong> _temporarilyBlockedIds = new()
+        private readonly List<long> _temporarilyBlockedIds = new()
         {
-            //0x00000000190828D4,
-            0x000000006C508645,
-            0xFFFFFFFFFFF473B3,
-            0x000000006C508646,
-            0x000000006C508647,
-            0x000000001DC04290,
-            0x0000000066EFE2F8,
-            0xFFFFFFFFD975A705,
-            0xFFFFFFFFA0285472,
-            0xFFFFFFFFF60C1145,
-            0x000000006EC527F6
+            // 419965140,
+            1817216581,
+            -756813,
+            1817216582,
+            1817216583,
+            499139216,
+            1726997240,
+            -646600955,
+            -1607969678,
+            -166981307,
+            1858414582
         };
     }
 }

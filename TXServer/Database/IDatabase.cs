@@ -35,6 +35,7 @@ namespace TXServer.Core.Data.Database
         DbSet<PlayerData.PlayerContainerShards> ContainerShards { get;  }
 
         DbSet<DailyBonusReward> DailyBonusRewards { get; }
+        DbSet<PlayerCompletedTutorial> CompletedTutorials { get; }
 
         DbSet<ServerData> Servers { get; }
 

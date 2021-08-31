@@ -7,8 +7,8 @@ namespace TXServer.ECSSystem.Events.Tutorial
     [SerialVersionUID(1505212007257L)]
     public class ApplyTutorialIdEvent : ECSEvent
     {
-        public void Execute(Player player, Entity session) => player.Data.AddCompletedTutorial((ulong) Id);
+        public void Execute(Player player, Entity session) => player.Data.AddCompletedTutorial(Id);
 
-        public long Id { get; private set; }
+        public long Id { get; set; }
     }
 }

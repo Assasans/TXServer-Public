@@ -28,7 +28,7 @@ namespace TXServer.ECSSystem.EntityTemplates.User
                 new UserExperienceComponent(player.Data.Experience),
                 new UserReputationComponent(player.Data.Reputation),
 
-                new TutorialCompleteIdsComponent(player.Data.CompletedTutorialIds, player),
+                new TutorialCompleteIdsComponent(player),
 
                 new FractionUserScoreComponent(player.Data.FractionUserScore),
 
