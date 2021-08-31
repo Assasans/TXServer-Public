@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -10,10 +11,9 @@ namespace TXServer.ECSSystem.Components.DailyBonus
     {
         public UserDailyBonusReceivedRewardsComponent(Player player)
         {
-            ReceivedRewards = player.Data.DailyBonusReceivedRewards;
             SelfOnlyPlayer = player;
         }
 
-        public IList<long> ReceivedRewards { get; set; }
+        public IReadOnlyList<long> ReceivedRewards => SelfOnlyPlayer.Data.DailyBonusReceivedRewards.ToIds().ToList().AsReadOnly();
     }
 }

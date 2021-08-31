@@ -26,6 +26,24 @@ using GlobalEntities = TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core
 {
+    public class DailyBonusReward : PlayerData.IEntity
+    {
+        public static DailyBonusReward Create(PlayerData player, long entityId)
+        {
+            return new DailyBonusReward()
+            {
+                Player = player,
+                PlayerId = player.UniqueId,
+                EntityId = entityId
+            };
+        }
+
+        public long PlayerId { get; set; }
+        [ForeignKey("PlayerId")]
+        public virtual PlayerData Player { get; set; }
+
+        public long EntityId { get; set; }
+    }
 
     // public class Preset
     // {
@@ -254,7 +272,7 @@ namespace TXServer.Core
 
             DailyBonusCycle = 0;
             DailyBonusNextReceiveDate = DateTime.UtcNow;
-            DailyBonusReceivedRewards = new ObservableCollection<long>();
+            DailyBonusReceivedRewards = new List<DailyBonusReward>();
             DailyBonusZone = 0;
 
             RegistrationDate = DateTimeOffset.UtcNow;
@@ -613,7 +631,7 @@ namespace TXServer.Core
                 });
             }
         }
-        [NotMapped /* TODO */] public ObservableCollection<long> DailyBonusReceivedRewards { get; set; } = new ObservableCollection<long>();
+        public List<DailyBonusReward> DailyBonusReceivedRewards { get; set; } = new List<DailyBonusReward>();
         public int DailyBonusZone
         {
             get => _dailyBonusZone;
@@ -1118,15 +1136,13 @@ namespace TXServer.Core
 
         public void AddDailyBonusReward(long code)
         {
-            DailyBonusReceivedRewards.Add(code);
-
-            Player.User.ChangeComponent<UserDailyBonusReceivedRewardsComponent>(component => component.ReceivedRewards.Add(code));
+            DailyBonusReceivedRewards.Add(DailyBonusReward.Create(this, code));
+            Player.User.ChangeComponent<UserDailyBonusReceivedRewardsComponent>();
         }
         public void ResetDailyBonusRewards()
         {
             DailyBonusReceivedRewards.Clear();
-
-            Player.User.ChangeComponent<UserDailyBonusReceivedRewardsComponent>(component => component.ReceivedRewards.Clear());
+            Player.User.ChangeComponent<UserDailyBonusReceivedRewardsComponent>();
         }
 
         public void AddIncomingFriend(PlayerData user)

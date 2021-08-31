@@ -11,11 +11,9 @@ namespace TXServer.ECSSystem.Components
 	[SerialVersionUID(1499174753575)]
 	public class UserStatisticsComponent : Component
     {
-        private readonly Player _player;
-
         public UserStatisticsComponent(Player player)
         {
-            _player = player;
+            SelfOnlyPlayer = player;
         }
 
 		private static readonly Dictionary<string, Func<PlayerStatistics, long>> PropertyMap = new()
@@ -63,7 +61,7 @@ namespace TXServer.ECSSystem.Components
                 Dictionary<string, long> statistics = new Dictionary<string, long>();
                 foreach ((string key, Func<PlayerStatistics, long> mapper) in PropertyMap)
                 {
-                    statistics.Add(key, mapper(_player.Data.Statistics));
+                    statistics.Add(key, mapper(SelfOnlyPlayer.Data.Statistics));
                 }
 
                 return new ReadOnlyDictionary<string, long>(statistics);

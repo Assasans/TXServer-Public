@@ -34,13 +34,15 @@ namespace TXServer.Core.Data.Database
         DbSet<PlayerData.PlayerContainer> Containers { get; }
         DbSet<PlayerData.PlayerContainerShards> ContainerShards { get;  }
 
+        DbSet<DailyBonusReward> DailyBonusRewards { get; }
+
         DbSet<ServerData> Servers { get; }
 
         DbSet<Invite> Invites { get; }
         DbSet<BlockedUsername> BlockedUsernames { get; }
 
         // PlayerData
-        
+
         PlayerData? GetPlayerData(string username);
         PlayerData? GetPlayerDataById(long id);
         PlayerData? GetPlayerDataByEmail(string email);
