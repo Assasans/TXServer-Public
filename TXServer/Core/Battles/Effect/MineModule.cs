@@ -97,9 +97,7 @@ namespace TXServer.Core.Battles.Effect
                 for (int i = 0; i < MatchPlayer.Battle.MatchTankPlayers.Count; i++)
                 {
                     if (MatchPlayer.IsEnemyOf(players[i]) &&
-                        Vector3.Distance(players[i].TankPosition, position) < TriggeringArea &&
-                        !(players[i].TryGetModule(typeof(InvulnerabilityModule), out BattleModule module)
-                          && module.EffectIsActive))
+                        Vector3.Distance(players[i].TankPosition, position) < TriggeringArea)
                         TryExplode(mine);
                 }
             }

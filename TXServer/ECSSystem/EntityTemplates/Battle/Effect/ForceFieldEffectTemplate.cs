@@ -7,9 +7,9 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
 	[SerialVersionUID(1503314606668L)]
 	public class ForceFieldEffectTemplate : EffectBaseTemplate
     {
-        private static readonly string _configPath = "/battle/effect/forcefield";
+        private const string ConfigPath = "/battle/effect/forcefield";
 
-		public static Entity CreateEntity(MatchPlayer matchPlayer) =>
-            CreateEntity(new ForceFieldEffectTemplate(), _configPath, matchPlayer, 8000, addTeam:true);
+        public static Entity CreateEntity(MatchPlayer matchPlayer) =>
+            CreateEntity(new ForceFieldEffectTemplate(), ConfigPath, matchPlayer, 8000, addTeam:true);
     }
 }

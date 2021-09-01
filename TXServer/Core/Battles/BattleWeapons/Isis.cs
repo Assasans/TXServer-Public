@@ -62,7 +62,7 @@ namespace TXServer.Core.Battles.BattleWeapons
             MatchPlayer
                 .SendEvent(new VisualScoreHealEvent(additiveScore), MatchPlayer.BattleUser);
 
-            MatchPlayer.UpdateStatistics(additiveScore:additiveScore, 0, 0, 0, null);
+            MatchPlayer.UpdateStatistics(additiveScore:additiveScore, 0, 0, 0);
         }
 
         public override bool IsOnCooldown(MatchPlayer target) => IsStreamOnCooldown(target);

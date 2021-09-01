@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using TXServer.Core.Battles.BattleWeapons;
@@ -14,7 +13,6 @@ using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.EntityTemplates.Battle;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.VisualScore;
-using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents.Tank;
 using TXServer.ECSSystem.Types;
@@ -49,8 +47,8 @@ namespace TXServer.Core.Battles
             if (isCritical) damage = damager.BattleWeapon.DamageWithCritical(isBackHit, damage);
 
 
-            damage = GetHpWithEffects(damage, victim, damager, IsModule(weaponMarketItem), isHeatDamage,
-                weaponMarketItem);
+            damage = GetHpWithEffects(damage, victim, damager, isModule:IsModule(weaponMarketItem),
+                isHeatDamage, weaponMarketItem);
 
             damager.UserResult.Damage += (int) damage;
 
@@ -263,6 +261,9 @@ namespace TXServer.Core.Battles
             foreach (BattleModule module in target.Modules)
                 damage = module.DamageWithEffect(damage, target, isHeatDamage, isModule, weaponMarketItem);
 
+            foreach (BattleModule module in shooter.Modules)
+                damage = module.DamageWithEffect(damage, target, isHeatDamage, isModule, weaponMarketItem);
+
             return damage;
         }
 
@@ -283,18 +284,18 @@ namespace TXServer.Core.Battles
             bool isModule = battleModule is not null;
 
             if (!isModule && shooter.Battle.ExtendedBattleMode is ExtendedBattleMode.HPS) return;
-
             if (target.TankState is not TankState.Active) return;
             if (!isModule && shooter.BattleWeapon.IsOnCooldown(target)) return;
 
-            float damage;
-            if (isModule)
-            {
-                damage = battleModule.BaseDamage(weapon, target);
-                if (damage == 0) return;
-            }
-            else
-                damage = shooter.BattleWeapon.BaseDamage(hitTarget.HitDistance, target, isSplashHit);
+            if (shooter.IsEnemyOf(target))
+                foreach (BattleModule module in target.Modules)
+                    if (!module.AllowsDamage()) return;
+
+            float damage = isModule
+                ? battleModule.BaseDamage(weapon, target)
+                : shooter.BattleWeapon.BaseDamage(hitTarget.HitDistance, target, isSplashHit);
+
+            if (damage == 0) return;
 
             DealDamage(marketItem, target, shooter, damage, localHitPoint:hitTarget.LocalHitPoint);
         }
