@@ -1,7 +1,6 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using TXServer.ECSSystem.Events;
 using TXServer.Library;
 
 namespace TXServer.Core
@@ -11,22 +10,25 @@ namespace TXServer.Core
         private readonly RSACryptoServiceProvider _provider;
         private readonly SHA256Managed _sha256;
 
+        private readonly byte[] _passcode;
         private readonly RSAParameters _parameters;
 
         public string PublicKey => $"{Convert.ToBase64String(_parameters.Modulus)}:{Convert.ToBase64String(_parameters.Exponent)}";
 
-        public PlayerEncryptionComponent(int keyLength = 520)
+        public PlayerEncryptionComponent(RSAParameters parameters, byte[] passcode, int keyLength = 520)
         {
             _provider = new RSACryptoServiceProvider(keyLength);
             _sha256 = new SHA256Managed();
 
-            _parameters = ServerConnection.SessionRsaParameters;
+            _parameters = parameters;
+            _passcode = passcode;
+
             _provider.ImportParameters(_parameters);
         }
 
         public byte[] GetLoginPasswordHash(byte[] passwordHash)
         {
-            byte[] hashPasscodeXor = XorArrays(passwordHash, Convert.FromBase64String(new PersonalPasscodeEvent().Passcode));
+            byte[] hashPasscodeXor = XorArrays(passwordHash, _passcode);
             byte[] concat = ConcatenateArrays(hashPasscodeXor, passwordHash);
 
             return _sha256.ComputeHash(concat);
@@ -54,7 +56,7 @@ namespace TXServer.Core
             byte[] array = new byte[b.Length];
             for (int i = 0; i < b.Length; i++)
             {
-                array[i] = (byte)(b[i] ^ a[i % a.Length]);
+                array[i] = (byte) (b[i] ^ a[i % a.Length]);
             }
             return array;
         }
