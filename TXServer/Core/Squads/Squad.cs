@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 using TXServer.Core.Battles;
 using TXServer.Core.Configuration;
 using TXServer.Core.Logging;
@@ -16,6 +17,8 @@ namespace TXServer.Core.Squads
 {
     public class Squad
     {
+        private static readonly ILogger Logger = Log.Logger.ForType<Squad>();
+
         public Squad(Player leader, Player participant)
         {
             Leader = leader;
@@ -27,7 +30,7 @@ namespace TXServer.Core.Squads
 
         public void AddPlayer(Player player)
         {
-            Logger.Log($"{player}: Joined squad {SquadEntity.EntityId}");
+            Logger.WithPlayer(player).Information("Joined squad {Squad}", SquadEntity.EntityId);
 
             player.SquadPlayer = new SquadPlayer(player, Leader == player, this);
             player.SharePlayers(Participants.Select(x => x.Player));
@@ -47,7 +50,7 @@ namespace TXServer.Core.Squads
 
         public void RemovePlayer(Player player, bool disband)
         {
-            Logger.Log($"{player}: Left squad {SquadEntity.EntityId}");
+            Logger.WithPlayer(player).Information("Left squad {Squad}", SquadEntity.EntityId);
 
             Participants.Remove(player.SquadPlayer);
             player.UnsharePlayers(Participants.Select(x => x.Player));
@@ -80,7 +83,7 @@ namespace TXServer.Core.Squads
             foreach (SquadPlayer squadPlayer in Participants.ToArray())
                 RemovePlayer(squadPlayer.Player, true);
 
-            Logger.Log($"Squad {SquadEntity.EntityId} was disbanded");
+            Logger.Information("Squad {Squad} was disbanded", SquadEntity.EntityId);
         }
 
         public void ProcessBattleLeave(Player player, Battle battle)

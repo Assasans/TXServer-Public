@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 using TXServer.Core;
 using TXServer.Core.Logging;
 using TXServer.Core.Protocol;
@@ -8,13 +9,14 @@ using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.GlobalEntities;
-using TXServer.ECSSystem.Types;
 
 namespace TXServer.ECSSystem.Events.Settings
 {
 	[SerialVersionUID(1490877430206L)]
 	public class ActivatePromoCodeEvent : ECSEvent
 	{
+        private static readonly ILogger Logger = Log.Logger.ForType<ActivatePromoCodeEvent>();
+
 		public void Execute(Player player, Entity entity)
 		{
             Dictionary<Entity, int> rewards = new();
@@ -41,7 +43,7 @@ namespace TXServer.ECSSystem.Events.Settings
                         if (int.TryParse(Code.Substring(2, Code.Length - 2), out int i))
                         {
                             player.Data.SetExperience(player.Data.Experience + i);
-                            Logger.Debug($"{player}: Changed experience to {player.Data.Experience}");
+                            Logger.WithPlayer(player).Debug("Changed experience to {Experience}", player.Data.Experience);
                         }
                         break;
                     default:

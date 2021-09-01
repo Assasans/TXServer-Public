@@ -1,12 +1,15 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
+using Serilog;
 using TXServer.Core.Logging;
 
 namespace TXServer.Database.Provider
 {
     public class MySqlDatabase : EntityFrameworkDatabase
     {
+        private static readonly ILogger Logger = Log.Logger.ForType<MySqlDatabase>();
+
         private readonly DatabaseConfig _config;
 
         public MySqlDatabase(DatabaseConfig config)
@@ -27,7 +30,13 @@ namespace TXServer.Database.Provider
                 Database = _config.Database
             };
 
-            Logger.Debug($"Connecting to mysql://{_config.Username}@{_config.Host}:{_config.Port}/{_config.Database}...");
+            Logger.Debug(
+                "Connecting to mysql://{Username}@{Host}:{Port}/{Database}...",
+                _config.Username,
+                _config.Host,
+                _config.Port,
+                _config.Database
+            );
 
             builder.UseMySql(
                 new MySqlConnection(stringBuilder.ToString()),

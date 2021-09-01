@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Serilog;
 using TXServer.Core;
 using TXServer.Core.ChatCommands;
 using TXServer.Core.Data.Database;
@@ -15,6 +16,8 @@ namespace TXServer.Database.Provider
 {
     public abstract class EntityFrameworkDatabase : DbContext, IDatabase
     {
+        private static readonly ILogger Logger = Log.Logger.ForType<EntityFrameworkDatabase>();
+
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
             // builder.UseLoggerFactory(LoggerFactory.Create(builder => builder
@@ -245,7 +248,7 @@ namespace TXServer.Database.Provider
             lock (this)
             {
                 int changes = SaveChanges();
-                if (changes > 0) Logger.Trace($"[Database] Database changes: {changes}");
+                if (changes > 0) Logger.Debug("Database changes: {Changes}", changes);
             }
         }
 

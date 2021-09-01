@@ -87,7 +87,7 @@ namespace TXServerUI
                 DisableHeightMaps = DisableHeightMapsCheckBox.IsChecked.GetValueOrDefault(),
 
                 DisablePingMessages = DisablePingMessagesCheckBox.IsChecked.GetValueOrDefault(),
-                EnableTracing = EnableTracingCheckBox.IsChecked.GetValueOrDefault(),
+                LogLevel = EnableTracingCheckBox.IsChecked.GetValueOrDefault() ? LogEventLevel.Verbose : LogEventLevel.Information,
                 EnableCommandStackTrace = EnableCommandStackTraceCheckBox.IsChecked.GetValueOrDefault(),
 
                 MapBoundsInactive = DisableMapBoundsCheckbox.IsChecked.GetValueOrDefault(),

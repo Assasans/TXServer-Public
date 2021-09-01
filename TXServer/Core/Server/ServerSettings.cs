@@ -1,4 +1,5 @@
 using System.Net;
+using Serilog.Events;
 
 namespace TXServer.Core
 {
@@ -14,7 +15,8 @@ namespace TXServer.Core
 
         public bool DisablePingMessages { get; set; }
 
-        public bool EnableTracing { get; set; }
+        public LogEventLevel LogLevel { get; set; }
+
         public bool EnableCommandStackTrace { get; set; }
 
         public bool MapBoundsInactive { get; set; }

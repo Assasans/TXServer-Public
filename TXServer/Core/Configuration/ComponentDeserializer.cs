@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using Serilog;
 using TXServer.Core.Logging;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -14,6 +15,8 @@ namespace TXServer.Core.Configuration
 {
     public class ComponentDeserializer : INodeTypeResolver, INodeDeserializer
     {
+        private static readonly ILogger Logger = Log.Logger.ForType<ComponentDeserializer>();
+
         private Type _type;
 
         public bool Deserialize(IParser reader, Type expectedType, Func<IParser, Type, object> nestedObjectDeserializer, out object retValue)
@@ -44,7 +47,7 @@ namespace TXServer.Core.Configuration
                 object value = nestedObjectDeserializer(reader, info.PropertyType);
                 info.SetValue(component, value);
 
-                Logger.Trace($">> {key}: {value}");
+                Logger.Verbose(">> {Key}: {Value}", key, value);
             }
             reader.MoveNext();
 
@@ -62,7 +65,7 @@ namespace TXServer.Core.Configuration
                 if (nodeEvent is not MappingStart)
                     return false;
 
-                Logger.Trace($"> {type}");
+                Logger.Verbose("> {Type}", type);
                 currentType = type;
                 return true;
             }

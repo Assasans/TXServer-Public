@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.Json;
+using Serilog.Events;
 using TXServer.Core;
 using TXServer.Core.Data.Database;
+using TXServer.Core.Logging;
 using TXServer.Database;
 using TXServer.Database.Entity;
 using TXServer.Database.Provider;
@@ -30,7 +32,7 @@ namespace TXServerConsole
                               "-db,  --database                             name  Set database provider (available providers: memory, mysql).\n" +
                               "-nhm, --disable-height-maps                        Disable loading of height maps.\n" +
                               "-np,  --disable-ping                               Disable sending of ping messages.\n" +
-                              "-t,   --enable-tracing                             Enable packet tracing (works only in debug builds).\n" +
+                              "-l,   --log-level                           level  Specify log level (available: verbose, debug, info, warn, error, fatal).\n" +
                               "-st,  --enable-stack-trace                         Enable outputting command stack trace of commands (works only with packet tracing enabled).\n" +
                               "-h,   --help                                       Display this help.");
         }
@@ -53,10 +55,13 @@ namespace TXServerConsole
 
             ServerSettings settings = new()
             {
-                DatabaseProvider = "memory"
+                DatabaseProvider = "memory",
+                LogLevel = LogEventLevel.Information
             };
 
             HashSet<string> uniqueArgs = new();
+
+            LogEventLevel? logLevel = null;
 
             try
             {
@@ -97,10 +102,24 @@ namespace TXServerConsole
                             if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
                             settings.DisablePingMessages = true;
                             break;
-                        case "t":
-                        case "-enable-tracing":
-                            if (!CheckParamCount(pair.Key, 0, pair.Value.Length)) return;
-                            settings.EnableTracing = true;
+                        case "l":
+                        case "-log-level":
+                            if (!CheckParamCount(pair.Key, 1, pair.Value.Length)) return;
+                            string level = pair.Value[0];
+
+                            logLevel = level switch
+                            {
+                                "verbose" => LogEventLevel.Verbose,
+                                "debug" => LogEventLevel.Debug,
+                                "info" => LogEventLevel.Information,
+                                "warn" => LogEventLevel.Warning,
+                                "error" => LogEventLevel.Error,
+                                "fatal" => LogEventLevel.Fatal,
+                                _ => null
+                            };
+
+                            if (logLevel == null)
+                                Console.WriteLine($"[Warning] Unknown log level: {level}");
                             break;
                         case "st":
                         case "-enable-stack-trace":
@@ -140,6 +159,11 @@ namespace TXServerConsole
                 Console.WriteLine("No run parameters specified.");
                 return;
             }
+
+            if (logLevel != null)
+                settings.LogLevel = logLevel.Value;
+
+            SerilogLogger.Init(settings.LogLevel);
 
             DatabaseConfig databaseConfig = JsonSerializer.Deserialize<DatabaseConfig>(File.ReadAllText("Library/Database.json"), new JsonSerializerOptions
             {

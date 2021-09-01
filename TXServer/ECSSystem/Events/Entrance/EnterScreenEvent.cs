@@ -1,6 +1,5 @@
-﻿
+﻿using Serilog;
 using TXServer.Core;
-using TXServer.Core.Battles;
 using TXServer.Core.Logging;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -10,9 +9,11 @@ namespace TXServer.ECSSystem.Events
     [SerialVersionUID(1453867134827)]
     public class EnterScreenEvent : ECSEvent
     {
+        private static readonly ILogger Logger = Log.Logger.ForType<EnterScreenEvent>();
+
         public void Execute(Player player, Entity entity)
         {
-            Logger.Debug($"{player}: Entering screen {Screen}");
+            Logger.WithPlayer(player).Debug("Entering screen {Screen}", Screen);
 
             switch (Screen)
             {

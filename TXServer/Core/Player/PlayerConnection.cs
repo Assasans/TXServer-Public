@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Serilog;
 using TXServer.Core.Commands;
 using TXServer.Core.Logging;
 using TXServer.Core.Protocol;
@@ -20,6 +21,8 @@ namespace TXServer.Core
 {
     public class PlayerConnection : IDisposable
     {
+        private static readonly ILogger Logger = Log.Logger.ForType<PlayerConnection>();
+
         public bool IsActive => Convert.ToBoolean(_Active);
         private int _Active = 1;
 
@@ -115,9 +118,9 @@ namespace TXServer.Core
                     SendCommands(commands);
                 }
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                Logger.Error($"{Player}: {e}");
+                Logger.WithPlayer(Player).Error(exception, "Unexpected exception");
                 Player.Dispose();
                 Player.User?.TryRemoveComponent<UserOnlineComponent>();
             }
@@ -135,15 +138,15 @@ namespace TXServer.Core
                     ReceiveAndExecuteCommands(this);
                 }
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                if (e is IOException)
+                if (exception is IOException)
                 {
-                    Logger.Debug($"{Player}: {e.InnerException?.Message ?? e.Message}");
+                    Logger.WithPlayer(Player).Error(exception.InnerException ?? exception, "Unexpected exception");
                 }
                 else
                 {
-                    Logger.Error($"{Player}: {e}");
+                    Logger.WithPlayer(Player).Error(exception, "Unexpected exception");
 #if DEBUG
                     Debugger.Launch();
 #endif
@@ -165,7 +168,10 @@ namespace TXServer.Core
 
 #if DEBUG
             LastClientPacket = commands;
-            Logger.Trace($"Received from {Player}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}");
+            Logger.WithPlayer(Player).Verbose(
+                "Received: {{\n{Commands}\n}}",
+                string.Join(",\n", commands.Select(command => $"    {command}"))
+            );
 #endif
 
             foreach (ICommand command in commands)
@@ -181,7 +187,11 @@ namespace TXServer.Core
 
 #if DEBUG
             if (Server.Instance.Settings.EnableCommandStackTrace)
-                Logger.Trace($"Queued commands for {Player}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}\n{Environment.StackTrace}");
+                Logger.WithPlayer(Player).Verbose(
+                    "Queued commands: {{\n{Commands}\n}}\n{StackTrace}",
+                    string.Join(",\n", commands.Select(command => $"    {command}")),
+                    Environment.StackTrace
+                );
 #endif
 
             foreach (ICommand command in commands)
@@ -195,7 +205,10 @@ namespace TXServer.Core
         {
 #if DEBUG
             LastServerPacket = commands;
-            Logger.Trace($"Sent to {Player}: {{\n{String.Join(",\n", commands.Select(x => $"\t{x}"))}\n}}");
+            Logger.WithPlayer(Player).Verbose(
+                "Sent commands: {{\n{Commands}\n}}",
+                string.Join(",\n", commands.Select(command => $"     {command}"))
+            );
 #endif
 
             using MemoryStream buffer = new();

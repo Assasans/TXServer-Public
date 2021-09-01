@@ -2,7 +2,7 @@
   "profiles": {
     "TXServerConsole": {
       "commandName": "Project",
-      "commandLineArgs": "--run 0.0.0.0 5050 10 --enable-tracing --disable-ping --disable-height-maps --database memory"
+      "commandLineArgs": "--run 0.0.0.0 5050 10 --log-level verbose --disable-ping --disable-height-maps --database memory"
     }
   }
 }

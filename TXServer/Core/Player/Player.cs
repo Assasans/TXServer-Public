@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using Serilog;
 using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.Core.Logging;
@@ -28,6 +29,8 @@ namespace TXServer.Core
     /// </summary>
     public sealed class Player : IDisposable
     {
+        private static readonly ILogger Logger = Log.Logger.ForType<Player>();
+
         public bool IsLoggedIn => User != null;
 
         public bool IsInSquad => SquadPlayer != null;
@@ -82,7 +85,7 @@ namespace TXServer.Core
             Connection = new PlayerConnection(this, socket);
             Connection.StartPlayerThreads();
 
-            Logger.Log($"{this} has connected.");
+            Logger.WithPlayer(this).Information("Player has connected");
         }
 
         public void Dispose()
@@ -97,7 +100,7 @@ namespace TXServer.Core
 
             EntityList.Clear();
 
-            Logger.Log($"{this} has disconnected.");
+            Logger.WithPlayer(this).Information("Player has disconnected");
 
             Server.StoredPlayerData.RemoveAll(pd => pd.UniqueId == Data?.UniqueId);
             if (Data is { RememberMe: true })
@@ -118,7 +121,7 @@ namespace TXServer.Core
 
         public void LogInWithDatabase(Entity clientSession)
         {
-            Logger.Log($"{this}: Loading data from database {Data.Username} ({Data.UniqueId}).");
+            Logger.WithPlayer(this).Information("Loading data from database {Username} ({Id})", Data.Username, Data.UniqueId);
 
             LogIn(clientSession);
         }
@@ -135,7 +138,7 @@ namespace TXServer.Core
             if (ClientSession.EntityId != clientSession?.EntityId)
                 throw new ArgumentException("ClientSession Entity doesn't match Player ClientSession Entity");
 
-            Logger.Log($"{this}: Logged in as {Data.Username}.");
+            Logger.WithPlayer(this).Information("Logged in as {Username}", Data.Username);
 
             // todo: in db
             List<string> admins = new() { "NoNick", "Tim203", "M8", "Kaveman", "Assasans" };
@@ -352,8 +355,7 @@ namespace TXServer.Core
             }
         }
 
-        public override string ToString() => $"{_EndPoint ??= Connection.Socket.RemoteEndPoint}{(ClientSession != null ? $" ({ClientSession.EntityId}{(UniqueId != null ? $", {UniqueId}" : null)})" : null)}";
-        private EndPoint _EndPoint;
+        public override string ToString() => $"{(UniqueId != null ? $"{UniqueId}" : ClientSession != null ? $"ID: {ClientSession.EntityId}" : $"IP: {((IPEndPoint) Connection.Socket.RemoteEndPoint).Address})")}";
 
         public readonly ConcurrentDictionary<Entity, DateTimeOffset> TempNotifications = new();
     }

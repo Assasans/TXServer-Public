@@ -11,14 +11,14 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
+using Serilog;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using TXServer.Core.Battles;
 using TXServer.Core.Battles.Matchmaking;
 using TXServer.Core.Configuration;
-using TXServer.Core.Logging;
 using TXServer.Core.HeightMaps;
+using TXServer.Core.Logging;
 using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Events.Ping;
 
@@ -26,6 +26,8 @@ namespace TXServer.Core
 {
     public class ServerConnection
     {
+        private static readonly ILogger Logger = Log.Logger.ForType<ServerConnection>();
+
         public Server Server { get; }
 
         public ServerConnection(Server server)
@@ -57,7 +59,7 @@ namespace TXServer.Core
 
             if (!Server.Instance.Settings.DisableHeightMaps)
             {
-                Logger.Log("Loading height maps...");
+                Logger.Information("Loading height maps...");
                 HeightMaps = JsonSerializer.Deserialize<Dictionary<string, HeightMap>>(
                     File.ReadAllText(HeightMapInfoLocation), new JsonSerializerOptions
                 {
@@ -67,10 +69,10 @@ namespace TXServer.Core
 
                 foreach (HeightMapLayer layer in HeightMaps.Values.SelectMany(map => map.Layers))
                 {
-                    Logger.Trace($"Reading {layer.Path}...");
+                    Logger.Verbose($"Reading {layer.Path}...");
                     layer.Image = Image.Load<Rgb24>(Path.Combine(Directory.GetCurrentDirectory(), "Library", layer.Path));
                 }
-                Logger.Log("Height maps loaded");
+                Logger.Information("Height maps loaded");
             }
 
             MaxPoolSize = poolSize;
@@ -89,7 +91,7 @@ namespace TXServer.Core
 #endif
                 new Thread(PingChecker) { Name = "Ping Checker" }.Start();
 
-            Logger.Log("Server is started.");
+            Logger.Information("Server is started");
         }
 
         /// <summary>
@@ -126,7 +128,7 @@ namespace TXServer.Core
             else
             {
                 socket.Close();
-                Logger.Warn("Server is full!");
+                Logger.Warning("Server is full!");
             }
         }
 
@@ -161,9 +163,9 @@ namespace TXServer.Core
 
                         AddPlayer(socket);
                     }
-                    catch (Exception e)
+                    catch (Exception exception)
                     {
-                        Logger.Error(e);
+                        Logger.Error(exception, "Unexpected exception");
 
                         if (accepted) socket.Close();
                     }
@@ -202,9 +204,9 @@ namespace TXServer.Core
                     {
                         context = httpListener.GetContext();
                     }
-                    catch (HttpListenerException e)
+                    catch (HttpListenerException exception)
                     {
-                        Logger.Error(e);
+                        Logger.Error(exception, "Unexpected exception");
                         return;
                     }
 
@@ -234,11 +236,11 @@ namespace TXServer.Core
                                 data = File.ReadAllBytes(rootPath + request.Url.LocalPath);
                             }
                         }
-                        catch (Exception e)
+                        catch (Exception exception)
                         {
                             data = Array.Empty<byte>();
 
-                            response.StatusCode = e switch
+                            response.StatusCode = exception switch
                             {
                                 FileNotFoundException or DirectoryNotFoundException => 404,
                                 UnauthorizedAccessException => 403,
@@ -246,7 +248,7 @@ namespace TXServer.Core
                             };
 
                             if (response.StatusCode == 500)
-                                Logger.Error(e);
+                                Logger.Error(exception, "Unexpected exception");
                         }
 
                         response.ContentLength64 = data.Length;

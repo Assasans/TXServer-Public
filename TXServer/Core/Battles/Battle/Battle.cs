@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Serilog;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Battles.Matchmaking;
 using TXServer.Core.HeightMaps;
@@ -26,6 +27,8 @@ namespace TXServer.Core.Battles
 {
     public partial class Battle
     {
+        private static readonly ILogger Logger = Log.Logger.ForType<Battle>();
+
         public Battle(ClientBattleParams battleParams, bool isMatchMaking, Player owner)
         {
             Params = battleParams;
@@ -128,7 +131,7 @@ namespace TXServer.Core.Battles
         {
             if (player.IsInBattle) return;
 
-            Logger.Log($"{player}: Joined battle {BattleEntity.EntityId}{(isSpectator ? " as spectator" : null)}");
+            Logger.WithPlayer(player).Information("Joined battle {Battle}{AsSpectator}", BattleEntity.EntityId, isSpectator ? " as spectator" : "");
 
             player.SharePlayers(JoinedTankPlayers.Select(x => x.Player));
 
@@ -163,7 +166,7 @@ namespace TXServer.Core.Battles
             {
                 Spectators.Remove(spectator);
 
-                Logger.Log($"{battlePlayer.Player}: Stopped spectating battle {BattleEntity.EntityId}");
+                Logger.WithPlayer(battlePlayer.Player).Information("Stopped spectating battle {Battle}", BattleEntity.EntityId);
             }
             else
             {
@@ -187,7 +190,7 @@ namespace TXServer.Core.Battles
                     .UnsharePlayers(battlePlayer.Player);
                 Spectators.UnsharePlayers(battlePlayer.Player);
 
-                Logger.Log($"{battlePlayer.Player}: Left battle {BattleEntity.EntityId}");
+                Logger.WithPlayer(battlePlayer.Player).Information("Left battle {Battle}", BattleEntity.EntityId);
             }
 
             battlePlayer.Player.UnsharePlayers(JoinedTankPlayers.Select(x => x.Player));

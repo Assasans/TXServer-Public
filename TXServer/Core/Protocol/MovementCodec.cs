@@ -2,14 +2,16 @@
 using System.Collections;
 using System.IO;
 using System.Numerics;
+using Serilog;
 using TXServer.Core.Logging;
-using TXServer.ECSSystem.Components.Battle;
 using TXServer.ECSSystem.Components.Battle.Tank;
 
 namespace TXServer.Core.Protocol
 {
     public class MovementCodec
     {
+        private static readonly ILogger Logger = Log.Logger.ForType<MovementCodec>();
+
         private const int MovementSize = 21;
         private const int PositionComponentBitsize = 17;
         private const int OrientationComponentBitsize = 13;
@@ -25,16 +27,16 @@ namespace TXServer.Core.Protocol
         {
             byte[] data = new byte[MovementSize];
             BitArray bits = new BitArray(data);
-            
+
             int position = 0;
             WriteVector3(bits, ref position, movement.Position, PositionComponentBitsize, PositionFactor);
             WriteQuaternion(bits, ref position, movement.Orientation, OrientationComponentBitsize, OrientationPrecision);
             WriteVector3(bits, ref position, movement.Velocity, LinearVelocityComponentBitsize, VelocityFactor);
             WriteVector3(bits, ref position, movement.AngularVelocity, AngularVelocityComponentBitsize, AngularVelocityFactor);
-            
+
             bits.CopyTo(data, 0);
             writer.Write(data);
-            if (position != bits.Length) 
+            if (position != bits.Length)
                 throw new Exception("Movement pack mismatch");
         }
 
@@ -50,12 +52,12 @@ namespace TXServer.Core.Protocol
             movement.Orientation = ReadQuaternion(bits, ref position, OrientationComponentBitsize, OrientationPrecision);
             movement.Velocity = ReadVector3(bits, ref position, LinearVelocityComponentBitsize, VelocityFactor);
             movement.AngularVelocity = ReadVector3(bits, ref position, AngularVelocityComponentBitsize, AngularVelocityFactor);
-            
+
             if (position != bits.Length)
                 throw new Exception("Movement unpack mismatch");
             return movement;
         }
-        
+
         private static Vector3 ReadVector3(
             BitArray bits,
             ref int position,
@@ -138,7 +140,7 @@ namespace TXServer.Core.Protocol
             float val = (Read(bits, ref position, size) - (1 << size - 1)) * factor;
             if (IsValidFloat(val))
                 return val;
-            Logger.Warn($"AbstractMoveCodec.ReadFloat: invalid float: {val}");
+            Logger.Warning("ReadFloat: invalid float: {Value}", val);
             return 0.0f;
         }
 
@@ -163,12 +165,12 @@ namespace TXServer.Core.Protocol
             int num1 = (int) (val / (double) factor);
             int num2 = 0;
             if (num1 < -offset)
-                Logger.Warn($"Value too small {val} offset={offset} factor={factor}");
+                Logger.Warning("Value too small: {Value} (offset = {Offset}; factor = {Factor})", val, offset, factor);
             else
                 num2 = num1 - offset;
             if (num2 >= offset)
             {
-                Logger.Warn($"Value too big {val} offset={offset} factor={factor}");
+                Logger.Warning("Value too big: {Value} (offset = {Offset}; factor = {Factor})", val, offset, factor);
                 num2 = offset;
             }
 

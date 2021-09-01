@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
+using Serilog;
 using TXServer.Core.Logging;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
@@ -16,6 +17,8 @@ namespace TXServer.Core.Configuration
 {
     public static partial class Config
     {
+        private static readonly ILogger Logger = Log.Logger.ForType(typeof(Config));
+
         private const string _configPath = "StateServer/config/master-48606/en/config.tar.gz";
 
         private static Dictionary<(string, Type), Component> _cachedComponents = new();
@@ -23,7 +26,7 @@ namespace TXServer.Core.Configuration
 
         public static void Init()
         {
-            Logger.Log("Initializing config...");
+            Logger.Information("Initializing config...");
 
             _cachedComponents = new();
             _rootNode = new();
@@ -55,7 +58,7 @@ namespace TXServer.Core.Configuration
                     }
 
                     if (!entry.Name.EndsWith("public.yml")) continue;
-                    Logger.Trace($"Reading {entry.Name}...");
+                    Logger.Verbose("Reading {Name}...", entry.Name);
                     components.Add(entry.Name[0..^11], deserializer.Deserialize(new StreamReader(stream)));
                 }
             }
@@ -110,12 +113,17 @@ namespace TXServer.Core.Configuration
                         type.GetMethod("Convert").Invoke(component, new[] { resultComponent });
                         currentNode.Components.TryAdd(resultType, resultComponent);
 
-                        Logger.Trace($"{pair.Key}: {component.GetType().Name} -> {resultType.Name}");
+                        Logger.Verbose(
+                            "{Key}: {ComponentType} -> {ResultType}",
+                            pair.Key,
+                            component.GetType().Name,
+                            resultType.Name
+                        );
                     }
                 }
             }
 
-            Logger.Log("Config is ready.");
+            Logger.Information("Config is ready");
         }
 
         private static ConfigNode GetNodeByPath(string path)

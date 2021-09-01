@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
+using Serilog;
 using TXServer.Core.Battles;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;
-using TXServer.Database.Provider;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core
 {
     public class Server
     {
+        private static readonly ILogger Logger = Log.Logger.ForType<Server>();
+
         public static Server Instance { get; set; }
 
         public ServerConnection Connection { get; private set; }
@@ -33,9 +34,9 @@ namespace TXServer.Core
 
         public void Start()
         {
-            Logger.Log("Starting server...");
-            Logger.Log($"Database provider: {Database.GetType().Name}");
-            Logger.Log($"Registered players: {Database.Players.Count()}");
+            Logger.Information("Starting server...");
+            Logger.Information("Database provider: {Provider}", Database.GetType().Name);
+            Logger.Information("Registered players: {Players}", Database.Players.Count());
 
             ServerData = Database.Servers.SingleOrDefault();
             if (ServerData == null)
@@ -74,7 +75,7 @@ namespace TXServer.Core
         {
             if (!Connection.IsStarted) return;
 
-            Logger.Log("Stopping server...");
+            Logger.Information("Stopping server...");
 
             Connection.StopServer();
 
@@ -82,12 +83,12 @@ namespace TXServer.Core
             Database.Save();
             Database.Shutdown();
 
-            Logger.Log("Server is stopped.");
+            Logger.Information("Server is stopped");
         }
 
         internal void HandleError(Exception exception)
         {
-            Logger.Error($"Fatal error: {exception}");
+            Logger.Error(exception, "Fatal error");
             Stop();
             UserErrorHandler?.Invoke(exception);
         }
