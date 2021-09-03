@@ -10,9 +10,13 @@ namespace TXServer.ECSSystem.EntityTemplates
     {
         public void AddUserItemComponents(Player player, Entity item)
         {
-            item.Components.Add(new PresetEquipmentComponent(player, item));
-            item.Components.Add(new PresetNameComponent($"Preset {player.Data.Presets.Count + 1}"));
-            player.Data.Presets.Add(item);
+            PlayerPreset preset = PlayerPreset.Create(player.Data, player.Data.Presets.Count, $"Preset {player.Data.Presets.Count + 1}");
+            preset.Entity = item;
+
+            item.Components.Add(new PresetEquipmentComponent(preset));
+            item.Components.Add(new PresetNameComponent(preset));
+
+            player.Data.Presets.Add(preset);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Item.Module
     {
 		public static Entity CreateEntity(Entity garageModule, BattleTankPlayer battlePlayer)
         {
-			Entity slot = battlePlayer.Player.CurrentPreset.Modules.SingleOrDefault(x => x.Value == garageModule).Key;
+			Entity slot = battlePlayer.Player.CurrentPreset.GetPlayerModules(battlePlayer.Player).SingleOrDefault(x => x.Value == garageModule).Key;
 			Component slotUserItemInfoComponent = slot != null
 				? slot.GetComponent<SlotUserItemInfoComponent>()
 				: new SlotUserItemInfoComponent(Types.Slot.SLOT7, ModuleBehaviourType.ACTIVE);

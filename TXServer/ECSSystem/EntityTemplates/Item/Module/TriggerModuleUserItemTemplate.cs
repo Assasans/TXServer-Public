@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.EntityTemplates {
 	[SerialVersionUID(636304361927229412L)]
 	public class TriggerModuleUserItemTemplate : IEntityTemplate {
 		public static Entity CreateEntity(Entity garageModule, BattleTankPlayer battlePlayer) {
-			Entity slot = battlePlayer.Player.CurrentPreset.Modules.SingleOrDefault(x => x.Value == garageModule).Key;
+			Entity slot = battlePlayer.Player.CurrentPreset.GetPlayerModules(battlePlayer.Player).SingleOrDefault(x => x.Value == garageModule).Key;
 			Component slotUserItemInfoComponent = slot.GetComponent<SlotUserItemInfoComponent>();
 
 			Entity entity = new(

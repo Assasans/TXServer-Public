@@ -64,79 +64,6 @@ namespace TXServer.Core
         public long EntityId { get; set; }
     }
 
-    // public class Preset
-    // {
-    //     [BsonIgnore] public PlayerData PlayerData { get; }
-    //
-    //     [BsonId] public Entity Entity { get; }
-    //
-    //     public PresetNameComponent NameComponent
-    //     {
-    //         get => Entity.GetComponent<PresetNameComponent>() ?? _nameComponent;
-    //         set
-    //         {
-    //             SetAndRaiseIfChanged(nameof(NameComponent), ref _nameComponent, value);
-    //
-    //             if (Entity == null) return;
-    //             Entity.AddOrChangeComponent(value);
-    //         }
-    //     }
-    //
-    //     public PresetEquipmentComponent EquipmentComponent
-    //     {
-    //         get => Entity.GetComponent<PresetEquipmentComponent>() ?? _equipmentComponent;
-    //         set
-    //         {
-    //             SetAndRaiseIfChanged(nameof(EquipmentComponent), ref _equipmentComponent, value);
-    //
-    //             if (Entity == null) return;
-    //             Entity.AddOrChangeComponent(value);
-    //         }
-    //     }
-    //
-    //     public Preset(PlayerData playerData, Entity entity)
-    //     {
-    //         PlayerData = playerData;
-    //         Entity = entity;
-    //     }
-    //
-    //     public void InitDefault()
-    //     {
-    //         NameComponent = new PresetNameComponent(this, "Unnamed preset");
-    //         EquipmentComponent = new PresetEquipmentComponent(this);
-    //     }
-    //
-    //     public bool Save()
-    //     {
-    //         return PlayerData.Save();
-    //     }
-    //
-    //     private void SetAndRaiseIfChanged<T>(string name, ref T backingField, T value)
-    //     {
-    //         backingField = value;
-    //         bool success = PlayerData.Save();
-    //
-    //         Logger.Debug($"[Preset/{Entity.EntityId}] Update property {name}: {value} [success: {success}]");
-    //     }
-    //
-    //     private void RaiseChanged<T>(string name, T value)
-    //     {
-    //         bool success = PlayerData.Save();
-    //
-    //         Logger.Debug($"[Preset/{Entity.EntityId}] Update property {name}: {value} [success: {success}]");
-    //     }
-    //
-    //     private void RemountEquipment()
-    //     {
-    //         PresetEquipmentComponent component = Entity.GetComponent<PresetEquipmentComponent>();
-    //         if (component != null) Entity.RemoveComponent<PresetEquipmentComponent>();
-    //         Entity.AddComponent(component);
-    //     }
-    //
-    //     private PresetNameComponent _nameComponent;
-    //     private PresetEquipmentComponent _equipmentComponent;
-    // }
-
     public static class DatabaseEntityExtensions
     {
         public static TEntity GetById<TEntity>(this IEnumerable<TEntity> entities, long entityId) where TEntity : PlayerData.IEntity
@@ -198,6 +125,89 @@ namespace TXServer.Core
         public static IEnumerable<long> ToOwnedIds<TEntity>(this IEnumerable<TEntity> entities) where TEntity : PlayerData.IEntity, PlayerData.IPlayerEquipment
         {
             return entities.Where(entity => entity.IsOwned).Select(entity => entity.EntityId);
+        }
+    }
+
+    public static class PlayerPresetEquipmentExtensions
+    {
+        // IHullEquipment
+
+        public static TEntity GetByHull<TEntity>(this IEnumerable<TEntity> entities, long hullId) where TEntity : PlayerData.IEntity, IHullEquipment
+        {
+            return entities.SingleOrDefault(entity => entity.HullId == hullId);
+        }
+
+        public static bool ContainsHull<TEntity>(this IEnumerable<TEntity> entities, long hullId) where TEntity : PlayerData.IEntity, IHullEquipment
+        {
+            return entities.Any(entity => entity.HullId == hullId);
+        }
+
+        public static bool TryGetByHull<TEntity>(this IEnumerable<TEntity> entities, long hullId, [MaybeNullWhen(false)] out TEntity property)
+            where TEntity : PlayerData.IEntity, IHullEquipment
+        {
+            TEntity entity = entities.GetByHull(hullId);
+            if (entity == null)
+            {
+                property = default;
+                return false;
+            }
+
+            property = entity;
+            return true;
+        }
+
+        public static bool TryGetByHull<TEntity, TProperty>(this IEnumerable<TEntity> entities, long hullId, Func<TEntity, TProperty> resolver, [MaybeNullWhen(false)] out TProperty property)
+            where TEntity : PlayerData.IEntity, IHullEquipment
+        {
+            TEntity entity = entities.GetByHull(hullId);
+            if (entity == null)
+            {
+                property = default;
+                return false;
+            }
+
+            property = resolver(entity);
+            return true;
+        }
+
+        // IWeaponEquipment
+
+        public static TEntity GetByWeapon<TEntity>(this IEnumerable<TEntity> entities, long weaponId) where TEntity : PlayerData.IEntity, IWeaponEquipment
+        {
+            return entities.SingleOrDefault(entity => entity.WeaponId == weaponId);
+        }
+
+        public static bool ContainsWeapon<TEntity>(this IEnumerable<TEntity> entities, long weaponId) where TEntity : PlayerData.IEntity, IWeaponEquipment
+        {
+            return entities.Any(entity => entity.WeaponId == weaponId);
+        }
+
+        public static bool TryGetByWeapon<TEntity>(this IEnumerable<TEntity> entities, long weaponId, [MaybeNullWhen(false)] out TEntity property)
+            where TEntity : PlayerData.IEntity, IWeaponEquipment
+        {
+            TEntity entity = entities.GetByWeapon(weaponId);
+            if (entity == null)
+            {
+                property = default;
+                return false;
+            }
+
+            property = entity;
+            return true;
+        }
+
+        public static bool TryGetByWeapon<TEntity, TProperty>(this IEnumerable<TEntity> entities, long hullId, Func<TEntity, TProperty> resolver, [MaybeNullWhen(false)] out TProperty property)
+            where TEntity : PlayerData.IEntity, IWeaponEquipment
+        {
+            TEntity entity = entities.GetByWeapon(hullId);
+            if (entity == null)
+            {
+                property = default;
+                return false;
+            }
+
+            property = resolver(entity);
+            return true;
         }
     }
 
@@ -284,7 +294,13 @@ namespace TXServer.Core
             GoldBonus = 5;
             PremiumExpirationDate = DateTime.MinValue;
 
-            Presets = new ObservableList<Entity>();
+            CurrentPresetIndex = 0;
+            Presets = new List<PlayerPreset>
+            {
+                PlayerPreset.Create(this, 0, "Default preset 1"),
+                PlayerPreset.Create(this, 1, "Default preset 2"),
+                PlayerPreset.Create(this, 2, "Default preset 3")
+            };
 
             FractionIndex = null;
             FractionUserScore = 0;
@@ -317,18 +333,19 @@ namespace TXServer.Core
             Punishments = new List<Punishment>();
             CompletedTutorials = new List<PlayerCompletedTutorial>();
 
-            Dictionary<Entity, Entity> defaultHulls = new Dictionary<Entity, Entity>();
-            foreach ((Entity weapon, Entity skin) in GlobalEntities.Hulls.DefaultSkins)
+            Dictionary<Entity, List<Entity>> defaultHulls = new Dictionary<Entity, List<Entity>>();
+            foreach (Entity hull in GlobalEntities.Hulls.GlobalItems.GetAllItems())
             {
-                defaultHulls.Add(weapon, skin);
+                defaultHulls.Add(hull, HullSkins.GlobalItems.GetAllItems().Where(item => item.GetComponent<ParentGroupComponent>().Key == hull.EntityId).ToList());
             }
 
-            Dictionary<Entity, (Entity Skin, Entity Shell)> defaultWeapons = new Dictionary<Entity, (Entity, Entity)>();
-            foreach ((Entity weapon, Entity skin) in GlobalEntities.Weapons.DefaultSkins)
+            Dictionary<Entity, (List<Entity> Skins, List<Entity> Shells)> defaultWeapons = new Dictionary<Entity, (List<Entity> Skins, List<Entity> Shells)>();
+            foreach (Entity weapon in GlobalEntities.Weapons.GlobalItems.GetAllItems())
             {
-                Entity shell = Shells.DefaultShells[weapon];
+                List<Entity> skins = WeaponSkins.GlobalItems.GetAllItems().Where(item => item.GetComponent<ParentGroupComponent>().Key == weapon.EntityId).ToList();
+                List<Entity> shells = Shells.GlobalItems.GetAllItems().Where(item => item.GetComponent<ParentGroupComponent>().Key == weapon.EntityId).ToList();
 
-                defaultWeapons.Add(weapon, (skin, shell));
+                defaultWeapons.Add(weapon, (skins, shells));
             }
 
             Avatar = 6224;
@@ -337,24 +354,20 @@ namespace TXServer.Core
             // Covers = new ObservableList<long> { -172249613 };
             Covers = new List<PlayerCover> { PlayerCover.Create(this, -172249613) };
             Graffiti = new List<PlayerGraffiti> { PlayerGraffiti.Create(this, 1001404575) };
-            Hulls = new List<PlayerHull>
+            Hulls = new List<PlayerHull>();
+            foreach ((Entity hull, List<Entity> skins) in defaultHulls)
             {
-                PlayerHull.Create(
-                    this,
-                    GlobalEntities.Hulls.GlobalItems.Hunter.EntityId,
-                    true,
-                    skins: new List<PlayerHullSkin> { PlayerHullSkin.Create(this, GlobalEntities.Hulls.GlobalItems.Hunter.EntityId, defaultHulls[GlobalEntities.Hulls.GlobalItems.Hunter].EntityId) }
-                )
-            };
-            foreach ((Entity hull, Entity skin) in defaultHulls)
-            {
-                if (Hulls.ContainsId(hull.EntityId)) continue;
                 Hulls.Add(PlayerHull.Create(
                     this,
                     hull.EntityId,
                     false,
-                    skins: new List<PlayerHullSkin> { PlayerHullSkin.Create(this, hull.EntityId, skin.EntityId) }
+                    skins: skins.Select(skin => PlayerHullSkin.Create(this, hull.EntityId, skin.EntityId, GlobalEntities.Hulls.DefaultSkins.ContainsValue(skin)))
                 ));
+            }
+
+            foreach (PlayerHull hull in Hulls)
+            {
+                hull.SkinId = hull.Skins.First().EntityId;
             }
 
             Modules = new List<PlayerModule>();
@@ -365,27 +378,25 @@ namespace TXServer.Core
             //     -966935184, 807172229, 357929046, 48235025, 1067800943, 1322064226, 70311513,
             //     530945311, -1408603862, 139800007, 366763244
             // };
-            Weapons = new List<PlayerWeapon>
+            Weapons = new List<PlayerWeapon>();
+            foreach ((Entity weapon, (List<Entity> skins, List<Entity> shells)) in defaultWeapons)
             {
-                PlayerWeapon.Create(
-                    this,
-                    GlobalEntities.Weapons.GlobalItems.Smoky.EntityId,
-                    true,
-                    skins: new List<PlayerWeaponSkin> { PlayerWeaponSkin.Create(this, GlobalEntities.Weapons.GlobalItems.Smoky.EntityId, defaultWeapons[GlobalEntities.Weapons.GlobalItems.Smoky].Skin.EntityId) },
-                    shellSkins: new List<PlayerWeaponShellSkin> { PlayerWeaponShellSkin.Create(this, GlobalEntities.Weapons.GlobalItems.Smoky.EntityId, defaultWeapons[GlobalEntities.Weapons.GlobalItems.Smoky].Shell.EntityId) }
-                )
-            };
-            foreach ((Entity weapon, (Entity skin, Entity shell)) in defaultWeapons)
-            {
-                if (Weapons.ContainsId(weapon.EntityId)) continue;
                 Weapons.Add(PlayerWeapon.Create(
                     this,
                     weapon.EntityId,
                     false,
-                    skins: new List<PlayerWeaponSkin> { PlayerWeaponSkin.Create(this, weapon.EntityId, skin.EntityId) },
-                    shellSkins: new List<PlayerWeaponShellSkin> { PlayerWeaponShellSkin.Create(this, weapon.EntityId, shell.EntityId) }
+                    skins: skins.Select(skin => PlayerWeaponSkin.Create(this, weapon.EntityId, skin.EntityId, GlobalEntities.Weapons.DefaultSkins.ContainsValue(skin))),
+                    shellSkins: shells.Select(shell => PlayerWeaponShellSkin.Create(this, weapon.EntityId, shell.EntityId, Shells.DefaultShells.ContainsValue(shell)))
                 ));
+
+                PlayerWeapon playerWeapon = Weapons.Single(playerWeapon => playerWeapon.EntityId == weapon.EntityId);
+
+                playerWeapon.SkinId = GlobalEntities.Weapons.DefaultSkins[weapon].EntityId;
+                playerWeapon.ShellSkinId = Shells.DefaultShells[weapon].EntityId;
             }
+
+            Hulls.GetById(GlobalEntities.Hulls.GlobalItems.Hunter.EntityId).IsOwned = true;
+            Weapons.GetById(GlobalEntities.Weapons.GlobalItems.Smoky.EntityId).IsOwned = true;
 
             Statistics = PlayerStatistics.Create(this);
 
@@ -717,8 +728,8 @@ namespace TXServer.Core
             }
         }
 
-        // TODO(Assasans)
-        [NotMapped /* TODO */] public virtual ObservableList<Entity> Presets { get; private set; } = new ObservableList<Entity>();
+        public int CurrentPresetIndex { get; set; }
+        public virtual List<PlayerPreset> Presets { get; private set; } = new List<PlayerPreset>();
 
         public class PlayerRelation
         {
@@ -774,12 +785,6 @@ namespace TXServer.Core
 
         public class PlayerAvatar : IEntity
         {
-            public long PlayerId { get; set; }
-            [ForeignKey("PlayerId")]
-            public virtual PlayerData Player { get; set; }
-
-            public long EntityId { get; set; }
-
             public static PlayerAvatar Create(PlayerData player, long entityId)
             {
                 return new PlayerAvatar
@@ -789,13 +794,15 @@ namespace TXServer.Core
                     EntityId = entityId
                 };
             }
+
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long EntityId { get; set; }
         }
 
-        // [NotMapped /* TODO */] public virtual List<PlayerAvatar> Avatars { get; private set; } = new List<PlayerAvatar>();
-
-        // [NotMapped /* TODO */] public ObservableDictionary<long, int> Containers { get; private set; }
         public virtual List<PlayerContainer> Containers { get; set; } = new List<PlayerContainer>();
-        // [NotMapped /* TODO */] public virtual ObservableList<long> Covers { get; private set; } = new ObservableList<long>();
 
         public long Avatar
         {
@@ -900,7 +907,6 @@ namespace TXServer.Core
         public interface IPlayerEquipment
         {
             bool IsOwned { get; set; }
-            long Xp { get; set; }
         }
 
         public class PlayerHull : IEntity, IPlayerEquipment
@@ -928,6 +934,8 @@ namespace TXServer.Core
 
             public bool IsOwned { get; set; }
             public long Xp { get; set; }
+
+            public long SkinId { get; set; }
 
             public virtual List<PlayerHullSkin> Skins { get; set; } = new List<PlayerHullSkin>();
         }
@@ -959,20 +967,24 @@ namespace TXServer.Core
             public bool IsOwned { get; set; }
             public long Xp { get; set; }
 
+            public long SkinId { get; set; }
+            public long ShellSkinId { get; set; }
+
             public virtual List<PlayerWeaponSkin> Skins { get; set; } = new List<PlayerWeaponSkin>();
             public virtual List<PlayerWeaponShellSkin> ShellSkins { get; set; } = new List<PlayerWeaponShellSkin>();
         }
 
-        public class PlayerHullSkin : IEntity
+        public class PlayerHullSkin : IEntity, IPlayerEquipment
         {
-            public static PlayerHullSkin Create(PlayerData player, long hullId, long entityId)
+            public static PlayerHullSkin Create(PlayerData player, long hullId, long entityId, bool isOwned)
             {
                 return new PlayerHullSkin()
                 {
                     Player = player,
                     PlayerId = player.UniqueId,
                     HullId = hullId,
-                    EntityId = entityId
+                    EntityId = entityId,
+                    IsOwned = isOwned
                 };
             }
 
@@ -986,18 +998,21 @@ namespace TXServer.Core
             public virtual PlayerHull Hull { get; set; }
 
             public long EntityId { get; set; }
+
+            public bool IsOwned { get; set; }
         }
 
-        public class PlayerWeaponSkin : IEntity
+        public class PlayerWeaponSkin : IEntity, IPlayerEquipment
         {
-            public static PlayerWeaponSkin Create(PlayerData player, long weaponId, long entityId)
+            public static PlayerWeaponSkin Create(PlayerData player, long weaponId, long entityId, bool isOwned)
             {
                 return new PlayerWeaponSkin()
                 {
                     Player = player,
                     PlayerId = player.UniqueId,
                     WeaponId = weaponId,
-                    EntityId = entityId
+                    EntityId = entityId,
+                    IsOwned = isOwned
                 };
             }
 
@@ -1011,18 +1026,21 @@ namespace TXServer.Core
             public virtual PlayerWeapon Weapon { get; set; }
 
             public long EntityId { get; set; }
+
+            public bool IsOwned { get; set; }
         }
 
-        public class PlayerWeaponShellSkin : IEntity
+        public class PlayerWeaponShellSkin : IEntity, IPlayerEquipment
         {
-            public static PlayerWeaponShellSkin Create(PlayerData player, long weaponId, long entityId)
+            public static PlayerWeaponShellSkin Create(PlayerData player, long weaponId, long entityId, bool isOwned)
             {
                 return new PlayerWeaponShellSkin()
                 {
                     Player = player,
                     PlayerId = player.UniqueId,
                     WeaponId = weaponId,
-                    EntityId = entityId
+                    EntityId = entityId,
+                    IsOwned = isOwned
                 };
             }
 
@@ -1036,6 +1054,8 @@ namespace TXServer.Core
             public virtual PlayerWeapon Weapon { get; set; }
 
             public long EntityId { get; set; }
+
+            public bool IsOwned { get; set; }
         }
 
         public class PlayerModule : IEntity
@@ -1118,11 +1138,11 @@ namespace TXServer.Core
             .Concat(Covers.ToIds())
             .Concat(Graffiti.ToIds())
             .Concat(Hulls.ToOwnedIds())
-            .Concat(Hulls.SelectMany(hull => hull.Skins).ToIds())
+            .Concat(Hulls.SelectMany(hull => hull.Skins).ToOwnedIds())
             .Concat(Paints.ToIds())
             .Concat(Weapons.ToOwnedIds())
-            .Concat(Weapons.SelectMany(weapon => weapon.Skins).ToIds())
-            .Concat(Weapons.SelectMany(weapon => weapon.ShellSkins).ToIds())
+            .Concat(Weapons.SelectMany(weapon => weapon.Skins).ToOwnedIds())
+            .Concat(Weapons.SelectMany(weapon => weapon.ShellSkins).ToOwnedIds())
             .Contains(marketItem.EntityId);
 
         public bool IsPremium => PremiumExpirationDate > DateTime.UtcNow;

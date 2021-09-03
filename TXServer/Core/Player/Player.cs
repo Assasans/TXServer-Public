@@ -53,10 +53,7 @@ namespace TXServer.Core
         public ConcurrentDictionary<Type, ItemList> UserItems { get; } = new();
 
 
-        public PresetEquipmentComponent CurrentPreset =>
-            Data.Presets.Single(p => p.HasComponent<MountedItemComponent>())
-                .GetComponent<PresetEquipmentComponent>();
-        public PresetEquipmentComponent RestorablePreset { get; set; }
+        public PlayerPreset CurrentPreset => Data.Presets[Data.CurrentPresetIndex];
 
         public Entity ClientSession { get; set; }
         public Entity User { get; set; }
@@ -160,14 +157,15 @@ namespace TXServer.Core
             foreach (Entity item in new[]
                 {
                     GetUserItemByMarket(GetEntityById(Data.Avatar)),
-                    CurrentPreset.WeaponItem,
-                    CurrentPreset.HullItem,
-                    CurrentPreset.WeaponPaint,
-                    CurrentPreset.TankPaint,
-                    CurrentPreset.Graffiti,
-                }.Concat(CurrentPreset.HullSkins.Values)
-                .Concat(CurrentPreset.WeaponSkins.Values)
-                .Concat(CurrentPreset.WeaponShells.Values))
+                    CurrentPreset.GetPlayerHull(this),
+                    CurrentPreset.GetPlayerHullPaint(this),
+                    CurrentPreset.GetPlayerHullSkin(this),
+                    CurrentPreset.GetPlayerWeapon(this),
+                    CurrentPreset.GetPlayerWeaponPaint(this),
+                    CurrentPreset.GetPlayerWeaponSkin(this),
+                    CurrentPreset.GetPlayerWeaponShellSkin(this),
+                    CurrentPreset.GetPlayerGraffiti(this)
+                })
             {
                 item.AddComponent(new MountedItemComponent());
             }

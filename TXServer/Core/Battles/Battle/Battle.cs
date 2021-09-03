@@ -353,7 +353,7 @@ namespace TXServer.Core.Battles
                 if (!Params.DisabledModules)
                 {
                     // add all selected modules
-                    foreach ((Entity _, Entity garageModule) in battlePlayer.Player.CurrentPreset.Modules.Where(
+                    foreach ((Entity _, Entity garageModule) in battlePlayer.Player.CurrentPreset.GetPlayerModules(battlePlayer.Player).Where(
                         entry => entry.Value?.GetComponent<MountedItemComponent>() != null
                     ))
                     {

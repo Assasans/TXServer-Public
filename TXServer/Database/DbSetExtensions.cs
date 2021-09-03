@@ -31,7 +31,9 @@ namespace TXServer.Database
                 .IncludeOptimized(player => player.Shards)
                 .IncludeOptimized(player => player.Statistics)
                 .IncludeOptimized(player => player.DailyBonusReceivedRewards)
-                .IncludeOptimized(player => player.CompletedTutorials);
+                .IncludeOptimized(player => player.CompletedTutorials)
+                .IncludeOptimized(player => player.Presets)
+                .IncludeOptimized(player => player.Presets.Select(preset => preset.Modules));
         }
     }
 }

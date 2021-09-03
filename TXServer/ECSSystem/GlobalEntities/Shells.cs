@@ -24,7 +24,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.TemplateAccessor.Template = new ShellUserItemTemplate();
 
-                if (player.Data.Weapons.SelectMany(weapon => weapon.ShellSkins).ToIds().Contains(id))
+                if (player.Data.Weapons.SelectMany(weapon => weapon.ShellSkins).ContainsOwnedId(id))
                     item.Components.Add(new UserGroupComponent(player.User));
             }
 

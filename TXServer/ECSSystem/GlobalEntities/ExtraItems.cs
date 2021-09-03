@@ -25,6 +25,25 @@ namespace TXServer.ECSSystem.GlobalEntities
                     item.AddComponent(new UserItemCounterComponent(player.Data.GoldBonus));
             }
 
+            foreach (PlayerPreset preset in player.Data.Presets)
+            {
+                Entity entity = new Entity(new TemplateAccessor(new PresetUserItemTemplate(), "garage/preset"),
+                    new MarketItemGroupComponent(-571744569),
+                    new PresetEquipmentComponent(preset),
+                    new PresetNameComponent(preset),
+                    new UserGroupComponent(player.User));
+
+                entity.GetComponent<PresetEquipmentComponent>().hullId = preset.Hull.EntityId;
+                entity.GetComponent<PresetEquipmentComponent>().weaponId = preset.Weapon.EntityId;
+
+                if (preset.Index == player.Data.CurrentPresetIndex)
+                    entity.AddComponent(new MountedItemComponent());
+
+                preset.Entity = entity;
+            }
+
+            player.ShareEntities(player.Data.Presets.Select(preset => preset.Entity));
+
             return items;
         }
 
@@ -55,15 +74,6 @@ namespace TXServer.ECSSystem.GlobalEntities
             public UserItems(Player player)
             {
                 Goldbonus.Components.Add(new ModuleGroupComponent((player.UserItems[typeof(Modules)] as Modules.Items).Gold));
-
-                if (player.Data.Presets.Any())
-                {
-                    player.RestorablePreset = player.CurrentPreset;
-                    player.Data.Presets.Clear();
-                }
-                PresetEquipmentComponent component = new(player, Preset);
-                Preset.Components.Add(component);
-                player.Data.Presets.Add(Preset);
             }
 
             public Entity Goldbonus { get; } = new Entity(new TemplateAccessor(new GoldBonusUserItemTemplate(), "garage/goldbonus"),
@@ -80,10 +90,9 @@ namespace TXServer.ECSSystem.GlobalEntities
             public Entity Xcrystal { get; } = new Entity(new TemplateAccessor(new XCrystalUserItemTemplate(), "garage/xcrystal"),
                 new MarketItemGroupComponent(947348559),
                 new UserItemCounterComponent(0));
-            public Entity Preset { get; } = new Entity(new TemplateAccessor(new PresetUserItemTemplate(), "garage/preset"),
-                new MarketItemGroupComponent(-571744569),
-                new PresetNameComponent("Preset 1"),
-                new MountedItemComponent());
+            // public Entity Preset { get; } = new Entity(new TemplateAccessor(new PresetUserItemTemplate(), "garage/preset"),
+            //     new MarketItemGroupComponent(-571744569),
+            //     new MountedItemComponent());
         }
     }
 }

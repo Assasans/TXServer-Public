@@ -23,7 +23,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.TemplateAccessor.Template = new HullSkinUserItemTemplate();
 
-                if (player.Data.Hulls.SelectMany(hull => hull.Skins).ToIds().Contains(id))
+                if (player.Data.Hulls.SelectMany(hull => hull.Skins).ContainsOwnedId(id))
                     item.Components.Add(new UserGroupComponent(player.User));
             }
 

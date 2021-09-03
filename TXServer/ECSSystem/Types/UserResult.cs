@@ -19,7 +19,7 @@ namespace TXServer.ECSSystem.Types
 
             EnterTime = DateTime.UtcNow.Ticks;
 
-            foreach (Entity module in battlePlayer.Player.CurrentPreset.Modules.Values.Where(module => module != null))
+            foreach (Entity module in battlePlayer.Player.CurrentPreset.GetPlayerModules(battlePlayer.Player).Values)
                 Modules.Add(new ModuleInfo(module.GetComponent<MarketItemGroupComponent>().Key,
                     module.GetComponent<ModuleUpgradeLevelComponent>().Level));
 
@@ -57,14 +57,12 @@ namespace TXServer.ECSSystem.Types
         public int FlagAssists { get; set; }
         public int FlagReturns { get; set; }
 
-        public long WeaponId => _battlePlayer.Player.CurrentPreset.Weapon.GetComponent<MarketItemGroupComponent>().Key;
-        public long HullId => _battlePlayer.Player.CurrentPreset.Hull.GetComponent<MarketItemGroupComponent>().Key;
-        public long PaintId => _battlePlayer.Player.CurrentPreset.TankPaint.GetComponent<MarketItemGroupComponent>().Key;
-        public long CoatingId => _battlePlayer.Player.CurrentPreset.WeaponPaint.GetComponent<MarketItemGroupComponent>().Key;
-        public long HullSkinId => _battlePlayer.Player.CurrentPreset
-            .HullSkins[_battlePlayer.Player.CurrentPreset.HullItem].GetComponent<MarketItemGroupComponent>().Key;
-        public long WeaponSkinId => _battlePlayer.Player.CurrentPreset
-            .WeaponSkins[_battlePlayer.Player.CurrentPreset.WeaponItem].GetComponent<MarketItemGroupComponent>().Key;
+        public long WeaponId => _battlePlayer.Player.CurrentPreset.Weapon.EntityId;
+        public long HullId => _battlePlayer.Player.CurrentPreset.Hull.EntityId;
+        public long PaintId => _battlePlayer.Player.CurrentPreset.HullPaint.EntityId;
+        public long CoatingId => _battlePlayer.Player.CurrentPreset.WeaponPaint.EntityId;
+        public long HullSkinId => _battlePlayer.Player.CurrentPreset.HullSkin.EntityId;
+        public long WeaponSkinId => _battlePlayer.Player.CurrentPreset.WeaponSkin.EntityId;
         public List<ModuleInfo> Modules { get; set; } = new();
 
         public int BonusesTaken { get; set; } = 0;

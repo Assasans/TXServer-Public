@@ -1,4 +1,5 @@
-﻿using TXServer.Core;
+﻿using System.Linq;
+using TXServer.Core;
 using TXServer.Core.Protocol;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -13,7 +14,8 @@ namespace TXServer.ECSSystem.Events.Item
             if (!slot.HasComponent<ModuleGroupComponent>() || !module.HasComponent<MountedItemComponent>())
                 return;
 
-            player.CurrentPreset.Modules[slot] = null;
+            PlayerPresetModule presetModule = player.CurrentPreset.Modules.Single(module => module.Slot == slot.GetComponent<SlotUserItemInfoComponent>().Slot);
+            player.CurrentPreset.Modules.Remove(presetModule);
 
 			slot.RemoveComponent<ModuleGroupComponent>();
 			module.RemoveComponent<MountedItemComponent>();

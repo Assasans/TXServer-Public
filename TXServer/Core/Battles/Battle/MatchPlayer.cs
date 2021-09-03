@@ -35,22 +35,24 @@ namespace TXServer.Core.Battles
     {
         public MatchPlayer(BattleTankPlayer battlePlayer, Entity battleEntity, IEnumerable<UserResult> userResults)
         {
-            OriginalSpeedComponent = Config.GetComponent<SpeedComponent>(
-                battlePlayer.Player.CurrentPreset.HullItem.TemplateAccessor.ConfigPath);
+            OriginalSpeedComponent = Config.GetComponent<SpeedComponent>(battlePlayer.Player.CurrentPreset.Hull.TemplateAccessor.ConfigPath);
 
             Battle = battlePlayer.Battle;
             Player = battlePlayer.Player;
 
             BattleUser = BattleUserTemplate.CreateEntity(battlePlayer.Player, battleEntity, battlePlayer.Team);
 
-            Tank = TankTemplate.CreateEntity(this, battlePlayer.Player.CurrentPreset.HullItem, BattleUser, battlePlayer);
-            Weapon = WeaponTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponItem, Tank, battlePlayer);
-            HullSkin = HullSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullSkins[battlePlayer.Player.CurrentPreset.HullItem], Tank);
-            WeaponSkin = WeaponSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponSkins[battlePlayer.Player.CurrentPreset.WeaponItem], Tank);
+            Entity hullItem = battlePlayer.Player.CurrentPreset.GetPlayerHull(Player);
+            Entity weaponItem = battlePlayer.Player.CurrentPreset.GetPlayerWeapon(Player);
+
+            Tank = TankTemplate.CreateEntity(this, hullItem, BattleUser, battlePlayer);
+            Weapon = WeaponTemplate.CreateEntity(hullItem, Tank, battlePlayer);
+            HullSkin = HullSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.GetPlayerHullSkin(Player), Tank);
+            WeaponSkin = WeaponSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.GetPlayerWeaponSkin(Player), Tank);
             WeaponPaint = WeaponPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponPaint, Tank);
-            TankPaint = TankPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.TankPaint, Tank);
+            TankPaint = TankPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullPaint, Tank);
             Graffiti = GraffitiBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.Graffiti, Tank);
-            Shell = ShellBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponShells[battlePlayer.Player.CurrentPreset.WeaponItem], Tank);
+            Shell = ShellBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.GetPlayerWeaponShellSkin(Player), Tank);
             Modules = new List<BattleModule>();
             Incarnation = TankIncarnationTemplate.CreateEntity(Tank);
             RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, Tank);

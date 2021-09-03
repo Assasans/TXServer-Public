@@ -23,7 +23,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 item.TemplateAccessor.Template = new WeaponSkinUserItemTemplate();
 
-                if (player.Data.Weapons.SelectMany(weapon => weapon.Skins).ToIds().Contains(id))
+                if (player.Data.Weapons.SelectMany(weapon => weapon.Skins).ContainsOwnedId(id))
                     item.Components.Add(new UserGroupComponent(player.User));
             }
 

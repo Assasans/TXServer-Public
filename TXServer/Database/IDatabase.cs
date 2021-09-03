@@ -1,11 +1,8 @@
 ﻿#nullable enable
 
-using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using TXServer.Core.ChatCommands;
 using TXServer.Database.Entity;
-using TXServer.Database.Provider;
 
 namespace TXServer.Core.Data.Database
 {
@@ -30,6 +27,9 @@ namespace TXServer.Core.Data.Database
         DbSet<PlayerData.PlayerWeaponShellSkin> WeaponShellSkins { get;  }
 
         DbSet<PlayerData.PlayerModule> Modules { get; }
+
+        DbSet<PlayerPreset> Presets { get; }
+        DbSet<PlayerPresetModule> PresetModules { get; }
 
         DbSet<PlayerData.PlayerContainer> Containers { get; }
         DbSet<PlayerData.PlayerContainerShards> ContainerShards { get;  }

@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Serilog;
 using TXServer.Core;
@@ -11,6 +12,7 @@ using TXServer.Core.ChatCommands;
 using TXServer.Core.Data.Database;
 using TXServer.Core.Logging;
 using TXServer.Database.Entity;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Database.Provider
 {
@@ -29,6 +31,31 @@ namespace TXServer.Database.Provider
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            var converter = new ValueConverter<ECSSystem.Base.Entity, long?>(
+                entity => entity != null ? entity.EntityId : null,
+                entityId => ResourceManager.GetGlobalEntities().SingleOrDefault(entity => entity.EntityId == entityId)
+            );
+
+            builder.Entity<PlayerPreset>(entity =>
+            {
+                entity.Property(preset => preset.Hull).HasConversion(converter);
+                entity.Property(preset => preset.HullPaint).HasConversion(converter);
+                entity.Property(preset => preset.HullSkin).HasConversion(converter);
+
+                entity.Property(preset => preset.Weapon).HasConversion(converter);
+                entity.Property(preset => preset.WeaponPaint).HasConversion(converter);
+                entity.Property(preset => preset.WeaponSkin).HasConversion(converter);
+                entity.Property(preset => preset.WeaponShellSkin).HasConversion(converter);
+
+                entity.Property(preset => preset.Graffiti).HasConversion(converter);
+            });
+
+            // foreach (IMutableProperty property in builder.Model.GetEntityTypes().SelectMany(type => type.GetProperties()))
+            // {
+            //     if (property.ClrType == typeof(ECSSystem.Base.Entity))
+            //         property.SetValueConverter(converter);
+            // }
+
             foreach (IMutableProperty property in builder.Model.GetEntityTypes().SelectMany(type => type.GetProperties()))
             {
                 if (property.ClrType == typeof(TimeSpan) || property.ClrType == typeof(TimeSpan?))
@@ -48,11 +75,11 @@ namespace TXServer.Database.Provider
 
             builder.Entity<PlayerData.PlayerWeapon>(entity =>
             {
-                entity.HasMany(player => player.Skins)
+                entity.HasMany(weapon => weapon.Skins)
                     .WithOne(skin => skin.Weapon)
                     .HasForeignKey(skin => new { skin.PlayerId, skin.EntityId });
 
-                entity.HasMany(player => player.ShellSkins)
+                entity.HasMany(weapon => weapon.ShellSkins)
                     .WithOne(skin => skin.Weapon)
                     .HasForeignKey(skin => new { skin.PlayerId, skin.EntityId });
             });
@@ -130,6 +157,11 @@ namespace TXServer.Database.Provider
                 entity.HasKey(module => new { module.PlayerId, module.EntityId });
             });
 
+            builder.Entity<PlayerPreset>(entity =>
+            {
+                entity.HasKey(preset => new { preset.PlayerId, preset.Index });
+            });
+
             builder.Entity<PlayerData.PlayerContainerShards>(entity =>
             {
                 entity.HasKey(shards => new { shards.PlayerId, shards.EntityId });
@@ -150,6 +182,11 @@ namespace TXServer.Database.Provider
                 entity.HasKey(tutorial => new { tutorial.PlayerId, tutorial.EntityId });
             });
 
+            builder.Entity<PlayerPresetModule>(entity =>
+            {
+                entity.HasKey(module => new { module.PlayerId, module.PresetIndex, module.Slot });
+            });
+
             builder.Entity<PlayerStatistics>(entity =>
             {
                 entity.HasKey(statistics => new { statistics.PlayerId });
@@ -158,6 +195,11 @@ namespace TXServer.Database.Provider
             builder.Entity<PlayerData>(entity =>
             {
                 entity.Ignore(player => player.Player);
+            });
+
+            builder.Entity<PlayerPreset>(entity =>
+            {
+                entity.Ignore(player => player.Entity);
             });
         }
 
@@ -180,6 +222,9 @@ namespace TXServer.Database.Provider
         public DbSet<PlayerData.PlayerWeaponShellSkin> WeaponShellSkins { get; protected set; } = null!;
 
         public DbSet<PlayerData.PlayerModule> Modules { get; protected set; } = null!;
+
+        public DbSet<PlayerPreset> Presets { get; protected set; } = null!;
+        public DbSet<PlayerPresetModule> PresetModules { get; protected set; } = null!;
 
         public DbSet<PlayerData.PlayerContainer> Containers { get; protected set; } = null!;
         public DbSet<PlayerData.PlayerContainerShards> ContainerShards { get; protected set; } = null!;
@@ -247,6 +292,37 @@ namespace TXServer.Database.Provider
         {
             lock (this)
             {
+                ChangeTracker.DetectChanges();
+                foreach (EntityEntry entry in ChangeTracker.Entries())
+                {
+                    var entity = entry.Entity;
+
+                    if (entry.State == EntityState.Added)
+                    {
+                        Logger.Verbose("Created {Type}: {Entity}", entry.Entity.GetType().Name, entity);
+                    }
+                    else if (entry.State == EntityState.Modified)
+                    {
+                        var originalValues = Entry(entity).OriginalValues;
+                        var currentValues = Entry(entity).CurrentValues;
+
+                        foreach (IProperty property in originalValues.Properties)
+                        {
+                            var original = originalValues[property];
+                            var current = currentValues[property];
+
+                            if (!Equals(original, current))
+                            {
+                                Logger.Verbose("Changed {Type}.{Property}: {Original} -> {Current}", entity.GetType().Name, property.Name, original, current);
+                            }
+                        }
+                    }
+                    else if (entry.State == EntityState.Deleted)
+                    {
+                        Logger.Verbose("Deleted {Type}: {Entity}", entry.Entity.GetType().Name, entity);
+                    }
+                }
+
                 int changes = SaveChanges();
                 if (changes > 0) Logger.Debug("Database changes: {Changes}", changes);
             }
