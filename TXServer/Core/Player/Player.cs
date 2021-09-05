@@ -382,7 +382,7 @@ namespace TXServer.Core
 
         public void Tick()
         {
-            foreach ((Entity notification, DateTimeOffset timeLimit) in TempNotifications.ToList())
+            foreach ((Entity notification, DateTimeOffset timeLimit) in TempNotifications.ToArray())
             {
                 if (DateTimeOffset.UtcNow <= timeLimit || notification is null) continue;
                 if (TempNotifications.TryRemove(notification, out _))

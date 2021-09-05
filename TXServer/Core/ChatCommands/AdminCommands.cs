@@ -12,6 +12,7 @@ using TXServer.ECSSystem.EntityTemplates;
 using TXServer.ECSSystem.EntityTemplates.Notification;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
+using TXServer.ECSSystem.Events.Chat;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 
@@ -61,13 +62,16 @@ namespace TXServer.Core.ChatCommands
                 return;
             }
 
-            ScreenMessage(desc.Item3(player, args[1..]), player, true);
+            string commandReply = desc.Item3(player, args[1..]);
+            if (commandReply is not null)
+                ScreenMessage(commandReply, player, true);
         }
 
         private static string ChangeBattleMode(Player player, string[] args)
         {
-            string prevMode = player.BattlePlayer.Battle.Params.BattleMode.ToString();
-            ClientBattleParams newParams = player.BattlePlayer.Battle.Params;
+            Battle battle = player.BattlePlayer.Battle;
+            string prevMode = battle.Params.BattleMode.ToString();
+            ClientBattleParams newParams = battle.Params;
             string toConvertMode = args.Length == 0 ? "" : args[0];
 
             newParams.BattleMode = toConvertMode.ToLower() switch
@@ -77,6 +81,12 @@ namespace TXServer.Core.ChatCommands
                 "tdm" => BattleMode.TDM,
                 _ => Battles.Matchmaking.MatchMaking.BattleModePicker()
             };
+
+            // (prevents client crash) another map if chosen BattleMode isn't available
+            if (!battle.IsMatchMaking && !battle.CurrentMapInfo.SpawnPoints.IsBattleModeAvailable(newParams.BattleMode))
+                newParams.MapId = ServerConnection.ServerMapInfo
+                    .FirstOrDefault(m => m.Value.SpawnPoints.IsBattleModeAvailable(newParams.BattleMode)).Value.MapId;
+
             player.BattlePlayer.Battle.UpdateParams(newParams);
 
             return
@@ -102,18 +112,26 @@ namespace TXServer.Core.ChatCommands
             string newMapName = args.Length == 0
                 ? otherMaps[new Random().Next(otherMaps.Count)].Name
                 : string.Join(" ", args);
-            long? newMapId = ServerConnection.ServerMapInfo.Values.SingleOrDefault(m =>
-                string.Equals(m.Name, newMapName, StringComparison.CurrentCultureIgnoreCase))?.MapId;
+            MapInfo newMapInfo = ServerConnection.ServerMapInfo.Values.SingleOrDefault(m =>
+                string.Equals(m.Name, newMapName, StringComparison.CurrentCultureIgnoreCase));
 
-            if (newMapId != null)
+            if (newMapInfo != null)
             {
-                newParams.MapId = (long) newMapId;
+                newParams.MapId = newMapInfo.MapId;
+
+                // (prevents client crash) another battle mode if chosen map doesn't support current
+                Battle battle = player.BattlePlayer.Battle;
+
+                if (!battle.IsMatchMaking && !newMapInfo.SpawnPoints.IsBattleModeAvailable(newParams.BattleMode))
+                    newParams.BattleMode = newMapInfo.SpawnPoints.GetAvailableBattleMode();
+
                 player.BattlePlayer.Battle.UpdateParams(newParams);
             }
             else
                 return $"Error, a map with name {newMapName} wasn't found";
 
-            return $"Successfully changed battle map from {prevMapName} to {player.BattlePlayer.Battle.CurrentMapInfo.Name}";
+            return $"Successfully changed battle map from {prevMapName} to " +
+                   $"{player.BattlePlayer.Battle.CurrentMapInfo.Name}";
         }
 
         private static string ChangeModules(Player player, string[] args)
@@ -412,7 +430,9 @@ namespace TXServer.Core.ChatCommands
         private static string PositionInfo(Player player, string[] args)
         {
             MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
-            return $"Vector3: {matchPlayer.TankPosition} || Quaternion: {matchPlayer.TankQuaternion}";
+            ChatMessageReceivedEvent.SystemMessageTarget(
+                $"Vector3: {matchPlayer.TankPosition} || Quaternion: {matchPlayer.TankQuaternion}", player);
+            return null;
         }
 
         private static string RecruitReward(Player player, string[] args)

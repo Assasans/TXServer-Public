@@ -26,7 +26,6 @@ using TXServer.ECSSystem.Events.Battle.Weapon.Hammer;
 using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.ServerComponents.Tank;
 using TXServer.ECSSystem.Types;
-using TXServer.ECSSystem.Types.Battle;
 using TXServer.Library;
 using static TXServer.Core.Battles.Battle;
 
@@ -165,10 +164,6 @@ namespace TXServer.Core.Battles
             // ReSharper disable once PossibleNullReferenceException
             Vector3 position = LastSpawnPoint?.Position ?? LastTeleportPoint.Position;
             Quaternion rotation = LastSpawnPoint?.Rotation ?? LastTeleportPoint.Rotation;
-
-            /* in case you want to set another json for testing a SINGLE spawn coordinate
-            string CoordinatesJson = File.ReadAllText("YourPath\\test.json");
-            coordinate = JsonSerializer.Deserialize<Coordinates.spawnCoordinate>(CoordinatesJson); */
 
             Tank.AddComponent(new TankMovementComponent(new Movement(position, Vector3.Zero, Vector3.Zero, rotation), new MoveControl(), 0, 0));
         }
@@ -326,7 +321,7 @@ namespace TXServer.Core.Battles
             {
                 Battle.CollisionsComponent.SemiActiveCollisionsPhase++;
 
-                Tank.RemoveComponent<TankStateTimeOutComponent>();
+                Tank.TryRemoveComponent<TankStateTimeOutComponent>();
                 Battle.BattleEntity.ChangeComponent(Battle.CollisionsComponent);
 
                 TankState = TankState.Active;

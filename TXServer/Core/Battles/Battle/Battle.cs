@@ -400,14 +400,11 @@ namespace TXServer.Core.Battles
             player.UnshareEntities(BattleEntity, RoundEntity, GeneralBattleChatEntity);
 
             // Supply boxes
-            if (!Params.DisabledModules)
+            foreach (BattleBonus battleBonus in BattleBonuses.Where(b => b.State != BonusState.Unused && b.State != BonusState.New))
             {
-                foreach (BattleBonus battleBonus in BattleBonuses.Where(b => b.State != BonusState.Unused && b.State != BonusState.New))
-                {
-                    player.UnshareEntities(battleBonus.BonusRegion);
-                    if (battleBonus.State == BonusState.Spawned)
-                        player.UnshareEntities(battleBonus.BonusEntity);
-                }
+                player.UnshareEntities(battleBonus.BonusRegion);
+                if (battleBonus.State == BonusState.Spawned)
+                    player.UnshareEntities(battleBonus.BonusEntity);
             }
 
             // Remove other players' entities and leave battle
@@ -625,10 +622,10 @@ namespace TXServer.Core.Battles
 
         public MapInfo CurrentMapInfo { get; private set; }
 
-        public List<BattleBonus> BattleBonuses { get; set; } = new();
+        public List<BattleBonus> BattleBonuses { get; } = new();
         public IEnumerable<BattleBonus> GoldBonuses => BattleBonuses.Where(b => b.BonusType == BonusType.GOLD);
         public int DroppedGoldBoxes { get; set; }
-        public List<Player> WaitingGoldBoxSenders { get; set; } = new();
+        public List<Player> WaitingGoldBoxSenders { get; } = new();
         public const int MaxDroppedGoldBoxes = 16;
 
         public BattleState BattleState

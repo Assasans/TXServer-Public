@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Health;
-using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 

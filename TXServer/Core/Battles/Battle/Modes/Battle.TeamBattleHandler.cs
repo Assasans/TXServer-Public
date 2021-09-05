@@ -72,15 +72,9 @@ namespace TXServer.Core.Battles
                 BlueTeamEntity = TeamTemplate.CreateEntity(TeamColor.BLUE, Battle.BattleEntity);
                 TeamBattleChatEntity = TeamBattleChatTemplate.CreateEntity();
 
-                var teamModesSpawnPoints = new Dictionary<BattleMode, TeamSpawnPointList>
-                {
-                    { BattleMode.CTF, Battle.CurrentMapInfo.SpawnPoints.CaptureTheFlag },
-                    { BattleMode.TDM, Battle.CurrentMapInfo.SpawnPoints.TeamDeathmatch }
-                };
-
-                SpawnPoints = teamModesSpawnPoints.ContainsKey(Battle.Params.BattleMode)
-                    ? teamModesSpawnPoints[Battle.Params.BattleMode]
-                    : teamModesSpawnPoints.Values.First(b => b != null);
+                SpawnPoints = Battle.CurrentMapInfo.SpawnPoints.IsBattleModeAvailable(Battle.Params.BattleMode)
+                    ? Battle.CurrentMapInfo.SpawnPoints.GetTeamSpawnPoints(Battle.Params.BattleMode)
+                    : Battle.CurrentMapInfo.SpawnPoints.GetAnyTeamSpawnPoints();
             }
 
             public void SetupBattle(IBattleModeHandler prevHandler)
