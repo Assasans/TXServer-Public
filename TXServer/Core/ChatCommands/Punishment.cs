@@ -15,7 +15,6 @@ namespace TXServer.Core.ChatCommands
 
             StartTime = DateTimeOffset.UtcNow;
             ExpirationTime = expirationTime ?? DateTimeOffset.UtcNow;
-            OriginalDuration = ExpirationTime - DateTimeOffset.UtcNow;
             TrTimes = trTimes ?? new Dictionary<string, string>();
             IsPermanent = isPermanent;
             Reason = reason;
@@ -75,7 +74,7 @@ namespace TXServer.Core.ChatCommands
                     if (Reason is not null) trMsg += $". Причина: {Reason}";
                     break;
                 default:
-                    trMsg = $"'{Player.Data.Username}' was muted {(!IsPermanent ? "for " : "")}{TrTimes["en"]}";
+                    trMsg = $"'{Player.Data.Username}' was {(Type == PunishmentType.Ban ? "banned" : "muted")} for{(!IsPermanent ? $" {TrTimes["en"]}" : "ever")}";
                     if (Reason is not null) trMsg += $". Reason: {Reason}";
                     break;
             }
@@ -123,13 +122,12 @@ namespace TXServer.Core.ChatCommands
             ForceRemoved ? CreateUnPunishmentMsg(target) : CreateNewPunishmentMsg(target);
 
 
-        public Player Player { get; }
+        private Player Player { get; }
         public PunishmentType Type { get; }
 
-        public DateTimeOffset StartTime { get; }
-        public DateTimeOffset ExpirationTime { get; }
-        public TimeSpan OriginalDuration { get; }
-        public Dictionary<string, string> TrTimes { get; }
+        private DateTimeOffset StartTime { get; }
+        private DateTimeOffset ExpirationTime { get; }
+        private Dictionary<string, string> TrTimes { get; }
         public TimeSpan Duration => ExpirationTime - DateTimeOffset.UtcNow;
 
 
