@@ -412,6 +412,10 @@ namespace TXServer.Core.Battles
             player.User.RemoveComponent<BattleGroupComponent>();
             ModeHandler.OnMatchLeave(baseBattlePlayer);
 
+            // supply effects and modules
+            foreach (BattleModule module in MatchTankPlayers.ToList().SelectMany(p => p.MatchPlayer.Modules))
+                module.UnshareEffect(baseBattlePlayer.Player);
+
             if (baseBattlePlayer is Spectator spectator)
             {
                 baseBattlePlayer.UnshareEntities(spectator.BattleUser);
@@ -425,10 +429,6 @@ namespace TXServer.Core.Battles
             // Only for tank players
             //
             var battlePlayer = (BattleTankPlayer)baseBattlePlayer;
-
-            // Player's own supply effects and modules
-            foreach (BattleModule module in MatchTankPlayers.ToList().SelectMany(p => p.MatchPlayer.Modules))
-                module.UnshareEffect(baseBattlePlayer.Player);
 
             // Unshare and remove self from list
             PlayersInMap.UnshareEntities(battlePlayer.MatchPlayer.GetEntities());
