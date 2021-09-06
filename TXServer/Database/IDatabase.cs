@@ -14,7 +14,8 @@ namespace TXServer.Core.Data.Database
         DbSet<PlayerData.PlayerRelation> Relations { get; }
         DbSet<Punishment> Punishments { get;}
 
-        DbSet<PlayerData.PlayerRewardedLeague> PlayerRewardedLeague { get; }
+        DbSet<PlayerData.PlayerRewardedLeague> RewardedLeagues { get; }
+        DbSet<PlayerData.PlayerSeasonReputation> SeasonReputations { get; }
 
         DbSet<PlayerData.PlayerAvatar> Avatars { get; }
         DbSet<PlayerData.PlayerPaint> Paints { get; }

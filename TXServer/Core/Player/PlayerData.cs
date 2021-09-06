@@ -128,6 +128,47 @@ namespace TXServer.Core
         }
     }
 
+    public static class PlayerSeasonReputationExtensions
+    {
+        public static TEntity GetBySeason<TEntity>(this IEnumerable<TEntity> entities, long season) where TEntity : PlayerData.PlayerSeasonReputation
+        {
+            return entities.SingleOrDefault(entity => entity.Season == season);
+        }
+
+        public static bool ContainsSeason<TEntity>(this IEnumerable<TEntity> entities, long season) where TEntity : PlayerData.PlayerSeasonReputation
+        {
+            return entities.Any(entity => entity.Season == season);
+        }
+
+        public static bool TryGetBySeason<TEntity>(this IEnumerable<TEntity> entities, long season, [MaybeNullWhen(false)] out TEntity property)
+            where TEntity : PlayerData.PlayerSeasonReputation
+        {
+            TEntity entity = entities.GetBySeason(season);
+            if (entity == null)
+            {
+                property = default;
+                return false;
+            }
+
+            property = entity;
+            return true;
+        }
+
+        public static bool TryGetBySeason<TEntity, TProperty>(this IEnumerable<TEntity> entities, long season, Func<TEntity, TProperty> resolver, [MaybeNullWhen(false)] out TProperty property)
+            where TEntity : PlayerData.PlayerSeasonReputation
+        {
+            TEntity entity = entities.GetBySeason(season);
+            if (entity == null)
+            {
+                property = default;
+                return false;
+            }
+
+            property = resolver(entity);
+            return true;
+        }
+    }
+
     public static class PlayerPresetEquipmentExtensions
     {
         // IHullEquipment
@@ -318,7 +359,10 @@ namespace TXServer.Core
             LastSeasonLeagueIndex = 0;
             LastSeasonPlace = 1;
             LastSeasonLeaguePlace = 1;
-            SeasonsReputation = new ObservableDictionary<int, int> { { Server.Instance.ServerData.SeasonNumber, 100 } };
+            SeasonsReputation = new List<PlayerSeasonReputation>
+            {
+                PlayerSeasonReputation.Create(this, Server.Instance.ServerData.SeasonNumber, 100)
+            };
 
             LeagueChestScore = 0;
             LeagueIndex = 0;
@@ -675,8 +719,12 @@ namespace TXServer.Core
             {
                 _reputation = value;
 
-                SeasonsReputation ??= new ObservableDictionary<int, int>();
-                SeasonsReputation[Server.Instance.ServerData.SeasonNumber] = value;
+                if (!SeasonsReputation.TryGetBySeason(Server.Instance.ServerData.SeasonNumber, out var reputation))
+                {
+                    reputation = PlayerSeasonReputation.Create(this, Server.Instance.ServerData.SeasonNumber);
+                    SeasonsReputation.Add(reputation);
+                }
+                reputation.Reputation = value;
 
                 if (Player?.User is null) return;
                 Player.User.ChangeComponent<UserReputationComponent>(component => component.Reputation = value);
@@ -701,7 +749,7 @@ namespace TXServer.Core
         public int LastSeasonPlace { get; set; }
         public int LastSeasonLeaguePlace { get; set; }
 
-        [NotMapped /* TODO */] public virtual ObservableDictionary<int, int> SeasonsReputation { get; protected set; } = new ObservableDictionary<int, int>();
+        public virtual List<PlayerSeasonReputation> SeasonsReputation { get; set; } = new List<PlayerSeasonReputation>();
 
         public DateTime PremiumExpirationDate
         {
@@ -774,6 +822,26 @@ namespace TXServer.Core
             public virtual PlayerData Player { get; set; }
 
             public long EntityId { get; set; }
+        }
+
+        public class PlayerSeasonReputation
+        {
+            public static PlayerSeasonReputation Create(PlayerData player, int season, int reputation = 0)
+            {
+                return new PlayerSeasonReputation()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    Season = season,
+                    Reputation = reputation
+                };
+            }
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public int Season { get; set; }
+            public int Reputation { get; set; }
         }
 
         public virtual List<PlayerRelation> Relations { get; private set; } = new List<PlayerRelation>();
