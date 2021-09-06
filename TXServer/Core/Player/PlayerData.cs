@@ -324,12 +324,6 @@ namespace TXServer.Core
             LeagueIndex = 0;
             Reputation = 100;
 
-            // AcceptedFriendIds = new ObservableList<long>();
-            // IncomingFriendIds = new ObservableList<long>();
-            // OutgoingFriendIds = new ObservableList<long>();
-            // BlockedPlayerIds = new ObservableList<long>();
-            // ReportedPlayerIds = new ObservableList<long>();
-
             Punishments = new List<Punishment>();
             CompletedTutorials = new List<PlayerCompletedTutorial>();
 
@@ -350,8 +344,6 @@ namespace TXServer.Core
 
             Avatar = 6224;
             Avatars = new List<PlayerAvatar> { PlayerAvatar.Create(this, 6224) };
-            // Containers = new ObservableDictionary<long, int>();
-            // Covers = new ObservableList<long> { -172249613 };
             Covers = new List<PlayerCover> { PlayerCover.Create(this, -172249613) };
             Graffiti = new List<PlayerGraffiti> { PlayerGraffiti.Create(this, 1001404575) };
             Hulls = new List<PlayerHull>();
@@ -373,11 +365,6 @@ namespace TXServer.Core
             Modules = new List<PlayerModule>();
             Paints = new List<PlayerPaint> { PlayerPaint.Create(this, -20020438) };
             Shards = new List<PlayerContainerShards>();
-            // Shells = new List<long>
-            // {
-            //     -966935184, 807172229, 357929046, 48235025, 1067800943, 1322064226, 70311513,
-            //     530945311, -1408603862, 139800007, 366763244
-            // };
             Weapons = new List<PlayerWeapon>();
             foreach ((Entity weapon, (List<Entity> skins, List<Entity> shells)) in defaultWeapons)
             {
@@ -773,12 +760,6 @@ namespace TXServer.Core
 
         public virtual List<PlayerRelation> Relations { get; private set; } = new List<PlayerRelation>();
 
-        // [Obsolete("Replaced by Relations", true)] [NotMapped /* TODO */] public virtual ObservableList<long> AcceptedFriendIds { get; private set; } = new ObservableList<long>();
-        // [Obsolete("Replaced by Relations", true)] [NotMapped /* TODO */] public virtual ObservableList<long> IncomingFriendIds { get; private set; } = new ObservableList<long>();
-        // [Obsolete("Replaced by Relations", true)] [NotMapped /* TODO */] public virtual ObservableList<long> OutgoingFriendIds { get; private set; } = new ObservableList<long>();
-        // [Obsolete("Replaced by Relations", true)] [NotMapped /* TODO */] public virtual ObservableList<long> BlockedPlayerIds { get; private set; } = new ObservableList<long>();
-        // [Obsolete("Replaced by Relations", true)] [NotMapped /* TODO */] public virtual ObservableList<long> ReportedPlayerIds { get; private set; } = new ObservableList<long>();
-
         public virtual List<PlayerCompletedTutorial> CompletedTutorials { get; private set; } = new List<PlayerCompletedTutorial>();
 
         public virtual List<Punishment> Punishments { get; private set; } = new List<Punishment>();
@@ -1117,16 +1098,6 @@ namespace TXServer.Core
         public virtual List<PlayerContainerShards> Shards { get; set; } = new List<PlayerContainerShards>();
 
         public virtual PlayerStatistics Statistics { get; set; }
-
-        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableList<long> Graffities { get; private set; }
-        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableDictionary<long, long> Hulls { get; private set; }
-        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableList<long> HullSkins { get; private set; }
-        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableDictionary<long, ModuleInfo> Modules { get; private set; }
-        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableList<long> Paints { get; private set; }
-        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableDictionary<long, int> Shards { get; private set; }
-        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableList<long> Shells { get; private set; }
-        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableDictionary<long, long> Weapons { get; private set; }
-        // [Obsolete("Replaced by Equipment !", true)] [NotMapped /* TODO */] public ObservableList<long> WeaponSkins { get; private set; }
 
         public bool ReceivedFractionsCompetitionReward { get; set; }
         public bool ReceivedReleaseReward { get; set; }
