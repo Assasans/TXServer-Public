@@ -15,6 +15,8 @@ namespace TXServer.ECSSystem.Events.Item
 		public void Execute(Player player, Entity container)
         {
             PlayerData.PlayerContainer playerContainer = player.Data.Containers.GetById(container.GetComponent<MarketItemGroupComponent>().Key);
+            if (playerContainer == null) return;
+
             int openAmount = Math.Min(playerContainer.Count, 100); // Prevent freeze when opening too many containers
 
             // remove opened container from user
