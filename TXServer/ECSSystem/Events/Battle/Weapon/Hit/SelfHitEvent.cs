@@ -22,6 +22,10 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
 
             if (weapon.TemplateAccessor.Template.GetType() == typeof(HammerBattleItemTemplate))
             {
+                Targets.RemoveAll(h =>
+                    !matchPlayer.IsEnemyOf(Damage.GetTargetByHit(matchPlayer, h)) &&
+                    !matchPlayer.Battle.Params.FriendlyFire);
+
                 ((Core.Battles.BattleWeapons.Hammer) matchPlayer.BattleWeapon).ProcessHits(Targets);
                 return;
             }

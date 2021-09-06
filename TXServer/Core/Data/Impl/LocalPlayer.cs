@@ -29,7 +29,7 @@ namespace TXServer.Core.Data.Impl
                 Crystals = 1000000;
                 XCrystals = 50000;
                 Experience = 0;
-                GoldBonus = 5;
+                GoldBonus = 2;
                 PremiumExpirationDate = DateTime.MinValue;
 
                 Fraction = null;
