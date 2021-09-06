@@ -13,8 +13,10 @@ namespace TXServer.Core.Data.Database
 
         DbSet<PlayerData.PlayerRelation> Relations { get; }
         DbSet<Punishment> Punishments { get;}
-        DbSet<PlayerData.PlayerAvatar> Avatars { get; }
 
+        DbSet<PlayerData.PlayerRewardedLeague> PlayerRewardedLeague { get; }
+
+        DbSet<PlayerData.PlayerAvatar> Avatars { get; }
         DbSet<PlayerData.PlayerPaint> Paints { get; }
         DbSet<PlayerData.PlayerCover> Covers { get; }
         DbSet<PlayerData.PlayerGraffiti> Graffities { get;}

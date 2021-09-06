@@ -93,6 +93,11 @@ namespace TXServer.Database.Provider
                     .HasForeignKey(relation => relation.PlayerId);
             });
 
+            builder.Entity<PlayerData.PlayerRewardedLeague>(entity =>
+            {
+                entity.HasKey(league => new { league.PlayerId, league.EntityId });
+            });
+
             builder.Entity<Punishment>(entity =>
             {
                 entity.HasKey(punishment => new { punishment.PlayerId, punishment.PunishmentId });
@@ -208,6 +213,8 @@ namespace TXServer.Database.Provider
 
         public DbSet<PlayerData.PlayerRelation> Relations { get; protected set; } = null!;
         public DbSet<Punishment> Punishments { get; protected set; } = null!;
+
+        public DbSet<PlayerData.PlayerRewardedLeague> RewardedLeagues { get; protected set; } = null!;
 
         public DbSet<PlayerData.PlayerPaint> Paints { get; protected set; } = null!;
         public DbSet<PlayerData.PlayerCover> Covers { get; protected set; } = null!;

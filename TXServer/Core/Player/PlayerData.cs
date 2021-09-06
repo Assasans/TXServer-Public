@@ -390,7 +390,7 @@ namespace TXServer.Core
             ReceivedFractionsCompetitionReward = false;
             ReceivedReleaseReward = false;
             ShowedFractionsCompetition = false;
-            RewardedLeagues = new ObservableList<long>();
+            RewardedLeagues = new List<PlayerRewardedLeague>();
         }
 
         public PlayerData()
@@ -758,6 +758,24 @@ namespace TXServer.Core
             public RelationType Type { get; set; }
         }
 
+        public class PlayerRewardedLeague : IEntity
+        {
+            public static PlayerRewardedLeague Create(PlayerData player, long entityId)
+            {
+                return new PlayerRewardedLeague()
+                {
+                    Player = player,
+                    PlayerId = player.UniqueId,
+                    EntityId = entityId
+                };
+            }
+            public long PlayerId { get; set; }
+            [ForeignKey("PlayerId")]
+            public virtual PlayerData Player { get; set; }
+
+            public long EntityId { get; set; }
+        }
+
         public virtual List<PlayerRelation> Relations { get; private set; } = new List<PlayerRelation>();
 
         public virtual List<PlayerCompletedTutorial> CompletedTutorials { get; private set; } = new List<PlayerCompletedTutorial>();
@@ -1103,7 +1121,7 @@ namespace TXServer.Core
         public bool ReceivedReleaseReward { get; set; }
         public bool ReceivedLastSeasonReward { get; set; }
         public bool ShowedFractionsCompetition { get; set; }
-        [NotMapped /* TODO */] public virtual ObservableList<long> RewardedLeagues { get; set; } = new ObservableList<long>();
+        public virtual List<PlayerRewardedLeague> RewardedLeagues { get; set; } = new List<PlayerRewardedLeague>();
 
         public bool OwnsMarketItem(Entity marketItem) => Avatars.ToIds()
             .Concat(Covers.ToIds())

@@ -54,7 +54,7 @@ namespace TXServer.ECSSystem.GlobalEntities
         public static void CheckForNotifications(Player player)
         {
             // season first entrance reward
-            if (!player.Data.RewardedLeagues.Contains(player.Data.League.EntityId) &&
+            if (!player.Data.RewardedLeagues.ContainsId(player.Data.League.EntityId) &&
                 player.Data.League.EntityId != GlobalItems.Training.EntityId)
                 player.ShareEntities(LeagueFirstEntranceRewardPersistentNotificationTemplate.CreateEntity(player));
 

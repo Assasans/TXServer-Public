@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.Components.Notification.League
     {
         public LeagueFirstEntranceRewardNotificationComponent(Player player)
         {
-            player.Data.RewardedLeagues.Add(player.Data.League.EntityId);
+            player.Data.RewardedLeagues.Add(PlayerData.PlayerRewardedLeague.Create(player.Data, player.Data.League.EntityId));
 
             Reward = player.Data.League.EntityId switch
             {
