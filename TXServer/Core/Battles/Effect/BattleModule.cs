@@ -333,10 +333,14 @@ namespace TXServer.Core.Battles.Effect
                 MatchPlayer.SendEvent(new InventoryAmmunitionChangedEvent(), ModuleEntity);
             }
         }
-        private int MaxAmmunition
+
+        public int MaxAmmunition
         {
-            set
+            get => _maxAmmunition;
+            private set
             {
+                _maxAmmunition = value;
+
                 if (ModuleEntity.HasComponent<InventoryAmmunitionComponent>())
                 {
                     ModuleEntity.ChangeComponent<InventoryAmmunitionComponent>(component =>
@@ -347,6 +351,7 @@ namespace TXServer.Core.Battles.Effect
                     ModuleEntity.AddComponent(new InventoryAmmunitionComponent(value));
             }
         }
+
         private int AmmunitionWaitingOnCooldown { get; set; }
 
         public bool IsOnCooldown => CurrentAmmunition < 1;
@@ -364,5 +369,8 @@ namespace TXServer.Core.Battles.Effect
 
         public readonly List<TickHandler> TickHandlers;
         private readonly List<Action> _nextTickHandlers;
+
+
+        private int _maxAmmunition;
     }
 }

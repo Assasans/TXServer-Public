@@ -30,14 +30,11 @@ namespace TXServer.Core
             public static extern IntPtr GetConsoleWindow();
         }
 
-        private static bool IsConsoleAttached;
+        private static bool _isConsoleAttached;
 
         /// <summary>
         /// Starts server.
         /// </summary>
-        /// <param name="ip">IP address.</param>
-        /// <param name="port">Port.</param>
-        /// <param name="poolSize">Max players.</param>
         public static Server InitServer(ServerSettings settings)
         {
             if (!Debugger.IsAttached)
@@ -45,7 +42,7 @@ namespace TXServer.Core
                 NativeMethods.AllocConsole();
                 _ = NativeMethods.DeleteMenu(NativeMethods.GetSystemMenu(NativeMethods.GetConsoleWindow(), false), 0xF060, 0);
                 Console.OutputEncoding = Encoding.UTF8;
-                IsConsoleAttached = true;
+                _isConsoleAttached = true;
             }
 
             if (Server.Instance == null)
@@ -70,10 +67,10 @@ namespace TXServer.Core
                 Server.Instance = null;
             }
 
-            if (disableConsole && IsConsoleAttached)
+            if (disableConsole && _isConsoleAttached)
             {
                 NativeMethods.FreeConsole();
-                IsConsoleAttached = false;
+                _isConsoleAttached = false;
             }
         }
 

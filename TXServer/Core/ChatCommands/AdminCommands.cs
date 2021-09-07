@@ -57,7 +57,7 @@ namespace TXServer.Core.ChatCommands
 
             foreach (ChatCommandConditions condition in Enum.GetValues<ChatCommandConditions>())
             {
-                if ((desc.Item2 & condition) != condition || (playerConditions & condition) == condition) continue;
+                if (!desc.Item2.HasFlag(condition) || playerConditions.HasFlag(condition)) continue;
                 ScreenMessage(ChatCommands.ConditionErrors[condition], player, true);
                 return;
             }

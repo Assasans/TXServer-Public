@@ -95,7 +95,7 @@ namespace TXServer.Core.ChatCommands
                 ChatCommandConditions playerConditions = GetConditionsFor(player);
 
                 foreach (var condition in Enum.GetValues<ChatCommandConditions>())
-                    if ((desc.Item2 & condition) == condition && (playerConditions & condition) != condition)
+                    if (desc.Item2.HasFlag(condition) && !playerConditions.HasFlag(condition))
                         reply = ConditionErrors[condition];
 
                 reply ??= desc.Item3(player, args[1..]);

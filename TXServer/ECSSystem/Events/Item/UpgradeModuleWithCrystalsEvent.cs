@@ -29,7 +29,7 @@ namespace TXServer.ECSSystem.Events.Item
 
             // check if player has enough blueprints to upgrade
             if (player.Data.Modules.TryGetValue(id, out (int _, int amount) blueprint) &&
-                blueprint.amount < modulePrice.Cards) return;
+                blueprint.amount - modulePrice.Cards < 0) return;
 
             if (xCrystals && player.Data.XCrystals >= price)
                 player.Data.XCrystals -= price;

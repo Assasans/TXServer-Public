@@ -91,7 +91,7 @@ namespace TXServer.Core.Battles.Effect
         {
             base.Tick();
 
-            foreach ((Entity mine, Vector3 position) in Positions)
+            foreach ((Entity mine, Vector3 position) in Positions.ToArray())
             {
                 List<MatchPlayer> players = MatchPlayer.Battle.MatchTankPlayers.Select(p => p.MatchPlayer).ToList();
                 for (int i = 0; i < MatchPlayer.Battle.MatchTankPlayers.Count; i++)

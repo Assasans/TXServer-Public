@@ -256,7 +256,11 @@ namespace TXServer.Core.Battles
                 }
                 module.Deactivate();
 
-                if (resetModuleCooldown && module.IsOnCooldown) module.DeactivateCooldown();
+                if (resetModuleCooldown && module.IsOnCooldown)
+                {
+                    module.DeactivateCooldown();
+                    module.CurrentAmmunition = module.MaxAmmunition;
+                }
             }
 
             Tank.ChangeComponent((Component) OriginalSpeedComponent.Clone());
