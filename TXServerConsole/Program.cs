@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text.Json;
 using Serilog.Events;
 using TXServer.Core;
 using TXServer.Core.Data.Database;
-using TXServer.Core.Logging;
 using TXServer.Database;
-using TXServer.Database.Entity;
 using TXServer.Database.Provider;
 
 namespace TXServerConsole
@@ -163,8 +160,6 @@ namespace TXServerConsole
             if (logLevel != null)
                 settings.LogLevel = logLevel.Value;
 
-            SerilogLogger.Init(settings.LogLevel);
-
             DatabaseConfig databaseConfig = JsonSerializer.Deserialize<DatabaseConfig>(File.ReadAllText("Library/Database.json"), new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -180,99 +175,12 @@ namespace TXServerConsole
                 _ => throw new InvalidOperationException($"Unknown database provider: {settings.DatabaseProvider}")
             };
 
-            // Comment this to not recreate database structure on start, deleting all data
-            // Uncomment if data model has been changed
-            // TODO(Assasans): EF Migrations should be used in production
-            (database as EntityFrameworkDatabase)?.Database.EnsureDeleted();
-            (database as EntityFrameworkDatabase)?.Database.EnsureCreated();
-
             Server.Instance = new Server
             {
                 Settings = settings,
                 Database = database
             };
             Server.Instance.Start();
-
-            lock (database)
-            {
-                if (!database.BlockedUsernames.Any())
-                {
-                    database.BlockedUsernames.Add(BlockedUsername.Create("Godmode_ON", "Reserved"));
-                    database.BlockedUsernames.Add(BlockedUsername.Create("Assasans"));
-                }
-
-                if (!database.Invites.Any())
-                {
-                    // Pair: Invite code - Username
-                    // Remark: Developers can login with any username
-                    Dictionary<string, string> invites = new Dictionary<string, string>()
-                    {
-                        ["NoNick"] = null,
-                        ["Tim203"] = null,
-                        ["M8"] = null,
-                        ["Kaveman"] = null,
-                        ["Assasans"] = null,
-                        ["Concodroid"] = "Concodroid",
-                        ["Corpserdefg"] = "Corpserdefg",
-                        ["SH42913"] = "SH42913",
-                        ["Bodr"] = "Bodr",
-                        ["C6OI"] = "C6OI",
-                        ["Legendar-X"] = "Legendar-X",
-                        ["Pchelik"] = "Pchelik",
-                        ["networkspecter"] = "networkspecter",
-                        ["DageLV"] = "DageLV",
-                        ["F24_dark"] = "F24_dark",
-                        ["Black_Wolf"] = "Black_Wolf",
-                        ["NN77296"] = "NN77296",
-                        ["MEWPASCO"] = "MEWPASCO",
-                        ["Doctor"] = "Doctor",
-                        ["TowerCrusher"] = "TowerCrusher",
-                        ["Kurays"] = "Kurays",
-                        ["AlveroHUN"] = "AlveroHUN",
-                        ["Inctrice"] = "Inctrice",
-                        ["NicolasIceberg"] = "NicolasIceberg",
-                        ["Bilmez"] = "Bilmez",
-                        ["Kotovsky"] = "Kotovsky"
-                    };
-                    database.Invites.AddRange(invites.Select(pair => Invite.Create(pair.Key, pair.Value)));
-                }
-
-                // Manual registration
-                if (!database.Players.Any(player => player.UniqueId == 1234))
-                {
-                    var data = new PlayerData(1234);
-                    data.InitDefault();
-                    data.Username = "Assasans";
-                    data.PasswordHash = Convert.FromBase64String("10onDIlsKilLbl9y5sLMLd34PUk2Mkcv7s5I/be5dOM=");
-                    data.DiscordId = 738672017791909900;
-                    data.IsDiscordVerified = true;
-                    data.CountryCode = "UA";
-                    data.PremiumExpirationDate = DateTime.Now + TimeSpan.FromDays(1000);
-
-                    // data.Punishments.Add(Punishment.Create(PunishmentType.Mute, data, "Sussy baka", null, DateTimeOffset.Now + TimeSpan.FromDays(100), false));
-
-                    database.Players.Add(data);
-                }
-
-                if (!database.Players.Any(player => player.UniqueId == 4321))
-                {
-                    var data = new PlayerData(4321);
-                    data.InitDefault();
-                    data.Username = "RELATIONS_TEST_USER";
-                    data.PasswordHash = Convert.FromBase64String("9uCh4qxBlFqap/+KiqoM68EqO8yYGpKa1c+BCgkOEa4=");
-
-                    database.Players.Add(data);
-                }
-
-                database.Save();
-            }
-
-            // Stopwatch stopwatch = new Stopwatch();
-            // stopwatch.Start();
-            // var player = database.Players.IncludePlayer().First();
-            // stopwatch.Stop();
-            //
-            // Console.WriteLine($"Fetched all player properties in {stopwatch.ElapsedMilliseconds} ms");
         }
     }
 }
