@@ -253,7 +253,7 @@ namespace TXServer.Database.Provider
 
         // PlayerData
 
-        public PlayerData? GetPlayerData(string username)
+        public virtual PlayerData? GetPlayerData(string username)
         {
             lock (this)
             {
@@ -261,7 +261,7 @@ namespace TXServer.Database.Provider
             }
         }
 
-        public PlayerData? GetPlayerDataById(long id)
+        public virtual PlayerData? GetPlayerDataById(long id)
         {
             lock (this)
             {
@@ -270,7 +270,7 @@ namespace TXServer.Database.Provider
         }
 
         [Obsolete("Email replaced with Discord account linking")]
-        public PlayerData? GetPlayerDataByEmail(string email)
+        public virtual PlayerData? GetPlayerDataByEmail(string email)
         {
             lock (this)
             {
