@@ -15,10 +15,16 @@ namespace TXServer.ECSSystem.Events.Entrance.Invite
 		public void Execute(Player player, Entity entity)
 		{
             string inviteCode = entity.GetComponent<InviteComponent>().InviteCode;
-			if (player.Server.Database.IsInviteValid(inviteCode))
-			{
+			if (player.Server.Database.TryGetInvite(inviteCode, out var invite))
+            {
+                player.Invite = invite;
 				player.SendEvent(new CommenceRegistrationEvent(), entity);
-				Logger.WithPlayer(player).Information("New session with invite code {Code}", inviteCode);
+
+				Logger.WithPlayer(player).Information(
+                    "New session with invite code {Code}{UsernameOptional}",
+                    inviteCode,
+                    invite.Username != null ? $" (username: {invite.Username})" : ""
+                );
 			}
 			else
 			{

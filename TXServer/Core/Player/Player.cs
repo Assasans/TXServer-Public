@@ -9,6 +9,7 @@ using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.Core.Logging;
 using TXServer.Core.Squads;
+using TXServer.Database.Entity;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.User;
@@ -54,6 +55,8 @@ namespace TXServer.Core
 
 
         public PlayerPreset CurrentPreset => Data.Presets[Data.CurrentPresetIndex];
+
+        public Invite Invite { get; set; }
 
         public Entity ClientSession { get; set; }
         public Entity User { get; set; }
@@ -208,6 +211,19 @@ namespace TXServer.Core
             Fractions.CheckForNotifications(this);
             Leagues.CheckForNotifications(this);
         }
+
+        public bool CheckInviteCode(string username)
+        {
+            if (((IPEndPoint) Connection.Socket.RemoteEndPoint).Address.Equals(IPAddress.Loopback)) return true;
+            if (Invite == null) return false;
+            if (Invite.Username == null) return true;
+            if (username.Equals(Invite.Username, StringComparison.InvariantCultureIgnoreCase)) return true;
+            if (username.StartsWith($"{Invite.Username}_", StringComparison.InvariantCultureIgnoreCase)) return true;
+            return false;
+        }
+
+        // private void SendInviteMissing() => ScreenMessage("You have not entered invite code");
+        // private void SendInviteUsernameInvalid() => ScreenMessage($"You are not allowed to use this username\nAssigned username: {Invite.Username}");
 
         public void UpdateFractionScores() =>
             SendEvent(new UpdateClientFractionScoresEvent(), Fractions.GlobalItems.Competition);

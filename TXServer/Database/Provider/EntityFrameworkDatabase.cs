@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -293,11 +294,13 @@ namespace TXServer.Database.Provider
                 return !Players.Any(player => player.Email == email);
             }
         }
-        public bool IsInviteValid(string code)
+
+        public bool TryGetInvite(string code, [MaybeNullWhen(false)] out Invite invite)
         {
             lock (this)
             {
-                return Invites.Any(invite => invite.Code == code);
+                invite = Invites.SingleOrDefault(invite => invite.Code == code);
+                return invite != null;
             }
         }
 

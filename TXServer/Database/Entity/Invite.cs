@@ -5,11 +5,12 @@ namespace TXServer.Database.Entity
 {
     public class Invite
     {
-        public static Invite Create(string code)
+        public static Invite Create(string code, string username = null)
         {
             return new Invite()
             {
-                Code = code
+                Code = code,
+                Username = username
             };
         }
 
@@ -17,5 +18,8 @@ namespace TXServer.Database.Entity
         [Key] public int Id { get; set; }
 
         public string Code { get; set; }
+
+        /// <remarks>If value is <see langword="null" /> - any username is allowed</remarks>
+        public string Username { get; set; }
     }
 }

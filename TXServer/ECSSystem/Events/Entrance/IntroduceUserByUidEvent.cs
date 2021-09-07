@@ -11,6 +11,13 @@ namespace TXServer.ECSSystem.Events.Entrance
     {
         public void Execute(Player player, Entity entity)
         {
+            if (!player.CheckInviteCode(Uid))
+            {
+                player.SendEvent(new UidInvalidEvent(), entity);
+                player.SendEvent(new LoginFailedEvent(), entity);
+                return;
+            }
+
             PlayerData data = player.Server.Database.GetPlayerData(Uid);
             if (data == null)
             {

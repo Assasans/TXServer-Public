@@ -203,15 +203,38 @@ namespace TXServerConsole
 
                 if (!database.Invites.Any())
                 {
-                    string[] invites = new[]
+                    // Pair: Invite code - Username
+                    // Remark: Developers can login with any username
+                    Dictionary<string, string> invites = new Dictionary<string, string>()
                     {
-                        "NoNick", "Tim203", "M8", "Kaveman", "Assasans",
-                        "Concodroid", "Corpserdefg",
-                        "SH42913",
-                        "Bodr", "C6OI", "Legendar-X", "Pchelik", "networkspecter", "DageLV", "F24_dark",
-                        "Black_Wolf", "NN77296", "MEWPASCO", "Doctor", "TowerCrusher", "Kurays", "AlveroHUN", "Inctrice", "NicolasIceberg", "Bilmez", "Kotovsky"
+                        ["NoNick"] = null,
+                        ["Tim203"] = null,
+                        ["M8"] = null,
+                        ["Kaveman"] = null,
+                        ["Assasans"] = null,
+                        ["Concodroid"] = "Concodroid",
+                        ["Corpserdefg"] = "Corpserdefg",
+                        ["SH42913"] = "SH42913",
+                        ["Bodr"] = "Bodr",
+                        ["C6OI"] = "C6OI",
+                        ["Legendar-X"] = "Legendar-X",
+                        ["Pchelik"] = "Pchelik",
+                        ["networkspecter"] = "networkspecter",
+                        ["DageLV"] = "DageLV",
+                        ["F24_dark"] = "F24_dark",
+                        ["Black_Wolf"] = "Black_Wolf",
+                        ["NN77296"] = "NN77296",
+                        ["MEWPASCO"] = "MEWPASCO",
+                        ["Doctor"] = "Doctor",
+                        ["TowerCrusher"] = "TowerCrusher",
+                        ["Kurays"] = "Kurays",
+                        ["AlveroHUN"] = "AlveroHUN",
+                        ["Inctrice"] = "Inctrice",
+                        ["NicolasIceberg"] = "NicolasIceberg",
+                        ["Bilmez"] = "Bilmez",
+                        ["Kotovsky"] = "Kotovsky"
                     };
-                    database.Invites.AddRange(invites.Select(Invite.Create));
+                    database.Invites.AddRange(invites.Select(pair => Invite.Create(pair.Key, pair.Value)));
                 }
 
                 // Manual registration

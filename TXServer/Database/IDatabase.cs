@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using TXServer.Core.ChatCommands;
 using TXServer.Database.Entity;
@@ -54,7 +55,7 @@ namespace TXServer.Core.Data.Database
         bool IsUsernameAvailable(string username);
         bool IsEmailAvailable(string email);
 
-        bool IsInviteValid(string code);
+        bool TryGetInvite(string code, [MaybeNullWhen(false)] out Invite invite);
 
         void Save();
 
