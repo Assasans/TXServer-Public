@@ -44,7 +44,7 @@ namespace TXServer.Core.Battles.BattleWeapons
                 (bool backHit, float damage, Vector3 hitPoint) hitInfo =
                     hits.ContainsKey(target) ? hits[target] : (false, 0, hitTarget.LocalHitPoint);
 
-                if (hitInfo.backHit is false && Damage.IsBackHit(hitTarget.LocalHitPoint, target.Tank))
+                if (hitInfo.backHit is false && Damage.IsBackHit(hitTarget.LocalHitPoint, target.TankEntity))
                 {
                     hitInfo.backHit = true;
                     hitInfo.hitPoint = hitTarget.LocalHitPoint;

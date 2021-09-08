@@ -30,6 +30,7 @@ namespace TXServer.Core.Battles.Effect {
         public override void Init()
         {
             base.Init();
+            DeactivateOnTankDisable = false;
             IsAffectedByEmp = false;
         }
     }

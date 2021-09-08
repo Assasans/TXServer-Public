@@ -23,13 +23,13 @@ namespace TXServer.Core.Battles.BattleWeapons
 
         public void StartAiming()
         {
-            ((Shaft) MatchPlayer.BattleWeapon).ShaftAimingBeginTime = DateTimeOffset.UtcNow;
+            ((Shaft) MatchPlayer.Weapon).ShaftAimingBeginTime = DateTimeOffset.UtcNow;
             ChangeRotationSpeed(speedMultiplier:RotationAimingStateMultiplier);
         }
 
         public void StopAiming()
         {
-            ((Shaft) MatchPlayer.BattleWeapon).ShaftLastAimingDurationMs =
+            ((Shaft) MatchPlayer.Weapon).ShaftLastAimingDurationMs =
                 (DateTimeOffset.UtcNow - (ShaftAimingBeginTime ?? DateTimeOffset.UtcNow)).TotalMilliseconds;
 
             double newEnergy = 0.9 - (ShaftLastAimingDurationMs ?? 0) * 0.0002;

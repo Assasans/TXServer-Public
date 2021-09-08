@@ -572,7 +572,8 @@ namespace TXServer.Core.ChatCommands
             int counter = 0;
             foreach (Battle battle in targets)
             {
-                if (!battle.IsMatchMaking) battle.BattleState = BattleState.Starting;
+                if (!battle.IsMatchMaking && ChatCommands.InactiveBattleStates.Contains(battle.BattleState))
+                    battle.BattleState = BattleState.Starting;
                 if (!battle.ForceStart) counter++;
                 battle.ForcePause = false;
                 battle.ForceStart = true;

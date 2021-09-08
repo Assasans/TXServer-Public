@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using TXServer.Core.Battles.BattleTanks;
 using TXServer.Core.Battles.BattleWeapons;
 using TXServer.Core.Battles.Effect;
 using TXServer.Core.Configuration;
@@ -43,25 +44,26 @@ namespace TXServer.Core.Battles
 
             BattleUser = BattleUserTemplate.CreateEntity(battlePlayer.Player, battleEntity, battlePlayer.Team);
 
-            Tank = TankTemplate.CreateEntity(this, battlePlayer.Player.CurrentPreset.HullItem, BattleUser, battlePlayer);
-            Weapon = WeaponTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponItem, Tank, battlePlayer);
-            HullSkin = HullSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullSkins[battlePlayer.Player.CurrentPreset.HullItem], Tank);
-            WeaponSkin = WeaponSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponSkins[battlePlayer.Player.CurrentPreset.WeaponItem], Tank);
-            WeaponPaint = WeaponPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponPaint, Tank);
-            TankPaint = TankPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.TankPaint, Tank);
-            Graffiti = GraffitiBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.Graffiti, Tank);
-            Shell = ShellBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponShells[battlePlayer.Player.CurrentPreset.WeaponItem], Tank);
+            TankEntity = TankTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullItem, BattleUser, battlePlayer);
+            WeaponEntity = WeaponTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponItem, TankEntity, battlePlayer);
+            HullSkin = HullSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullSkins[battlePlayer.Player.CurrentPreset.HullItem], TankEntity);
+            WeaponSkin = WeaponSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponSkins[battlePlayer.Player.CurrentPreset.WeaponItem], TankEntity);
+            WeaponPaint = WeaponPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponPaint, TankEntity);
+            TankPaint = TankPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.TankPaint, TankEntity);
+            Graffiti = GraffitiBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.Graffiti, TankEntity);
+            Shell = ShellBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponShells[battlePlayer.Player.CurrentPreset.WeaponItem], TankEntity);
             Modules = new List<BattleModule>();
-            Incarnation = TankIncarnationTemplate.CreateEntity(Tank);
-            RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, Tank);
+            Incarnation = TankIncarnationTemplate.CreateEntity(TankEntity);
+            RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, TankEntity);
 
-            BattleWeapon = (BattleWeapon) Activator.CreateInstance(Weapons.WeaponToType[Player.CurrentPreset.Weapon], this);
-            if (BattleWeapon?.CustomComponents is not null)
+            Tank = new BattleTank(this);
+            Weapon = (BattleWeapon) Activator.CreateInstance(Weapons.WeaponToType[Player.CurrentPreset.Weapon], this);
+            if (Weapon?.CustomComponents is not null)
             {
-                foreach (Component component in BattleWeapon.CustomComponents)
+                foreach (Component component in Weapon.CustomComponents)
                 {
-                    Weapon.TryRemoveComponent(component.GetType());
-                    Weapon.AddComponent(component);
+                    WeaponEntity.TryRemoveComponent(component.GetType());
+                    WeaponEntity.AddComponent(component);
                 }
             }
 
@@ -69,7 +71,7 @@ namespace TXServer.Core.Battles
             UserResult = new UserResult(battlePlayer, userResults);
 
             TemperatureConfigComponent =
-                Config.GetComponent<TemperatureConfigComponent>(Tank.TemplateAccessor.ConfigPath);
+                Config.GetComponent<TemperatureConfigComponent>(TankEntity.TemplateAccessor.ConfigPath);
 
             if (Battle.ModeHandler is TeamBattleHandler handler)
                 SpawnCoordinates = handler.BattleViewFor(Player.BattlePlayer).SpawnPoints;
@@ -121,22 +123,14 @@ namespace TXServer.Core.Battles
 
         public int GetScoreWithBonus(int score) => (int) (PersonalBattleResult.ScoreBattleSeriesMultiplier * score + (Player.Data.IsPremium ? score * 0.5 : 0));
 
-        public void HealthChanged()
-        {
-            Battle.PlayersInMap.SendEvent(new HealthChangedEvent(), Tank);
-
-            if (TryGetModule(out AdrenalineModule adrenalineModule))
-                adrenalineModule.CheckActivationNecessity();
-        }
-
         private void PrepareForRespawning()
         {
-            Tank.TryRemoveComponent<TankVisibleStateComponent>();
+            TankEntity.TryRemoveComponent<TankVisibleStateComponent>();
 
-            if (Tank.TryRemoveComponent<TankMovementComponent>())
+            if (TankEntity.TryRemoveComponent<TankMovementComponent>())
             {
                 Entity prevIncarnation = Incarnation;
-                Incarnation = TankIncarnationTemplate.CreateEntity(Tank);
+                Incarnation = TankIncarnationTemplate.CreateEntity(TankEntity);
 
                 foreach (Player player in prevIncarnation.PlayerReferences.ToArray())
                 {
@@ -165,7 +159,7 @@ namespace TXServer.Core.Battles
             Vector3 position = LastSpawnPoint?.Position ?? LastTeleportPoint.Position;
             Quaternion rotation = LastSpawnPoint?.Rotation ?? LastTeleportPoint.Rotation;
 
-            Tank.AddComponent(new TankMovementComponent(new Movement(position, Vector3.Zero, Vector3.Zero, rotation), new MoveControl(), 0, 0));
+            TankEntity.AddComponent(new TankMovementComponent(new Movement(position, Vector3.Zero, Vector3.Zero, rotation), new MoveControl(), 0, 0));
         }
 
         public void RankUp()
@@ -191,13 +185,13 @@ namespace TXServer.Core.Battles
             float turretRotationMultiplier =
                 MathUtils.Map(Temperature, 0, TemperatureConfigComponent.MinTemperature, 1, 0.5f);
 
-            Tank.ChangeComponent<SpeedComponent>(component =>
+            TankEntity.ChangeComponent<SpeedComponent>(component =>
             {
                 component.Speed = speed;
                 component.TurnSpeed = turnSpeed;
             });
-            Weapon.ChangeComponent<WeaponRotationComponent>(component =>
-                component.ChangeByTemperature(BattleWeapon, turretRotationMultiplier));
+            WeaponEntity.ChangeComponent<WeaponRotationComponent>(component =>
+                component.ChangeByTemperature(Weapon, turretRotationMultiplier));
         }
 
         public bool TryGetModule(Type moduleType, out BattleModule module)
@@ -224,9 +218,9 @@ namespace TXServer.Core.Battles
         {
             if (KeepDisabled) return;
 
-            BattleWeapon.OnSpawn();
+            Weapon.OnSpawn();
 
-            Tank.AddComponent(new TankMovableComponent());
+            TankEntity.AddComponent(new TankMovableComponent());
 
             foreach (BattleModule module in Modules.Where(m => m.ActivateOnTankSpawn && !m.IsOnCooldown))
                 module.Activate();
@@ -238,8 +232,8 @@ namespace TXServer.Core.Battles
             SpeedByTemperature();
 
             if (KeepDisabled)
-                Tank.TryRemoveComponent(TankStates[_tankState].Item1);
-            Tank.TryRemoveComponent<SelfDestructionComponent>();
+                TankEntity.TryRemoveComponent(TankStates[_tankState].Item1);
+            TankEntity.TryRemoveComponent<SelfDestructionComponent>();
 
             List<BattleModule> battleModules =
                 resetModuleCooldown ? Modules : Modules.Where(m => m.DeactivateOnTankDisable).ToList();
@@ -263,17 +257,17 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            Tank.ChangeComponent((Component) OriginalSpeedComponent.Clone());
+            TankEntity.ChangeComponent((Component) OriginalSpeedComponent.Clone());
 
-            if (BattleWeapon.GetType() == typeof(Vulcan)) ((Vulcan) BattleWeapon).ResetOverheat();
+            if (Weapon.GetType() == typeof(Vulcan)) ((Vulcan) Weapon).ResetOverheat();
 
             // trigger: Drone Module (stay after tank disable)
             if (TryGetModule(out TurretDroneModule turretDroneModule))
                 foreach (var droneTuple in turretDroneModule.Drones)
                     TurretDroneModule.Stay(droneTuple.Item1);
 
-            Tank.TryRemoveComponent<TankMovableComponent>();
-            BattleWeapon.OnDespawn();
+            TankEntity.TryRemoveComponent<TankMovableComponent>();
+            Weapon.OnDespawn();
         }
 
         public void Tick()
@@ -310,7 +304,7 @@ namespace TXServer.Core.Battles
                     case TankState.SemiActive:
                         if (!WaitingForTankActivation)
                         {
-                            Tank.AddComponent(new TankStateTimeOutComponent());
+                            TankEntity.AddComponent(new TankStateTimeOutComponent());
                             WaitingForTankActivation = true;
                         }
                         break;
@@ -325,16 +319,13 @@ namespace TXServer.Core.Battles
             {
                 Battle.CollisionsComponent.SemiActiveCollisionsPhase++;
 
-                Tank.TryRemoveComponent<TankStateTimeOutComponent>();
+                TankEntity.TryRemoveComponent<TankStateTimeOutComponent>();
                 Battle.BattleEntity.ChangeComponent(Battle.CollisionsComponent);
 
                 TankState = TankState.Active;
                 WaitingForTankActivation = false;
 
-                var component = Tank.GetComponent<HealthComponent>();
-                Tank.RemoveComponent<HealthComponent>();
-                component.CurrentHealth = component.MaxHealth;
-                Tank.AddComponent(component);
+                Tank.CurrentHealth = Tank.MaxHealth;
             }
 
             foreach (KeyValuePair<Type, TranslatedEvent> pair in TranslatedEvents)
@@ -364,20 +355,22 @@ namespace TXServer.Core.Battles
                 }
             }
 
-            BattleWeapon.Tick();
+            Weapon.Tick();
             Damage.DealAutoTemperature(this);
         }
 
 
         public readonly Battle Battle;
         public Player Player { get; }
-        public BattleWeapon BattleWeapon { get; }
         public Entity BattleUser { get; }
         public Entity RoundUser { get; }
 
+        public BattleTank Tank { get; }
+        public BattleWeapon Weapon { get; }
+
         public Entity Incarnation { get; private set; }
-        public Entity Tank { get; }
-        public Entity Weapon { get; }
+        public Entity TankEntity { get; }
+        public Entity WeaponEntity { get; }
         public Entity HullSkin { get; }
         public Entity WeaponSkin { get; }
         public Entity WeaponPaint { get; }
@@ -405,11 +398,11 @@ namespace TXServer.Core.Battles
                         break;
                     case TankState.SemiActive:
                         EnableTank();
-                        Tank.ChangeComponent(new TemperatureComponent(0));
-                        Tank.AddComponent(new TankVisibleStateComponent());
+                        TankEntity.ChangeComponent(new TemperatureComponent(0));
+                        TankEntity.AddComponent(new TankVisibleStateComponent());
                         break;
                     case TankState.Dead:
-                        Player.SendEvent(new SelfTankExplosionEvent(), Tank);
+                        Player.SendEvent(new SelfTankExplosionEvent(), TankEntity);
                         DisableTank();
                         if (Battle.ModeHandler is CTFHandler handler)
                         {
@@ -423,13 +416,13 @@ namespace TXServer.Core.Battles
                         break;
                 }
 
-                Tank.TryRemoveComponent(TankStates[_tankState].Item1);
-                Tank.AddComponent((Component)Activator.CreateInstance(TankStates[value].Item1));
+                TankEntity.TryRemoveComponent(TankStates[_tankState].Item1);
+                TankEntity.AddComponent((Component)Activator.CreateInstance(TankStates[value].Item1));
                 _tankState = value;
 
                 if (value == TankState.Active &&
-                    Weapon.TemplateAccessor.Template.GetType() == typeof(HammerBattleItemTemplate))
-                    Player.SendEvent(new SetMagazineReadyEvent(), Weapon);
+                    WeaponEntity.TemplateAccessor.Template.GetType() == typeof(HammerBattleItemTemplate))
+                    Player.SendEvent(new SetMagazineReadyEvent(), WeaponEntity);
 
                 TankStateChangeTime = DateTime.UtcNow.AddSeconds(TankStates[value].Item2);
             }
@@ -446,8 +439,8 @@ namespace TXServer.Core.Battles
             TemperatureHits.Sum(temperatureHit => temperatureHit.CurrentTemperature);
         public float Temperature
         {
-            get => Tank.GetComponent<TemperatureComponent>().Temperature;
-            set => Tank.ChangeComponent<TemperatureComponent>(component => component.Temperature = value);
+            get => TankEntity.GetComponent<TemperatureComponent>().Temperature;
+            set => TankEntity.ChangeComponent<TemperatureComponent>(component => component.Temperature = value);
         }
         public TemperatureConfigComponent TemperatureConfigComponent { get; set; }
 

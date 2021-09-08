@@ -51,15 +51,13 @@ namespace TXServer.Core.Battles.Effect
 
         public void CheckActivationNecessity()
         {
-            HealthComponent healthComponent = MatchPlayer.Tank.GetComponent<HealthComponent>();
-
-            if (healthComponent.CurrentHealth <= 0)
+            if (MatchPlayer.Tank.CurrentHealth <= 0 || MatchPlayer.Tank.CurrentHealth >= MatchPlayer.Tank.MaxHealth)
             {
                 Deactivate();
                 return;
             }
 
-            if (healthComponent.CurrentHealth / healthComponent.MaxHealth < MaxHpPercentWorking)
+            if (MatchPlayer.Tank.CurrentHealth / MatchPlayer.Tank.MaxHealth <= MaxHpPercentWorking)
             {
                 if (!IsEmpLocked && !EffectIsActive)
                     Activate();

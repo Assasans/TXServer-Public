@@ -18,8 +18,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Activate()
         {
-            (MatchPlayer.BattleWeapon as Hammer)?.RefillMagazine();
-            MatchPlayer.SendEvent(new ExecuteEnergyInjectionEvent(), MatchPlayer.Weapon);
+            (MatchPlayer.Weapon as Hammer)?.RefillMagazine();
+            MatchPlayer.SendEvent(new ExecuteEnergyInjectionEvent(), MatchPlayer.WeaponEntity);
         }
 
         public override void Init()
@@ -33,7 +33,7 @@ namespace TXServer.Core.Battles.Effect
             EffectEntity = EnergyInjectionEffectTemplate.CreateEntity(MatchPlayer);
             MatchPlayer.ShareEntities(EffectEntity);
             ModuleEntity.AddComponent(new EnergyInjectionModuleReloadEnergyComponent(ReloadEnergyPercent));
-            MatchPlayer.Weapon.AddComponent(new EnergyInjectionEffectComponent(ReloadEnergyPercent));
+            MatchPlayer.WeaponEntity.AddComponent(new EnergyInjectionEffectComponent(ReloadEnergyPercent));
         }
 
         private float ReloadEnergyPercent { get; set; }

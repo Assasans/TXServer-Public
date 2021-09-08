@@ -38,8 +38,8 @@ namespace TXServer.Core.Battles.BattleWeapons
             {
                 CurrentCriticalProbability = AfterCriticalProbability;
 
-                MatchPlayer.Battle.PlayersInMap.SendEvent(new CriticalDamageEvent(victim.Tank, localPosition),
-                    MatchPlayer.Weapon);
+                MatchPlayer.Battle.PlayersInMap.SendEvent(new CriticalDamageEvent(victim.TankEntity, localPosition),
+                    MatchPlayer.WeaponEntity);
                 return true;
             }
 

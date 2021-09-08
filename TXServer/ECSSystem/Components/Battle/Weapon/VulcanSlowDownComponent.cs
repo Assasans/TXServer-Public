@@ -11,8 +11,8 @@ namespace TXServer.ECSSystem.Components.Battle.Weapon
         public void OnAttached(Player player, Entity weapon)
         {
             if (!IsAfterShooting) return;
-            ((Vulcan) player.BattlePlayer.MatchPlayer.BattleWeapon).LastVulcanHeatTactTime = null;
-            ((Vulcan) player.BattlePlayer.MatchPlayer.BattleWeapon).VulcanShootingStartTime = null;
+            ((Vulcan) player.BattlePlayer.MatchPlayer.Weapon).LastVulcanHeatTactTime = null;
+            ((Vulcan) player.BattlePlayer.MatchPlayer.Weapon).VulcanShootingStartTime = null;
         }
 
         public bool IsAfterShooting { get; set; }

@@ -19,7 +19,6 @@ namespace TXServer.Core.Battles.Effect
         public override void Activate()
         {
             float duration = IsSupply || IsCheat ? SupplyDuration(30000) : Duration;
-
             if (EffectIsActive)
             {
                 ChangeDuration(duration);
@@ -50,7 +49,6 @@ namespace TXServer.Core.Battles.Effect
         public override void Init()
         {
             base.Init();
-            // min & max factor are the same for this module
             ModuleFactor = Config.GetComponent<ModuleDamageEffectMaxFactorPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
         }
@@ -60,7 +58,8 @@ namespace TXServer.Core.Battles.Effect
         {
             if (!EffectIsActive || isHeatDamage || isModuleDamage ||
                   MatchPlayer.Battle.ExtendedBattleMode is ExtendedBattleMode.HPS) return damage;
-            return IsCheat ? target.Tank.GetComponent<HealthComponent>().CurrentHealth : damage * Factor;
+
+            return IsCheat ? target.Tank.CurrentHealth : damage * Factor;
         }
 
         public float Factor => IsSupply ? 1.5f : ModuleFactor;

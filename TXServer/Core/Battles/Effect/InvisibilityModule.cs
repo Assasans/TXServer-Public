@@ -23,7 +23,7 @@ namespace TXServer.Core.Battles.Effect
 
             Schedule(TimeSpan.FromMilliseconds(Duration), Deactivate);
 
-            if (MatchPlayer.Weapon.HasComponent<StreamWeaponWorkingComponent>()) Deactivate();
+            if (MatchPlayer.WeaponEntity.HasComponent<StreamWeaponWorkingComponent>()) Deactivate();
         }
 
 		public override void Deactivate()

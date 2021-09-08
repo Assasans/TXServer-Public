@@ -17,7 +17,7 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
 
             MatchPlayer matchPlayer = player.BattlePlayer.MatchPlayer;
 
-            if (matchPlayer.TankState == TankState.Dead && !matchPlayer.BattleWeapon.IsBulletWeapon)
+            if (matchPlayer.TankState == TankState.Dead && !matchPlayer.Weapon.IsBulletWeapon)
                 return;
 
             if (weapon.TemplateAccessor.Template.GetType() == typeof(HammerBattleItemTemplate))
@@ -26,14 +26,14 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
                     !matchPlayer.IsEnemyOf(Damage.GetTargetByHit(matchPlayer, h)) &&
                     !matchPlayer.Battle.Params.FriendlyFire);
 
-                ((Core.Battles.BattleWeapons.Hammer) matchPlayer.BattleWeapon).ProcessHits(Targets);
+                ((Core.Battles.BattleWeapons.Hammer) matchPlayer.Weapon).ProcessHits(Targets);
                 return;
             }
 
             foreach (HitTarget hitTarget in Targets)
             {
                 if (matchPlayer.IsEnemyOf(Damage.GetTargetByHit(matchPlayer, hitTarget)) ||
-                     matchPlayer.Battle.Params.FriendlyFire && !matchPlayer.BattleWeapon.NotFriendlyFireUsable)
+                     matchPlayer.Battle.Params.FriendlyFire && !matchPlayer.Weapon.NotFriendlyFireUsable)
                     Damage.HandleHit(weapon, matchPlayer, hitTarget);
                 else
                     Damage.HandleMateHit(weapon, matchPlayer, hitTarget);
@@ -43,7 +43,7 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
             player.User.ChangeComponent<UserStatisticsComponent>(component =>
                 component.Statistics["HITS"] += Targets.Count);
 
-            (matchPlayer.BattleWeapon as Core.Battles.BattleWeapons.Shaft)?.ResetAiming();
+            (matchPlayer.Weapon as Core.Battles.BattleWeapons.Shaft)?.ResetAiming();
         }
 
         public virtual IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteHitEvent>();

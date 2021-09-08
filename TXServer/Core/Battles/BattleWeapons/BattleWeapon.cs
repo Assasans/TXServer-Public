@@ -50,7 +50,7 @@ namespace TXServer.Core.Battles.BattleWeapons
 
             WeaponRotationComponent weaponRotationComponent = BattlePlayer.TurretRotationSpeed is null
                 ? Config.GetComponent<WeaponRotationComponent>(
-                    MatchPlayer.Tank.TemplateAccessor.ConfigPath.Replace("battle", "garage"))
+                    MatchPlayer.TankEntity.TemplateAccessor.ConfigPath.Replace("battle", "garage"))
                 : new WeaponRotationComponent((float) BattlePlayer.TurretRotationSpeed);
             OriginalWeaponRotationComponent = (WeaponRotationComponent) weaponRotationComponent.Clone();
             CustomComponents.Add(weaponRotationComponent);
@@ -126,7 +126,7 @@ namespace TXServer.Core.Battles.BattleWeapons
         protected readonly MatchPlayer MatchPlayer;
         private BattleTankPlayer BattlePlayer => MatchPlayer.Player.BattlePlayer;
 
-        protected Entity Weapon => MatchPlayer.Weapon;
+        protected Entity Weapon => MatchPlayer.WeaponEntity;
         protected Entity MarketItem => MatchPlayer.Player.CurrentPreset.Weapon;
         protected string MarketItemPath => MarketItem.TemplateAccessor.ConfigPath;
         private string BattleItemPath => "battle/weapon/" + MarketItemPath.Split('/').Last();

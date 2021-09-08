@@ -17,7 +17,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Effect
         {
             Entity effect = new(new TemplateAccessor(template, configPath),
                 new EffectComponent(),
-                matchPlayer.Tank.GetComponent<TankGroupComponent>());
+                matchPlayer.TankEntity.GetComponent<TankGroupComponent>());
 
             if (durationMs > 0)
             {

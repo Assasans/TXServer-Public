@@ -14,8 +14,8 @@ namespace TXServer.ECSSystem.EntityTemplates.Item.Slot
             Entity entity = new Entity(new TemplateAccessor(new SlotUserItemTemplate(), "/garage/module/slot"),
                 module.GetComponent<SlotTankPartComponent>(),
                 module.GetComponent<SlotUserItemInfoComponent>(),
-                battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
-                battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>()
+                battlePlayer.MatchPlayer.TankEntity.GetComponent<UserGroupComponent>(),
+                battlePlayer.MatchPlayer.TankEntity.GetComponent<TankGroupComponent>()
             );
             
             module.AddComponent(new ModuleGroupComponent(entity.EntityId));

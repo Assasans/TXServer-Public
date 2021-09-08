@@ -7,7 +7,6 @@ using TXServer.Core.Battles.Effect;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Effect;
-using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Incarnation;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.EntityTemplates.Battle;
@@ -32,10 +31,10 @@ namespace TXServer.Core.Battles
 
 
             // backHit & turretHit
-            bool isTurretHit = (damager.BattleWeapon as Shaft)?.ShaftAimingBeginTime != null &&
-                               IsTurretHit(localHitPoint, victim.Tank);
+            bool isTurretHit = (damager.Weapon as Shaft)?.ShaftAimingBeginTime != null &&
+                               IsTurretHit(localHitPoint, victim.TankEntity);
             if (isBackHit == false)
-                isBackHit = !isTurretHit && IsBackHit(localHitPoint, victim.Tank);
+                isBackHit = !isTurretHit && IsBackHit(localHitPoint, victim.TankEntity);
 
             if (isBackHit) damage *= 1.20f;
             if (isTurretHit) damage *= 2;
@@ -43,8 +42,8 @@ namespace TXServer.Core.Battles
             if ((isBackHit || isTurretHit) && victim.TryGetModule(out BackhitDefenceModule backhitDefModule))
                 damage = backhitDefModule.GetReducedDamage(damage);
 
-            bool isCritical = !IsModule(weaponMarketItem) && damager.BattleWeapon.IsCritical(victim, localHitPoint);
-            if (isCritical) damage = damager.BattleWeapon.DamageWithCritical(isBackHit, damage);
+            bool isCritical = !IsModule(weaponMarketItem) && damager.Weapon.IsCritical(victim, localHitPoint);
+            if (isCritical) damage = damager.Weapon.DamageWithCritical(isBackHit, damage);
 
 
             damage = GetHpWithEffects(damage, victim, damager, isModule:IsModule(weaponMarketItem),
@@ -52,53 +51,41 @@ namespace TXServer.Core.Battles
 
             damager.UserResult.Damage += (int) damage;
 
-            victim.Tank.ChangeComponent<HealthComponent>(component =>
+
+            victim.Tank.CurrentHealth = Math.Clamp(victim.Tank.CurrentHealth - damage, 0, float.MaxValue);
+
+            if (victim.Tank.CurrentHealth <= 0)
             {
-                component.CurrentHealth = Math.Clamp(component.CurrentHealth - damage, 0, float.MaxValue);
-
-                if (component.CurrentHealth <= 0)
+                if (!(victim.TryGetModule(out EmergencyProtectionModule ep) &&
+                      ep.TryActivate()))
+                    ProcessKill(weaponMarketItem, victim, damager);
+            }
+            else
+            {
+                if (victim.Battle.ModeHandler is TeamBattleHandler)
                 {
-                    if (!(victim.TryGetModule(out EmergencyProtectionModule ep) &&
-                          ep.TryActivate()))
-                        ProcessKill(weaponMarketItem, victim, damager);
+                    if (victim.DamageAssistants.ContainsKey(damager))
+                        victim.DamageAssistants[damager] += damage;
+                    else
+                        victim.DamageAssistants.Add(damager, damage);
                 }
-                else
-                {
-                    if (victim.Battle.ModeHandler is TeamBattleHandler)
-                    {
-                        if (victim.DamageAssistants.ContainsKey(damager))
-                            victim.DamageAssistants[damager] += damage;
-                        else
-                            victim.DamageAssistants.Add(damager, damage);
-                    }
-                }
+            }
 
-                if (!IsModule(weaponMarketItem) || IsModule(weaponMarketItem) && damage != 0)
-                    damager.SendEvent(new DamageInfoEvent(damage, localHitPoint, isBackHit || isCritical || isTurretHit),
-                        victim.Tank);
-                victim.HealthChanged();
-            });
+            if (!IsModule(weaponMarketItem) || IsModule(weaponMarketItem) && damage != 0)
+                damager.SendEvent(new DamageInfoEvent(damage, localHitPoint, isBackHit || isCritical || isTurretHit),
+                    victim.TankEntity);
         }
 
         public static bool DealHeal(float healHp, MatchPlayer matchPlayer)
         {
-            bool healed = true;
-            matchPlayer.Tank.ChangeComponent<HealthComponent>(component =>
-            {
-                if (component.CurrentHealth >= component.MaxHealth)
-                {
-                    healed = false;
-                    return;
-                }
+            if (matchPlayer.Tank.CurrentHealth >= matchPlayer.Tank.MaxHealth)
+                return false;
 
-                component.CurrentHealth = Math.Clamp(component.CurrentHealth + healHp, 0, component.MaxHealth);
-            });
-            if (!healed) return healed;
+            matchPlayer.Tank.CurrentHealth =
+                Math.Clamp(matchPlayer.Tank.CurrentHealth + healHp, 0, matchPlayer.Tank.MaxHealth);
+            matchPlayer.SendEvent(new DamageInfoEvent(healHp, healHit:true), matchPlayer.TankEntity);
 
-            matchPlayer.SendEvent(new DamageInfoEvent(healHp, healHit:true), matchPlayer.Tank);
-            matchPlayer.HealthChanged();
-
-            return healed;
+            return true;
         }
 
         public static void DealNewTemperature(Entity weapon, Entity weaponMarketItem, MatchPlayer target,
@@ -106,7 +93,7 @@ namespace TXServer.Core.Battles
         {
             (_, BattleModule module) = GetWeaponItems(weapon, shooter);
             bool isModule = module != null;
-            float maxHeatDamage = isModule ? module.MaxHeatDamage : shooter.BattleWeapon.MaxHeatDamage;
+            float maxHeatDamage = isModule ? module.MaxHeatDamage : shooter.Weapon.MaxHeatDamage;
             float temperatureChange;
             float totalTemperature = target.TemperatureFromAllHits();
 
@@ -116,9 +103,8 @@ namespace TXServer.Core.Battles
                 temperatureChange = module.TemperatureChange;
             }
             else
-                temperatureChange = shooter.BattleWeapon.TemperatureDeltaPerHit(totalTemperature);
+                temperatureChange = shooter.Weapon.TemperatureDeltaPerHit(totalTemperature);
 
-            float original = temperatureChange;
             if (!isModule && hitDistance > 8)
                 temperatureChange = MathUtils.Map(hitDistance, 16, 8,
                     temperatureChange / 100 * (temperatureChange > 0 ? 45 : 15), temperatureChange);
@@ -163,7 +149,7 @@ namespace TXServer.Core.Battles
 
             TemperatureHit temperatureHit =
                 target.TemperatureHits.SingleOrDefault(t => t.Shooter == shooter && t.WeaponMarketItem == weaponMarketItem);
-            float temperatureLimit = isModule ? 1 : shooter.BattleWeapon.TemperatureLimit;
+            float temperatureLimit = isModule ? 1 : shooter.Weapon.TemperatureLimit;
 
             if (temperatureHit != default)
             {
@@ -179,7 +165,7 @@ namespace TXServer.Core.Battles
                     : null;
 
                 target.TemperatureHits.Add(new TemperatureHit(temperatureChange, maxHeatDamage,
-                    isModule ? 0 : shooter.BattleWeapon.MinHeatDamage, shooter,
+                    isModule ? 0 : shooter.Weapon.MinHeatDamage, shooter,
                     weapon, weaponMarketItem, temperatureLimit: temperatureLimit,
                     normalizationBlockEndTime: normalizationBlockEndTime));
             }
@@ -285,7 +271,7 @@ namespace TXServer.Core.Battles
 
             if (!isModule && shooter.Battle.ExtendedBattleMode is ExtendedBattleMode.HPS) return;
             if (target.TankState is not TankState.Active) return;
-            if (!isModule && shooter.BattleWeapon.IsOnCooldown(target)) return;
+            if (!isModule && shooter.Weapon.IsOnCooldown(target)) return;
 
             if (shooter.IsEnemyOf(target))
                 foreach (BattleModule module in target.Modules)
@@ -293,7 +279,7 @@ namespace TXServer.Core.Battles
 
             float damage = isModule
                 ? battleModule.BaseDamage(weapon, target)
-                : shooter.BattleWeapon.BaseDamage(hitTarget.HitDistance, target, isSplashHit);
+                : shooter.Weapon.BaseDamage(hitTarget.HitDistance, target, isSplashHit);
 
             if (damage == 0) return;
 
@@ -305,10 +291,10 @@ namespace TXServer.Core.Battles
             MatchPlayer target = GetTargetByHit(shooter, hitTarget);
             (Entity weaponMarketItem, _) = GetWeaponItems(weapon, shooter);
 
-            if (shooter.BattleWeapon.IsOnCooldown(target)) return;
+            if (shooter.Weapon.IsOnCooldown(target)) return;
 
-            if (shooter.BattleWeapon.GetType() == typeof(Isis))
-                ((Isis) shooter.BattleWeapon).HealMate(target, hitTarget);
+            if (shooter.Weapon.GetType() == typeof(Isis))
+                ((Isis) shooter.Weapon).HealMate(target, hitTarget);
 
             if (target.TemperatureFromAllHits() != 0)
                 DealNewTemperature(weapon, weaponMarketItem, target, shooter, onlyNormalize:true);
@@ -362,7 +348,7 @@ namespace TXServer.Core.Battles
 
             if (killer.Player != victim.Player)
             {
-                battle.PlayersInMap.SendEvent(new KillEvent(weaponMarketItem, victim.Tank), killer.BattleUser);
+                battle.PlayersInMap.SendEvent(new KillEvent(weaponMarketItem, victim.TankEntity), killer.BattleUser);
                 killer.SendEvent(
                     new VisualScoreKillEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid,
                         victim.Player.User.GetComponent<UserRankComponent>().Rank,
@@ -394,7 +380,7 @@ namespace TXServer.Core.Battles
                 assist.Key != damager && assist.Key != victim))
             {
                 assist.Key.UpdateStatistics(additiveScore: 5, 0, additiveKillAssists: 1, 0, null);
-                int percent = (int)(assist.Value / victim.Tank.GetComponent<HealthComponent>().MaxHealth * 100);
+                int percent = (int)(assist.Value / victim.Tank.MaxHealth * 100);
                 assist.Key.SendEvent(
                     new VisualScoreAssistEvent(victim.Player.User.GetComponent<UserUidComponent>().Uid, percent,
                         assist.Key.GetScoreWithBonus(5)), assist.Key.BattleUser);

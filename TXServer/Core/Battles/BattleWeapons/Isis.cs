@@ -56,9 +56,8 @@ namespace TXServer.Core.Battles.BattleWeapons
 
             int additiveScore = MatchPlayer.GetScoreWithBonus(2);
 
-            target.Player.BattlePlayer.MatchPlayer.HealthChanged();
             MatchPlayer.Battle.Spectators.Concat(new[] {(IPlayerPart) MatchPlayer})
-                .SendEvent(new DamageInfoEvent(hp, hitTarget.LocalHitPoint, false, true), target.Tank);
+                .SendEvent(new DamageInfoEvent(hp, hitTarget.LocalHitPoint, false, true), target.TankEntity);
             MatchPlayer
                 .SendEvent(new VisualScoreHealEvent(additiveScore), MatchPlayer.BattleUser);
 

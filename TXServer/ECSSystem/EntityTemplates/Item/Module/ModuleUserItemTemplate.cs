@@ -35,14 +35,11 @@ namespace TXServer.ECSSystem.EntityTemplates.Item.Module {
                 */
 				new ModuleUsesCounterComponent(),
 				//new UserItemCounterComponent(100),
-				battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
-				battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>()
+				battlePlayer.MatchPlayer.TankEntity.GetComponent<UserGroupComponent>(),
+				battlePlayer.MatchPlayer.TankEntity.GetComponent<TankGroupComponent>()
 			);
 
-            if (garageModule.GetComponent<ModuleBehaviourTypeComponent>().Type is not ModuleBehaviourType.PASSIVE)
-                entity.AddComponent(new InventoryEnabledStateComponent());
-
-			return entity;
+            return entity;
 		}
 	}
 }

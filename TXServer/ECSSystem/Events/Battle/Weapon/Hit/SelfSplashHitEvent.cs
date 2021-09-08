@@ -26,7 +26,7 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hit
             foreach (HitTarget splashTarget in SplashTargets.Where(hitTarget =>
                 matchPlayer.Battle.Params.FriendlyFire ||
                 matchPlayer.IsEnemyOf(Damage.GetTargetByHit(matchPlayer, hitTarget)) ||
-                matchPlayer.BattleWeapon.AllowsSelfDamage && hitTarget.Entity == player.BattlePlayer.MatchPlayer.Tank))
+                matchPlayer.Weapon.AllowsSelfDamage && hitTarget.Entity == player.BattlePlayer.MatchPlayer.TankEntity))
                 Damage.HandleHit(weapon, player.BattlePlayer.MatchPlayer, splashTarget, true);
 
             player.User.ChangeComponent<UserStatisticsComponent>(component => component.Statistics["SHOTS"]++);

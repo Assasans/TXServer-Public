@@ -1,6 +1,7 @@
 ﻿using System;
+using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle.Health;
+using TXServer.ECSSystem.Components.Battle.Module.Healing;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 
@@ -11,15 +12,17 @@ namespace TXServer.Core.Battles.Effect
         public RepairKitModule(MatchPlayer matchPlayer, Entity garageModule) : base(
             matchPlayer,
             ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
-        )
-        {
-        }
+        ) { }
 
         public override void Activate()
         {
             LastTickTime = DateTimeOffset.UtcNow.AddMilliseconds(-TickPeriod);
 
             float duration = IsSupply || IsCheat ? SupplyDuration(3000) : Duration;
+
+            if (!IsSupply)
+                Damage.DealHeal(InstantHp, MatchPlayer);
+
             if (EffectIsActive)
             {
                 ChangeDuration(duration);
@@ -47,28 +50,39 @@ namespace TXServer.Core.Battles.Effect
             IsCheat = false;
         }
 
+        public override void Init()
+        {
+            base.Init();
+            ModuleHpPerMs = Config.GetComponent<ModuleHealingEffectHPPerMSPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level];
+            InstantHp = Config.GetComponent<ModuleHealingEffectInstantHPPropertyComponent>(ConfigPath)
+                .UpgradeLevel2Values[Level];
+        }
+
         protected override void Tick()
         {
             base.Tick();
 
-            if (EffectIsActive && DifferenceToLastHeal.TotalMilliseconds >= 250)
+            if (EffectIsActive && DifferenceToLastHeal.TotalMilliseconds >= TickPeriod)
             {
                 LastTickTime = DateTimeOffset.UtcNow;
 
-                HealthComponent healthComponent = MatchPlayer.Tank.GetComponent<HealthComponent>();
-                if (healthComponent.CurrentHealth >= healthComponent.MaxHealth) return;
+                if (MatchPlayer.Tank.CurrentHealth >= MatchPlayer.Tank.MaxHealth) return;
 
-                float healHp = healthComponent.CurrentHealth + TickPeriod * HpPerMs > healthComponent.MaxHealth
-                    ? healthComponent.MaxHealth - healthComponent.CurrentHealth
+                float healHp = MatchPlayer.Tank.CurrentHealth + TickPeriod * HpPerMs > MatchPlayer.Tank.MaxHealth
+                    ? MatchPlayer.Tank.MaxHealth - MatchPlayer.Tank.CurrentHealth
                     : TickPeriod * HpPerMs;
 
                 Damage.DealHeal(healHp, MatchPlayer);
             }
         }
 
-        // TODO: find configs for repair kit module (card) & init
-        private float HpPerMs { get; } = 0.633f;
-        private float TickPeriod { get; } = 250;
+        protected override bool AllowsEnabledState() => MatchPlayer.Tank.CurrentHealth < MatchPlayer.Tank.MaxHealth;
+
+        private float HpPerMs => IsCheat || IsSupply ? 0.633f : ModuleHpPerMs;
+        private float InstantHp { get; set; }
+        private const float TickPeriod = 250;
+        private float ModuleHpPerMs { get; set; }
 
         private DateTimeOffset LastTickTime { get; set; }
         private TimeSpan DifferenceToLastHeal => LastTickTime == default ? default : DateTimeOffset.UtcNow - LastTickTime;

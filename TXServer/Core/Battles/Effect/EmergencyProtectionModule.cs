@@ -7,7 +7,6 @@ using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
 using TXServer.ECSSystem.Events.Battle.Effect;
 using TXServer.Library;
-using HealthComponent = TXServer.ECSSystem.Components.Battle.Health.HealthComponent;
 
 namespace TXServer.Core.Battles.Effect
 {
@@ -31,7 +30,7 @@ namespace TXServer.Core.Battles.Effect
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
             MatchPlayer.Battle.PlayersInMap.SendEvent(new TriggerEffectExecuteEvent(), EffectEntity);
-            MatchPlayer.Weapon.TryRemoveComponent<ShootableComponent>();
+            MatchPlayer.WeaponEntity.TryRemoveComponent<ShootableComponent>();
 
             MatchPlayer.TemperatureHits.Clear();
             Damage.DealNewTemperature(EffectEntity, MarketItem, MatchPlayer, MatchPlayer);
@@ -45,14 +44,14 @@ namespace TXServer.Core.Battles.Effect
 
             if (DateTimeOffset.UtcNow >= ImmunityEndTime)
             {
-                float healHp = FixedHp + AdditiveHpFactor * MatchPlayer.Tank.GetComponent<HealthComponent>().MaxHealth;
+                float healHp = FixedHp + AdditiveHpFactor * MatchPlayer.Tank.MaxHealth;
                 Damage.DealHeal(healHp, MatchPlayer);
                 MatchPlayer.TemperatureHits.Clear();
                 MatchPlayer.Temperature = MatchPlayer.TemperatureFromAllHits();
                 MatchPlayer.SpeedByTemperature();
             }
 
-            MatchPlayer.Weapon.TryAddComponent(new ShootableComponent());
+            MatchPlayer.WeaponEntity.TryAddComponent(new ShootableComponent());
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
 
             EffectEntity = null;

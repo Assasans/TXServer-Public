@@ -19,12 +19,12 @@ namespace TXServer.Core.Battles.Effect
         {
             if (EffectEntity != null) return;
 
-            MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.TurnSpeed *= HullRotation);
-            MatchPlayer.Weapon.ChangeComponent<WeaponRotationComponent>(component =>
+            MatchPlayer.TankEntity.ChangeComponent<SpeedComponent>(component => component.TurnSpeed *= HullRotation);
+            MatchPlayer.WeaponEntity.ChangeComponent<WeaponRotationComponent>(component =>
             {
                 component.Acceleration *= TurretAcceleration;
                 component.Speed *= TurretSpeed;
-                MatchPlayer.BattleWeapon.OriginalWeaponRotationComponent = (WeaponRotationComponent) component.Clone();
+                MatchPlayer.Weapon.OriginalWeaponRotationComponent = (WeaponRotationComponent) component.Clone();
             });
 
             EffectEntity = AcceleratedGearsEffectTemplate.CreateEntity(MatchPlayer);
@@ -35,12 +35,12 @@ namespace TXServer.Core.Battles.Effect
         {
             if (EffectEntity == null) return;
 
-            MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.TurnSpeed /= HullRotation);
-            MatchPlayer.Weapon.ChangeComponent<WeaponRotationComponent>(component =>
+            MatchPlayer.TankEntity.ChangeComponent<SpeedComponent>(component => component.TurnSpeed /= HullRotation);
+            MatchPlayer.WeaponEntity.ChangeComponent<WeaponRotationComponent>(component =>
             {
                 component.Acceleration /= TurretAcceleration;
                 component.Speed /= TurretSpeed;
-                MatchPlayer.BattleWeapon.OriginalWeaponRotationComponent = (WeaponRotationComponent) component.Clone();
+                MatchPlayer.Weapon.OriginalWeaponRotationComponent = (WeaponRotationComponent) component.Clone();
             });
 
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);

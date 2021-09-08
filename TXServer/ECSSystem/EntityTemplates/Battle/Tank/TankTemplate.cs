@@ -14,7 +14,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Tank
     [SerialVersionUID(2012489519776979402)]
     public class TankTemplate : IEntityTemplate
     {
-        public static Entity CreateEntity(MatchPlayer selfMatchPlayer, Entity hullUserItem, Entity battleUser, BattleTankPlayer battlePlayer)
+        public static Entity CreateEntity(Entity hullUserItem, Entity battleUser, BattleTankPlayer battlePlayer)
         {
             string configPath = hullUserItem.TemplateAccessor.ConfigPath;
 
@@ -23,7 +23,6 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Tank
                 new TankPartComponent(),
                 battleUser.GetComponent<UserGroupComponent>(),
                 battleUser.GetComponent<BattleGroupComponent>(),
-                Config.GetComponent<HealthComponent>(configPath),
                 Config.GetComponent<HealthConfigComponent>(configPath),
                 Config.GetComponent<DampingComponent>(configPath),
                 Config.GetComponent<SpeedComponent>(configPath),

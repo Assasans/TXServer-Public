@@ -10,10 +10,10 @@ namespace TXServer.ECSSystem.Components.Battle.Weapon
 	public class ShaftAimingWorkingStateComponent : Component
     {
         public void OnAttached(Player player, Entity weapon) =>
-            ((Shaft) player.BattlePlayer.MatchPlayer.BattleWeapon).StartAiming();
+            ((Shaft) player.BattlePlayer.MatchPlayer.Weapon).StartAiming();
 
         public void OnRemove(Player player, Entity weapon) =>
-            ((Shaft) player.BattlePlayer.MatchPlayer.BattleWeapon).StopAiming();
+            ((Shaft) player.BattlePlayer.MatchPlayer.Weapon).StopAiming();
 
         public float InitialEnergy { get; set; }
         public float ExhaustedEnergy { get; set; }

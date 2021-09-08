@@ -7,10 +7,13 @@ using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Tank;
 using TXServer.ECSSystem.Components.Battle.Module;
 
-namespace TXServer.ECSSystem.EntityTemplates {
+namespace TXServer.ECSSystem.EntityTemplates
+{
 	[SerialVersionUID(1486980355472L)]
-	public class PassiveModuleUserItemTemplate : IEntityTemplate {
+	public class PassiveModuleUserItemTemplate : IEntityTemplate
+    {
 		public static Entity CreateEntity(Entity garageModule, BattleTankPlayer battlePlayer) {
+
 			Entity slot = battlePlayer.Player.CurrentPreset.Modules.SingleOrDefault(x => x.Value == garageModule).Key;
 			Component slotUserItemInfoComponent = slot.GetComponent<SlotUserItemInfoComponent>();
 
@@ -21,11 +24,9 @@ namespace TXServer.ECSSystem.EntityTemplates {
 				),
 				new SlotTankPartComponent(garageModule.GetComponent<ModuleTankPartComponent>().TankPart),
 				slotUserItemInfoComponent,
-                new InventoryEnabledStateComponent(),
-				new ModuleUsesCounterComponent(),
-				//new UserItemCounterComponent(100),
-				battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
-				battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>()
+                new ModuleUsesCounterComponent(),
+                battlePlayer.MatchPlayer.TankEntity.GetComponent<UserGroupComponent>(),
+				battlePlayer.MatchPlayer.TankEntity.GetComponent<TankGroupComponent>()
 			);
 			return entity;
 		}

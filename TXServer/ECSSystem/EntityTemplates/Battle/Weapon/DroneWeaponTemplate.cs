@@ -21,7 +21,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Weapon
                 new DroneWeaponComponent(),
 
                 matchPlayer.Battle.BattleEntity.GetComponent<BattleGroupComponent>(),
-                matchPlayer.Tank.GetComponent<UserGroupComponent>(),
+                matchPlayer.TankEntity.GetComponent<UserGroupComponent>(),
 
                 new ShootableComponent(),
                 Config.GetComponent<StreamHitConfigComponent>(ConfigPath),
@@ -30,7 +30,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle.Weapon
                 Config.GetComponent<WeaponCooldownComponent>(ConfigPath));
 
             if (matchPlayer.Battle.ModeHandler is Core.Battles.Battle.TeamBattleHandler)
-                effect.AddComponent(matchPlayer.Tank.GetComponent<TeamGroupComponent>());
+                effect.AddComponent(matchPlayer.TankEntity.GetComponent<TeamGroupComponent>());
 
             effect.AddComponent(new UnitGroupComponent(effect));
 

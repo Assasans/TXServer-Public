@@ -43,7 +43,7 @@ namespace TXServer.Core.Battles
         {
             State = FlagState.Captured;
             Carrier = battlePlayer;
-            Entity tank = Carrier.MatchPlayer.Tank;
+            Entity tank = Carrier.MatchPlayer.TankEntity;
 
             FlagEntity.AddComponent(new TankGroupComponent(tank));
 
@@ -143,7 +143,7 @@ namespace TXServer.Core.Battles
 
             State = FlagState.Captured;
             Carrier = battlePlayer;
-            Entity tank = Carrier.MatchPlayer.Tank;
+            Entity tank = Carrier.MatchPlayer.TankEntity;
 
             FlagEntity.AddComponent(new TankGroupComponent(tank));
 
@@ -161,7 +161,7 @@ namespace TXServer.Core.Battles
             State = FlagState.Home;
             if (battlePlayer != null)
             {
-                FlagEntity.AddComponent(new TankGroupComponent(battlePlayer.MatchPlayer.Tank));
+                FlagEntity.AddComponent(new TankGroupComponent(battlePlayer.MatchPlayer.TankEntity));
                 // todo: calculate flag return score
                 battlePlayer.SendEvent(new VisualScoreFlagReturnEvent(battlePlayer.MatchPlayer.GetScoreWithBonus(5)), battlePlayer.MatchPlayer.BattleUser);
             }

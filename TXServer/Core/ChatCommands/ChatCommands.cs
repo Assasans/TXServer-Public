@@ -203,7 +203,7 @@ namespace TXServer.Core.ChatCommands
             if (!targets.Any())
                 return $"Error, the target '{targetName}' wasn't found in this battle";
             if (targets.Count == 1 &&
-                targets[0].MatchPlayer?.Weapon.TemplateAccessor.Template is not RicochetBattleItemTemplate and not
+                targets[0].MatchPlayer?.WeaponEntity.TemplateAccessor.Template is not RicochetBattleItemTemplate and not
                     TwinsBattleItemTemplate)
             {
                 targets[0].BulletSpeed = bulletSpeed;
@@ -225,10 +225,10 @@ namespace TXServer.Core.ChatCommands
                     continue;
                 }
 
-                if (target.MatchPlayer?.Weapon.TemplateAccessor.Template is RicochetBattleItemTemplate or
+                if (target.MatchPlayer?.WeaponEntity.TemplateAccessor.Template is RicochetBattleItemTemplate or
                     TwinsBattleItemTemplate)
                 {
-                    target.MatchPlayer.Weapon.ChangeComponent<WeaponBulletShotComponent>(component =>
+                    target.MatchPlayer.WeaponEntity.ChangeComponent<WeaponBulletShotComponent>(component =>
                         component.BulletSpeed = (float)bulletSpeed);
                 }
                 else
@@ -585,7 +585,7 @@ namespace TXServer.Core.ChatCommands
                     continue;
                 }
 
-                target.MatchPlayer.Weapon.ChangeComponent<KickbackComponent>(component =>
+                target.MatchPlayer.WeaponEntity.ChangeComponent<KickbackComponent>(component =>
                     component.KickbackForce = (float)kickback);
             }
 
@@ -705,25 +705,25 @@ namespace TXServer.Core.ChatCommands
                     continue;
                 }
 
-                if (target.MatchPlayer.Weapon.HasComponent<StreamWeaponComponent>())
-                    target.MatchPlayer.Weapon.ChangeComponent<StreamWeaponEnergyComponent>(component =>
+                if (target.MatchPlayer.WeaponEntity.HasComponent<StreamWeaponComponent>())
+                    target.MatchPlayer.WeaponEntity.ChangeComponent<StreamWeaponEnergyComponent>(component =>
                         component.UnloadEnergyPerSec = (float)unloadEnergyPerShot);
                 else
                 {
-                    target.MatchPlayer.Weapon.ChangeComponent<DiscreteWeaponEnergyComponent>(component =>
+                    target.MatchPlayer.WeaponEntity.ChangeComponent<DiscreteWeaponEnergyComponent>(component =>
                         component.UnloadEnergyPerShot = (float)unloadEnergyPerShot);
-                    target.MatchPlayer.Weapon.ChangeComponent<WeaponCooldownComponent>(component =>
+                    target.MatchPlayer.WeaponEntity.ChangeComponent<WeaponCooldownComponent>(component =>
                         component.CooldownIntervalSec = (float)unloadEnergyPerShot);
                 }
 
-                switch (target.MatchPlayer.Weapon.TemplateAccessor.Template)
+                switch (target.MatchPlayer.WeaponEntity.TemplateAccessor.Template)
                 {
                     case RailgunBattleItemTemplate:
-                        target.MatchPlayer.Weapon.ChangeComponent<RailgunChargingWeaponComponent>(component =>
+                        target.MatchPlayer.WeaponEntity.ChangeComponent<RailgunChargingWeaponComponent>(component =>
                             component.ChargingTime = (float)unloadEnergyPerShot);
                         break;
                     case ShaftBattleItemTemplate:
-                        target.MatchPlayer.Weapon.ChangeComponent<ShaftEnergyComponent>(component =>
+                        target.MatchPlayer.WeaponEntity.ChangeComponent<ShaftEnergyComponent>(component =>
                         {
                             component.PossibleUnloadEnergyPerAimingShot = 0;
                             component.ReloadEnergyPerSec = 1;
@@ -967,7 +967,7 @@ namespace TXServer.Core.ChatCommands
             return targets;
         }
 
-        private static readonly BattleState[] InactiveBattleStates =
+        public static readonly BattleState[] InactiveBattleStates =
         {
             BattleState.CustomNotStarted, BattleState.NotEnoughPlayers, BattleState.StartCountdown, BattleState.Starting
         };

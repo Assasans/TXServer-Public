@@ -23,10 +23,9 @@ namespace TXServer.ECSSystem.EntityTemplates.Item.Module
 				new TemplateAccessor(new GoldBonusModuleUserItemTemplate(), garageModule.TemplateAccessor.ConfigPath),
 				new SlotTankPartComponent(garageModule.GetComponent<ModuleTankPartComponent>().TankPart),
 				slotUserItemInfoComponent,
-                new InventoryEnabledStateComponent(),
-				new ModuleUsesCounterComponent(),
-                battlePlayer.MatchPlayer.Tank.GetComponent<UserGroupComponent>(),
-				battlePlayer.MatchPlayer.Tank.GetComponent<TankGroupComponent>()
+                new ModuleUsesCounterComponent(),
+                battlePlayer.MatchPlayer.TankEntity.GetComponent<UserGroupComponent>(),
+				battlePlayer.MatchPlayer.TankEntity.GetComponent<TankGroupComponent>()
 			);
 			return entity;
 		}

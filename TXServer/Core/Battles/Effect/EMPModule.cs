@@ -42,7 +42,7 @@ namespace TXServer.Core.Battles.Effect
             foreach (Entity tank in targets)
             {
                 MatchPlayer target = MatchPlayer.Battle.MatchTankPlayers.
-                    Single(p => p.MatchPlayer.Tank == tank).MatchPlayer;
+                    Single(p => p.MatchPlayer.TankEntity == tank).MatchPlayer;
 
                 if (target.TryGetModule(out InvulnerabilityModule shieldModule))
                     if (shieldModule.EffectIsActive) continue;

@@ -27,7 +27,7 @@ namespace TXServer.Core.Battles.Effect
             EffectEntity = TurboSpeedEffectTemplate.CreateEntity(MatchPlayer, (long)duration);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
-            MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.Speed *= Factor());
+            MatchPlayer.TankEntity.ChangeComponent<SpeedComponent>(component => component.Speed *= Factor());
 
             Schedule(TimeSpan.FromMilliseconds(duration), Deactivate);
         }
@@ -42,7 +42,7 @@ namespace TXServer.Core.Battles.Effect
             }
 
             MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity);
-            MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.Speed /= Factor());
+            MatchPlayer.TankEntity.ChangeComponent<SpeedComponent>(component => component.Speed /= Factor());
 
             EffectEntity = null;
             IsCheat = false;

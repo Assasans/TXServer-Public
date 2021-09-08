@@ -11,8 +11,8 @@ namespace TXServer.ECSSystem.Components.Battle.Weapon
 	{
         public void OnAttached(Player player, Entity weapon)
         {
-            if (player.BattlePlayer.MatchPlayer.BattleWeapon.GetType() == typeof(Vulcan))
-                ((Vulcan) player.BattlePlayer.MatchPlayer.BattleWeapon).TrySaveShootingStartTime();
+            if (player.BattlePlayer.MatchPlayer.Weapon.GetType() == typeof(Vulcan))
+                ((Vulcan) player.BattlePlayer.MatchPlayer.Weapon).TrySaveShootingStartTime();
         }
 
         [OptionalMapped] public DateTime StartShootingTime { get; set; }

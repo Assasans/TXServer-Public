@@ -19,23 +19,16 @@ namespace TXServer.Core.Battles.Effect
         {
             if (IsOnCooldown || MatchPlayer.TankState == TankState.Dead || IsEmpLocked) return;
 
-            HealthComponent healthComponent = MatchPlayer.Tank.GetComponent<HealthComponent>();
-
-            if (!(healthComponent.CurrentHealth < healthComponent.MaxHealth)) return;
+            if (!(MatchPlayer.Tank.CurrentHealth < MatchPlayer.Tank.MaxHealth)) return;
 
             CurrentAmmunition--;
 
             EffectEntity = LifestealEffectTemplate.CreateEntity(MatchPlayer);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
-            MatchPlayer.Tank.ChangeComponent<HealthComponent>(component =>
-            {
-                component.CurrentHealth += component.MaxHealth * AdditiveHpFactor;
-                component.CurrentHealth += FixedHp;
-            });
+            MatchPlayer.Tank.CurrentHealth += MatchPlayer.Tank.MaxHealth * AdditiveHpFactor + FixedHp;
 
             MatchPlayer.Battle.PlayersInMap.SendEvent(new TriggerEffectExecuteEvent(), EffectEntity);
-            MatchPlayer.HealthChanged();
 
             Schedule(() => { MatchPlayer.Battle.PlayersInMap.UnshareEntities(EffectEntity); });
         }

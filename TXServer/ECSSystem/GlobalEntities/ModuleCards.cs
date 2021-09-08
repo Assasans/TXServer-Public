@@ -101,6 +101,9 @@ namespace TXServer.ECSSystem.GlobalEntities
             public Entity Rage { get; } = new Entity(-786092160, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/rage"),
                 new ParentGroupComponent(Modules.GlobalItems.Rage),
                 new MarketItemGroupComponent(-786092160));
+            public Entity Repairkit { get; } = new Entity(-786092161, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/repairkit"),
+                new ParentGroupComponent(Modules.GlobalItems.Repairkit),
+                new MarketItemGroupComponent(-786092161));
             public Entity Sapper { get; } = new Entity(-887306593, new TemplateAccessor(new ModuleCardMarketItemTemplate(), "garage/module/card/sapper"),
                 new ParentGroupComponent(Modules.GlobalItems.Sapper),
                 new MarketItemGroupComponent(-887306593));
@@ -121,7 +124,7 @@ namespace TXServer.ECSSystem.GlobalEntities
         public static readonly List<Entity> Tier1Modules = new()
         {
             GlobalItems.Absorbingarmor,
-            //GlobalItem.RepairKit,
+            GlobalItems.Repairkit,
             GlobalItems.Turbospeed,
             GlobalItems.Backhitdefence,
             GlobalItems.Tempblock,

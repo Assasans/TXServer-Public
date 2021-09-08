@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.Events.Battle.Weapon.Hammer
         public new static void Execute(Player player, Entity tank)
         {
             new SelfShotEvent().Execute(player, tank);
-            ((Core.Battles.BattleWeapons.Hammer) player.BattlePlayer.MatchPlayer.BattleWeapon).ProcessShot();
+            ((Core.Battles.BattleWeapons.Hammer) player.BattlePlayer.MatchPlayer.Weapon).ProcessShot();
         }
 
         public override IRemoteEvent ToRemoteEvent() => this.ToRemoteEvent<RemoteHammerShotEvent>();

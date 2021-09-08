@@ -44,6 +44,8 @@ namespace TXServer.Core.Battles.Effect
                 ?.UpgradeLevel2Values[Level] ?? 0;
             MaxDamage = Config.GetComponent<ModuleEffectMaxDamagePropertyComponent>(ConfigPath, false)
                 ?.UpgradeLevel2Values[Level] ?? 0;
+
+            IsEnabled = true;
         }
 
         protected float GetConfigByLevel(List<float> statsPerLevel) =>
@@ -141,6 +143,7 @@ namespace TXServer.Core.Battles.Effect
         }
 
         public virtual bool AllowsDamage() => true;
+        protected virtual bool AllowsEnabledState() => true;
 
         public virtual void On_Death() {}
 
@@ -188,7 +191,7 @@ namespace TXServer.Core.Battles.Effect
                     return;
                 }
                 if (GetType() == typeof(TurboSpeedModule) && IsCheat)
-                    MatchPlayer.Tank.ChangeComponent<SpeedComponent>(component => component.Speed = float.MaxValue);
+                    MatchPlayer.TankEntity.ChangeComponent<SpeedComponent>(component => component.Speed = float.MaxValue);
             }
 
             EffectEntity.ChangeComponent<DurationConfigComponent>(component => component.Duration = (long)duration);
@@ -215,12 +218,12 @@ namespace TXServer.Core.Battles.Effect
         {
             if (IsModule)
             {
-                bool battleStateAllowsModule = MatchPlayer.Battle.BattleState is BattleState.Running ||
+                bool battleAllowsModule = MatchPlayer.Battle.BattleState is BattleState.Running ||
                                                MatchPlayer.Battle.IsMatchMaking &&
                                                ((Battle.MatchMakingBattleHandler) MatchPlayer.Battle.TypeHandler)
                                                ?.WarmUpState is WarmUpState.WarmingUp;
-                IsEnabled = battleStateAllowsModule && ModuleType is not ModuleBehaviourType.PASSIVE &&
-                            MatchPlayer.TankState == TankState.Active;
+                IsEnabled = AllowsEnabledState() && battleAllowsModule && ModuleType is not ModuleBehaviourType.PASSIVE
+                            && MatchPlayer.TankState == TankState.Active;
             }
         }
 
@@ -294,9 +297,9 @@ namespace TXServer.Core.Battles.Effect
                 if (value == _isEnabled) return;
 
                 _isEnabled = value;
-                if (value is false)
+                if (!value)
                     ModuleEntity.TryRemoveComponent<InventoryEnabledStateComponent>();
-                else if (!ModuleEntity.HasComponent<InventoryEnabledStateComponent>())
+                else
                     ModuleEntity.AddComponent(new InventoryEnabledStateComponent());
             }
         }
