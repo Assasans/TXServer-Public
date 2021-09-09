@@ -58,70 +58,58 @@ namespace TXServer.Core
                 if (!Database.BlockedUsernames.Any())
                 {
                     Database.BlockedUsernames.Add(BlockedUsername.Create("Godmode_ON", "Reserved"));
-                    Database.BlockedUsernames.Add(BlockedUsername.Create("Assasans"));
                 }
 
                 if (!Database.Invites.Any())
                 {
-                    // Pair: Invite code - Username
+                    // Pair: Invite code - (Username, Discord ID)
                     // Remark: Developers can login with any username
-                    Dictionary<string, string> invites = new Dictionary<string, string>()
+                    Dictionary<string, (string, long?)> invites = new Dictionary<string, (string, long?)>()
                     {
-                        ["NoNick"] = null,
-                        ["Tim203"] = null,
-                        ["M8"] = null,
-                        ["Kaveman"] = null,
-                        ["Assasans"] = null,
-                        ["Concodroid"] = "Concodroid",
-                        ["Corpserdefg"] = "Corpserdefg",
-                        ["SH42913"] = "SH42913",
-                        ["Bodr"] = "Bodr",
-                        ["C6OI"] = "C6OI",
-                        ["Legendar-X"] = "Legendar-X",
-                        ["Pchelik"] = "Pchelik",
-                        ["networkspecter"] = "networkspecter",
-                        ["DageLV"] = "DageLV",
-                        ["F24_dark"] = "F24_dark",
-                        ["Black_Wolf"] = "Black_Wolf",
-                        ["NN77296"] = "NN77296",
-                        ["MEWPASCO"] = "MEWPASCO",
-                        ["Doctor"] = "Doctor",
-                        ["TowerCrusher"] = "TowerCrusher",
-                        ["Kurays"] = "Kurays",
-                        ["AlveroHUN"] = "AlveroHUN",
-                        ["Inctrice"] = "Inctrice",
-                        ["NicolasIceberg"] = "NicolasIceberg",
-                        ["Bilmez"] = "Bilmez",
-                        ["Kotovsky"] = "Kotovsky"
+                        ["NoNick"] = (null, 559800250924007434),
+                        ["Tim203"] = (null, 267678060914933770),
+                        ["M8"] = (null, 378982361922273290),
+                        // ["Kaveman"] = (null, 596233653332344842), // Left the server
+                        ["Assasans"] = (null, 738672017791909900),
+                        ["Concodroid"] = ("Concodroid", 283288000845316097),
+                        ["Corpserdefg"] = ("Corpserdefg", 627471155275497492),
+                        ["SH42913"] = ("SH42913", 345965142078521345),
+                        ["Bodr"] = ("Bodr", 463998485939879936),
+                        ["C6OI"] = ("C6OI", 789524259809525780),
+                        ["Legendar-X"] = ("Legendar-X", 603166898665947145),
+                        // ["Pchelik"] = ("Pchelik", 794278628984750081), // Left the server
+                        ["networkspecter"] = ("networkspecter", 772039662762983445),
+                        ["DageLV"] = ("DageLV", 740287827270566089),
+                        ["F24_dark"] = ("F24_dark", 684078674382684251),
+                        ["Black_Wolf"] = ("Black_Wolf", 313045520576937985),
+                        ["NN77296"] = ("NN77296", 492828413242114068),
+                        ["MEWPASCO"] = ("MEWPASCO", 355351557233180672),
+                        ["Doctor"] = ("Doctor", 525214812355952642),
+                        // ["TowerCrusher"] = ("TowerCrusher", 398561533489184809), // Doesn't have Tester role
+                        ["Kurays"] = ("Kurays", 485731951404384258),
+                        ["AlveroHUN"] = ("AlveroHUN", 427738852900470785),
+                        ["Inctrice"] = ("Inctrice", 794522032225910817),
+                        ["NicolasIceberg"] = ("NicolasIceberg", 496714562893119488),
+                        ["Bilmez"] = ("Bilmez", null), // Didn't found any mentions on the Discord server
+                        ["Kotovsky"] = ("Kotovsky", 570595325375545384)
                     };
-                    Database.Invites.AddRange(invites.Select(pair => Invite.Create(pair.Key, pair.Value)));
-                }
+                    foreach ((string invite, (string username, long? discordId)) in invites)
+                    {
+                        Database.Invites.Add(Invite.Create(invite, username));
 
-                // Manual registration
-                if (!Database.Players.Any(player => player.UniqueId == 1234))
-                {
-                    var data = new PlayerData(1234);
-                    data.InitDefault();
-                    data.Username = "Assasans";
-                    data.PasswordHash = Convert.FromBase64String("10onDIlsKilLbl9y5sLMLd34PUk2Mkcv7s5I/be5dOM=");
-                    data.DiscordId = 738672017791909900;
-                    data.IsDiscordVerified = true;
-                    data.CountryCode = "UA";
-                    data.PremiumExpirationDate = DateTime.Now + TimeSpan.FromDays(1000);
+                        if (Database.Players.Any(player => player.Username == username)) continue;
 
-                    // data.Punishments.Add(Punishment.Create(PunishmentType.Mute, data, "Sussy baka", null, DateTimeOffset.Now + TimeSpan.FromDays(100), false));
+                        var data = new PlayerData(DateTimeOffset.UtcNow.Ticks);
+                        data.InitDefault();
+                        data.Username = username ?? invite; // Use invite code as username as a fallback
+                        // Password "111": "9uCh4qxBlFqap/+KiqoM68EqO8yYGpKa1c+BCgkOEa4="
+                        data.PasswordHash = Array.Empty<byte>(); // Allow any password
+                        data.DiscordId = discordId;
+                        data.IsDiscordVerified = true;
+                        data.PremiumExpirationDate = DateTime.Now + TimeSpan.FromDays(1000);
 
-                    Database.Players.Add(data);
-                }
-
-                if (!Database.Players.Any(player => player.UniqueId == 4321))
-                {
-                    var data = new PlayerData(4321);
-                    data.InitDefault();
-                    data.Username = "RELATIONS_TEST_USER";
-                    data.PasswordHash = Convert.FromBase64String("9uCh4qxBlFqap/+KiqoM68EqO8yYGpKa1c+BCgkOEa4=");
-
-                    Database.Players.Add(data);
+                        Database.Players.Add(data);
+                    }
                 }
 
                 Database.Save();

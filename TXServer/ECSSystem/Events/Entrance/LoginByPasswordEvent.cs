@@ -12,7 +12,7 @@ namespace TXServer.ECSSystem.Events
     {
         public void Execute(Player player, Entity clientSession)
         {
-            if (player.Server.Database is not InMemoryDatabase && !player.EncryptionComponent.GetLoginPasswordHash(player.Data.PasswordHash).SequenceEqual(Convert.FromBase64String(PasswordEncipher)))
+            if (player.Server.Database is not InMemoryDatabase && player.Data.PasswordHash.Length > 0 && !player.EncryptionComponent.GetLoginPasswordHash(player.Data.PasswordHash).SequenceEqual(Convert.FromBase64String(PasswordEncipher)))
             {
                 player.SendEvent(new InvalidPasswordEvent(), clientSession);
                 player.SendEvent(new LoginFailedEvent(), clientSession);
