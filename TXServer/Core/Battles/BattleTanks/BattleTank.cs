@@ -26,8 +26,7 @@ namespace TXServer.Core.Battles.BattleTanks
             {
                 _currentHealth = value;
 
-                if (MatchPlayer.TryGetModule(out RepairKitModule repairKitModule) && repairKitModule.EffectIsActive &&
-                    (repairKitModule.IsSupply || repairKitModule.IsCheat))
+                if (MatchPlayer.TryGetModule(out RepairKitModule repairKitModule) && repairKitModule.EffectIsActive)
                 {
                     // this way prevents the client from crashing when using the other way below while a repair kit
                     // supply is active
