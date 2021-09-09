@@ -69,7 +69,7 @@ namespace TXServer.Core
 
                 foreach (HeightMapLayer layer in HeightMaps.Values.SelectMany(map => map.Layers))
                 {
-                    Logger.Verbose($"Reading {layer.Path}...");
+                    Logger.Verbose("Reading {Layer}...", layer.Path);
                     layer.Image = Image.Load<Rgb24>(Path.Combine(Directory.GetCurrentDirectory(), "Library", layer.Path));
                 }
                 Logger.Information("Height maps loaded");

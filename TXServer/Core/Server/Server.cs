@@ -14,7 +14,7 @@ namespace TXServer.Core
 {
     public class Server
     {
-        private static readonly ILogger Logger = Log.Logger.ForType<Server>();
+        private static ILogger Logger;
 
         public static Server Instance { get; set; }
 
@@ -37,6 +37,7 @@ namespace TXServer.Core
         public void Start()
         {
             SerilogLogger.Init(Settings.LogLevel);
+            Logger = Log.Logger.ForType<Server>();
 
             Logger.Information("Starting server...");
             // Comment this to not recreate database structure on start, deleting all data
