@@ -1,10 +1,12 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Serilog.Events;
 using TXServer.Core;
 
 namespace TXServerUI
