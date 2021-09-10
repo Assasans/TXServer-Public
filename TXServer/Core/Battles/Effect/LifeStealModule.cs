@@ -1,6 +1,5 @@
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Module.LifeSteal;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;
@@ -26,7 +25,7 @@ namespace TXServer.Core.Battles.Effect
             EffectEntity = LifestealEffectTemplate.CreateEntity(MatchPlayer);
             MatchPlayer.Battle.PlayersInMap.ShareEntities(EffectEntity);
 
-            MatchPlayer.Tank.CurrentHealth += MatchPlayer.Tank.MaxHealth * AdditiveHpFactor + FixedHp;
+            Damage.DealHeal(MatchPlayer.Tank.MaxHealth * AdditiveHpFactor + FixedHp, MatchPlayer);
 
             MatchPlayer.Battle.PlayersInMap.SendEvent(new TriggerEffectExecuteEvent(), EffectEntity);
 
@@ -41,6 +40,12 @@ namespace TXServer.Core.Battles.Effect
                 .UpgradeLevel2Values[Level];
             FixedHp = Config.GetComponent<ModuleLifestealEffectFixedHPPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
+        }
+
+        public override void On_EnemyKill()
+        {
+            base.On_Death();
+            Activate();
         }
 
         private float AdditiveHpFactor { get; set; }

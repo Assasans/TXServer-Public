@@ -16,7 +16,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
                 new TeamComponent(),
                 new TeamColorComponent(color),
                 battle.GetComponent<BattleGroupComponent>(),
-                new TeamScoreComponent(0)
+                new TeamScoreComponent()
             );
             entity.Components.Add(new TeamGroupComponent(entity));
 

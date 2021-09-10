@@ -60,6 +60,12 @@ namespace TXServer.Core.Battles
                 _ => TeamBattleResult.DRAW
             };
 
+            public virtual void ResetScore()
+            {
+                foreach (Entity team in new[] {RedTeamEntity, BlueTeamEntity})
+                    team.ChangeComponent(new TeamScoreComponent());
+            }
+
             public void SortRoundUsers()
             {
                 foreach (List<BattleTankPlayer> list in new[] { RedTeamPlayers, BlueTeamPlayers })

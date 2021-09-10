@@ -62,6 +62,7 @@ namespace TXServer.Core.Battles
                         if (!Battle.MatchTankPlayers.Any() && !Battle.KeepRunning)
                         {
                             Battle.BattleLobbyEntity.RemoveComponent<BattleGroupComponent>();
+                            Battle.ModeHandler.ResetScore();
                             Battle.BattleState = BattleState.CustomNotStarted;
                         }
 

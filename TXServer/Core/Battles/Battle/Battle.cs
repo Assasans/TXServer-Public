@@ -15,6 +15,7 @@ using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Team;
 using TXServer.ECSSystem.Components.Battle.Time;
 using TXServer.ECSSystem.EntityTemplates.Battle;
+using TXServer.ECSSystem.EntityTemplates.Battle.BattleMode;
 using TXServer.ECSSystem.EntityTemplates.Chat;
 using TXServer.ECSSystem.Events.Battle;
 using TXServer.ECSSystem.Events.Battle.Bonus;
@@ -304,7 +305,7 @@ namespace TXServer.Core.Battles
             }
 
             // fractions competition
-            if (ServerData.FractionsCompetitionActive && !ServerData.FractionsCompetitionFinished)
+            if (IsMatchMaking && ServerData.FractionsCompetitionActive && !ServerData.FractionsCompetitionFinished)
             {
                 ServerData.AntaeusScore +=
                     Convert.ToInt64(antaeusScore + (antaeusScore < frontierScore ? neutralScore : 0));
@@ -316,8 +317,7 @@ namespace TXServer.Core.Battles
 
             if (RoundEntity.GetComponent<RoundRestartingStateComponent>() == null)
                 RoundEntity.AddComponent(new RoundRestartingStateComponent());
-            if (BattleLobbyEntity.GetComponent<BattleGroupComponent>() != null)
-                BattleLobbyEntity.RemoveComponent<BattleGroupComponent>();
+            BattleLobbyEntity.TryRemoveComponent<BattleGroupComponent>();
         }
 
         public void InitMatchPlayer(BaseBattlePlayer battlePlayer)

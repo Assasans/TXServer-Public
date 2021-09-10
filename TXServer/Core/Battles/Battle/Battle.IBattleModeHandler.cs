@@ -48,6 +48,8 @@ namespace TXServer.Core.Battles
             void CompleteWarmUp();
             void OnFinish();
 
+            void ResetScore();
+
             BattleTankPlayer AddPlayer(Player player);
             void RemovePlayer(BattleTankPlayer battlePlayer);
             void OnMatchJoin(BaseBattlePlayer battlePlayer);

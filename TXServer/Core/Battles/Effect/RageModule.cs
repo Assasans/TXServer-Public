@@ -56,6 +56,12 @@ namespace TXServer.Core.Battles.Effect
                     .UpgradeLevel2Values[Level];
         }
 
+        public override void On_EnemyKill()
+        {
+            base.On_EnemyKill();
+            Activate();
+        }
+
 
         private float ReduceCooldownTimePerKill { get; set; }
     }

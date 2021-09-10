@@ -25,63 +25,45 @@ namespace TXServer.Core.ChatCommands
 {
     public static class ChatCommands
     {
-        private static readonly Dictionary<string, (string, ChatCommandConditions, Func<Player, string[], string>)>
+        private static readonly Dictionary<string, (string, ChatCommandCondition[], Func<Player, string[], string>)>
             Commands = new()
         {
-            { "help", ("help [opt: hackBattle]", ChatCommandConditions.None, Help) },
-            { "ping", (null, ChatCommandConditions.None, Ping) },
+            { "help", ("help [opt: hackBattle]", new[]{ChatCommandCondition.None}, Help) },
+            { "ping", (null, new[]{ChatCommandCondition.None}, Ping) },
 
-            { "stats", (null, ChatCommandConditions.Tester, Stats) },
-            { "spawnInfo", (null, ChatCommandConditions.Tester | ChatCommandConditions.InMatch, SpawnInfo) },
+            { "stats", (null, new[]{ChatCommandCondition.Tester}, Stats) },
+            { "spawnInfo", (null, new[]{ChatCommandCondition.Tester, ChatCommandCondition.InMatch}, SpawnInfo) },
 
-            { "hackBattle", ("hackBattle [everyone/onlyme]", ChatCommandConditions.TestServer | ChatCommandConditions.BattleOwner, HackBattle) },
-            { "bulletSpeed", ("bulletSpeed [max/stuck/norm/number] [target]", ChatCommandConditions.HackBattle, BulletSpeed) },
-            { "cases", ("cases (punishments)", ChatCommandConditions.None, ListPunishments) },
-            { "cheat", ("cheat [supply] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.ActiveTank, Cheat) },
-            { "flag", ("flag [color] [deliver/drop/return/give] [target]", ChatCommandConditions.HackBattle | ChatCommandConditions.Admin, FlagAction) },
-            { "gravity", ("gravity [number]", ChatCommandConditions.BattleOwner | ChatCommandConditions.HackBattle, Gravity) },
-            { "kickback", ("kickback [number] [target]", ChatCommandConditions.HackBattle, Kickback) },
-            { "kill", ("kill [target]", ChatCommandConditions.InMatch | ChatCommandConditions.Admin, KillPlayer) },
-            { "mode", ("kill [target]", ChatCommandConditions.BattleOwner | ChatCommandConditions.NonHackBattle | ChatCommandConditions.InactiveBattle, Mode) },
-            { "tp", ("teleport [target]", ChatCommandConditions.Premium | ChatCommandConditions.InMatch | ChatCommandConditions.HackBattle, Teleport) },
-            { "turretReload", ("turretReload [instant/never] [target]", ChatCommandConditions.HackBattle, ReloadTime) },
-            { "turretRotation", ("turretRotation [instant/stuck/norm/number]", ChatCommandConditions.HackBattle, TurretRotation) },
-            { "jump", ("jump [multiplier]", ChatCommandConditions.HackBattle | ChatCommandConditions.InMatch, Jump) }
+            { "hackBattle", ("hackBattle [everyone/onlyme]", new[]{ChatCommandCondition.TestServer, ChatCommandCondition.BattleOwner}, HackBattle) },
+            { "bulletSpeed", ("bulletSpeed [max/stuck/norm/number] [target]", new[]{ChatCommandCondition.HackBattle}, BulletSpeed) },
+            { "cases", ("cases (punishments)", new[]{ChatCommandCondition.None}, ListPunishments) },
+            { "cheat", ("cheat [supply] [target]", new[]{ChatCommandCondition.HackBattle, ChatCommandCondition.ActiveTank}, Cheat) },
+            { "flag", ("flag [color] [deliver/drop/return/give] [target]", new[]{ChatCommandCondition.HackBattle, ChatCommandCondition.Admin}, FlagAction) },
+            { "gravity", ("gravity [number]", new[]{ChatCommandCondition.BattleOwner, ChatCommandCondition.HackBattle}, Gravity) },
+            { "kickback", ("kickback [number] [target]", new[]{ChatCommandCondition.HackBattle}, Kickback) },
+            { "kill", ("kill [target]", new[]{ChatCommandCondition.InMatch, ChatCommandCondition.Admin}, KillPlayer) },
+            { "mode", ("kill [target]", new[]{ChatCommandCondition.BattleOwner, ChatCommandCondition.NonHackBattle, ChatCommandCondition.InactiveBattle}, Mode) },
+            { "tp", ("teleport [target]", new[]{ChatCommandCondition.Premium, ChatCommandCondition.InMatch, ChatCommandCondition.HackBattle}, Teleport) },
+            { "turretReload", ("turretReload [instant/never] [target]", new[]{ChatCommandCondition.HackBattle}, ReloadTime) },
+            { "turretRotation", ("turretRotation [instant/stuck/norm/number]", new[]{ChatCommandCondition.HackBattle}, TurretRotation) },
+            { "jump", ("jump [multiplier]", new[]{ChatCommandCondition.HackBattle, ChatCommandCondition.InMatch}, Jump) }
         };
 
-        public static readonly Dictionary<ChatCommandConditions, string> ConditionErrors = new()
+        public static readonly Dictionary<ChatCommandCondition, string> ConditionErrors = new()
         {
-            { ChatCommandConditions.ActiveTank, "Your tank needs to be active" },
-            { ChatCommandConditions.Admin, "You are not an admin" },
-            { ChatCommandConditions.BattleOwner, "You need to be the battle owner" },
-            { ChatCommandConditions.HackBattle, "HackBattle is not enabled or you don't have permission to it" },
-            { ChatCommandConditions.NonHackBattle, "This command is not allowed in HackBattles" },
-            { ChatCommandConditions.InactiveBattle, "You need to be in a battle lobby with no active players in-battle" },
-            { ChatCommandConditions.ActiveBattle, "You need to be in a battle with active players in-battle" },
-            { ChatCommandConditions.InBattle, "You need to be in a battle" },
-            { ChatCommandConditions.InMatch, "You need to be in a match" },
-            { ChatCommandConditions.Premium, "You need an active premium pass" },
-            { ChatCommandConditions.Tester, "You need to be a tester" },
-            { ChatCommandConditions.TestServer, "This command is only available on test server" }
+            { ChatCommandCondition.ActiveTank, "Your tank needs to be active" },
+            { ChatCommandCondition.Admin, "You are not an admin" },
+            { ChatCommandCondition.BattleOwner, "You need to be the battle owner" },
+            { ChatCommandCondition.HackBattle, "HackBattle is not enabled or you don't have permission to it" },
+            { ChatCommandCondition.NonHackBattle, "This command is not allowed in HackBattles" },
+            { ChatCommandCondition.InactiveBattle, "You need to be in a battle lobby with no active players in-battle" },
+            { ChatCommandCondition.ActiveBattle, "You need to be in a battle with active players in-battle" },
+            { ChatCommandCondition.InBattle, "You need to be in a battle" },
+            { ChatCommandCondition.InMatch, "You need to be in a match" },
+            { ChatCommandCondition.Premium, "You need an active premium pass" },
+            { ChatCommandCondition.Tester, "You need to be a tester" },
+            { ChatCommandCondition.TestServer, "This command is only available on test server" }
         };
-
-        /// <summary>
-        /// Preprocesses command conditions
-        /// </summary>
-        static ChatCommands()
-        {
-            foreach (var _command in Commands)
-            {
-                var command = _command.Value;
-
-                if (command.Item2.HasFlag(ChatCommandConditions.ActiveTank))
-                    command.Item2 |= ChatCommandConditions.InMatch;
-                if ((command.Item2 & (ChatCommandConditions.BattleOwner | ChatCommandConditions.HackBattle | ChatCommandConditions.InMatch)) != 0)
-                    command.Item2 |= ChatCommandConditions.InBattle;
-
-                Commands[_command.Key] = command;
-            }
-        }
 
         public static bool CheckForCommand(Player player, string message, out string reply)
         {
@@ -92,10 +74,10 @@ namespace TXServer.Core.ChatCommands
 
             if (Commands.TryGetValue(args[0], out var desc))
             {
-                ChatCommandConditions playerConditions = GetConditionsFor(player);
+                List<ChatCommandCondition> playerConditions = GetConditionsFor(player);
 
-                foreach (var condition in Enum.GetValues<ChatCommandConditions>())
-                    if (desc.Item2.HasFlag(condition) && !playerConditions.HasFlag(condition))
+                foreach (var condition in Enum.GetValues<ChatCommandCondition>())
+                    if (GetCompletedConditions(desc.Item2).Contains(condition) && !playerConditions.Contains(condition))
                         reply = ConditionErrors[condition];
 
                 reply ??= desc.Item3(player, args[1..]);
@@ -104,31 +86,46 @@ namespace TXServer.Core.ChatCommands
             reply ??= "Unknown command. Enter \"/help\" to view available commands";
             return true;
         }
+
+        public static List<ChatCommandCondition> GetCompletedConditions(ChatCommandCondition[] commandConditions)
+        {
+            List<ChatCommandCondition> additionalConditions = new List<ChatCommandCondition>();
+            List<ChatCommandCondition> inBattleConditions = new List<ChatCommandCondition>
+                {ChatCommandCondition.BattleOwner, ChatCommandCondition.HackBattle, ChatCommandCondition.InMatch};
+
+            if (commandConditions.Contains(ChatCommandCondition.ActiveTank))
+                additionalConditions.Add(ChatCommandCondition.InMatch);
+            if (commandConditions.Any(c => inBattleConditions.Contains(c)))
+                additionalConditions.Add(ChatCommandCondition.InBattle);
+
+            return additionalConditions;
+        }
+
         private static string Help(Player player, string[] args)
         {
-            ChatCommandConditions playerConditions = GetConditionsFor(player);
+            List<ChatCommandCondition> playerConditions = GetConditionsFor(player);
             string message;
 
             if (!args.Any())
             {
                 message = '/' + string.Join("\n/", from command in Commands
-                                                   where playerConditions.HasFlag(command.Value.Item2) &&
-                                                         !command.Value.Item2.HasFlag(ChatCommandConditions.HackBattle)
+                                                   where !command.Value.Item2.Except(playerConditions).Any() &&
+                                                         !command.Value.Item2.Contains(ChatCommandCondition.HackBattle)
                                                    select command.Value.Item1 ?? command.Key);
             }
             else
             {
-                ChatCommandConditions condition;
+                ChatCommandCondition condition;
                 switch (args[0])
                 {
                     case "admin":
-                        condition = ChatCommandConditions.Admin;
+                        condition = ChatCommandCondition.Admin;
                         if (!player.Data.Admin)
                             return ConditionErrors[condition];
                         break;
                     case "hackBattle":
-                        condition = ChatCommandConditions.HackBattle;
-                        if (!playerConditions.HasFlag(ChatCommandConditions.HackBattle))
+                        condition = ChatCommandCondition.HackBattle;
+                        if (!playerConditions.Contains(ChatCommandCondition.HackBattle))
                             return ConditionErrors[condition];
                         break;
                     case "target":
@@ -138,8 +135,8 @@ namespace TXServer.Core.ChatCommands
                             message += "\nFor battles: 'all/custom/mm/others/this' or nothing";
                         return message;
                     case "tp":
-                        condition = ChatCommandConditions.Premium;
-                        if (!playerConditions.HasFlag(condition))
+                        condition = ChatCommandCondition.Premium;
+                        if (!playerConditions.Contains(condition))
                             return ConditionErrors[condition];
                         if (!player.IsInBattle)
                             return "Teleport your tank to a player or a teleport point. Use '/help tp' " +
@@ -153,8 +150,8 @@ namespace TXServer.Core.ChatCommands
                 }
 
                 message = '/' + string.Join("\n/", from command in Commands
-                                                   where playerConditions.HasFlag(command.Value.Item2) &&
-                                                         command.Value.Item2.HasFlag(condition)
+                                                   where !command.Value.Item2.Except(playerConditions).Any() &&
+                                                         command.Value.Item2.Contains(condition)
                                                    select command.Value.Item1 ?? command.Key);
             }
             return message;
@@ -648,7 +645,7 @@ namespace TXServer.Core.ChatCommands
             if (args.Length <= 0 || args[0] == player.Data.Username)
                 return $"Network latency: {player.Connection.Ping} ms";
             if (!player.Data.Admin)
-                return ConditionErrors[ChatCommandConditions.Admin];
+                return ConditionErrors[ChatCommandCondition.Admin];
 
             Player targetPlayer = Server.Instance.FindPlayerByUsername(args[0]);
             return targetPlayer == null
@@ -893,40 +890,39 @@ namespace TXServer.Core.ChatCommands
 
 
 
-        public static ChatCommandConditions GetConditionsFor(Player player)
+        public static List<ChatCommandCondition> GetConditionsFor(Player player)
         {
-            ChatCommandConditions conditions = 0;
+            List<ChatCommandCondition> conditions = new();
 
             if (player.Server.Settings.TestServer || player.Data.Admin)
-                conditions |= ChatCommandConditions.TestServer;
+                conditions.Add(ChatCommandCondition.TestServer);
 
             if (player.Data.Admin)
-                conditions |= ChatCommandConditions.Admin;
+                conditions.Add(ChatCommandCondition.Admin);
             if (player.Data.Beta || player.Data.Admin)
-                conditions |= ChatCommandConditions.Tester;
+                conditions.Add(ChatCommandCondition.Tester);
             if (player.Data.IsPremium)
-                conditions |= ChatCommandConditions.Premium;
+                conditions.Add(ChatCommandCondition.Premium);
 
             if (player.IsInBattle)
             {
-                conditions |= ChatCommandConditions.InBattle;
+                conditions.Add(ChatCommandCondition.InBattle);
 
                 if (player.IsBattleOwner || player.Data.Admin)
-                    conditions |= ChatCommandConditions.BattleOwner;
+                    conditions.Add(ChatCommandCondition.BattleOwner);
                 if (player.BattlePlayer.Battle.TypeHandler is CustomBattleHandler handler)
                     if (handler.HackBattle && player.IsBattleOwner || handler.HackBattle && handler.HackBattleDemocracy)
-                        conditions |= ChatCommandConditions.HackBattle;
+                        conditions.Add(ChatCommandCondition.HackBattle);
                 if (player.Data.Admin)
-                    conditions |= ChatCommandConditions.HackBattle;
+                    conditions.Add(ChatCommandCondition.HackBattle);
 
                 if (player.IsInMatch)
-                    conditions |= ChatCommandConditions.InMatch;
+                    conditions.Add(ChatCommandCondition.InMatch);
                 if (player.BattlePlayer?.MatchPlayer?.TankState == TankState.Active)
-                    conditions |= ChatCommandConditions.ActiveTank;
-                if (InactiveBattleStates.Contains(player.BattlePlayer.Battle.BattleState))
-                    conditions |= ChatCommandConditions.InactiveBattle;
-                else
-                    conditions |= ChatCommandConditions.ActiveBattle;
+                    conditions.Add(ChatCommandCondition.ActiveTank);
+                conditions.Add(InactiveBattleStates.Contains(player.BattlePlayer.Battle.BattleState)
+                    ? ChatCommandCondition.InactiveBattle
+                    : ChatCommandCondition.ActiveBattle);
             }
 
             return conditions;

@@ -339,6 +339,7 @@ namespace TXServer.Core.Battles
 
         private static void ProcessKill(Entity weaponMarketItem, MatchPlayer victim, MatchPlayer killer)
         {
+            // module triggers
             foreach (BattleModule battleModule in victim.Modules)
                 battleModule.On_Death();
             (victim.Battle.ModeHandler as HPSHandler)?.On_Death(victim);
@@ -367,9 +368,9 @@ namespace TXServer.Core.Battles
 
             ProcessKillAssists(victim, killer);
 
-            // module triggers: LifeSteal + Rage
-            if (killer.TryGetModule(out LifeStealModule module)) module.Activate();
-            if (killer.TryGetModule(out RageModule rageModule)) rageModule.Activate();
+            // module triggers
+            foreach (BattleModule battleModule in killer.Modules)
+                battleModule.On_EnemyKill();
 
             killer.Battle.TriggerRandomGoldbox();
         }

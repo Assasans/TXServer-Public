@@ -29,6 +29,8 @@ namespace TXServer.Core.Battles
 
             public IList<SpawnPoint> SpawnPoints { get; private set; }
 
+            public virtual void ResetScore() { }
+
             public virtual void SetupBattle()
             {
                 SpawnPoints = Battle.CurrentMapInfo.SpawnPoints.Deathmatch;

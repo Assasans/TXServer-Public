@@ -209,7 +209,6 @@ namespace TXServer.Core.Battles
 
             var carrier = Carrier;
             Carrier = null;
-
             LastCarrier = null;
 
             _battle.TriggerRandomGoldbox();

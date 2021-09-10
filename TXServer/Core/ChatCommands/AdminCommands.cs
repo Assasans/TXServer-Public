@@ -20,30 +20,30 @@ namespace TXServer.Core.ChatCommands
 {
     public static class AdminCommands
     {
-        private static readonly Dictionary<string, (string, ChatCommandConditions, Func<Player, string[], string>)>
+        private static readonly Dictionary<string, (string, ChatCommandCondition[], Func<Player, string[], string>)>
             Commands = new(StringComparer.InvariantCultureIgnoreCase)
         {
-            { "battleMode", ("battlemode [opt: shortcut]", ChatCommandConditions.InactiveBattle, ChangeBattleMode) },
-            { "competition", ("competition [start/finish/reset]", ChatCommandConditions.None, FractionsCompetitionEditor) },
-            { "dailyBonus", (null, ChatCommandConditions.None, DailyBonusRecharge)},
-            { "finish", (null, ChatCommandConditions.ActiveBattle, Finish) },
-            { "friendlyFire", (null, ChatCommandConditions.InactiveBattle, ChangeFriendlyFire) },
-            { "giveItem", (null, ChatCommandConditions.Admin, GiveItem) },
-            { "goldrain", (null, ChatCommandConditions.ActiveBattle, GoldboxRain) },
-            { "immune", (null, ChatCommandConditions.InBattle, Immune) },
-            { "map", ("map [opt: map name]", ChatCommandConditions.InactiveBattle, ChangeMap) },
-            { "message", ("message [all/uid] [message]", ChatCommandConditions.None, Message) },
-            { "modules", (null, ChatCommandConditions.InactiveBattle, ChangeModules) },
-            { "noPause", ("noPause [opt: active/inactive]", ChatCommandConditions.InBattle, NoPause)},
-            { "open", (null, ChatCommandConditions.InBattle, Open) },
-            { "pause", (null, ChatCommandConditions.InBattle, Pause) },
-            { "positionInfo", (null, ChatCommandConditions.InMatch, PositionInfo) },
-            { "recruitReward", ("recruitReward [opt: check/reset]", ChatCommandConditions.None, RecruitReward) },
-            { "reload", ("reload [opt: all]", ChatCommandConditions.None, Reload) },
-            { "season", ("season [finish]", ChatCommandConditions.None, SeasonEditor ) },
-            { "start", (null, ChatCommandConditions.InBattle, Start) },
-            { "shutdown", (null, ChatCommandConditions.Admin, Shutdown) },
-            { "supplyRain", (null, ChatCommandConditions.ActiveBattle, SupplyRain) },
+            { "battleMode", ("battlemode [opt: shortcut]", new[]{ChatCommandCondition.InactiveBattle}, ChangeBattleMode) },
+            { "competition", ("competition [start/finish/reset]", new[]{ChatCommandCondition.None}, FractionsCompetitionEditor) },
+            { "dailyBonus", (null, new[]{ChatCommandCondition.None}, DailyBonusRecharge)},
+            { "finish", (null, new[]{ChatCommandCondition.ActiveBattle}, Finish) },
+            { "friendlyFire", (null, new[]{ChatCommandCondition.InactiveBattle}, ChangeFriendlyFire) },
+            { "giveItem", (null, new[]{ChatCommandCondition.Admin}, GiveItem) },
+            { "goldrain", (null, new[]{ChatCommandCondition.ActiveBattle}, GoldboxRain) },
+            { "immune", (null, new[]{ChatCommandCondition.InBattle}, Immune) },
+            { "map", ("map [opt: map name]", new[]{ChatCommandCondition.InactiveBattle}, ChangeMap) },
+            { "message", ("message [all/uid] [message]", new[]{ChatCommandCondition.None}, Message) },
+            { "modules", (null, new[]{ChatCommandCondition.InactiveBattle}, ChangeModules) },
+            { "noPause", ("noPause [opt: active/inactive]", new[]{ChatCommandCondition.InBattle}, NoPause)},
+            { "open", (null, new[]{ChatCommandCondition.InBattle}, Open) },
+            { "pause", (null, new[]{ChatCommandCondition.InBattle}, Pause) },
+            { "positionInfo", (null, new[]{ChatCommandCondition.InMatch}, PositionInfo) },
+            { "recruitReward", ("recruitReward [opt: check/reset]", new[]{ChatCommandCondition.None}, RecruitReward) },
+            { "reload", ("reload [opt: all]", new[]{ChatCommandCondition.None}, Reload) },
+            { "season", ("season [finish]", new[]{ChatCommandCondition.None}, SeasonEditor ) },
+            { "start", (null, new[]{ChatCommandCondition.InBattle}, Start) },
+            { "shutdown", (null, new[]{ChatCommandCondition.Admin}, Shutdown) },
+            { "supplyRain", (null, new[]{ChatCommandCondition.ActiveBattle}, SupplyRain) },
         };
 
         public static void CheckForCommand(string command, Player player)
@@ -52,12 +52,13 @@ namespace TXServer.Core.ChatCommands
             string[] args = command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (!Commands.ContainsKey(args[0].ToLower())) return;
 
-            (string, ChatCommandConditions, Func<Player, string[], string>) desc = Commands[args[0].ToLower()];
-            ChatCommandConditions playerConditions = ChatCommands.GetConditionsFor(player);
+            (string, ChatCommandCondition[], Func<Player, string[], string>) desc = Commands[args[0].ToLower()];
+            List<ChatCommandCondition> playerCondition = ChatCommands.GetConditionsFor(player);
 
-            foreach (ChatCommandConditions condition in Enum.GetValues<ChatCommandConditions>())
+            foreach (ChatCommandCondition condition in Enum.GetValues<ChatCommandCondition>())
             {
-                if (!desc.Item2.HasFlag(condition) || playerConditions.HasFlag(condition)) continue;
+                if (!ChatCommands.GetCompletedConditions(desc.Item2).Contains(condition) ||
+                    playerCondition.Contains(condition)) continue;
                 ScreenMessage(ChatCommands.ConditionErrors[condition], player, true);
                 return;
             }

@@ -13,7 +13,8 @@ namespace TXServer.Core.Battles
         {
             public Dictionary<Entity, Flag> Flags { get; private set; }
 
-            public override TeamColor LosingTeam => (BlueTeamEntity.GetComponent<TeamScoreComponent>().Score - RedTeamEntity.GetComponent<TeamScoreComponent>().Score) switch
+            public override TeamColor LosingTeam => (BlueTeamEntity.GetComponent<TeamScoreComponent>().Score -
+                                                     RedTeamEntity.GetComponent<TeamScoreComponent>().Score) switch
             {
                 > 5 => TeamColor.RED,
                 < -5 => TeamColor.BLUE,
@@ -55,6 +56,14 @@ namespace TXServer.Core.Battles
                     if (flag.Value.State == FlagState.Captured)
                         flag.Value.Drop(false, silent: true);
                 }
+            }
+
+            public override void ResetScore()
+            {
+                base.ResetScore();
+
+                foreach (var flag in Flags.Values.Where(flag => flag.State is not FlagState.Home))
+                    flag.Return();
             }
 
             public override void Tick()

@@ -2,7 +2,7 @@
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle;
 
-namespace TXServer.ECSSystem.EntityTemplates.Battle
+namespace TXServer.ECSSystem.EntityTemplates.Battle.BattleMode
 {
     [SerialVersionUID(8215935014037697786L)]
     public class TDMTemplate : TeamBattleTemplate
@@ -11,7 +11,7 @@ namespace TXServer.ECSSystem.EntityTemplates.Battle
         {
             Entity entity = CreateEntity(battleLobby, new TDMTemplate(), "tdm", scoreLimit, timeLimit, warmingUpTimeLimit);
             entity.Components.Add(new TDMComponent());
-            entity.Components.Add(new BattleScoreComponent(0, 0, 0));
+            entity.Components.Add(new BattleScoreComponent());
 
             return entity;
         }

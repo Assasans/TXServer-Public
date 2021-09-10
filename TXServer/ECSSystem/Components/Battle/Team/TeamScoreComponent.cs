@@ -6,11 +6,8 @@ namespace TXServer.ECSSystem.Components.Battle.Team
     [SerialVersionUID(-2440064891528955383)]
     public class TeamScoreComponent : Component
     {
-        public TeamScoreComponent(int score)
-        {
-            Score = score;
-        }
-        
+        public TeamScoreComponent() => Score = 0;
+
         public int Score { get; set; }
     }
 }

@@ -149,6 +149,7 @@ namespace TXServer.Core.Battles.Effect
         protected virtual bool AllowsEnabledState() => true;
 
         public virtual void On_Death() {}
+        public virtual void On_EnemyKill() {}
 
         public void ShareEffect(Player joiningPlayer)
         {
@@ -362,7 +363,7 @@ namespace TXServer.Core.Battles.Effect
 
         public bool IsOnCooldown => CurrentAmmunition < 1;
 
-        public string ConfigPath { get; set; }
+        protected string ConfigPath { get; private set; }
         public int Level { get; set; }
 
         private float MinDamage { get; set; }
