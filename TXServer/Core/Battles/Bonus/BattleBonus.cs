@@ -73,9 +73,9 @@ namespace TXServer.Core.Battles
                     (Type, Entity) desc = _bonusToModule[BonusType];
                     if (!player.BattlePlayer.MatchPlayer.TryGetModule(desc.Item1, out BattleModule module))
                     {
-                        module =
-                            (BattleModule) Activator.CreateInstance(desc.Item1, player.BattlePlayer.MatchPlayer,
-                                desc.Item2);
+                        module = (BattleModule) Activator.CreateInstance(desc.Item1,
+                            player.BattlePlayer.MatchPlayer, desc.Item2);
+                        module.Init();
                         player.BattlePlayer.MatchPlayer.Modules.Add(module);
                     }
                     module.IsSupply = true;

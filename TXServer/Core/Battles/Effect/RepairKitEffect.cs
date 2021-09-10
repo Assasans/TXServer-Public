@@ -52,6 +52,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
+            IsLegacyEffect = true;
+
             base.Init();
             ModuleHpPerMs = Config.GetComponent<ModuleHealingEffectHPPerMSPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
@@ -85,6 +87,7 @@ namespace TXServer.Core.Battles.Effect
         private float ModuleHpPerMs { get; set; }
 
         private DateTimeOffset LastTickTime { get; set; }
-        private TimeSpan DifferenceToLastHeal => LastTickTime == default ? default : DateTimeOffset.UtcNow - LastTickTime;
+        private TimeSpan DifferenceToLastHeal =>
+            LastTickTime == default ? default : DateTimeOffset.UtcNow - LastTickTime;
     }
 }

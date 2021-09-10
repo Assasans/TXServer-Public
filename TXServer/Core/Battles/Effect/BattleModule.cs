@@ -306,6 +306,7 @@ namespace TXServer.Core.Battles.Effect
         private bool _isEnabled = true;
         public bool IsSupply { get; set; }
         public bool EffectIsActive => EffectEntity is not null || EffectEntities.Any();
+        public bool IsLegacyEffect { get; set; }
 
         public bool ActivateOnTankSpawn { get; protected set; }
         protected bool AlwaysActiveExceptEmp { get; set; }

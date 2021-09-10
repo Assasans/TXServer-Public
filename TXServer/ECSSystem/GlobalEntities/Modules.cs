@@ -45,7 +45,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
                 long id = item.GetComponent<MarketItemGroupComponent>().Key;
 
-                if (player.Data.Modules.TryGetValue(id, out (int, int) moduleInfo) && moduleInfo.Item1 > 0)
+                if (player.Data.Modules.TryGetValue(id, out (int, int) moduleInfo) && moduleInfo.Item1 >= 0)
                     item.Components.Add(new UserGroupComponent(player.User.EntityId));
 
                 item.Components.Add(new ModuleGroupComponent(item.EntityId));
