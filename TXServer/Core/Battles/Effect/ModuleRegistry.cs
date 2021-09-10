@@ -44,7 +44,6 @@ namespace TXServer.Core.Battles.Effect
             }
             else
             {
-                module.ConfigPath = $"garage/module/upgrade/properties/{name.Split('/').Last()}";
                 module.Level = 0;
                 if (module is not GoldModule)
                     module.Level = matchPlayer.Player.Data

@@ -75,7 +75,6 @@ namespace TXServer.Core.Battles
                     {
                         module = (BattleModule) Activator.CreateInstance(desc.Item1,
                             player.BattlePlayer.MatchPlayer, desc.Item2);
-                        module.Init();
                         player.BattlePlayer.MatchPlayer.Modules.Add(module);
                     }
                     module.IsSupply = true;
@@ -84,8 +83,8 @@ namespace TXServer.Core.Battles
             }
         }
 
-        public Entity BonusRegion { get; set; }
-        public Entity BonusEntity { get; set; }
+        public Entity BonusRegion { get; private set; }
+        public Entity BonusEntity { get; private set; }
         public BonusType BonusType { get; }
         private Vector3 Position { get; }
         private int SpawnHeight { get; } = 30;

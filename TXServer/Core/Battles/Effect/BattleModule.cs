@@ -19,7 +19,7 @@ namespace TXServer.Core.Battles.Effect
     {
 		protected BattleModule(MatchPlayer matchPlayer, Entity moduleEntity)
         {
-			MatchPlayer = matchPlayer;
+            MatchPlayer = matchPlayer;
 
             if (moduleEntity != null)
                 SlotEntity = SlotUserItemTemplate.CreateEntity(moduleEntity, matchPlayer.Player.BattlePlayer);
@@ -33,6 +33,9 @@ namespace TXServer.Core.Battles.Effect
 		public virtual void Deactivate() { }
         public virtual void Init()
         {
+            ConfigPath =
+                $"garage/module/upgrade/properties/{ModuleEntity.TemplateAccessor.ConfigPath.Split('/').Last()}";
+
             CooldownDuration = GetConfigByLevel(Config.GetComponent<ModuleCooldownPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values);
             Duration = Config.GetComponent<ModuleEffectDurationPropertyComponent>(ConfigPath, false)
@@ -306,7 +309,6 @@ namespace TXServer.Core.Battles.Effect
         private bool _isEnabled = true;
         public bool IsSupply { get; set; }
         public bool EffectIsActive => EffectEntity is not null || EffectEntities.Any();
-        public bool IsLegacyEffect { get; set; }
 
         public bool ActivateOnTankSpawn { get; protected set; }
         protected bool AlwaysActiveExceptEmp { get; set; }

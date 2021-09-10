@@ -18,7 +18,7 @@ namespace TXServer.Core
 
         public ServerSettings Settings { get; init; }
         public IDatabase Database { get; init; }
-        public ServerData ServerData { get; set; }
+        public ServerData ServerData { get; private set; }
         public Action UserErrorHandler { get; init; }
         public ModuleRegistry ModuleRegistry { get; }
         public List<PlayerData> StoredPlayerData { get; } = new();

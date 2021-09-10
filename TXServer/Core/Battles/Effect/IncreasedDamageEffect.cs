@@ -48,8 +48,6 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
-            IsLegacyEffect = true;
-
             base.Init();
 
             ModuleFactor = Config.GetComponent<ModuleDamageEffectMaxFactorPropertyComponent>(ConfigPath)

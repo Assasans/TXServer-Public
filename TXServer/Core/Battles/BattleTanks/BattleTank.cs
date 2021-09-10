@@ -4,6 +4,7 @@ using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Events.Battle;
+using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.Core.Battles.BattleTanks
 {
@@ -24,7 +25,7 @@ namespace TXServer.Core.Battles.BattleTanks
             {
                 _currentHealth = value;
 
-                if (MatchPlayer.Modules.Any(m => m.IsLegacyEffect && m.EffectIsActive))
+                if (MatchPlayer.Modules.Any(m => Modules.LegacyEffects.Contains(m.GetType()) && m.EffectIsActive))
                 {
                     // this way prevents the client from crashing when using the other way below while a repair kit
                     // supply is active

@@ -304,5 +304,13 @@ namespace TXServer.ECSSystem.GlobalEntities
             [GlobalItems.Tempblock] = typeof(TempblockModule),
             [GlobalItems.Turbospeed] = typeof(TurboSpeedModule)
         };
+
+        public static readonly List<Type> LegacyEffects = new()
+        {
+            typeof(AbsorbingArmorEffect),
+            typeof(IncreasedDamageModule),
+            typeof(RepairKitModule),
+            typeof(TurboSpeedModule)
+        };
     }
 }

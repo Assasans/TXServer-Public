@@ -52,9 +52,8 @@ namespace TXServer.Core.Battles.Effect
 
         public override void Init()
         {
-            IsLegacyEffect = true;
-
             base.Init();
+
             ModuleHpPerMs = Config.GetComponent<ModuleHealingEffectHPPerMSPropertyComponent>(ConfigPath)
                 .UpgradeLevel2Values[Level];
             InstantHp = Config.GetComponent<ModuleHealingEffectInstantHPPropertyComponent>(ConfigPath)
