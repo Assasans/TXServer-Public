@@ -274,7 +274,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
         public static readonly Dictionary<Entity, Type> ModuleToType = new()
         {
-            [GlobalItems.Absorbingarmor] = typeof(AbsorbingArmorEffect),
+            [GlobalItems.Absorbingarmor] = typeof(AbsorbingArmorModule),
             [GlobalItems.Acceleratedgears] = typeof(AcceleratedGearsModule),
             [GlobalItems.Adrenaline] = typeof(AdrenalineModule),
             [GlobalItems.Backhitdefence] = typeof(BackhitDefenceModule),
@@ -307,7 +307,7 @@ namespace TXServer.ECSSystem.GlobalEntities
 
         public static readonly List<Type> LegacyEffects = new()
         {
-            typeof(AbsorbingArmorEffect),
+            typeof(AbsorbingArmorModule),
             typeof(IncreasedDamageModule),
             typeof(RepairKitModule),
             typeof(TurboSpeedModule)

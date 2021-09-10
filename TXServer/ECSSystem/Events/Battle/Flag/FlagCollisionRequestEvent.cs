@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using TXServer.Core;
 using TXServer.Core.Battles;
 using TXServer.Core.Protocol;
@@ -19,9 +20,7 @@ namespace TXServer.ECSSystem.Events.Battle.Flag
         {
             Core.Battles.Battle battle = player.BattlePlayer.Battle;
             var handler = (CTFHandler)battle.ModeHandler;
-
             Core.Battles.Flag flag = handler.Flags.Values.First(x => x.FlagEntity == flagEntity);
-
             BattleView view = handler.BattleViewFor(player.BattlePlayer);
 
             if (battle.BattleState == BattleState.WarmUp ||
@@ -53,7 +52,7 @@ namespace TXServer.ECSSystem.Events.Battle.Flag
                         foreach (UserResult assistResult in assistResults)
                             assistResult.FlagAssists += 1;
                     }
-                    else
+                    else if (Vector3.Distance(flag._basePosition, player.BattlePlayer.MatchPlayer.TankPosition) < 5)
                     {
                         flag.Capture(player.BattlePlayer);
                     }

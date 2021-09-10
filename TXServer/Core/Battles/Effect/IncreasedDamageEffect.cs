@@ -1,7 +1,6 @@
 using System;
 using TXServer.Core.Configuration;
 using TXServer.ECSSystem.Base;
-using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Module.IncreasedDamage;
 using TXServer.ECSSystem.EntityTemplates.Battle.Effect;
 using TXServer.ECSSystem.EntityTemplates.Item.Module;

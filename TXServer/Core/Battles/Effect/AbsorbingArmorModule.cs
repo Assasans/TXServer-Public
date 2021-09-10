@@ -7,9 +7,9 @@ using TXServer.ECSSystem.EntityTemplates.Item.Module;
 
 namespace TXServer.Core.Battles.Effect
 {
-	public class AbsorbingArmorEffect : BattleModule
+	public class AbsorbingArmorModule : BattleModule
     {
-		public AbsorbingArmorEffect(MatchPlayer matchPlayer, Entity garageModule) : base(
+		public AbsorbingArmorModule(MatchPlayer matchPlayer, Entity garageModule) : base(
 			matchPlayer,
 			ModuleUserItemTemplate.CreateEntity(garageModule, matchPlayer.Player.BattlePlayer)
 		) { }
@@ -55,7 +55,7 @@ namespace TXServer.Core.Battles.Effect
         public override float DamageWithEffect(float damage, MatchPlayer target, bool isHeatDamage, bool isModuleDamage,
             Entity weaponMarketItem) => EffectIsActive && MatchPlayer == target ? damage * Factor() : damage;
 
-        public float Factor()
+        private float Factor()
         {
             if (IsCheat) return 0;
             return IsSupply ? 0.5f : ModuleFactor;

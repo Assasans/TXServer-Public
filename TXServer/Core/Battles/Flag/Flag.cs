@@ -61,7 +61,6 @@ namespace TXServer.Core.Battles
             LastCarrierMinTime = DateTime.UtcNow.AddSeconds(3);
 
             ReturnStartTime = DateTime.UtcNow.AddSeconds(60);
-            State = FlagState.Dropped;
 
             Vector3 flagPosition;
             if (!Server.Instance.Settings.DisableHeightMaps)
@@ -96,6 +95,7 @@ namespace TXServer.Core.Battles
                 if (tuple == default)
                 {
                     Carrier = null;
+                    State = FlagState.Dropped;
 
                     FlagEntity.RemoveComponent<TankGroupComponent>();
                     FlagEntity.AddComponent(new FlagGroundedStateComponent());
@@ -107,12 +107,17 @@ namespace TXServer.Core.Battles
                 }
 
                 (HeightMapLayer _, float y) = tuple;
-                flagPosition = new Vector3(Carrier.MatchPlayer.TankPosition.X, y + 0.9f, Carrier.MatchPlayer.TankPosition.Z) - Vector3.UnitY;
+                flagPosition = new Vector3(Carrier.MatchPlayer.TankPosition.X, y + 0.9f,
+                                   Carrier.MatchPlayer.TankPosition.Z) - Vector3.UnitY;
             }
             else
                 flagPosition = Carrier.MatchPlayer.TankPosition - Vector3.UnitY;
 
+            // prevent glitch if flag state has changed in the meantime
+            if (State != FlagState.Captured) return;
+
             Carrier = null;
+            State = FlagState.Dropped;
 
             if (!silent)
                 _battle.PlayersInMap.SendEvent(new FlagDropEvent(isUserAction), FlagEntity);
@@ -139,7 +144,8 @@ namespace TXServer.Core.Battles
 
         public void Pickup(BattleTankPlayer battlePlayer)
         {
-            if (battlePlayer == LastCarrier && LastCarrierMinTime > DateTime.UtcNow) return;
+            if (battlePlayer == LastCarrier && LastCarrierMinTime > DateTime.UtcNow ||
+                State == FlagState.Captured) return;
 
             State = FlagState.Captured;
             Carrier = battlePlayer;
@@ -225,7 +231,7 @@ namespace TXServer.Core.Battles
         private readonly Battle _battle;
         public Entity PedestalEntity { get; }
         public Entity FlagEntity { get; }
-        private readonly Vector3 _basePosition;
+        public readonly Vector3 _basePosition;
 
         public Entity Team { get; }
 
