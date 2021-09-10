@@ -11,7 +11,6 @@ using TXServer.Core.ServerMapInformation;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Chassis;
-using TXServer.ECSSystem.Components.Battle.Health;
 using TXServer.ECSSystem.Components.Battle.Module;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.Battle.Tank;
@@ -34,7 +33,7 @@ namespace TXServer.Core.Battles
 {
     public class MatchPlayer : IPlayerPart
     {
-        public MatchPlayer(BattleTankPlayer battlePlayer, Entity battleEntity, IEnumerable<UserResult> userResults)
+        public MatchPlayer(BattleTankPlayer battlePlayer)
         {
             OriginalSpeedComponent = Config.GetComponent<SpeedComponent>(
                 battlePlayer.Player.CurrentPreset.HullItem.TemplateAccessor.ConfigPath);
@@ -42,7 +41,8 @@ namespace TXServer.Core.Battles
             Battle = battlePlayer.Battle;
             Player = battlePlayer.Player;
 
-            BattleUser = BattleUserTemplate.CreateEntity(battlePlayer.Player, battleEntity, battlePlayer.Team);
+            BattleUser = BattleUserTemplate.CreateEntity(battlePlayer.Player, battlePlayer.Battle.BattleEntity,
+                battlePlayer.Team);
 
             TankEntity = TankTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.HullItem, BattleUser, battlePlayer);
             WeaponEntity = WeaponTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponItem, TankEntity, battlePlayer);
@@ -54,7 +54,7 @@ namespace TXServer.Core.Battles
             Shell = ShellBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponShells[battlePlayer.Player.CurrentPreset.WeaponItem], TankEntity);
             Modules = new List<BattleModule>();
             Incarnation = TankIncarnationTemplate.CreateEntity(TankEntity);
-            RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battleEntity, TankEntity);
+            RoundUser = RoundUserTemplate.CreateEntity(battlePlayer, battlePlayer.Battle.BattleEntity, TankEntity);
 
             Tank = new BattleTank(this);
             Weapon = (BattleWeapon) Activator.CreateInstance(Weapons.WeaponToType[Player.CurrentPreset.Weapon], this);
@@ -68,7 +68,7 @@ namespace TXServer.Core.Battles
             }
 
             PersonalBattleResult = new PersonalBattleResultForClient(Player);
-            UserResult = new UserResult(battlePlayer, userResults);
+            UserResult = new UserResult(battlePlayer);
 
             TemperatureConfigComponent =
                 Config.GetComponent<TemperatureConfigComponent>(TankEntity.TemplateAccessor.ConfigPath);
@@ -89,7 +89,7 @@ namespace TXServer.Core.Battles
         private static readonly Dictionary<TankState, (Type, double)> TankStates = new()
         {
             { TankState.New, (typeof(TankNewStateComponent), 0) },
-            { TankState.Spawn, (typeof(TankSpawnStateComponent), 1.5) },
+            { TankState.Spawn, (typeof(TankSpawnStateComponent), 1.75) },
             { TankState.SemiActive, (typeof(TankSemiActiveStateComponent), 0.5) },
             { TankState.Active, (typeof(TankActiveStateComponent), 0) },
             { TankState.Dead, (typeof(TankDeadStateComponent), 3) }

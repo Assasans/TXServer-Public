@@ -349,9 +349,7 @@ namespace TXServer.Core.Battles
             {
                 BattleTankPlayer tankPlayer = (BattleTankPlayer)battlePlayer;
 
-                MatchPlayer matchPlayer =
-                    new(tankPlayer, BattleEntity, (ModeHandler as TeamBattleHandler)?.BattleViewFor(tankPlayer)
-                        .AllyTeamResults ?? ((SoloBattleHandler) ModeHandler).Results);
+                MatchPlayer matchPlayer = new(tankPlayer);
                 tankPlayer.MatchPlayer = matchPlayer;
 
                 if (!Params.DisabledModules)

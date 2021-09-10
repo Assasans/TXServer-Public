@@ -12,10 +12,9 @@ namespace TXServer.ECSSystem.Types
 {
     public class UserResult
     {
-        public UserResult(BattleTankPlayer battlePlayer, IEnumerable<UserResult> userResults)
+        public UserResult(BattleTankPlayer battlePlayer)
         {
             _battlePlayer = battlePlayer;
-            _userResults = userResults;
 
             EnterTime = DateTime.UtcNow.Ticks;
 
@@ -25,7 +24,9 @@ namespace TXServer.ECSSystem.Types
 
         }
 
-        private readonly IEnumerable<UserResult> _userResults;
+        private IEnumerable<UserResult> UserResults =>
+            (_battlePlayer.Battle.ModeHandler as Core.Battles.Battle.TeamBattleHandler)?.BattleViewFor(_battlePlayer)
+            .AllyTeamResults ?? ((Core.Battles.Battle.SoloBattleHandler) _battlePlayer.Battle.ModeHandler).Results;
         private readonly BattleTankPlayer _battlePlayer;
 
         public long UserId => _battlePlayer.User.EntityId;
@@ -37,7 +38,7 @@ namespace TXServer.ECSSystem.Types
 
         public long EnterTime { get; set; }
 
-        public int Place => _userResults.OrderBy(x => x.ScoreWithoutPremium).ToList().IndexOf(this);
+        public int Place => UserResults.OrderBy(x => x.ScoreWithoutPremium).ToList().IndexOf(this);
         public int Kills { get; set; } = 0;
         public int KillAssists { get; set; }
         public int KillStrike { get; set; }
