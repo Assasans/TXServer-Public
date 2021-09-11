@@ -67,6 +67,13 @@ namespace TXServer.Database.Provider
             {
             });
 
+            builder.Entity<Invite>(entity =>
+            {
+                entity.HasMany(invite => invite.Players)
+                    .WithOne(player => player.Invite)
+                    .HasForeignKey(player => player.InviteId);
+            });
+
             builder.Entity<PlayerData.PlayerHull>(entity =>
             {
                 entity.HasMany(player => player.Skins)
@@ -299,7 +306,7 @@ namespace TXServer.Database.Provider
         {
             lock (this)
             {
-                invite = Invites.SingleOrDefault(invite => invite.Code == code);
+                invite = Invites.IncludeInvite().SingleOrDefault(invite => invite.Code == code);
                 return invite != null;
             }
         }

@@ -1,6 +1,7 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using TXServer.Core;
+using TXServer.Database.Entity;
 using Z.EntityFramework.Plus;
 
 namespace TXServer.Database
@@ -34,6 +35,12 @@ namespace TXServer.Database
                 .IncludeOptimized(player => player.CompletedTutorials)
                 .IncludeOptimized(player => player.Presets)
                 .IncludeOptimized(player => player.Presets.Select(preset => preset.Modules));
+        }
+
+        public static IQueryable<TInvite> IncludeInvite<TInvite>(this IQueryable<TInvite> queryable) where TInvite : Invite
+        {
+            return queryable
+                .IncludeOptimized(invite => invite.Players);
         }
     }
 }

@@ -63,53 +63,47 @@ namespace TXServer.Core
 
                 if (!Database.Invites.Any())
                 {
-                    // Pair: Invite code - (Username, Discord ID)
-                    // Remark: Developers can login with any username
-                    Dictionary<string, (string, long?)> invites = new Dictionary<string, (string, long?)>()
+                    // Pair: Invite code - (Account limit, Discord ID)
+                    // Remark: Developers don't have account limit
+                    Dictionary<string, (int?, long?)> invites = new Dictionary<string, (int?, long?)>()
                     {
                         ["NoNick"] = (null, 559800250924007434),
                         ["Tim203"] = (null, 267678060914933770),
                         ["M8"] = (null, 378982361922273290),
                         // ["Kaveman"] = (null, 596233653332344842), // Left the server
                         ["Assasans"] = (null, 738672017791909900),
-                        ["Concodroid"] = ("Concodroid", 283288000845316097),
-                        ["Corpserdefg"] = ("Corpserdefg", 627471155275497492),
-                        ["SH42913"] = ("SH42913", 345965142078521345),
-                        ["Bodr"] = ("Bodr", 463998485939879936),
-                        ["C6OI"] = ("C6OI", 789524259809525780),
-                        ["Legendar-X"] = ("Legendar-X", 603166898665947145),
-                        // ["Pchelik"] = ("Pchelik", 794278628984750081), // Left the server
-                        ["networkspecter"] = ("networkspecter", 772039662762983445),
-                        ["DageLV"] = ("DageLV", 740287827270566089),
-                        ["F24_dark"] = ("F24_dark", 684078674382684251),
-                        ["Black_Wolf"] = ("Black_Wolf", 313045520576937985),
-                        ["NN77296"] = ("NN77296", 492828413242114068),
-                        ["MEWPASCO"] = ("MEWPASCO", 355351557233180672),
-                        ["Doctor"] = ("Doctor", 525214812355952642),
-                        // ["TowerCrusher"] = ("TowerCrusher", 398561533489184809), // Doesn't have Tester role
-                        ["Kurays"] = ("Kurays", 485731951404384258),
-                        ["AlveroHUN"] = ("AlveroHUN", 427738852900470785),
-                        ["Inctrice"] = ("Inctrice", 794522032225910817),
-                        ["NicolasIceberg"] = ("NicolasIceberg", 496714562893119488),
-                        ["Bilmez"] = ("Bilmez", null), // Didn't found any mentions on the Discord server
-                        ["Kotovsky"] = ("Kotovsky", 570595325375545384)
+                        ["Concodroid"] = (1, 283288000845316097),
+                        ["Corpserdefg"] = (1, 627471155275497492),
+                        ["SH42913"] = (1, 345965142078521345),
+                        ["Bodr"] = (1, 463998485939879936),
+                        ["C6OI"] = (1, 789524259809525780),
+                        ["Legendar-X"] = (1, 603166898665947145),
+                        // ["Pchelik"] = (1, 794278628984750081), // Left the server
+                        ["networkspecter"] = (1, 772039662762983445),
+                        ["DageLV"] = (1, 740287827270566089),
+                        ["F24_dark"] = (1, 684078674382684251),
+                        ["Black_Wolf"] = (1, 313045520576937985),
+                        ["NN77296"] = (1, 492828413242114068),
+                        ["MEWPASCO"] = (1, 355351557233180672),
+                        ["Doctor"] = (1, 525214812355952642),
+                        // ["TowerCrusher"] = (1", 398561533489184809), // Doesn't have Tester role
+                        ["Kurays"] = (1, 485731951404384258),
+                        ["AlveroHUN"] = (1, 427738852900470785),
+                        ["Inctrice"] = (1, 794522032225910817),
+                        ["NicolasIceberg"] = (1, 496714562893119488),
+                        ["Bilmez"] = (1, null), // Didn't found any mentions on the Discord server
+                        ["Kotovsky"] = (1, 570595325375545384)
                     };
-                    foreach ((string invite, (string username, long? discordId)) in invites)
+                    foreach ((string inviteCode, (int? accountLimit, long? discordId)) in invites)
                     {
-                        Database.Invites.Add(Invite.Create(invite, username));
+                        Invite invite = Invite.Create(inviteCode, accountLimit);
+                        Database.Invites.Add(invite);
 
-                        if (Database.Players.Any(player => player.Username == username)) continue;
-
-                        var data = new PlayerData(DateTimeOffset.UtcNow.Ticks);
-                        data.InitDefault();
-                        data.Username = username ?? invite; // Use invite code as username as a fallback
-                        // Password "111": "9uCh4qxBlFqap/+KiqoM68EqO8yYGpKa1c+BCgkOEa4="
-                        data.PasswordHash = Array.Empty<byte>(); // Allow any password
-                        data.DiscordId = discordId;
-                        data.IsDiscordVerified = true;
-                        data.PremiumExpirationDate = DateTime.Now + TimeSpan.FromDays(1000);
-
-                        Database.Players.Add(data);
+                        PlayerData player = new PlayerData(DateTimeOffset.UtcNow.Ticks);
+                        player.InitDefault();
+                        player.Username = inviteCode;
+                        player.Invite = invite;
+                        Database.Players.Add(player);
                     }
                 }
 

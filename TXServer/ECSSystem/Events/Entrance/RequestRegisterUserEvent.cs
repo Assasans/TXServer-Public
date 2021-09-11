@@ -13,6 +13,12 @@ namespace TXServer.ECSSystem.Events.Entrance
     {
         public void Execute(Player player, Entity entity)
         {
+            if (!player.CheckInviteCodeRegister())
+            {
+                player.SendEvent(new RequestRegisterUserEvent());
+                player.SendEvent(new RegistrationFailedEvent());
+            }
+
             if (!Server.Instance.Database.IsUsernameAvailable(Uid))
             {
                 player.SendEvent(new RequestRegisterUserEvent());

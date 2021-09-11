@@ -6,6 +6,7 @@ using System.Reflection;
 using TXServer.Core.Battles;
 using TXServer.Core.Commands;
 using TXServer.Core.ServerMapInformation;
+using TXServer.Database.Entity;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.EntityTemplates;
@@ -23,6 +24,7 @@ namespace TXServer.Core.ChatCommands
         private static readonly Dictionary<string, (string, ChatCommandConditions, Func<Player, string[], string>)>
             Commands = new(StringComparer.InvariantCultureIgnoreCase)
             {
+                { "addInvite", (null, ChatCommandConditions.Admin, AddInvite) },
                 { "battleMode", ("battlemode [opt: shortcut]", ChatCommandConditions.InactiveBattle, ChangeBattleMode) },
                 { "competition", ("competition [start/finish/reset]", ChatCommandConditions.None, FractionsCompetitionEditor) },
                 { "dailyBonus", (null, ChatCommandConditions.None, DailyBonusRecharge) },
@@ -324,6 +326,27 @@ namespace TXServer.Core.ChatCommands
             return player.BattlePlayer.IsCheatImmune
                 ? "Congrats, you got vaccinated"
                 : "You got successfully unvaccinated";
+        }
+
+        private static string AddInvite(Player player, string[] args)
+        {
+            if (args.Length < 1) return "error: no argument for invite code";
+
+            string code = args[0];
+            int accountLimit = -1;
+            if (args.Length > 1)
+            {
+                if (!int.TryParse(args[2], out accountLimit))
+                    return "error: item id argument needs to be a number";
+            }
+
+            Invite invite = Invite.Create(code, accountLimit < 0 ? null : accountLimit);
+            lock (player.Server.Database)
+            {
+                player.Server.Database.Invites.Add(invite);
+            }
+
+            return $"Added invite code: {code} (max accounts: {invite.AccountLimit?.ToString() ?? "unlimited"})";
         }
 
         private static string Message(Player player, string[] args)

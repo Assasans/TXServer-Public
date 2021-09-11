@@ -21,9 +21,8 @@ namespace TXServer.ECSSystem.Events.Entrance.Invite
 				player.SendEvent(new CommenceRegistrationEvent(), entity);
 
 				Logger.WithPlayer(player).Information(
-                    "New session with invite code {Code}{UsernameOptional}",
-                    inviteCode,
-                    invite.Username != null ? $" (username: {invite.Username})" : ""
+                    "New session with invite code {Code}",
+                    inviteCode
                 );
 			}
 			else

@@ -9,6 +9,7 @@ using TXServer.Core.Battles.Effect;
 using TXServer.Core.ChatCommands;
 using TXServer.Core.Configuration;
 using TXServer.Core.Logging;
+using TXServer.Database.Entity;
 using TXServer.Database.Observable;
 using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
@@ -534,6 +535,10 @@ namespace TXServer.Core
         public byte[] PasswordHash { get; set; }
         public string HardwareId { get; set; }
         public byte[] AutoLoginToken { get; set; }
+
+        public int InviteId { get; set; }
+        [ForeignKey("InviteId")]
+        public Invite Invite { get; set; }
 
         public bool RememberMe
         {

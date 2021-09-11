@@ -216,10 +216,17 @@ namespace TXServer.Core
         {
             if (((IPEndPoint) Connection.Socket.RemoteEndPoint).Address.Equals(IPAddress.Loopback)) return true;
             if (Invite == null) return false;
-            if (Invite.Username == null) return true;
-            if (username.Equals(Invite.Username, StringComparison.InvariantCultureIgnoreCase)) return true;
-            if (username.StartsWith($"{Invite.Username}_", StringComparison.InvariantCultureIgnoreCase)) return true;
-            return false;
+            if (Invite.AccountLimit == null) return true;
+            if (Invite.Players.Any(player => player.Username == username)) return true;
+            return Invite.Players.Count < Invite.AccountLimit;
+        }
+
+        public bool CheckInviteCodeRegister()
+        {
+            if (((IPEndPoint) Connection.Socket.RemoteEndPoint).Address.Equals(IPAddress.Loopback)) return true;
+            if (Invite == null) return false;
+            if (Invite.AccountLimit == null) return true;
+            return Invite.Players.Count < Invite.AccountLimit;
         }
 
         // private void SendInviteMissing() => ScreenMessage("You have not entered invite code");
