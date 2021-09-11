@@ -7,6 +7,7 @@ using TXServer.ECSSystem.Components.Battle.Time;
 using TXServer.ECSSystem.Components.User;
 using TXServer.ECSSystem.Events.Matchmaking;
 using TXServer.ECSSystem.Events.MatchMaking;
+using TXServer.ECSSystem.GlobalEntities;
 using TXServer.ECSSystem.Types;
 
 namespace TXServer.Core.Battles.Matchmaking
@@ -39,6 +40,9 @@ namespace TXServer.Core.Battles.Matchmaking
 
         public static void EnterMatchMaking(Player player, Entity mode = null)
         {
+            if (!player.Data.CompletedTutorialIds.Contains(216071486) &&
+                mode != MatchmakingModes.GlobalItems.Training) return;
+
             if (mode is not null)
                 player.SendEvent(new EnteredToMatchMakingEvent(), mode);
             WaitingPlayers.Add(player, DateTimeOffset.UtcNow.AddSeconds(2));

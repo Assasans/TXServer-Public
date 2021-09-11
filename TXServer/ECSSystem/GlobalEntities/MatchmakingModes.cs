@@ -1,5 +1,6 @@
 ﻿using TXServer.ECSSystem.Base;
 using TXServer.ECSSystem.Components;
+using TXServer.ECSSystem.Components.Matchmaking.Mode;
 using TXServer.ECSSystem.EntityTemplates;
 
 namespace TXServer.ECSSystem.GlobalEntities
@@ -12,6 +13,8 @@ namespace TXServer.ECSSystem.GlobalEntities
         {
             public Entity Rating { get; } = new Entity(-2076021809, new TemplateAccessor(new MatchMakingModeTemplate(), "battleselect/matchmaking/mode/rating"),
                 new MatchMakingRatingModeComponent());
+            public Entity Training { get; } = new Entity(-1512720201, new TemplateAccessor(new MatchMakingModeTemplate(), "battleselect/matchmaking/mode/trainingBattle"),
+                new MatchMakingTrainingModeComponent());
         }
     }
 }

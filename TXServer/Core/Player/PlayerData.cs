@@ -212,7 +212,7 @@ namespace TXServer.Core
         public List<long> BlockedPlayerIds { get; protected set; }
         public List<long> ReportedPlayerIds { get; protected set; }
 
-        public List<ulong> CompletedTutorialIds { get; set; }
+        public List<long> CompletedTutorialIds { get; set; }
         public List<ChatCommands.Punishment> Punishments { get; protected set; }
 
         public List<long> Avatars { get; protected set; }
@@ -410,7 +410,7 @@ namespace TXServer.Core
             ReportedPlayerIds.Add(userId);
         }
 
-        public void AddCompletedTutorial(ulong tutorialId)
+        public void AddCompletedTutorial(long tutorialId)
         {
             Player.User.ChangeComponent<TutorialCompleteIdsComponent>(component =>
                 component.CompletedIds.Add(tutorialId));

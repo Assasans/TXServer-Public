@@ -63,7 +63,7 @@ namespace TXServer.Core.Data.Impl
                 ReportedPlayerIds = new List<long>();
 
                 Punishments = new List<Punishment>();
-                CompletedTutorialIds = new List<ulong>();
+                CompletedTutorialIds = new List<long>();
 
                 Avatar = 6224;
                 Avatars = new List<long> {6224};

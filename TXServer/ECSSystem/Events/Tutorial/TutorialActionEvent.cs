@@ -17,8 +17,22 @@ namespace TXServer.ECSSystem.Events.Tutorial
         {
             switch (TutorialId, StepId, Action)
             {
+                case (419965140, -578695959, TutorialAction.END):
+                    if (!player.Data.OwnsMarketItem(Graffiti.GlobalItems.Armsrace))
+                        player.SaveNewMarketItem(Graffiti.GlobalItems.Armsrace);
+                    break;
+                case (-1423861367, 1325524063, TutorialAction.START):
+                    player.SaveNewMarketItem(Containers.GlobalItems.Tutorialbronze1);
+                    SendResult(player);
+                    break;
+                case (-2063696990, 723559096, TutorialAction.START):
+                    // turretChangeTutorial: step 7 ["first turret is on us"]
+                    player.Data.Crystals += 200;
+                    SendResult(player);
+                    break;
                 case (-719658163, 1331311973, TutorialAction.START):
-                    // todo: check if repair kit is owned and add if not (level 1, 0 blueprints)
+                    // firstEntranceTutorial: step 4 [mount repair kit]
+                    // todo: check if repair kit is owned and add if not add it (level 1, 0 blueprints)
                     // unmount all modules
                     foreach (Entity slot in player.CurrentPreset.Modules.Keys.ToList())
                     {
@@ -32,17 +46,20 @@ namespace TXServer.ECSSystem.Events.Tutorial
                         player.EntityList.Single(e =>
                             e.TemplateAccessor.Template.GetType() == typeof(ModuleUserItemTemplate) &&
                             e.TemplateAccessor.ConfigPath.Split('/').Last() == "repairkit"),
-                        player.CurrentPreset.Modules.Keys.ToList()[5]);
+                        player.CurrentPreset.Modules.Keys.ToList()[3]);
 
-                    player.SendEvent(new TutorialIdResultEvent(StepId, true, true), player.ClientSession);
-
+                    SendResult(player);
                     break;
-                case (419965140, -578695959, TutorialAction.END):
-                    if (!player.Data.OwnsMarketItem(Graffiti.GlobalItems.Armsrace))
-                        player.SaveNewMarketItem(Graffiti.GlobalItems.Armsrace);
+                case (-719658163, 1331311974, TutorialAction.END) or (-2063696990, 723559099, TutorialAction.END):
+                    // firstEntranceTutorial/turretChangeTutorial: step 5/11 [enter training battle]
+                    Core.Battles.Matchmaking.MatchMaking.EnterMatchMaking(player,
+                        MatchmakingModes.GlobalItems.Training);
                     break;
             }
         }
+
+        private void SendResult(Player player) =>
+            player.SendEvent(new TutorialIdResultEvent(StepId, true, true), player.ClientSession);
 
         public long TutorialId { get; set; }
         public long StepId { get; set; }

@@ -9,6 +9,7 @@ using TXServer.ECSSystem.Components;
 using TXServer.ECSSystem.Components.Battle.Round;
 using TXServer.ECSSystem.Components.BattleRewards;
 using TXServer.ECSSystem.Components.Item.Tank;
+using TXServer.ECSSystem.EntityTemplates.BattleReward;
 using TXServer.ECSSystem.GlobalEntities;
 
 namespace TXServer.ECSSystem.Types
@@ -44,9 +45,12 @@ namespace TXServer.ECSSystem.Types
                 _player.CheckTankRankUp(ResourceManager.GetUserItem(_player, _player.CurrentPreset.Weapon));
 
                 // Reputation
-                // todo: calculate earned reputation
-                ReputationDelta = TeamBattleResult == TeamBattleResult.DEFEAT ? -15 : 25;
-                _player.Data.Reputation += (int) ReputationDelta;
+                if (_player.Data.CompletedTutorialIds.Contains(-1423861367))
+                {
+                    // todo: calculate earned reputation
+                    ReputationDelta = TeamBattleResult == TeamBattleResult.DEFEAT ? -15 : 25;
+                    _player.Data.Reputation += (int) ReputationDelta;
+                }
 
                 // Container reward
                 _player.Data.LeagueChestScore += ScoreWithBonus;
@@ -55,13 +59,8 @@ namespace TXServer.ECSSystem.Types
                 if (earnedContainerAmount > 0)
                     _player.SaveNewMarketItem(Container, earnedContainerAmount);
 
-                // rewards
-                Entity reward = Leveling.GetTankRankRewards(_player);
-                if (reward is not null)
-                {
-                    _player.ShareEntities(reward);
-                    Reward = reward;
-                }
+                // reward
+                Reward ??= Leveling.GetTankRankRewards(_player);
 
                 _player.User.ChangeComponent<UserStatisticsComponent>(component =>
                 {
@@ -115,6 +114,7 @@ namespace TXServer.ECSSystem.Types
         }
 
         private readonly Player _player;
+        private Entity _reward;
         private MatchPlayer MatchPlayer => _player.BattlePlayer.MatchPlayer;
 
         private static readonly Dictionary<int, float> BattleSeriesMultipliers = new()
@@ -170,6 +170,15 @@ namespace TXServer.ECSSystem.Types
 
 		public int LeaguePlace { get; set; } = 1;
 
-		[OptionalMapped] public Entity Reward { get; set; }
-	}
+        [OptionalMapped] public Entity Reward
+        {
+            get => _reward;
+            set
+            {
+                _reward = value;
+                if (_reward != null)
+                    MatchPlayer.ShareEntities(value);
+            }
+        }
+    }
 }

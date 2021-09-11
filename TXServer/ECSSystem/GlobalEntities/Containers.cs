@@ -203,7 +203,8 @@ namespace TXServer.ECSSystem.GlobalEntities
         private static readonly Dictionary<Entity, Type> ContainerToType = new()
         {
             { GlobalItems.Everything, typeof(EverythingContainer) },
-            { GlobalItems.Cardsscout, typeof(ScoutContainer) }
+            { GlobalItems.Cardsscout, typeof(ScoutContainer) },
+            { GlobalItems.Tutorialbronze1, typeof(TutorialBronze1Container) }
         };
 
         public static ShopContainer GetShopContainer(Entity containerMarketItem, Player player)

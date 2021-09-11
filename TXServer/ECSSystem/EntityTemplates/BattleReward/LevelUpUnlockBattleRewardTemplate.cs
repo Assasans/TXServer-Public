@@ -11,7 +11,6 @@ namespace TXServer.ECSSystem.EntityTemplates.BattleReward
         public static Entity CreateEntity(List<Entity> unlockedItems)
         {
             Entity battleReward = CreateEntity(new LevelUpUnlockBattleRewardTemplate(), "battle_rewards/lvlup_unlock");
-
             battleReward.AddComponent(new LevelUpUnlockPersonalRewardComponent(unlockedItems));
 
             return battleReward;
