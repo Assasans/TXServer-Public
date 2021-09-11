@@ -46,7 +46,7 @@ namespace TXServer.Core.Battles
             Entity weaponItem = battlePlayer.Player.CurrentPreset.GetPlayerWeapon(Player);
 
             Tank = TankTemplate.CreateEntity(this, hullItem, BattleUser, battlePlayer);
-            Weapon = WeaponTemplate.CreateEntity(hullItem, Tank, battlePlayer);
+            Weapon = WeaponTemplate.CreateEntity(weaponItem, Tank, battlePlayer);
             HullSkin = HullSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.GetPlayerHullSkin(Player), Tank);
             WeaponSkin = WeaponSkinBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.GetPlayerWeaponSkin(Player), Tank);
             WeaponPaint = WeaponPaintBattleItemTemplate.CreateEntity(battlePlayer.Player.CurrentPreset.WeaponPaint, Tank);
