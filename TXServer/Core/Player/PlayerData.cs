@@ -540,6 +540,8 @@ namespace TXServer.Core
         [ForeignKey("InviteId")]
         public Invite Invite { get; set; }
 
+        public bool IsOldClient { get; set; }
+
         public bool RememberMe
         {
             get => _rememberMe;
