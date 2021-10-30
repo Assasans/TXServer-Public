@@ -6,6 +6,21 @@
 - 10 maximum players: `dotnet run --project TXServerConsole --run 0.0.0.0 5050 10`
 - Loopback, 5 maximum players: `dotnet run --project TXServerConsole --run 127.0.0.1 5050 5`
 
+# Server configuration
+
+All server configs are located in [TXServer/Library](TXServer/Library) directory.  
+
+- `BlueprintContainers.json` - Blueprints drop rate from the blueprint containers
+- `Config.json` (`#master` branch) - Deprecated SQLite database configuration
+- `Database.json` (`#database` branch) - MySQL database configuration
+- `HeightMaps.json` - Map height maps, used for calculating correct position on flag drop (images are located in [TXServer/Library/HeightMaps](TXServer/Library/HeightMaps) directory)
+- `ServerMapInfo.json`:
+  * Flag positions
+  * Spawn points
+  * Teleport points
+  * Bonus points
+- `TemplateByConfigPath.json` - `ConfigPath` to `Template` mapping
+
 # Protocol
 
 ## Message structure
