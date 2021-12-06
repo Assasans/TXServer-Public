@@ -2,9 +2,16 @@
 
 # Building and running
 
-- `dotnet run --project TXServerConsole --run <address> <port> <max players>`
-- 10 maximum players: `dotnet run --project TXServerConsole --run 0.0.0.0 5050 10`
-- Loopback, 5 maximum players: `dotnet run --project TXServerConsole --run 127.0.0.1 5050 5`
+Building:
+
+1. `dotnet build TXServerConsole`
+2. `cd TXServerConsole/bin/Debug/net5.0`
+
+Running:
+
+- `TXServerConsole.exe --run <address> <port> <max players>`
+- 10 maximum players: `TXServerConsole.exe --run 0.0.0.0 5050 10`
+- Loopback, 5 maximum players: `TXServerConsole.exe --run 127.0.0.1 5050 5`
 
 # Server configuration
 
