@@ -1,5 +1,9 @@
 # TXServer
 
+# Remarks
+
+You have to use client from [tankix.tgz](TXServer/StateServer/resources/StandaloneWindows/tankix.tgz) archive
+
 # Building and running
 
 Building:
