@@ -2,7 +2,7 @@
 
 # Remarks
 
-You have to use client from [tankix.tgz](TXServer/StateServer/resources/StandaloneWindows/tankix.tgz) archive
+You have to use client from [tankix.tgz](TXServer/StateServer/resources/StandaloneWindows/tankix.tgz) archive, otherwise you will get "Invalid packet magic: 47-45" exception
 
 # Building and running
 
